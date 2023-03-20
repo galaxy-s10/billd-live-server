@@ -6,7 +6,7 @@
 # Email: 2274751790@qq.com
 # FilePath: /billd-live-server/pm2.sh
 # Github: https://github.com/galaxy-s10
-# LastEditTime: 2023-03-20 23:58:41
+# LastEditTime: 2023-03-21 00:24:04
 # LastEditors: shuisheng
 ###
 
@@ -86,19 +86,19 @@ echo 删除旧的pm2服务:
 pm2 del $JOBNAME-$ENV-$PORT
 
 # WARN，测试
-# sh pm2.sh vue3-blog-serve beta workspace 4300 v0.0.1
-# sh pm2.sh vue3-blog-serve prod workspace 4200 v0.0.1
+# sh pm2.sh billd-live-serve beta workspace 4300 v0.0.1
+# sh pm2.sh billd-live-serve prod workspace 4200 v0.0.1
 
 echo 使用pm2维护:
 # pm2 start ./src/index.ts --name $JOBNAME-$ENV --interpreter ./node_modules/.bin/nodemon
 
-# npx cross-env NODE_APP_RELEASE_PROJECT_NAME=JOBNAME NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=4300 pm2 start ./dist/index.js --name vue3-blog-server-beta-4300
+# npx cross-env NODE_APP_RELEASE_PROJECT_NAME=JOBNAME NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=4300 pm2 start ./dist/index.js --name billd-live-server-beta-4300
 npx cross-env NODE_ENV=production NODE_APP_RELEASE_PROJECT_NAME=$JOBNAME NODE_APP_RELEASE_PROJECT_ENV=$ENV NODE_APP_RELEASE_PROJECT_PORT=$PORT pm2 start ./dist/index.js --name $JOBNAME-$ENV-$PORT
 
 # yarn和pnpm都能用
 # npx cross-env NODE_APP_RELEASE_PROJECT_NAME=$JOBNAME NODE_APP_RELEASE_PROJECT_ENV=$ENV NODE_APP_RELEASE_PROJECT_PORT=$PORT pm2 start ./src/index.ts --name $JOBNAME-$ENV-$PORT --interpreter ./node_modules/.bin/ts-node --interpreter-args '-P tsconfig.json'
 
-# 在使用yarn时，下面的命令报错：[PM2][ERROR] Script not found: /Users/huangshuisheng/Desktop/hss/github/vue3-blog-server/ts-node
+# 在使用yarn时，下面的命令报错：[PM2][ERROR] Script not found: /Users/huangshuisheng/Desktop/hss/github/billd-live-server/ts-node
 # cross-env NODE_APP_RELEASE_PROJECT_NAME=$JOBNAME NODE_APP_RELEASE_PROJECT_ENV=$ENV NODE_APP_RELEASE_PROJECT_PORT=$PORT pm2 start --name $JOBNAME-$ENV-$PORT ts-node -- -P tsconfig.json ./src/index.ts
 
 # 在使用yarn时，下面的命令生效（和上面的命令相比只是差了一个npx）

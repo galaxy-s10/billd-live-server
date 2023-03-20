@@ -93,7 +93,8 @@ function runServer() {
       console.log(chalkWARN(`当前的项目环境: ${PROJECT_ENV}`));
       try {
         exec(
-          `ffmpeg -stream_loop -1 -re -i https://resource.hsslive.cn/media/fddm_2.mp4 -c copy -f flv rtmp://localhost/live/fddm_2`,
+          // `ffmpeg -stream_loop -1 -re -i https://resource.hsslive.cn/media/fddm_2.mp4 -c copy -f flv rtmp://localhost/live/fddm_2`,
+          `ffmpeg -stream_loop -1 -re -i /node/fddm_2.mp4 -c copy -f flv rtmp://localhost/live/fddm_2`,
           (error, stream) => {
             console.log(error, stream);
           }
