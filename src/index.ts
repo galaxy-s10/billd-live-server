@@ -1,6 +1,8 @@
 // 一定要将import './init';放到最开头,因为它里面初始化了路径别名
 import './init';
 
+import { exec } from 'child_process';
+
 import Koa from 'koa';
 import koaBody from 'koa-body';
 import conditional from 'koa-conditional-get';
@@ -20,7 +22,6 @@ import {
   UPLOAD_DIR,
 } from '@/constant';
 import { CustomError } from '@/model/customError.model';
-import { loadAllRoutes } from '@/router';
 import {
   chalkERROR,
   chalkINFO,
@@ -74,7 +75,7 @@ function runServer() {
   async function main() {
     try {
       // app.use(apiBeforeVerify); // 注意：需要在所有路由加载前使用这个中间件
-      loadAllRoutes(app); // 加载所有路由
+      // loadAllRoutes(app); // 加载所有路由
       initNodeMediaServer();
       await new Promise((resolve) => {
         // 语法糖, 等同于http.createServer(app.callback()).listen(3000);
@@ -90,6 +91,17 @@ function runServer() {
       console.log(chalkWARN(`当前监听的端口: ${port}`));
       console.log(chalkWARN(`当前的项目名称: ${PROJECT_NAME}`));
       console.log(chalkWARN(`当前的项目环境: ${PROJECT_ENV}`));
+      try {
+        exec(
+          `ffmpeg -stream_loop -1 -re -i https://resource.hsslive.cn/media/fddm_2.mp4 -c copy -f flv rtmp://localhost/live/fddm_2`,
+          (error, stream) => {
+            console.log(error, stream);
+          }
+        );
+        console.log('222');
+      } catch (error) {
+        console.log(error);
+      }
     } catch (error) {
       console.log(chalkERROR(`项目启动失败！`));
       console.log(error);

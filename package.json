@@ -11,9 +11,9 @@
     "build": "rimraf dist && tsc -P ./tsconfig.json",
     "commit": "cz",
     "copy": "node ./handleGiteeJenkins.js",
-    "dev": "cross-env NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=development NODE_APP_RELEASE_PROJECT_PORT=3300 nodemon ./src/index.ts",
-    "dev:beta": "cross-env NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=3300 nodemon ./src/index.ts",
-    "dev:prod": "cross-env NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=prod NODE_APP_RELEASE_PROJECT_PORT=3200 nodemon ./src/index.ts",
+    "dev": "cross-env NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=development NODE_APP_RELEASE_PROJECT_PORT=4300 nodemon ./src/index.ts",
+    "dev:beta": "cross-env NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=4300 nodemon ./src/index.ts",
+    "dev:prod": "cross-env NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=prod NODE_APP_RELEASE_PROJECT_PORT=4200 nodemon ./src/index.ts",
     "lint": "eslint --config ./.eslintrc.js . --ext .js,.ts --cache",
     "lint:fix": "eslint --config ./.eslintrc.js . --ext .js,.ts --cache --fix",
     "prepare": "husky install",
@@ -21,8 +21,8 @@
     "push": "cz && standard-version",
     "release": "standard-version",
     "release:first": "standard-version --first-release",
-    "start:beta": "cross-env NODE_ENV=production NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=3300 nodemon ./dist/index.js",
-    "start:prod": "cross-env NODE_ENV=production NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=prod NODE_APP_RELEASE_PROJECT_PORT=3200 nodemon ./dist/index.js",
+    "start:beta": "cross-env NODE_ENV=production NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=4300 nodemon ./dist/index.js",
+    "start:prod": "cross-env NODE_ENV=production NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=prod NODE_APP_RELEASE_PROJECT_PORT=4200 nodemon ./dist/index.js",
     "typecheck": "tsc -p ./tsconfig.json --noEmit"
   },
   "config": {

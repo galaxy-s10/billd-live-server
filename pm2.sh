@@ -6,7 +6,7 @@
 # Email: 2274751790@qq.com
 # FilePath: /billd-live-server/pm2.sh
 # Github: https://github.com/galaxy-s10
-# LastEditTime: 2023-03-19 17:04:45
+# LastEditTime: 2023-03-20 23:58:41
 # LastEditors: shuisheng
 ###
 
@@ -86,13 +86,13 @@ echo 删除旧的pm2服务:
 pm2 del $JOBNAME-$ENV-$PORT
 
 # WARN，测试
-# sh pm2.sh vue3-blog-serve beta workspace 3300 v0.0.1
-# sh pm2.sh vue3-blog-serve prod workspace 3200 v0.0.1
+# sh pm2.sh vue3-blog-serve beta workspace 4300 v0.0.1
+# sh pm2.sh vue3-blog-serve prod workspace 4200 v0.0.1
 
 echo 使用pm2维护:
 # pm2 start ./src/index.ts --name $JOBNAME-$ENV --interpreter ./node_modules/.bin/nodemon
 
-# npx cross-env NODE_APP_RELEASE_PROJECT_NAME=JOBNAME NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=3300 pm2 start ./dist/index.js --name vue3-blog-server-beta-3300
+# npx cross-env NODE_APP_RELEASE_PROJECT_NAME=JOBNAME NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=4300 pm2 start ./dist/index.js --name vue3-blog-server-beta-4300
 npx cross-env NODE_ENV=production NODE_APP_RELEASE_PROJECT_NAME=$JOBNAME NODE_APP_RELEASE_PROJECT_ENV=$ENV NODE_APP_RELEASE_PROJECT_PORT=$PORT pm2 start ./dist/index.js --name $JOBNAME-$ENV-$PORT
 
 # yarn和pnpm都能用
@@ -105,7 +105,7 @@ npx cross-env NODE_ENV=production NODE_APP_RELEASE_PROJECT_NAME=$JOBNAME NODE_AP
 # npx cross-env NODE_APP_RELEASE_PROJECT_NAME=$JOBNAME NODE_APP_RELEASE_PROJECT_ENV=$ENV NODE_APP_RELEASE_PROJECT_PORT=$PORT pm2 start --name $JOBNAME-$ENV-$PORT ts-node -- -P tsconfig.json ./src/index.ts
 
 # 写死测试1，yarn和pnpm都能用
-# npx cross-env NODE_APP_RELEASE_PROJECT_NAME=JOBNAME NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=3300 pm2 start --name JOBNAME-beta-3300 --interpreter ./node_modules/.bin/ts-node --interpreter-args '-P tsconfig.json' ./src/index.ts
+# npx cross-env NODE_APP_RELEASE_PROJECT_NAME=JOBNAME NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=4300 pm2 start --name JOBNAME-beta-4300 --interpreter ./node_modules/.bin/ts-node --interpreter-args '-P tsconfig.json' ./src/index.ts
 
 # 写死测试2，yarn和pnpm都能用
-# npx cross-env NODE_APP_RELEASE_PROJECT_NAME=JOBNAME NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=3300 pm2 start ./src/index.ts --name JOBNAME-beta-3300 --interpreter ./node_modules/.bin/ts-node --interpreter-args '-P tsconfig.json'
+# npx cross-env NODE_APP_RELEASE_PROJECT_NAME=JOBNAME NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=4300 pm2 start ./src/index.ts --name JOBNAME-beta-4300 --interpreter ./node_modules/.bin/ts-node --interpreter-args '-P tsconfig.json'
