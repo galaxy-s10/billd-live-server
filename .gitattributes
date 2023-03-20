@@ -1,0 +1,15 @@
+# ！！！！！！这里面的配置会影响git的行为，会导致你本地的文件和提交的文件不一致！！！！！！！！
+
+# * text eol=crlf优点是会在git add .的时候，不会修改本地文件，但是会修改提交到暂存区的文件
+# 会将提交到暂存区的所有文件的结尾符换成crlf。
+# * text eol=crlf缺点是会在git add .的时候，将提交到暂存区的图片的lf也换成crlf，但是不会更改工作区的图片，
+# 这样就会有问题，因为你本地的图片没改，但是你提交的图片却改了，可能会导致这个图片不显示（可以看提交记录，
+# 图片会不显示），然后你提交到代码仓库后，代码仓库的图片也是有问题的，就会有毛病
+# * text eol=lf，即设置成和.editorconfig的end_of_line一样的值，就会不管是win还是mac，都统一
+# 使用eol设置的换行符，就不会有换行符的问题了（不会受autocrlf和safecrlf的影响）
+# * text eol=lf
+
+# 设置* text=auto的话，能兼容win和mac，绝大部分情况下没问题，但是如果git配置了safecrlf = true，就会导致问题
+# 因为safecrlf = true不允许提交包含混合的换行符文件，建议设置safecrlf = false，然后使用* text=auto
+# PS: 很多开源项目（react、angular、webpack...）都是使用* text=auto。
+* text=auto
