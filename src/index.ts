@@ -2,6 +2,7 @@
 import './init';
 
 import { exec } from 'child_process';
+import path from 'path';
 
 import Koa from 'koa';
 import koaBody from 'koa-body';
@@ -92,14 +93,18 @@ function runServer() {
       console.log(chalkWARN(`当前的项目名称: ${PROJECT_NAME}`));
       console.log(chalkWARN(`当前的项目环境: ${PROJECT_ENV}`));
       try {
-        exec(
+        const ffmpegSh = path.resolve(__dirname, '../ffmpeg.sh');
+        const child = exec(
+          `sh ${ffmpegSh}`,
           // `ffmpeg -stream_loop -1 -re -i https://resource.hsslive.cn/media/fddm_2.mp4 -c copy -f flv rtmp://localhost/live/fddm_2`,
-          `ffmpeg -stream_loop -1 -re -i /node/fddm_2.mp4 -c copy -f flv rtmp://localhost/live/fddm_2`,
+          // `ffmpeg -stream_loop -1 -re -i /node/fddm_2.mp4 -c copy -f flv rtmp://localhost/live/fddm_2`,
           (error, stream) => {
             console.log(error, stream);
           }
         );
-        console.log('222');
+        child.on('exit', () => {
+          console.log(ffmpegSh, '子进程退出了');
+        });
       } catch (error) {
         console.log(error);
       }
