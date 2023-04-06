@@ -1,21 +1,19 @@
 // websocket消息类型
 export const wsMsgType = {
-  /** 用户连接 */
-  connect: 'connect',
   /** 用户进入聊天 */
-  userInRoom: 'userInRoom',
-  /** 游客切换头像 */
-  visitorSwitchAvatar: 'visitorSwitchAvatar',
+  join: 'join',
+  /** 用户进入聊天 */
+  joined: 'joined',
+  /** 用户进入聊天 */
+  otherJoin: 'otherJoin',
   /** 用户退出聊天 */
-  userOutRoom: 'userOutRoom',
+  leave: 'leave',
+  /** 用户退出聊天 */
+  leaved: 'leaved',
+  /** 人满了 */
+  full: 'full',
   /** 用户发送消息 */
-  userSendMsg: 'userSendMsg',
-  /** 获取在线数据 */
-  getOnlineData: 'getOnlineData',
-  /** 用户存活 */
-  live: 'live',
-  /** 用户点歌 */
-  chooseSong: 'chooseSong',
+  message: 'message',
 };
 
 // websocket连接状态

@@ -2,7 +2,6 @@
 import './init';
 
 import { exec } from 'child_process';
-import path from 'path';
 
 import Koa from 'koa';
 import koaBody from 'koa-body';
@@ -29,6 +28,8 @@ import {
   chalkSUCCESS,
   chalkWARN,
 } from '@/utils/chalkTip';
+
+import { ffmpegSh } from './ffmpeg';
 
 function runServer() {
   const port = +PROJECT_PORT; // 端口
@@ -77,7 +78,6 @@ function runServer() {
     try {
       // app.use(apiBeforeVerify); // 注意：需要在所有路由加载前使用这个中间件
       // loadAllRoutes(app); // 加载所有路由
-      initNodeMediaServer();
       await new Promise((resolve) => {
         // 语法糖, 等同于http.createServer(app.callback()).listen(3000);
         const httpServer = app.listen(port, () => {
@@ -88,22 +88,22 @@ function runServer() {
           connectWebSocket(httpServer); // 初始化websocket
         }
       }); // http接口服务
+      initNodeMediaServer();
       console.log(chalkSUCCESS(`项目启动成功！`));
       console.log(chalkWARN(`当前监听的端口: ${port}`));
       console.log(chalkWARN(`当前的项目名称: ${PROJECT_NAME}`));
       console.log(chalkWARN(`当前的项目环境: ${PROJECT_ENV}`));
       try {
-        const ffmpegSh = path.resolve(__dirname, '../ffmpeg.sh');
-        const child = exec(
-          `sh ${ffmpegSh}`,
-          // `ffmpeg -stream_loop -1 -re -i https://resource.hsslive.cn/media/fddm_2.mp4 -c copy -f flv rtmp://localhost/live/fddm_2`,
-          // `ffmpeg -stream_loop -1 -re -i /node/fddm_2.mp4 -c copy -f flv rtmp://localhost/live/fddm_2`,
-          (error, stream) => {
-            console.log(error, stream);
-          }
-        );
+        const child = exec(ffmpegSh, {}, (error, stream) => {
+          console.log(chalkINFO(`${new Date().toLocaleString()}，有打印`));
+          console.log(error, stream);
+        });
         child.on('exit', () => {
-          console.log(ffmpegSh, '子进程退出了');
+          console.log(
+            chalkINFO(
+              `${new Date().toLocaleString()}，子进程退出了，${ffmpegSh}`
+            )
+          );
         });
       } catch (error) {
         console.log(error);
