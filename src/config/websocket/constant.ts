@@ -14,6 +14,9 @@ export const wsMsgType = {
   full: 'full',
   /** 用户发送消息 */
   message: 'message',
+  offer: 'offer',
+  answer: 'answer',
+  candidate: 'candidate',
 };
 
 // websocket连接状态
