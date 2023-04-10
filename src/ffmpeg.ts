@@ -2,7 +2,7 @@ import { BILIBILI_LIVE_KEY, BILIBILI_LIVE_URL } from '@/config/secret';
 
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from './constant';
 
-let localFile = 'https://resource.hsslive.cn/media/fddm_2.mp4';
+let localFile = 'https://project.hsslive.cn/fddm_2.mp4';
 let remoteFlv = 'rtmp://localhost/live/fddm_2';
 
 if (PROJECT_ENV !== PROJECT_ENV_ENUM.development) {
