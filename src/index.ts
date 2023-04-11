@@ -1,8 +1,6 @@
 // 一定要将import './init';放到最开头,因为它里面初始化了路径别名
 import './init';
 
-import { exec } from 'child_process';
-
 import Koa from 'koa';
 import koaBody from 'koa-body';
 import conditional from 'koa-conditional-get';
@@ -28,8 +26,6 @@ import {
   chalkSUCCESS,
   chalkWARN,
 } from '@/utils/chalkTip';
-
-import { ffmpegSh } from './ffmpeg';
 
 function runServer() {
   const port = +PROJECT_PORT; // 端口
@@ -93,21 +89,21 @@ function runServer() {
       console.log(chalkWARN(`当前监听的端口: ${port}`));
       console.log(chalkWARN(`当前的项目名称: ${PROJECT_NAME}`));
       console.log(chalkWARN(`当前的项目环境: ${PROJECT_ENV}`));
-      try {
-        const child = exec(ffmpegSh, {}, (error, stream) => {
-          console.log(chalkINFO(`${new Date().toLocaleString()}，有打印`));
-          console.log(error, stream);
-        });
-        child.on('exit', () => {
-          console.log(
-            chalkINFO(
-              `${new Date().toLocaleString()}，子进程退出了，${ffmpegSh}`
-            )
-          );
-        });
-      } catch (error) {
-        console.log(error);
-      }
+      // try {
+      //   const child = exec(ffmpegSh, {}, (error, stream) => {
+      //     console.log(chalkINFO(`${new Date().toLocaleString()}，有打印`));
+      //     console.log(error, stream);
+      //   });
+      //   child.on('exit', () => {
+      //     console.log(
+      //       chalkINFO(
+      //         `${new Date().toLocaleString()}，子进程退出了，${ffmpegSh}`
+      //       )
+      //     );
+      //   });
+      // } catch (error) {
+      //   console.log(error);
+      // }
     } catch (error) {
       console.log(chalkERROR(`项目启动失败！`));
       console.log(error);
