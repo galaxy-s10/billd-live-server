@@ -56,7 +56,9 @@ export const connectWebSocket = (server) => {
         } else if (adminStatus.live) {
           // socket.emit(WsMsgTypeEnum.adminIn, data);
         }
-        socket.to(data.roomId).emit(WsMsgTypeEnum.otherJoin, data);
+        socket
+          .to(data.roomId)
+          .emit(WsMsgTypeEnum.otherJoin, { socketId: socket.id });
 
         // io.emit(WsMsgTypeEnum.liveUser, liveUser);
       }
@@ -70,7 +72,7 @@ export const connectWebSocket = (server) => {
         '收到用户退出房间',
         data
       );
-      socket.emit(WsMsgTypeEnum.leaved, {});
+      socket.emit(WsMsgTypeEnum.leaved, { socketId: socket.id });
     });
 
     // 收到用户发送消息
@@ -159,6 +161,7 @@ export const connectWebSocket = (server) => {
       const liveUser = await getAllLiveUser(io);
       console.log('当前所有在线用户', liveUser);
       io.emit(WsMsgTypeEnum.liveUser, liveUser);
+      io.emit(WsMsgTypeEnum.leaved, { socketId: socket.id });
       if (socket.id === adminStatus.socketId) {
         adminStatus.socketId = '';
         adminStatus.live = false;
