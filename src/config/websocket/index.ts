@@ -3,6 +3,7 @@ import { Server, Socket } from 'socket.io';
 import { chalkINFO } from '@/utils/chalkTip';
 
 import { WsConnectStatusEnum, WsMsgTypeEnum } from './constant';
+import DBController from './mysql.controller';
 
 const adminStatus = { socketId: '', live: false };
 
@@ -39,12 +40,18 @@ export const connectWebSocket = (server) => {
     // 收到用户进入房间
     socket.on(
       WsMsgTypeEnum.join,
-      async (data: { roomId: string; data: any; isAdmin?: boolean }) => {
+      async (data: {
+        roomId: string;
+        roomName: string;
+        data: any;
+        isAdmin?: boolean;
+      }) => {
         socket.join(data.roomId);
         console.log(
           new Date().toLocaleString(),
           socket.id,
           '收到用户进入房间',
+          data.roomId,
           data
         );
         const liveUser = await getAllLiveUser(io);
@@ -53,19 +60,23 @@ export const connectWebSocket = (server) => {
         if (data.isAdmin) {
           adminStatus.socketId = socket.id;
           adminStatus.live = true;
+          DBController.addLiveRoom({
+            roomId: data.roomId,
+            socketId: socket.id,
+            data,
+          });
         } else if (adminStatus.live) {
           // socket.emit(WsMsgTypeEnum.adminIn, data);
         }
         socket
           .to(data.roomId)
           .emit(WsMsgTypeEnum.otherJoin, { socketId: socket.id });
-
-        // io.emit(WsMsgTypeEnum.liveUser, liveUser);
+        io.emit(WsMsgTypeEnum.liveUser, liveUser);
       }
     );
 
     // 收到用户退出房间
-    socket.on(WsMsgTypeEnum.leave, (data) => {
+    socket.on(WsMsgTypeEnum.leave, async (data) => {
       console.log(
         new Date().toLocaleString(),
         socket.id,
@@ -73,6 +84,8 @@ export const connectWebSocket = (server) => {
         data
       );
       socket.emit(WsMsgTypeEnum.leaved, { socketId: socket.id });
+      const liveUser = await getAllLiveUser(io);
+      io.emit(WsMsgTypeEnum.liveUser, liveUser);
     });
 
     // 收到用户发送消息
@@ -141,7 +154,11 @@ export const connectWebSocket = (server) => {
         reason
       );
       const liveUser = await getAllLiveUser(io);
-      console.log('当前所有在线用户', liveUser);
+      io.emit(WsMsgTypeEnum.liveUser, liveUser);
+      const res = await DBController.searchLiveRoom(socket.id);
+      if (res.count) {
+        DBController.deleteLiveRoom(res.rows[0].get().socketId);
+      }
       console.log(
         new Date().toLocaleString(),
         socket.id,
@@ -159,12 +176,11 @@ export const connectWebSocket = (server) => {
         reason
       );
       const liveUser = await getAllLiveUser(io);
-      console.log('当前所有在线用户', liveUser);
       io.emit(WsMsgTypeEnum.liveUser, liveUser);
       io.emit(WsMsgTypeEnum.leaved, { socketId: socket.id });
-      if (socket.id === adminStatus.socketId) {
-        adminStatus.socketId = '';
-        adminStatus.live = false;
+      const res = await DBController.searchLiveRoom(socket.id);
+      if (res.count) {
+        DBController.deleteLiveRoom(res.rows[0].get().socketId);
       }
       console.log(
         new Date().toLocaleString(),

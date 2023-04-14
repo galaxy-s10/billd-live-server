@@ -9,6 +9,7 @@ import staticService from 'koa-static';
 
 import { catchErrorMiddle, corsMiddle } from '@/app/app.middleware';
 import errorHandler from '@/app/handler/error-handle';
+import { connectMysql } from '@/config/mysql';
 import { initNodeMediaServer } from '@/config/stream';
 import { connectWebSocket } from '@/config/websocket';
 import {
@@ -19,7 +20,9 @@ import {
   STATIC_DIR,
   UPLOAD_DIR,
 } from '@/constant';
+import { initDb } from '@/init/initDb';
 import { CustomError } from '@/model/customError.model';
+import { loadAllRoutes } from '@/router';
 import {
   chalkERROR,
   chalkINFO,
@@ -73,7 +76,11 @@ function runServer() {
   async function main() {
     try {
       // app.use(apiBeforeVerify); // 注意：需要在所有路由加载前使用这个中间件
-      // loadAllRoutes(app); // 加载所有路由
+      await Promise.all([
+        connectMysql(), // 连接mysql
+      ]);
+      initDb(3); // 加载sequelize的relation表关联
+      loadAllRoutes(app); // 加载所有路由
       await new Promise((resolve) => {
         // 语法糖, 等同于http.createServer(app.callback()).listen(3000);
         const httpServer = app.listen(port, () => {

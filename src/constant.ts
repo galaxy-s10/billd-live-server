@@ -95,6 +95,7 @@ export const VERIFY_EMAIL_RESULT_CODE = {
 
 // redis前缀
 export const REDIS_PREFIX = {
+  liveRoom: `${PROJECT_NAME}-${PROJECT_ENV}-liveRoom`, // 登录不区分前后台
   emailLogin: `${PROJECT_NAME}-${PROJECT_ENV}-emailLogin`, // 登录不区分前后台
   emailRegister: `${PROJECT_NAME}-${PROJECT_ENV}-emailRegister`, // 注册不区分前后台
   userBindEmail: `${PROJECT_NAME}-${PROJECT_ENV}-userBindEmail`, // 用户绑定邮箱
