@@ -24,8 +24,14 @@ class DBController {
   };
 
   /** 获取所有在线房间 */
-  searchLiveRoom = async (socketId: string) => {
+  searchLiveRoomBySocketId = async (socketId: string) => {
     const res = await liveModel.findAndCountAll({ where: { socketId } });
+    return res;
+  };
+
+  /** 获取所有在线房间 */
+  searchLiveRoomByRoomId = async (roomId: string) => {
+    const res = await liveModel.findAndCountAll({ where: { roomId } });
     return res;
   };
 }

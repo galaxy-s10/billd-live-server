@@ -1,9 +1,4 @@
-import {
-  IAuth,
-  IFrontend,
-  IInteractionStatis,
-  InteractionStatisType,
-} from '@/interface';
+import { IAuth } from '@/interface';
 
 const initAuth = () => {
   const deafultAuth: IAuth[] = [
@@ -234,80 +229,6 @@ const initRoleAuth = () => {
   return roleAuth;
 };
 
-const initFrontend = (): IFrontend[] => [
-  {
-    key: 'allow_qq_login',
-    value: '1',
-    desc: "是否开启qq登录（'1'开启；'2'关闭）",
-    type: 'switch',
-  },
-  {
-    key: 'allow_github_login',
-    value: '1',
-    desc: "是否开启github登录（'1'开启；'2'关闭）",
-    type: 'switch',
-  },
-  {
-    key: 'allow_email_login',
-    value: '1',
-    desc: "是否开启email登录（'1'开启；'2'关闭）",
-    type: 'switch',
-  },
-  {
-    key: 'allow_comment',
-    value: '1',
-    desc: "是否开启留言（'1'开启；'2'关闭）",
-    type: 'switch',
-  },
-  {
-    key: 'allow_link',
-    value: '1',
-    desc: "是否开启友链（'1'开启；'2'关闭）",
-    type: 'switch',
-  },
-  {
-    key: 'allow_shutdown_modal',
-    value: '2',
-    desc: "是否开启停机弹窗（'1'开启；'2'关闭）",
-    type: 'switch',
-  },
-  {
-    key: 'shutdown_modal_content',
-    value: '停机中，预计30分钟左右恢复',
-    desc: '停机弹窗内容',
-    type: 'markdown',
-  },
-  {
-    key: 'allow_home_modal',
-    value: '2',
-    desc: "是否开启首页弹窗（'1'开启；'2'关闭）",
-    type: 'switch',
-  },
-  {
-    key: 'home_modal_content',
-    value: '今天是元旦节，祝大家元旦快乐',
-    desc: '首页弹窗内容',
-    type: 'markdown',
-  },
-  {
-    key: 'about_me',
-    value: '',
-    desc: '关于我',
-    type: 'markdown',
-  },
-];
-
-const initInteractionStatis = (): IInteractionStatis[] => [
-  {
-    key: 'historyHightOnlineNum',
-    value: JSON.stringify({}),
-    desc: '历史最高同时在线（游客+用户）',
-    type: InteractionStatisType.historyInfo,
-  },
-];
-
 export const bulkCreateAuth = initAuth();
 export const bulkCreateRole = initRole();
 export const bulkCreateRoleAuth = initRoleAuth();
-export const bulkFrontend = initFrontend();
-export const bulkInteractionStatis = initInteractionStatis();

@@ -1,24 +1,15 @@
-import Article from './article.model';
-import ArticleTag from './articleTag.model';
-import ArticleType from './articleType.model';
+import { chalkINFO } from '@/utils/chalkTip';
+
 import Auth from './auth.model';
-import Comment from './comment.model';
 import EmailUser from './emailUser.model';
 import GithubUser from './githubUser.model';
 import Log from './log.model';
-import QiniuData from './qiniuData.model';
 import QqUser from './qqUser.model';
 import Role from './role.model';
 import RoleAuth from './roleAuth.model';
-import Star from './star.model';
-import Tag from './tag.model';
 import ThirdUser from './thirdUser.model';
-import Type from './type.model';
 import User from './user.model';
-import UserArticle from './userArticle.model';
 import UserRole from './userRole.model';
-
-import { chalkINFO } from '@/utils/chalkTip';
 
 console.log(chalkINFO('加载了relation'));
 /**
@@ -65,154 +56,6 @@ console.log(chalkINFO('加载了relation'));
 //   sourceKey: 'id',
 //   constraints: false,
 // });
-
-User.belongsToMany(Article, {
-  // sourceKey: 'id', // 默认为源表的主键
-  // targetKey: 'id', // 默认为目标表的主键
-  foreignKey: 'user_id', // 目标表中外键的名称
-  otherKey: 'article_id', // 联接表中外键的名称
-  constraints: false, // 不生成外键
-  through: {
-    model: UserArticle,
-    unique: false, // 不生成唯一索引
-  },
-});
-
-Article.belongsToMany(User, {
-  foreignKey: 'article_id',
-  otherKey: 'user_id',
-  constraints: false,
-  through: {
-    model: UserArticle,
-    unique: false, // 不生成唯一索引
-  },
-});
-
-Article.belongsToMany(Type, {
-  foreignKey: 'article_id',
-  otherKey: 'type_id',
-  constraints: false,
-  through: {
-    model: ArticleType,
-    unique: false, // 不生成唯一索引
-  },
-});
-
-Type.belongsToMany(Article, {
-  foreignKey: 'type_id',
-  otherKey: 'article_id',
-  constraints: false,
-  through: {
-    model: ArticleType,
-    unique: false, // 不生成唯一索引
-  },
-});
-
-Article.belongsToMany(Tag, {
-  foreignKey: 'article_id',
-  otherKey: 'tag_id',
-  constraints: false,
-  through: {
-    model: ArticleTag,
-    unique: false, // 不生成唯一索引
-  },
-});
-
-Tag.belongsToMany(Article, {
-  foreignKey: 'tag_id',
-  otherKey: 'article_id',
-  constraints: false,
-  through: {
-    model: ArticleTag,
-    unique: false, // 不生成唯一索引
-  },
-});
-
-Comment.belongsTo(User, {
-  as: 'from_user',
-  foreignKey: 'from_user_id',
-  constraints: false,
-});
-Comment.belongsTo(User, {
-  as: 'to_user',
-  foreignKey: 'to_user_id',
-  constraints: false,
-});
-
-Article.hasMany(Comment, {
-  foreignKey: 'article_id',
-  constraints: false,
-});
-
-Comment.belongsTo(Article, {
-  foreignKey: 'article_id',
-  constraints: false,
-});
-
-Comment.hasMany(Star, {
-  foreignKey: 'comment_id',
-  constraints: false,
-});
-Comment.hasOne(Star, {
-  foreignKey: 'comment_id',
-  constraints: false,
-  as: 'is_star',
-});
-Star.belongsTo(Comment, {
-  foreignKey: 'comment_id',
-  constraints: false,
-  // as: 'all_star',
-});
-// Star.belongsTo(Comment, {
-//   foreignKey: 'comment_id',
-//   constraints: false,
-//   as: 'is_star',
-// });
-
-Comment.hasMany(Comment, {
-  as: 'children_comment',
-  foreignKey: 'parent_comment_id',
-  constraints: false,
-});
-
-// Comment.hasMany(Comment, {
-//   // 为了分页时候的所有子评论数量，使用连接查询，但是这样太耗性能了，单独搞个字段维护吧
-//   as: 'all_comment',
-//   foreignKey: 'parent_comment_id',
-//   constraints: false,
-// });
-
-Comment.belongsTo(Comment, {
-  as: 'reply_comment',
-  foreignKey: 'reply_comment_id',
-  constraints: false,
-});
-
-Star.belongsTo(Article, {
-  foreignKey: 'article_id',
-  constraints: false,
-});
-
-Article.hasMany(Star, {
-  foreignKey: 'article_id',
-  constraints: false,
-});
-
-// Star.belongsTo(User, {
-//   foreignKey: 'from_user_id',
-//   constraints: false,
-// });
-
-Star.belongsTo(User, {
-  as: 'from_user',
-  foreignKey: 'from_user_id',
-  constraints: false,
-});
-Star.belongsTo(User, {
-  as: 'to_user',
-  foreignKey: 'to_user_id',
-  constraints: false,
-});
 
 User.belongsToMany(Role, {
   foreignKey: 'user_id',
@@ -374,42 +217,6 @@ User.belongsToMany(QqUser, {
   },
 });
 
-Star.belongsTo(User, {
-  foreignKey: 'from_user_id',
-  constraints: false,
-});
-
-// 发出的star
-User.hasMany(Star, {
-  foreignKey: 'from_user_id',
-  constraints: false,
-  as: 'send_stars',
-});
-// 收到的star
-User.hasMany(Star, {
-  foreignKey: 'to_user_id',
-  constraints: false,
-  as: 'receive_stars',
-});
-
-// 发出的评论
-User.hasMany(Comment, {
-  foreignKey: 'from_user_id',
-  constraints: false,
-  as: 'send_comments',
-});
-// 收到的评论
-User.hasMany(Comment, {
-  foreignKey: 'to_user_id',
-  constraints: false,
-  as: 'receive_comments',
-});
-
-Comment.belongsTo(User, {
-  foreignKey: 'from_user_id',
-  constraints: false,
-});
-
 Role.belongsToMany(User, {
   foreignKey: 'role_id',
   otherKey: 'user_id',
@@ -430,11 +237,6 @@ User.belongsToMany(Role, {
 });
 
 // =================
-
-QiniuData.belongsTo(User, {
-  foreignKey: 'user_id',
-  constraints: false,
-});
 
 // 流量统计
 // DayData.belongsTo(VisitorLog, { foreignKey: 'today' });

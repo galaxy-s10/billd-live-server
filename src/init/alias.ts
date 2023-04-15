@@ -2,7 +2,7 @@ import path from 'path';
 
 import moduleAlias from 'module-alias';
 
-import { PROJECT_ENV, PROJECT_ENV_ENUM, PROJECT_NODE_ENV } from '../constant';
+import { PROJECT_NODE_ENV } from '../constant';
 import { chalkSUCCESS } from '../utils/chalkTip';
 
 if (PROJECT_NODE_ENV === 'development') {

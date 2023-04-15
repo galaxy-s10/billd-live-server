@@ -8,7 +8,7 @@ import { IList, IRole } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import authService from '@/service/auth.service';
 import roleService from '@/service/role.service';
-import { arrayUnique, arrayToTree, arrayGetDifference } from '@/utils';
+import { arrayGetDifference, arrayToTree, arrayUnique } from '@/utils';
 
 class RoleController {
   async getAllList(ctx: ParameterizedContext, next) {

@@ -1,8 +1,5 @@
 import { ParameterizedContext } from 'koa';
 
-import otherController from './other.controller';
-import redisController from './redis.controller';
-
 import { authJwt, signJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import {
@@ -16,7 +13,10 @@ import { CustomError } from '@/model/customError.model';
 import emailUserService from '@/service/emailUser.service';
 import thirdUserService from '@/service/thirdUser.service';
 import userService from '@/service/user.service';
-import { emailContentTemplate, randomNumber, getRandomString } from '@/utils';
+import { emailContentTemplate, getRandomString, randomNumber } from '@/utils';
+
+import otherController from './other.controller';
+import redisController from './redis.controller';
 
 interface IKey {
   prefix: string;

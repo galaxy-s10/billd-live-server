@@ -2,7 +2,7 @@ import { ParameterizedContext } from 'koa';
 import { Model, ModelStatic } from 'sequelize/types';
 
 import sequelize from '@/config/mysql';
-import { chalkERROR, chalkSUCCESS, chalkINFO } from '@/utils/chalkTip';
+import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 
 /**
  * 获取日期当天的开始时间到结束时间

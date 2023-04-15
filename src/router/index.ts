@@ -2,13 +2,8 @@ import fs from 'fs';
 
 import Router from 'koa-router';
 
-import {
-  PROJECT_ENV,
-  PROJECT_ENV_ENUM,
-  PROJECT_NAME,
-  PROJECT_NODE_ENV,
-} from '@/constant';
-import { chalkINFO, chalkERROR } from '@/utils/chalkTip';
+import { PROJECT_ENV, PROJECT_NAME, PROJECT_NODE_ENV } from '@/constant';
+import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 
 const router = new Router();
 
@@ -37,4 +32,5 @@ export function loadAllRoutes(app) {
       console.log(error);
     }
   });
+  console.log(chalkSUCCESS('加载所有route成功~'));
 }

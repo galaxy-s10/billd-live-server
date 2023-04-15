@@ -14,7 +14,7 @@ const config = {
   },
 };
 
-export const initNodeMediaServer = () => {
+export const connectNodeMediaServer = () => {
   // console.log(chalkINFO('初始化流媒体服务器'));
   // const nms = new NodeMediaServer(config);
   // nms.run();

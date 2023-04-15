@@ -9,12 +9,12 @@ import staticService from 'koa-static';
 
 import { catchErrorMiddle, corsMiddle } from '@/app/app.middleware';
 import errorHandler from '@/app/handler/error-handle';
+import { apiBeforeVerify } from '@/app/verify.middleware';
 import { connectMysql } from '@/config/mysql';
-import { initNodeMediaServer } from '@/config/stream';
+import { connectNodeMediaServer } from '@/config/stream';
 import { connectWebSocket } from '@/config/websocket';
 import {
   PROJECT_ENV,
-  PROJECT_ENV_ENUM,
   PROJECT_NAME,
   PROJECT_PORT,
   STATIC_DIR,
@@ -23,12 +23,7 @@ import {
 import { initDb } from '@/init/initDb';
 import { CustomError } from '@/model/customError.model';
 import { loadAllRoutes } from '@/router';
-import {
-  chalkERROR,
-  chalkINFO,
-  chalkSUCCESS,
-  chalkWARN,
-} from '@/utils/chalkTip';
+import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 
 function runServer() {
   const port = +PROJECT_PORT; // 端口
@@ -68,14 +63,11 @@ function runServer() {
   ); // 静态文件目录
   app.use(conditional()); // 接口缓存
   app.use(etag()); // 接口缓存
-
   app.use(corsMiddle); // 设置允许跨域
-
   app.on('error', errorHandler); // 接收全局错误，位置必须得放在最开头？
-
   async function main() {
     try {
-      // app.use(apiBeforeVerify); // 注意：需要在所有路由加载前使用这个中间件
+      app.use(apiBeforeVerify); // 注意：需要在所有路由加载前使用这个中间件
       await Promise.all([
         connectMysql(), // 连接mysql
       ]);
@@ -86,12 +78,9 @@ function runServer() {
         const httpServer = app.listen(port, () => {
           resolve('ok');
         });
-        if (PROJECT_ENV !== PROJECT_ENV_ENUM.beta) {
-          console.log(chalkINFO('当前是非beta环境，初始化websocket'));
-          connectWebSocket(httpServer); // 初始化websocket
-        }
+        connectWebSocket(httpServer); // 初始化websocket
       }); // http接口服务
-      initNodeMediaServer();
+      connectNodeMediaServer();
       console.log(chalkSUCCESS(`项目启动成功！`));
       console.log(chalkWARN(`当前监听的端口: ${port}`));
       console.log(chalkWARN(`当前的项目名称: ${PROJECT_NAME}`));

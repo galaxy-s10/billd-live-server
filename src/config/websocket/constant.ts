@@ -30,12 +30,12 @@ export enum WsMsgTypeEnum {
   leaved = 'leaved',
   /** 当前所有在线用户 */
   liveUser = 'liveUser',
-  /** 人满了 */
-  full = 'full',
   /** 用户发送消息 */
   message = 'message',
-  /** 管理员在线 */
-  adminIn = 'adminIn',
+  /** 房间正在直播 */
+  roomLiveing = 'roomLiveing',
+  /** 房间不在直播 */
+  roomNoLive = 'roomNoLive',
   offer = 'offer',
   answer = 'answer',
   candidate = 'candidate',

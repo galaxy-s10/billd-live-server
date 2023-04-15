@@ -1,14 +1,11 @@
 import Sequelize from 'sequelize';
 
-import { THIRD_PLATFORM, PROJECT_ENV } from '@/constant';
-import { IUser, IList } from '@/interface';
-import articleModel from '@/model/article.model';
-import commentModel from '@/model/comment.model';
+import { PROJECT_ENV, THIRD_PLATFORM } from '@/constant';
+import { IList, IUser } from '@/interface';
 import emailModel from '@/model/emailUser.model';
 import githubUserModel from '@/model/githubUser.model';
 import qqUserModel from '@/model/qqUser.model';
 import roleModel from '@/model/role.model';
-import starModel from '@/model/star.model';
 import userModel from '@/model/user.model';
 import { handlePaging } from '@/utils';
 
@@ -229,45 +226,7 @@ class UserService {
       },
       where: { id },
     });
-    const userArticlePromise = userModel.count({
-      include: [{ model: articleModel }],
-      where: { id },
-    });
-    const userSendCommentPromise = userModel.count({
-      include: [{ model: commentModel, as: 'send_comments' }],
-      where: { id },
-    });
-    const userReceiveCommentPromise = userModel.count({
-      include: [{ model: commentModel, as: 'receive_comments' }],
-      where: { id },
-    });
-    const userSendStarPromise = userModel.count({
-      include: [{ model: starModel, as: 'send_stars' }],
-      where: { id },
-    });
-    const userReceiveStarPromise = userModel.count({
-      include: [{ model: starModel, as: 'receive_stars' }],
-      where: { id },
-    });
-    const [
-      userSendComment,
-      userReceiveComment,
-      userSendStar,
-      userReceiveStar,
-      userArticle,
-    ] = await Promise.all([
-      userSendCommentPromise,
-      userReceiveCommentPromise,
-      userSendStarPromise,
-      userReceiveStarPromise,
-      userArticlePromise,
-    ]);
     const result = userInfo.get();
-    result.send_comments_total = userSendComment;
-    result.receive_comments_total = userReceiveComment;
-    result.send_stars_total = userSendStar;
-    result.receive_stars_total = userReceiveStar;
-    result.articles_total = userArticle;
     return result;
   }
 

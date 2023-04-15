@@ -3,7 +3,7 @@ import fs from 'fs';
 import { aliasOk } from './alias'; // 处理路径别名
 
 // eslint-disable-next-line import/order
-import { UPLOAD_DIR, SECRET_FILE, SECRETTEMP_FILE } from '../constant';
+import { SECRETTEMP_FILE, SECRET_FILE, UPLOAD_DIR } from '../constant';
 
 function handleSecretFile() {
   const isExist = fs.existsSync(SECRET_FILE);

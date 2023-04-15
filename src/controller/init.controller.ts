@@ -7,15 +7,11 @@ import {
   bulkCreateAuth,
   bulkCreateRole,
   bulkCreateRoleAuth,
-  bulkFrontend,
-  bulkInteractionStatis,
 } from '@/init/initData';
 import { initDb } from '@/init/initDb';
 import AuthModel from '@/model/auth.model';
 import { CustomError } from '@/model/customError.model';
 import dayDataModel from '@/model/dayData.model';
-import frontendModel from '@/model/frontend.model';
-import interactionStatisModel from '@/model/interactionStatis.model';
 import RoleModel from '@/model/role.model';
 import RoleAuthModel from '@/model/roleAuth.model';
 import userModel from '@/model/user.model';
@@ -145,40 +141,6 @@ class InitController {
     } else {
       throw new CustomError(
         '已经初始化过管理员了，不能再初始化了！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
-      );
-    }
-
-    await next();
-  }
-
-  // 初始化前端设置
-  async initFrontend(ctx: ParameterizedContext, next) {
-    const count = await frontendModel.count();
-    if (count === 0) {
-      await frontendModel.bulkCreate(bulkFrontend);
-      successHandler({ ctx, data: '初始化初始化前端设置成功！' });
-    } else {
-      throw new CustomError(
-        '已经初始化过前端设置，不能再初始化了！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
-      );
-    }
-
-    await next();
-  }
-
-  // 初始化互动统计
-  async initInteractionStatis(ctx: ParameterizedContext, next) {
-    const count = await interactionStatisModel.count();
-    if (count === 0) {
-      await interactionStatisModel.bulkCreate(bulkInteractionStatis);
-      successHandler({ ctx, data: '初始化互动统计成功！' });
-    } else {
-      throw new CustomError(
-        '已经初始化过初始化互动统计，不能再初始化了！',
         ALLOW_HTTP_CODE.paramsError,
         ALLOW_HTTP_CODE.paramsError
       );

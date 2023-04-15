@@ -1,7 +1,7 @@
 import fs from 'fs';
 
 import sequelize from '@/config/mysql';
-import { PROJECT_ENV, PROJECT_ENV_ENUM, PROJECT_NODE_ENV } from '@/constant';
+import { PROJECT_NODE_ENV } from '@/constant';
 import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
 import { deleteAllForeignKeys, deleteAllIndexs } from '@/utils/index';
 

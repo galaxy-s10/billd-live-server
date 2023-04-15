@@ -1,17 +1,17 @@
 import { ParameterizedContext } from 'koa';
 import nodemailer from 'nodemailer';
 
-import redisController from './redis.controller';
-
 import successHandler from '@/app/handler/success-handle';
 import { QQ_EMAIL_PASS, QQ_EMAIL_USER } from '@/config/secret';
 import {
   ALLOW_HTTP_CODE,
-  VERIFY_EMAIL_RESULT_CODE,
   QQ_MAIL_CONFIG,
+  VERIFY_EMAIL_RESULT_CODE,
 } from '@/constant';
 import { CustomError } from '@/model/customError.model';
 import { getRandomString } from '@/utils';
+
+import redisController from './redis.controller';
 
 class OtherController {
   sendEmail = async (email: string, subject: string, content: string) => {

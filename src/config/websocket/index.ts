@@ -1,11 +1,10 @@
 import { Server, Socket } from 'socket.io';
 
+import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import { chalkINFO } from '@/utils/chalkTip';
 
 import { WsConnectStatusEnum, WsMsgTypeEnum } from './constant';
 import DBController from './mysql.controller';
-
-const adminStatus = { socketId: '', live: false };
 
 interface IOffer {
   socketId: string;
@@ -24,7 +23,11 @@ async function getAllLiveUser(io) {
 }
 
 export const connectWebSocket = (server) => {
-  console.log(chalkINFO('当前非beta环境，初始化websocket'));
+  if (PROJECT_ENV === PROJECT_ENV_ENUM.beta) {
+    console.log(chalkINFO('当前是beta环境，不初始化websocket'));
+    return;
+  }
+  console.log(chalkINFO('当前不是beta环境，初始化websocket'));
 
   const io = new Server(server);
 
@@ -32,7 +35,7 @@ export const connectWebSocket = (server) => {
   // socket.broadcast.emit会将消息发送给除了发件人以外的所有人
   // io.emit会将消息发送给所有人，包括发件人
 
-  io.on(WsConnectStatusEnum.connection, async (socket: Socket) => {
+  io.on(WsConnectStatusEnum.connection, (socket: Socket) => {
     console.log(new Date().toLocaleString(), 'connection', socket.id);
     // const currLiveUser = await getAllLiveUser(io);
     // io.emit(WsMsgTypeEnum.liveUser, currLiveUser);
@@ -47,26 +50,20 @@ export const connectWebSocket = (server) => {
         isAdmin?: boolean;
       }) => {
         socket.join(data.roomId);
-        console.log(
-          new Date().toLocaleString(),
-          socket.id,
-          '收到用户进入房间',
-          data.roomId,
-          data
-        );
+        console.log(new Date().toLocaleString(), '收到用户进入房间', data);
         const liveUser = await getAllLiveUser(io);
-        console.log('当前所有在线用户', liveUser);
         socket.emit(WsMsgTypeEnum.joined, data);
         if (data.isAdmin) {
-          adminStatus.socketId = socket.id;
-          adminStatus.live = true;
           DBController.addLiveRoom({
             roomId: data.roomId,
             socketId: socket.id,
             data,
           });
-        } else if (adminStatus.live) {
-          // socket.emit(WsMsgTypeEnum.adminIn, data);
+        } else {
+          const res = await DBController.searchLiveRoomByRoomId(data.roomId);
+          if (!res.count) {
+            socket.emit(WsMsgTypeEnum.roomNoLive, data);
+          }
         }
         socket
           .to(data.roomId)
@@ -96,17 +93,24 @@ export const connectWebSocket = (server) => {
         '收到用户发送消息',
         data
       );
+      socket.to(data.roomId).emit(WsMsgTypeEnum.message, data);
     });
 
     // 收到管理员开始直播
-    socket.on(WsMsgTypeEnum.adminIn, (data) => {
+    socket.on(WsMsgTypeEnum.roomLiveing, (data) => {
       console.log(
         new Date().toLocaleString(),
         socket.id,
         '收到管理员开始直播',
         data
       );
-      socket.to(data.roomId).emit(WsMsgTypeEnum.adminIn, data);
+      socket.to(data.roomId).emit(WsMsgTypeEnum.roomLiveing, data);
+    });
+
+    // 收到管理员不在直播
+    socket.on(WsMsgTypeEnum.roomNoLive, (data) => {
+      console.log(new Date().toLocaleString(), '收到管理员不在直播', data);
+      socket.to(data.roomId).emit(WsMsgTypeEnum.roomNoLive, data);
     });
 
     // 收到offer
@@ -155,7 +159,7 @@ export const connectWebSocket = (server) => {
       );
       const liveUser = await getAllLiveUser(io);
       io.emit(WsMsgTypeEnum.liveUser, liveUser);
-      const res = await DBController.searchLiveRoom(socket.id);
+      const res = await DBController.searchLiveRoomBySocketId(socket.id);
       if (res.count) {
         DBController.deleteLiveRoom(res.rows[0].get().socketId);
       }
@@ -178,7 +182,7 @@ export const connectWebSocket = (server) => {
       const liveUser = await getAllLiveUser(io);
       io.emit(WsMsgTypeEnum.liveUser, liveUser);
       io.emit(WsMsgTypeEnum.leaved, { socketId: socket.id });
-      const res = await DBController.searchLiveRoom(socket.id);
+      const res = await DBController.searchLiveRoomBySocketId(socket.id);
       if (res.count) {
         DBController.deleteLiveRoom(res.rows[0].get().socketId);
       }

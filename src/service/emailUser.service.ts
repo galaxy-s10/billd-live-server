@@ -7,6 +7,7 @@ import userModel from '@/model/user.model';
 import { handlePaging } from '@/utils';
 
 const { Op } = Sequelize;
+
 class EmailService {
   /** 是否存在 */
   async isExist(ids: number[]) {

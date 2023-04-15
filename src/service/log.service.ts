@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 
-import { ILog, IList } from '@/interface';
+import { IList, ILog } from '@/interface';
 import logModel from '@/model/log.model';
 import { handlePaging } from '@/utils';
 

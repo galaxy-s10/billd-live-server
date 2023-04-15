@@ -5,6 +5,7 @@ import authModel from '@/model/auth.model';
 import { handlePaging } from '@/utils';
 
 const { Op } = Sequelize;
+
 class AuthService {
   /** 权限是否存在 */
   async isExist(ids: number[]) {
