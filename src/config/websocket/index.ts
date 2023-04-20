@@ -85,6 +85,24 @@ export const connectWebSocket = (server) => {
       io.emit(WsMsgTypeEnum.liveUser, liveUser);
     });
 
+    // 收到用户发blob
+    socket.on(
+      WsMsgTypeEnum.sendBlob,
+      (data: { data: { blob: any; timestamp: number } }) => {
+        console.log(
+          new Date().toLocaleString(),
+          socket.id,
+          '收到用户发blob',
+          data
+        );
+        // fs.writeFileSync(
+        //   path.resolve(__dirname, `./chunk/${data.data.timestamp}.webm`),
+        //   data.data.blob
+        // );
+        // const blob = new Blob(data.data.blob);
+      }
+    );
+
     // 收到用户发送消息
     socket.on(WsMsgTypeEnum.message, (data) => {
       console.log(
@@ -93,6 +111,18 @@ export const connectWebSocket = (server) => {
         '收到用户发送消息',
         data
       );
+      // if (data.data.debug) {
+      //   const chunkDir = path.resolve(__dirname, `./chunk/`);
+      //   // 读取目录
+      //   readdirSync(chunkDir)
+      //     .sort((a: string, b: string) => +a - +b)
+      //     .forEach((v) => {
+      //       console.log('当前chunk', v);
+      //       const buffer = Buffer.from(readFileSync(`${chunkDir}/${v}`));
+      //       // bufferArr.push(buffer);
+      //       io.emit(WsMsgTypeEnum.sendBlob, { buffer });
+      //     });
+      // }
       socket.to(data.roomId).emit(WsMsgTypeEnum.message, data);
     });
 

@@ -31,7 +31,6 @@ specifiers:
   eslint-config-prettier: ^8.3.0
   eslint-plugin-import: ^2.27.5
   eslint-plugin-prettier: ^4.0.0
-  fs-extra: ^10.1.0
   husky: ^7.0.0
   joi: ^17.5.0
   jsonwebtoken: ^8.5.1
@@ -46,6 +45,7 @@ specifiers:
   koa-router: ^10.1.1
   koa-static: ^5.0.0
   lint-staged: ^12.1.6
+  mediasoup: '3'
   module-alias: ^2.2.2
   mysql2: ^2.3.3
   node-emoji: ^1.11.0
@@ -63,15 +63,12 @@ specifiers:
   standard-version: ^9.3.2
   ts-node: ^10.4.0
   typescript: ^4.8.2
-  ws: ^8.5.0
 
 dependencies:
   '@socket.io/redis-adapter': 8.0.0
   axios: 0.26.1
-  chalk: 4.1.2
   crypto-js: 4.1.1
   dayjs: 1.11.5
-  fs-extra: 10.1.0
   joi: 17.6.3
   jsonwebtoken: 8.5.1
   koa: 2.13.4
@@ -84,6 +81,7 @@ dependencies:
   koa-generic-session: 2.3.0
   koa-router: 10.1.1
   koa-static: 5.0.0
+  mediasoup: 3.11.22
   module-alias: 2.2.2
   mysql2: 2.3.3
   node-emoji: 1.11.0
@@ -92,12 +90,9 @@ dependencies:
   nodemailer: 6.8.0
   qiniu: 7.7.0
   redis: 4.3.1
-  rimraf: 4.0.5
   sequelize: 6.25.2_mysql2@2.3.3
   socket.io: 4.5.3
   ssh2: 1.11.0
-  typescript: 4.8.4
-  ws: 8.9.0
 
 devDependencies:
   '@commitlint/cli': 16.3.0
@@ -118,6 +113,7 @@ devDependencies:
   '@types/validator': 13.7.7
   '@typescript-eslint/eslint-plugin': 5.40.0_25sstg4uu2sk4pm7xcyzuov7xq
   '@typescript-eslint/parser': 5.40.0_z4bbprzjrhnsfa24uvmcbu7f5q
+  chalk: 4.1.2
   commitizen: 4.2.5
   cross-env: 7.0.3
   eslint: 8.25.0
@@ -129,8 +125,10 @@ devDependencies:
   lint-staged: 12.5.0
   nodemon: 2.0.20
   prettier: 2.7.1
+  rimraf: 4.0.5
   standard-version: 9.5.0
   ts-node: 10.9.1_gy6k6bedrshoc5b4zgt3uehy7q
+  typescript: 4.8.4
 
 packages:
 
@@ -1906,7 +1904,7 @@ packages:
     dev: true
 
   /debug/4.3.4:
-    resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/debug/-/debug-4.3.4.tgz}
+    resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
     engines: {node: '>=6.0'}
     peerDependencies:
       supports-color: '*'
@@ -1917,7 +1915,7 @@ packages:
       ms: 2.1.2
 
   /debug/4.3.4_supports-color@9.2.3:
-    resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/debug/-/debug-4.3.4.tgz}
+    resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
     engines: {node: '>=6.0'}
     peerDependencies:
       supports-color: '*'
@@ -1928,6 +1926,19 @@ packages:
       ms: 2.1.2
       supports-color: 9.2.3
     dev: true
+
+  /debug/4.3.4_supports-color@9.3.1:
+    resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
+    engines: {node: '>=6.0'}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+    dependencies:
+      ms: 2.1.2
+      supports-color: 9.3.1
+    dev: false
 
   /decamelize-keys/1.1.0:
     resolution: {integrity: sha512-ocLWuYzRPoS9bfiSdDd3cxvrzovVMZnRDVEzAs+hWIVXGDbHxWMECij2OBuyB/An0FFW/nLuq6Kv1i/YC5Qfzg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/decamelize-keys/-/decamelize-keys-1.1.0.tgz}
@@ -2722,6 +2733,7 @@ packages:
       graceful-fs: 4.2.10
       jsonfile: 6.1.0
       universalify: 2.0.0
+    dev: true
 
   /fs-extra/8.1.0:
     resolution: {integrity: sha512-yhlQgA6mnOJUKOsRUFsgJdQCvkKhcz8tlZG5HBQfReYZy46OwLcY+Zia0mtdHsOo9y/hP+CxMN0TU9QxoOtG4g==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/fs-extra/-/fs-extra-8.1.0.tgz}
@@ -2951,6 +2963,15 @@ packages:
   /grapheme-splitter/1.0.4:
     resolution: {integrity: sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/grapheme-splitter/-/grapheme-splitter-1.0.4.tgz}
     dev: true
+
+  /h264-profile-level-id/1.0.1_supports-color@9.3.1:
+    resolution: {integrity: sha512-D3Rln/jKNjKDW5ZTJTK3niSoOGE+pFqPvRHHVgQN3G7umcn/zWGPUo8Q8VpDj16x3hKz++zVviRNRmXu5cpN+Q==}
+    engines: {node: '>=8.0.0'}
+    dependencies:
+      debug: 4.3.4_supports-color@9.3.1
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
 
   /handlebars/4.7.7:
     resolution: {integrity: sha512-aAcXm5OAfE/8IXkcZvCepKU3VzW1/39Fb5ZuqMtgI/hT8X2YgoMvBY5dLhq/cpOvw7Lk1nK/UF71aLG/ZnVYRA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/handlebars/-/handlebars-4.7.7.tgz}
@@ -3482,6 +3503,7 @@ packages:
       universalify: 2.0.0
     optionalDependencies:
       graceful-fs: 4.2.10
+    dev: true
 
   /jsonparse/1.3.1:
     resolution: {integrity: sha512-POQXvpdL69+CluYsillJ7SUhKvytYjW9vG/GKpnf+xP8UWgYEM/RaMzHHofbALDiKbbP1W8UEYmgGl39WkPZsg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/jsonparse/-/jsonparse-1.3.1.tgz}
@@ -3877,6 +3899,17 @@ packages:
     engines: {node: '>= 0.6'}
     dev: false
 
+  /mediasoup/3.11.22:
+    resolution: {integrity: sha512-p8nTcsf4L3OehzgwZlfsnFsTcfu0G1gx4lKpUOVYzkvKqxgqw4GdKhRnaOl21f/UzDnadsITmyZvglSxDiKumA==}
+    engines: {node: '>=16'}
+    requiresBuild: true
+    dependencies:
+      debug: 4.3.4_supports-color@9.3.1
+      h264-profile-level-id: 1.0.1_supports-color@9.3.1
+      supports-color: 9.3.1
+      uuid: 9.0.0
+    dev: false
+
   /meow/8.1.2:
     resolution: {integrity: sha512-r85E3NdZ+mpYk1C6RjPFEMSE+s1iZMuHtsHAqY0DT3jZczl0diWUZ8g6oU7h0M9cD2EL+PzaYghhCLzR0ZNn5Q==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/meow/-/meow-8.1.2.tgz}
     engines: {node: '>=10'}
@@ -4021,7 +4054,7 @@ packages:
     dev: false
 
   /ms/2.1.2:
-    resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/ms/-/ms-2.1.2.tgz}
+    resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
 
   /ms/2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
@@ -4834,7 +4867,7 @@ packages:
     resolution: {integrity: sha512-3gf/WdsBM+ZkuPb76MpXSxNKt00QQ3PdXqDCCBOsHgcoBs8DAhXbqtrGQUAkhxHgXYWzXxuaOsN4s21+at5fBw==}
     engines: {node: '>=14'}
     hasBin: true
-    dev: false
+    dev: true
 
   /rndm/1.2.0:
     resolution: {integrity: sha512-fJhQQI5tLrQvYIYFpOnFinzv9dwmR7hRnUz1XqP3OJ1jIweTNOd6aTO4jwQSgcBSFUB+/KHJxuGneime+FdzOw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/rndm/-/rndm-1.2.0.tgz}
@@ -5330,6 +5363,11 @@ packages:
     engines: {node: '>=12'}
     dev: true
 
+  /supports-color/9.3.1:
+    resolution: {integrity: sha512-knBY82pjmnIzK3NifMo3RxEIRD9E0kIzV4BKcyTZ9+9kWgLMxd4PrsTSMoFQUabgRBbF8KOLRDCyKgNV+iK44Q==}
+    engines: {node: '>=12'}
+    dev: false
+
   /supports-preserve-symlinks-flag/1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
@@ -5567,6 +5605,7 @@ packages:
     resolution: {integrity: sha512-QCh+85mCy+h0IGff8r5XWzOVSbBO+KfeYrMQh7NJ58QujwcE22u+NUSmUxqF+un70P9GXKxa2HCNiTTMJknyjQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/typescript/-/typescript-4.8.4.tgz}
     engines: {node: '>=4.2.0'}
     hasBin: true
+    dev: true
 
   /uglify-js/3.17.3:
     resolution: {integrity: sha512-JmMFDME3iufZnBpyKL+uS78LRiC+mK55zWfM5f/pWBJfpOttXAqYfdDGRukYhJuyRinvPVAtUhvy7rlDybNtFg==}
@@ -5616,6 +5655,7 @@ packages:
   /universalify/2.0.0:
     resolution: {integrity: sha512-hAZsKq7Yy11Zu1DE0OzWjw7nnLZmJZYTDZZyEFHZdUhV8FkH5MCfoU1XMaxXovpyW5nq5scPqq0ZDP9Zyl04oQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/universalify/-/universalify-2.0.0.tgz}
     engines: {node: '>= 10.0.0'}
+    dev: true
 
   /unpipe/1.0.0:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}
@@ -5679,6 +5719,11 @@ packages:
 
   /uuid/8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/uuid/-/uuid-8.3.2.tgz}
+    hasBin: true
+    dev: false
+
+  /uuid/9.0.0:
+    resolution: {integrity: sha512-MXcSTerfPa4uqyzStbRoTgt5XIe3x5+42+q1sDuy3R5MDk66URdLMOZe5aPX/SQd+kuYAh0FdP/pO28IkQyTeg==}
     hasBin: true
     dev: false
 
@@ -5800,19 +5845,6 @@ packages:
 
   /ws/8.2.3:
     resolution: {integrity: sha512-wBuoj1BDpC6ZQ1B7DWQBYVLphPWkm8i9Y0/3YdHjHKHiohOJ1ws+3OccDWtH+PoC9DZD5WOTrJvNbWvjS6JWaA==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: ^5.0.2
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-    dev: false
-
-  /ws/8.9.0:
-    resolution: {integrity: sha512-Ja7nszREasGaYUYCI2k4lCKIRTt+y7XuqVoHR44YpI49TtryyqbqvDMn5eqfW7e6HzTukDRIsXqzVHScqRcafg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/ws/-/ws-8.9.0.tgz}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
