@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+
 import { Server, Socket } from 'socket.io';
 
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
@@ -95,10 +98,10 @@ export const connectWebSocket = (server) => {
           '收到用户发blob',
           data
         );
-        // fs.writeFileSync(
-        //   path.resolve(__dirname, `./chunk/${data.data.timestamp}.webm`),
-        //   data.data.blob
-        // );
+        fs.writeFileSync(
+          path.resolve(__dirname, `./chunk/${data.data.timestamp}.webm`),
+          data.data.blob
+        );
         // const blob = new Blob(data.data.blob);
       }
     );

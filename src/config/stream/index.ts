@@ -1,3 +1,5 @@
+import { chalkINFO } from '@/utils/chalkTip';
+
 const NodeMediaServer = require('node-media-server');
 
 const config = {
@@ -15,9 +17,9 @@ const config = {
 };
 
 export const connectNodeMediaServer = () => {
-  // console.log(chalkINFO('初始化流媒体服务器'));
-  // const nms = new NodeMediaServer(config);
-  // nms.run();
+  console.log(chalkINFO('初始化流媒体服务器'));
+  const nms = new NodeMediaServer(config);
+  nms.run();
   // nms.on('preConnect', (id, args) => {
   //   console.log(
   //     '[NodeEvent on preConnect]',

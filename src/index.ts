@@ -25,6 +25,9 @@ import { CustomError } from '@/model/customError.model';
 import { loadAllRoutes } from '@/router';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 
+import { readFileSync } from './config/websocket/utils';
+
+readFileSync();
 function runServer() {
   const port = +PROJECT_PORT; // 端口
   const app = new Koa();
