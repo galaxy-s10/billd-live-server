@@ -66,6 +66,8 @@ export const connectWebSocket = (server) => {
           const res = await DBController.searchLiveRoomByRoomId(data.roomId);
           if (!res.count) {
             socket.emit(WsMsgTypeEnum.roomNoLive, data);
+          } else {
+            socket.emit(WsMsgTypeEnum.roomLiveing, data);
           }
         }
         socket
