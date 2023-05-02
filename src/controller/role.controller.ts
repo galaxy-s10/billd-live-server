@@ -1,3 +1,4 @@
+import { arrayUnique } from 'billd-utils';
 import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
@@ -8,7 +9,7 @@ import { IList, IRole } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import authService from '@/service/auth.service';
 import roleService from '@/service/role.service';
-import { arrayGetDifference, arrayToTree, arrayUnique } from '@/utils';
+import { arrayToTree } from '@/utils';
 
 class RoleController {
   async getAllList(ctx: ParameterizedContext, next) {

@@ -62,6 +62,7 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
       '/admin/qiniu_data/upload',
       '/admin/qiniu_data/mulit_upload',
       '/admin/qiniu_data/progress',
+      '/alipay/pay_status',
     ];
     if (whiteList.includes(ctx.request.path)) {
       console.log('白名单，不插入日志');

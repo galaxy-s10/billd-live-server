@@ -1,3 +1,4 @@
+import { getRandomString } from 'billd-utils';
 import { ParameterizedContext } from 'koa';
 import nodemailer from 'nodemailer';
 
@@ -9,7 +10,6 @@ import {
   VERIFY_EMAIL_RESULT_CODE,
 } from '@/constant';
 import { CustomError } from '@/model/customError.model';
-import { getRandomString } from '@/utils';
 
 import redisController from './redis.controller';
 

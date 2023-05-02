@@ -8,6 +8,12 @@ billd 直播间后端
 pnpm install
 ```
 
+## billd 依赖
+
+```bash
+pnpm i billd-utils@latest billd-scss@latest billd-html-webpack-plugin@latest billd-deploy@latest
+```
+
 ## 启动项目
 
 ```bash

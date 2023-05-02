@@ -1,3 +1,4 @@
+import { getRandomString } from 'billd-utils';
 import { ParameterizedContext } from 'koa';
 
 import { authJwt, signJwt } from '@/app/auth/authJwt';
@@ -14,7 +15,6 @@ import thirdUserModel from '@/model/thirdUser.model';
 import githubUserService from '@/service/githubUser.service';
 import thirdUserService from '@/service/thirdUser.service';
 import userService from '@/service/user.service';
-import { getRandomString } from '@/utils';
 import axios from '@/utils/request';
 
 class GithubUserController {

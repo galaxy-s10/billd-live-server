@@ -1,3 +1,4 @@
+import { arrayUnique, getArrayDifference } from 'billd-utils';
 import { ParameterizedContext } from 'koa';
 
 import { verifyUserAuth } from '@/app/auth/verifyUserAuth';
@@ -6,7 +7,7 @@ import { ALLOW_HTTP_CODE, PROJECT_ENV } from '@/constant';
 import { IAuth, IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import authService from '@/service/auth.service';
-import { arrayGetDifference, arrayToTree, arrayUnique } from '@/utils';
+import { arrayToTree } from '@/utils';
 
 class AuthController {
   async commonGetAllChildAuth(id) {
@@ -407,7 +408,7 @@ class AuthController {
     }
     const all_child_auths: any = await authService.findByPid(id);
     const all_child_auths_id = all_child_auths.map((v) => v.id);
-    const hasDiff = arrayGetDifference(c_auths, all_child_auths_id);
+    const hasDiff = getArrayDifference(c_auths, all_child_auths_id);
     if (hasDiff.length) {
       throw new CustomError(
         `${c_auths.toString()}中的权限父级id不是${id}！`,

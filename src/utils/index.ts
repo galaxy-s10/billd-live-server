@@ -5,21 +5,6 @@ import sequelize from '@/config/mysql';
 import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 
 /**
- * 获取日期当天的开始时间到结束时间
- */
-export function dateStartAndEnd(date: Date) {
-  const y = date.getFullYear();
-  const m = date.getMonth() + 1;
-  const d = date.getDate();
-  const startTime = `${y}-${m}-${d} 00:00:00`;
-  const endTime = `${y}-${m}-${d} 23:59:59`;
-  return {
-    startTime,
-    endTime,
-  };
-}
-
-/**
  * @description: 处理free命令返回的内存信息
  * @param {string} str
  * @return {*}
@@ -57,70 +42,8 @@ export const getFileExt = (name: string) => {
   return ext;
 };
 
-/**
- * @description:
- * @param {any} fnArray
- * @param {*} time
- * @return {*}
- */
-export const promiseQueue = async (fnArray: any[], time?: number) => {
-  const asyncPromise = (fn: any, index: number) => {
-    return new Promise((resolve) => {
-      if (Object.prototype.toString.call(fn) === '[object Function]') {
-        // 首次不走定时器
-        if (index === 0) {
-          fn?.();
-          resolve(true);
-        } else if (time) {
-          setTimeout(() => {
-            fn?.();
-            resolve(true);
-          }, time);
-        } else {
-          fn?.();
-          resolve(true);
-        }
-      }
-    });
-  };
-  for (let i = 0; i < fnArray.length; i += 1) {
-    const fn = fnArray[i];
-    // eslint-disable-next-line
-    await asyncPromise(fn, i);
-  }
-};
-
-/** 模拟ajax请求 */
-export const mockAjax = (time = 1000) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        code: 0,
-        data: {
-          name: '张三',
-          age: 18,
-        },
-      });
-    }, time);
-  });
-};
-
 export const isAdmin = (ctx: ParameterizedContext) =>
   ctx.req.url!.indexOf('/admin/') !== -1;
-
-/** 转换时间格式,datetime可以是字符串'2022-8-28 00:00:00'，也可以是数字时间戳1673171023498 */
-export const formatDate = (datetime) => {
-  function addDateZero(num: number) {
-    return num < 10 ? `0${num}` : num;
-  }
-  const d = new Date(datetime);
-  const formatdatetime = `${d.getFullYear()}-${addDateZero(
-    d.getMonth() + 1
-  )}-${addDateZero(d.getDate())} ${addDateZero(d.getHours())}:${addDateZero(
-    d.getMinutes()
-  )}:${addDateZero(d.getSeconds())}`;
-  return formatdatetime;
-};
 
 /** 处理返回的分页数据 */
 export const handlePaging = (
@@ -237,58 +160,6 @@ export const initTable = (
 };
 
 /**
- * 去除url上的参数，获取url
- * @param url string
- * @returns string
- */
-export const getUrl = (url: string) => {
-  return url.replace(/\?.+/, '');
-};
-
-/**
- * 获取[min,max]之间的随机整数
- * 例如：[10,30],[-21,32],[-100,-20]
- */
-export const getRandomInt = (min: number, max: number) =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
-
-/**
- * @description 获取[min,max]之间的随机整数。
- * @example getRangeRandom([-10,100]) ===> -8
- * @param {number} min
- * @param {number} max
- * @return {*}
- */
-export const getRangeRandom = (min: number, max: number) =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
-
-/**
- * @description 获取随机字符串(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789)
- * @example getRandomString(4) ===> abd3
- * @param {number} length
- * @return {*}
- */
-export const getRandomString = (length: number): string => {
-  const str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let res = '';
-  for (let i = 0; i < length; i += 1) {
-    // res += str.charAt(getRangeRandom(0, str.length - 1));
-    res += str[getRangeRandom(0, str.length - 1)];
-  }
-  return res;
-};
-
-/**
- * 获取随机数字字符串
- * length: 长度，不能大于16
- */
-export const randomNumber = (length: number): number => {
-  const str = Math.random().toString().slice(2);
-  const res = +str.slice(str.length - length);
-  return res;
-};
-
-/**
  * @param code 验证码
  * @param desc 验证码作用
  * @param exp 有效期，单位：秒，但返回时会转换成分钟
@@ -309,37 +180,6 @@ export const emailContentTemplate = ({
     exp / 60
   }分钟，请勿告知他人。`;
   return { subject: subjectTemp, content };
-};
-
-/** 数组去重 */
-export const arrayUnique = (arr: number[]) => {
-  return Array.from(new Set(arr));
-};
-
-/** 求并集 */
-export const arrayGetUnion = (a: any[], b: any[]) => {
-  return a.concat(
-    b.filter((v) => {
-      return a.indexOf(v) === -1;
-    })
-  );
-};
-
-/** 求交集 */
-export const arrayGetIntersection = (a: any[], b: any[]) => {
-  return a.filter((v) => {
-    return b.indexOf(v) > -1;
-  });
-};
-
-/**
- * 求差集，a:[1,2,3]，b:[2,4,5]，结果：[1,3]
- * a:[2,4,5]，b:[1,2,3]，结果：[4,5]
- */
-export const arrayGetDifference = (a: any[], b: any[]) => {
-  return a.filter((v) => {
-    return b.indexOf(v) === -1;
-  });
 };
 
 /**
@@ -391,43 +231,4 @@ export const arrayToTree = ({
   };
   const data = JSON.parse(JSON.stringify(originArr));
   return handleToTree(data, originPid);
-};
-
-/**
- * 获取最近一周
- */
-export const getLastestWeek = () => {
-  const oneDay = 1000 * 60 * 60 * 24;
-  const endDate = +new Date();
-  const startDate = endDate - oneDay * 7;
-  return { startDate, endDate };
-};
-
-/**
- * @description 格式化内存大小（要求传入的数字以byte为单位）
- * @param {number} val
- * @param {*} num 显示几位小数，默认2
- * @return {*}
- */
-export const formatMemorySize = (val: number, num = 2) => {
-  // bit:"比特"或"位",1byte=8bit
-  const oneByte = 1;
-  const oneKb = oneByte * 1024;
-  const oneMb = oneKb * 1024;
-  const oneGb = oneMb * 1024;
-  const oneTb = oneGb * 1024;
-  const format = (v: number) => v.toFixed(num);
-  if (val < oneKb) {
-    return `${format(val / oneByte)}byte`;
-  }
-  if (val < oneMb) {
-    return `${format(val / oneKb)}kb`;
-  }
-  if (val < oneGb) {
-    return `${format(val / oneMb)}mb`;
-  }
-  if (val < oneTb) {
-    return `${format(val / oneGb)}gb`;
-  }
-  return `${format(val / oneTb)}tb`;
 };

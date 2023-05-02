@@ -1,3 +1,4 @@
+import { arrayUnique, getRandomInt, getRandomString } from 'billd-utils';
 import { ParameterizedContext } from 'koa';
 
 import { authJwt, signJwt } from '@/app/auth/authJwt';
@@ -16,7 +17,6 @@ import emailUserService from '@/service/emailUser.service';
 import roleService from '@/service/role.service';
 import thirdUserService from '@/service/thirdUser.service';
 import userService from '@/service/user.service';
-import { arrayUnique, getRandomString, randomNumber } from '@/utils';
 
 import redisController from './redis.controller';
 
@@ -61,7 +61,7 @@ class UserController {
       }
       // 用户表创建用户
       const userData = await this.handleCreate({
-        username: `用户${randomNumber(8)}`,
+        username: `用户${getRandomInt(8)}`,
         password: getRandomString(8),
       });
       // 邮箱表创建邮箱
