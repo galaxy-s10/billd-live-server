@@ -4,10 +4,11 @@ import path from 'path';
 import { Server, Socket } from 'socket.io';
 
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import liveService from '@/service/live.service';
 import { chalkINFO } from '@/utils/chalkTip';
 
 import { WsConnectStatusEnum, WsMsgTypeEnum } from './constant';
-import DBController from './mysql.controller';
+import LiveRedisController from './redis.controller';
 
 interface IOffer {
   socketId: string;
@@ -40,8 +41,6 @@ export const connectWebSocket = (server) => {
 
   io.on(WsConnectStatusEnum.connection, (socket: Socket) => {
     console.log(new Date().toLocaleString(), 'connection', socket.id);
-    // const currLiveUser = await getAllLiveUser(io);
-    // io.emit(WsMsgTypeEnum.liveUser, currLiveUser);
 
     // 收到用户进入房间
     socket.on(
@@ -53,41 +52,54 @@ export const connectWebSocket = (server) => {
         isAdmin?: boolean;
       }) => {
         socket.join(data.roomId);
-        console.log(new Date().toLocaleString(), '收到用户进入房间', data);
-        const liveUser = await getAllLiveUser(io);
-        socket.emit(WsMsgTypeEnum.joined, data);
+        console.log(
+          new Date().toLocaleString(),
+          '收到用户进入房间',
+          { 'socket.id': socket.id, roomId: data.roomId },
+          data
+        );
         if (data.isAdmin) {
-          DBController.addLiveRoom({
+          liveService.create({
             roomId: data.roomId,
             socketId: socket.id,
-            data,
+            data: JSON.stringify(data),
           });
+          socket.emit(WsMsgTypeEnum.joined, data);
         } else {
-          const res = await DBController.searchLiveRoomByRoomId(data.roomId);
+          const res = await liveService.findByRoomId(data.roomId);
           if (!res.count) {
-            socket.emit(WsMsgTypeEnum.roomNoLive, data);
+            socket.emit(WsMsgTypeEnum.roomNoLive, { roomId: data.roomId });
           } else {
+            LiveRedisController.setUserJoinedRoom({
+              socketId: socket.id,
+              roomId: data.roomId,
+            });
+            socket.emit(
+              WsMsgTypeEnum.joined,
+              JSON.parse(res.rows[0].data || '{}')
+            );
             socket.emit(WsMsgTypeEnum.roomLiveing, data);
+            socket
+              .to(data.roomId)
+              .emit(WsMsgTypeEnum.otherJoin, { socketId: socket.id });
+            const liveUser = await getAllLiveUser(io);
+            socket.to(data.roomId).emit(WsMsgTypeEnum.liveUser, liveUser);
           }
         }
-        socket
-          .to(data.roomId)
-          .emit(WsMsgTypeEnum.otherJoin, { socketId: socket.id });
-        io.emit(WsMsgTypeEnum.liveUser, liveUser);
       }
     );
 
-    // 收到用户退出房间
+    // 收到用户离开房间
     socket.on(WsMsgTypeEnum.leave, async (data) => {
       console.log(
         new Date().toLocaleString(),
         socket.id,
-        '收到用户退出房间',
+        '收到用户离开房间',
         data
       );
       socket.emit(WsMsgTypeEnum.leaved, { socketId: socket.id });
       const liveUser = await getAllLiveUser(io);
-      io.emit(WsMsgTypeEnum.liveUser, liveUser);
+      socket.to(data.roomId).emit(WsMsgTypeEnum.liveUser, liveUser);
     });
 
     // 收到用户发blob
@@ -145,7 +157,6 @@ export const connectWebSocket = (server) => {
     // 收到管理员不在直播
     socket.on(WsMsgTypeEnum.roomNoLive, (data) => {
       console.log(new Date().toLocaleString(), '收到管理员不在直播', data);
-      socket.to(data.roomId).emit(WsMsgTypeEnum.roomNoLive, data);
     });
 
     // 收到offer
@@ -185,19 +196,7 @@ export const connectWebSocket = (server) => {
     });
 
     // 断开连接中
-    socket.on(WsConnectStatusEnum.disconnecting, async (reason) => {
-      console.log(
-        new Date().toLocaleString(),
-        socket.id,
-        '===断开连接中===',
-        reason
-      );
-      const liveUser = await getAllLiveUser(io);
-      io.emit(WsMsgTypeEnum.liveUser, liveUser);
-      const res = await DBController.searchLiveRoomBySocketId(socket.id);
-      if (res.count) {
-        DBController.deleteLiveRoom(res.rows[0].get().socketId);
-      }
+    socket.on(WsConnectStatusEnum.disconnecting, (reason) => {
       console.log(
         new Date().toLocaleString(),
         socket.id,
@@ -214,19 +213,27 @@ export const connectWebSocket = (server) => {
         '===已断开连接===',
         reason
       );
-      const liveUser = await getAllLiveUser(io);
-      io.emit(WsMsgTypeEnum.liveUser, liveUser);
-      io.emit(WsMsgTypeEnum.leaved, { socketId: socket.id });
-      const res = await DBController.searchLiveRoomBySocketId(socket.id);
+      const res = await liveService.findBySocketId(socket.id);
       if (res.count) {
-        DBController.deleteLiveRoom(res.rows[0].get().socketId);
+        // 是管理员断开连接
+        const roomId = res.rows[0].roomId || '-1';
+        socket.to(roomId).emit(WsMsgTypeEnum.roomNoLive);
+        liveService.deleteBySocketId(res.rows[0].get().socketId || '-1');
+      } else {
+        // 不是管理员断开连接
+        const res1 = await LiveRedisController.getUserJoinedRoom({
+          socketId: socket.id,
+        });
+        if (res1) {
+          const joinedRoomId = JSON.parse(res1).roomId;
+          const liveUser = await getAllLiveUser(io);
+          socket.to(joinedRoomId).emit(WsMsgTypeEnum.liveUser, liveUser);
+          socket
+            .to(joinedRoomId)
+            .emit(WsMsgTypeEnum.leaved, { socketId: socket.id });
+          LiveRedisController.delUserJoinedRoom({ socketId: socket.id });
+        }
       }
-      console.log(
-        new Date().toLocaleString(),
-        socket.id,
-        '===已断开连接===',
-        reason
-      );
     });
   });
 };

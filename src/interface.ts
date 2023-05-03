@@ -1,3 +1,13 @@
+export interface ILive {
+  id?: number;
+  socketId?: string;
+  roomId?: string;
+  data?: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
 export interface IBlacklist {
   id?: number;
   ip?: string;

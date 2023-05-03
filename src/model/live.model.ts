@@ -1,9 +1,19 @@
-import { DataTypes } from 'sequelize';
+import {
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+} from 'sequelize';
 
 import sequelize from '@/config/mysql';
+import { ILive } from '@/interface';
 import { initTable } from '@/utils';
 
-const model = sequelize.define(
+interface LiveModel
+  extends Model<InferAttributes<LiveModel>, InferCreationAttributes<LiveModel>>,
+    ILive {}
+
+const model = sequelize.define<LiveModel>(
   'live',
   {
     id: {

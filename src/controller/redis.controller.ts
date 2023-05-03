@@ -6,17 +6,17 @@ class RedisController {
    * @param {*} param1
    * @return {*}
    */
-  getTTL = async ({ prefix = '', key = '' }) => {
+  getTTL = async ({ prefix, key }: { prefix: string; key: string }) => {
     const res = await redisClient.ttl(`${prefix}-${key}`);
     return res;
   };
 
-  del = async ({ prefix = '', key = '' }) => {
+  del = async ({ prefix, key }: { prefix: string; key: string }) => {
     const res = await redisClient.del(`${prefix}-${key}`);
     return res;
   };
 
-  getVal = async ({ prefix = '', key = '' }) => {
+  getVal = async ({ prefix, key }: { prefix: string; key: string }) => {
     const res = await redisClient.get(`${prefix}-${key}`);
     return res;
   };

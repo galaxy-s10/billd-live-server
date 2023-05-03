@@ -1,6 +1,9 @@
 // 一定要将import './init';放到最开头,因为它里面初始化了路径别名
 import './init';
 
+import { exec } from 'child_process';
+import path from 'path';
+
 import Koa from 'koa';
 import koaBody from 'koa-body';
 import conditional from 'koa-conditional-get';
@@ -11,6 +14,7 @@ import { catchErrorMiddle, corsMiddle } from '@/app/app.middleware';
 import errorHandler from '@/app/handler/error-handle';
 import { apiBeforeVerify } from '@/app/verify.middleware';
 import { connectMysql } from '@/config/mysql';
+import { connectRedis } from '@/config/redis';
 import { connectNodeMediaServer } from '@/config/stream';
 import { connectWebSocket } from '@/config/websocket';
 import {
@@ -23,11 +27,13 @@ import {
 import { initDb } from '@/init/initDb';
 import { CustomError } from '@/model/customError.model';
 import { loadAllRoutes } from '@/router';
-import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
+import {
+  chalkERROR,
+  chalkINFO,
+  chalkSUCCESS,
+  chalkWARN,
+} from '@/utils/chalkTip';
 
-import { readFileSync } from './config/websocket/utils';
-
-readFileSync();
 function runServer() {
   const port = +PROJECT_PORT; // 端口
   const app = new Koa();
@@ -73,6 +79,7 @@ function runServer() {
       app.use(apiBeforeVerify); // 注意：需要在所有路由加载前使用这个中间件
       await Promise.all([
         connectMysql(), // 连接mysql
+        connectRedis(), // 连接redis
       ]);
       initDb(3); // 加载sequelize的relation表关联
       loadAllRoutes(app); // 加载所有路由
@@ -88,21 +95,21 @@ function runServer() {
       console.log(chalkWARN(`当前监听的端口: ${port}`));
       console.log(chalkWARN(`当前的项目名称: ${PROJECT_NAME}`));
       console.log(chalkWARN(`当前的项目环境: ${PROJECT_ENV}`));
-      // try {
-      //   const child = exec(ffmpegSh, {}, (error, stream) => {
-      //     console.log(chalkINFO(`${new Date().toLocaleString()}，有打印`));
-      //     console.log(error, stream);
-      //   });
-      //   child.on('exit', () => {
-      //     console.log(
-      //       chalkINFO(
-      //         `${new Date().toLocaleString()}，子进程退出了，${ffmpegSh}`
-      //       )
-      //     );
-      //   });
-      // } catch (error) {
-      //   console.log(error);
-      // }
+      try {
+        const srsSh = `sh ${path.resolve(__dirname, '../srs.sh')}`;
+        // const srsSh = `${path.resolve(__dirname, '../srs.sh')}`;
+        const child = exec(srsSh, {}, (error, stream) => {
+          console.log(chalkINFO(`${new Date().toLocaleString()}，有打印`));
+          console.log(error, stream);
+        });
+        child.on('exit', () => {
+          console.log(
+            chalkINFO(`${new Date().toLocaleString()}，子进程退出了，${srsSh}`)
+          );
+        });
+      } catch (error) {
+        console.log(error);
+      }
     } catch (error) {
       console.log(chalkERROR(`项目启动失败！`));
       console.log(error);

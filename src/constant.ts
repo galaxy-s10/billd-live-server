@@ -107,7 +107,8 @@ export const REDIS_PREFIX = {
   currDayHightOnlineNum: `${PROJECT_NAME}-${PROJECT_ENV}-currDayHightOnlineNum`, // 当前最高同时在线数
   onlineUser: `${PROJECT_NAME}-${PROJECT_ENV}-onlineUser`, // 当前在线用户
   onlineVisitor: `${PROJECT_NAME}-${PROJECT_ENV}-onlineVisitor`, // 当前在线游客
-  onlineList: `${PROJECT_NAME}-${PROJECT_ENV}-onlineList`, // 当前在线游客+用户
+  roomId: `${PROJECT_NAME}-${PROJECT_ENV}-roomId`, // 当前在线游客+用户
+  joined: `${PROJECT_NAME}-${PROJECT_ENV}-joined`, // 当前在线游客+用户
   live: `${PROJECT_NAME}-${PROJECT_ENV}-live`, // 在线游客+用户
 };
 
