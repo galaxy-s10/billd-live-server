@@ -34,6 +34,8 @@ import {
   chalkWARN,
 } from '@/utils/chalkTip';
 
+import { ffmpegSh } from './ffmpeg';
+
 function runServer() {
   const port = +PROJECT_PORT; // 端口
   const app = new Koa();
@@ -99,12 +101,34 @@ function runServer() {
         const srsSh = `sh ${path.resolve(__dirname, '../srs.sh')}`;
         // const srsSh = `${path.resolve(__dirname, '../srs.sh')}`;
         const child = exec(srsSh, {}, (error, stream) => {
-          console.log(chalkINFO(`${new Date().toLocaleString()}，有打印`));
+          console.log(chalkINFO(`${new Date().toLocaleString()}，srsSh有打印`));
           console.log(error, stream);
         });
         child.on('exit', () => {
           console.log(
-            chalkINFO(`${new Date().toLocaleString()}，子进程退出了，${srsSh}`)
+            chalkINFO(
+              `${new Date().toLocaleString()}，srsSh子进程退出了，${srsSh}`
+            )
+          );
+        });
+      } catch (error) {
+        console.log(error);
+      }
+      try {
+        const ffmpegShCmd = 'echo test' || ffmpegSh;
+        const child = exec(ffmpegShCmd);
+        child.on('exit', () => {
+          console.log(
+            chalkINFO(
+              `${new Date().toLocaleString()}，ffmpegSh子进程退出了，${ffmpegShCmd}`
+            )
+          );
+        });
+        child.on('error', () => {
+          console.log(
+            chalkINFO(
+              `${new Date().toLocaleString()}，ffmpegSh子进程错误，${ffmpegShCmd}`
+            )
           );
         });
       } catch (error) {

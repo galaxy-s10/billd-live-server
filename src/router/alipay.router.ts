@@ -4,7 +4,7 @@ import Router from 'koa-router';
 import Sequelize from 'sequelize';
 
 import successHandler from '@/app/handler/success-handle';
-import { ALIPAY_CONFIG } from '@/config/secret';
+import { ALIPAY_LIVE_CONFIG } from '@/config/secret';
 import OrderModel from '@/model/order.model';
 
 const alipayRouter = new Router({ prefix: '/alipay' });
@@ -13,10 +13,10 @@ const { Op } = Sequelize;
 alipayRouter.post('/pay', async (ctx, next) => {
   const { total_amount, subject, body } = ctx.request.body;
   const alipaySdk = new AlipaySdk({
-    appId: ALIPAY_CONFIG.appId,
-    privateKey: ALIPAY_CONFIG.privateKey,
-    alipayPublicKey: ALIPAY_CONFIG.alipayPublicKey,
-    gateway: ALIPAY_CONFIG.gateway,
+    appId: ALIPAY_LIVE_CONFIG.appId,
+    privateKey: ALIPAY_LIVE_CONFIG.privateKey,
+    alipayPublicKey: ALIPAY_LIVE_CONFIG.alipayPublicKey,
+    gateway: ALIPAY_LIVE_CONFIG.gateway,
   });
 
   const bizContent = {

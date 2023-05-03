@@ -7,7 +7,7 @@
 # FilePath: /billd-live-server/srs.sh
 # Github: https://github.com/galaxy-s10
 # LastEditors: shuisheng
-# LastEditTime: 2023-05-03 17:49:01
+# LastEditTime: 2023-05-03 23:23:43
 ###
 
 # 生成头部文件快捷键：ctrl+cmd+i
@@ -25,9 +25,9 @@ docker rm $JOBNAME
 
 echo 启动新的容器$JOBNAME:
 
-# -p :80:8080, 将容器的8080端口映射到主机的80端口
 # -d, 后台运行
-docker run --rm --env CANDIDATE=$CANDIDATE \
+# -p :80:8080, 将容器的8080端口映射到主机的80端口
+docker run -d --name $JOBNAME --rm --env CANDIDATE=$CANDIDATE \
   -p 1935:1935 -p 5001:8080 -p 1985:1985 -p 8000:8000/udp \
   registry.cn-hangzhou.aliyuncs.com/ossrs/srs:4 \
   objs/srs -c conf/rtc.conf
