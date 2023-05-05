@@ -16,6 +16,7 @@ export function loadAllRoutes(app) {
   });
   app.use(router.routes()).use(router.allowedMethods()); // 每一个router都要配置routes()和allowedMethods()
 
+  const err: string[] = [];
   fs.readdirSync(__dirname).forEach((file) => {
     try {
       if (PROJECT_NODE_ENV === 'development') {
@@ -24,13 +25,18 @@ export function loadAllRoutes(app) {
 
       const allRouter = require(`./${file}`).default;
       app.use(allRouter.routes()).use(allRouter.allowedMethods()); // allRouter也要配置routes()和allowedMethods()
-      // router.use('/front', allRouter.routes()).use(allRouter.allowedMethods());
-      router.use('/admin', allRouter.routes()).use(allRouter.allowedMethods()); // admin的router也要配置routes()和allowedMethods()
+      // router.use('/front', allRouter.routes()).use(allRouter.allowedMethods()); // front的router也要配置routes()和allowedMethods()
+      // router.use('/admin', allRouter.routes()).use(allRouter.allowedMethods()); // admin的router也要配置routes()和allowedMethods()
       console.log(chalkINFO(`加载路由: ${file}`));
     } catch (error) {
-      console.log(chalkERROR(`加载${file}路由出错:`));
+      err.push(file);
+      console.log(chalkERROR(`加载路由: ${file}出错!`));
       console.log(error);
     }
   });
-  console.log(chalkSUCCESS('加载所有route成功~'));
+  if (err.length) {
+    console.log(chalkERROR(`加载路由: ${err.toString()}出错！`));
+  } else {
+    console.log(chalkSUCCESS('加载所有route成功~'));
+  }
 }

@@ -15,6 +15,7 @@ import errorHandler from '@/app/handler/error-handle';
 import { apiBeforeVerify } from '@/app/verify.middleware';
 import { connectMysql } from '@/config/mysql';
 import { connectRedis } from '@/config/redis';
+import { createRedisPubSub } from '@/config/redis/pub';
 import { connectNodeMediaServer } from '@/config/stream';
 import { connectWebSocket } from '@/config/websocket';
 import {
@@ -82,6 +83,7 @@ function runServer() {
       await Promise.all([
         connectMysql(), // 连接mysql
         connectRedis(), // 连接redis
+        createRedisPubSub(), // 创建redis的发布订阅
       ]);
       initDb(3); // 加载sequelize的relation表关联
       loadAllRoutes(app); // 加载所有路由
@@ -99,7 +101,7 @@ function runServer() {
       console.log(chalkWARN(`当前的项目环境: ${PROJECT_ENV}`));
       try {
         const srsSh = `sh ${path.resolve(__dirname, '../srs.sh')}`;
-        // const srsSh = `${path.resolve(__dirname, '../srs.sh')}`;
+        // const srsSh = `echo ${path.resolve(__dirname, '../srs.sh')}`;
         const child = exec(srsSh, {}, (error, stream) => {
           console.log(chalkINFO(`${new Date().toLocaleString()}，srsSh有打印`));
           console.log(error, stream);
@@ -116,6 +118,7 @@ function runServer() {
       }
       try {
         const ffmpegShCmd = 'echo test' || ffmpegSh;
+        // const ffmpegShCmd = ffmpegSh;
         const child = exec(ffmpegShCmd);
         child.on('exit', () => {
           console.log(

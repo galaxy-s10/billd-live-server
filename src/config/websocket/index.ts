@@ -3,7 +3,10 @@ import path from 'path';
 
 import { Server, Socket } from 'socket.io';
 
-import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import { pubClient } from '@/config/redis/pub';
+import { REDIS_CONFIG } from '@/config/secret';
+import { PROJECT_ENV, PROJECT_ENV_ENUM, REDIS_PREFIX } from '@/constant';
+import alipayController from '@/controller/alipay.controller';
 import liveService from '@/service/live.service';
 import { chalkINFO } from '@/utils/chalkTip';
 
@@ -34,6 +37,17 @@ export const connectWebSocket = (server) => {
   console.log(chalkINFO('当前不是beta环境，初始化websocket'));
 
   const io = new Server(server);
+
+  pubClient.subscribe(
+    `__keyevent@${REDIS_CONFIG.database}__:expired`,
+    (redisKey, subscribeName) => {
+      console.log('过期key监听', redisKey, subscribeName);
+      if (redisKey.indexOf(REDIS_PREFIX.order) === 0) {
+        const out_trade_no = redisKey.replace(`${REDIS_PREFIX.order}-`, '');
+        alipayController.commonGetPayStatus(out_trade_no);
+      }
+    }
+  );
 
   // socket.emit会将消息发送给发件人
   // socket.broadcast.emit会将消息发送给除了发件人以外的所有人

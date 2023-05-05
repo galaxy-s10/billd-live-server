@@ -4,7 +4,7 @@ import { REDIS_CONFIG } from '@/config/secret';
 import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 
 export const pubClient = createClient({
-  database: 0,
+  database: REDIS_CONFIG.database,
   socket: {
     port: REDIS_CONFIG.socket.port,
     host: REDIS_CONFIG.socket.host,
@@ -14,7 +14,7 @@ export const pubClient = createClient({
 
 const subClient = pubClient.duplicate();
 
-export const createPubSub = async () => {
+export const createRedisPubSub = async () => {
   const msg = (flag: boolean) =>
     `创建${REDIS_CONFIG.socket.host}:${
       REDIS_CONFIG.socket.port

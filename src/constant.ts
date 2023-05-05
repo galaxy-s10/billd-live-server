@@ -95,21 +95,12 @@ export const VERIFY_EMAIL_RESULT_CODE = {
 
 // redis前缀
 export const REDIS_PREFIX = {
-  liveRoom: `${PROJECT_NAME}-${PROJECT_ENV}-liveRoom`, // 登录不区分前后台
   emailLogin: `${PROJECT_NAME}-${PROJECT_ENV}-emailLogin`, // 登录不区分前后台
   emailRegister: `${PROJECT_NAME}-${PROJECT_ENV}-emailRegister`, // 注册不区分前后台
   userBindEmail: `${PROJECT_NAME}-${PROJECT_ENV}-userBindEmail`, // 用户绑定邮箱
   userCancelBindEmail: `${PROJECT_NAME}-${PROJECT_ENV}-userCancelBindEmail`, // 用户取消绑定邮箱
-  fileProgress: `${PROJECT_NAME}-${PROJECT_ENV}-fileProgress`, // 文件上传进度
-  chunkFileProgress: `${PROJECT_NAME}-${PROJECT_ENV}-chunkFileProgress`, // 分片文件上传进度
-  chooseSongList: `${PROJECT_NAME}-${PROJECT_ENV}-chooseSongList`, // 点歌列表
-  historyHightOnlineNum: `${PROJECT_NAME}-${PROJECT_ENV}-historyHightOnlineNum`, // 历史最高同时在线数
-  currDayHightOnlineNum: `${PROJECT_NAME}-${PROJECT_ENV}-currDayHightOnlineNum`, // 当前最高同时在线数
-  onlineUser: `${PROJECT_NAME}-${PROJECT_ENV}-onlineUser`, // 当前在线用户
-  onlineVisitor: `${PROJECT_NAME}-${PROJECT_ENV}-onlineVisitor`, // 当前在线游客
-  roomId: `${PROJECT_NAME}-${PROJECT_ENV}-roomId`, // 当前在线游客+用户
-  joined: `${PROJECT_NAME}-${PROJECT_ENV}-joined`, // 当前在线游客+用户
-  live: `${PROJECT_NAME}-${PROJECT_ENV}-live`, // 在线游客+用户
+  joined: `${PROJECT_NAME}-${PROJECT_ENV}-joined`, // 游客加入了房间
+  order: `${PROJECT_NAME}-${PROJECT_ENV}-order`, // 订单
 };
 
 // 平台类型

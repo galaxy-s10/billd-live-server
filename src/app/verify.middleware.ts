@@ -169,43 +169,43 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
     return;
   }
 
-  if (admin) {
-    if (backendWhiteList.indexOf(url) !== -1) {
-      await next();
-      consoleEnd();
-      return;
-    }
-    const { code, message } = await authJwt(ctx);
-    if (code !== ALLOW_HTTP_CODE.ok) {
-      consoleEnd();
-      throw new CustomError(message, code, code);
-    }
-    /**
-     * 这里必须await next()，因为路由匹配肯定是先匹配这个app.use的，
-     * 如果这里匹配完成后直接next()了，就会返回数据了（404），也就是不会
-     * 继续走后面的匹配了！但是如果加了await，就会等待后面的继续匹配完！
-     */
+  // if (admin) {
+  //   if (backendWhiteList.indexOf(url) !== -1) {
+  //     await next();
+  //     consoleEnd();
+  //     return;
+  //   }
+  //   const { code, message } = await authJwt(ctx);
+  //   if (code !== ALLOW_HTTP_CODE.ok) {
+  //     consoleEnd();
+  //     throw new CustomError(message, code, code);
+  //   }
+  //   /**
+  //    * 这里必须await next()，因为路由匹配肯定是先匹配这个app.use的，
+  //    * 如果这里匹配完成后直接next()了，就会返回数据了（404），也就是不会
+  //    * 继续走后面的匹配了！但是如果加了await，就会等待后面的继续匹配完！
+  //    */
+  //   await next();
+  //   consoleEnd();
+  // } else {
+  // 前端的get接口都不需要判断token，白名单内的也不需要判断token（如注册登录这些接口是post的）
+  if (ctx.request.method === 'GET' || frontendWhiteList.indexOf(url) !== -1) {
     await next();
     consoleEnd();
-  } else {
-    // 前端的get接口都不需要判断token，白名单内的也不需要判断token（如注册登录这些接口是post的）
-    if (ctx.request.method === 'GET' || frontendWhiteList.indexOf(url) !== -1) {
-      await next();
-      consoleEnd();
-      return;
-    }
-    const { code, message } = await authJwt(ctx);
-    if (code !== ALLOW_HTTP_CODE.ok) {
-      consoleEnd();
-      throw new CustomError(message, code, code);
-    }
-    /**
-     * 因为这个verify.middleware是最先执行的中间件路由，
-     * 而且这个verify.middleware是异步的，因此如果需要等待异步执行完成才继续匹配后面的中间时，
-     * 必须使用await next()，如果这里使用next()，就会返回数据了（404），也就是不会
-     * 继续走后面的匹配了！但是如果加了await，就会等待后面的继续匹配完！
-     */
-    await next();
-    consoleEnd();
+    return;
   }
+  const { code, message } = await authJwt(ctx);
+  if (code !== ALLOW_HTTP_CODE.ok) {
+    consoleEnd();
+    throw new CustomError(message, code, code);
+  }
+  /**
+   * 因为这个verify.middleware是最先执行的中间件路由，
+   * 而且这个verify.middleware是异步的，因此如果需要等待异步执行完成才继续匹配后面的中间时，
+   * 必须使用await next()，如果这里使用next()，就会返回数据了（404），也就是不会
+   * 继续走后面的匹配了！但是如果加了await，就会等待后面的继续匹配完！
+   */
+  await next();
+  consoleEnd();
+  // }
 };
