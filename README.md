@@ -1,20 +1,28 @@
-# 简介
+# 项目简介
 
 billd 直播间后端，主要根据[https://github.com/galaxy-s10/vue3-blog-server](https://github.com/galaxy-s10/vue3-blog-server)进行修改的
 
-## 安装依赖
+# 线上地址
+
+[https://live.hsslive.cn](https://live.hsslive.cn)
+
+# 接口文档
+
+[apifox](https://www.apifox.cn/apidoc/shared-46443f95-e389-4453-9da7-a98ea8c72177)
+
+# 安装依赖
 
 ```bash
 pnpm install
 ```
 
-## billd 依赖
+# billd 依赖
 
 ```bash
 pnpm i billd-utils@latest billd-scss@latest billd-html-webpack-plugin@latest billd-deploy@latest
 ```
 
-## 启动项目
+# 启动项目
 
 > 本地需要有 mysql、redis、docker 环境！
 >
