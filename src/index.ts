@@ -1,9 +1,6 @@
 // 一定要将import './init';放到最开头,因为它里面初始化了路径别名
 import './init';
 
-import { exec } from 'child_process';
-import path from 'path';
-
 import Koa from 'koa';
 import koaBody from 'koa-body';
 import conditional from 'koa-conditional-get';
@@ -16,7 +13,6 @@ import { apiBeforeVerify } from '@/app/verify.middleware';
 import { connectMysql } from '@/config/mysql';
 import { connectRedis } from '@/config/redis';
 import { createRedisPubSub } from '@/config/redis/pub';
-import { connectNodeMediaServer } from '@/config/stream';
 import { connectWebSocket } from '@/config/websocket';
 import {
   PROJECT_ENV,
@@ -26,18 +22,13 @@ import {
   UPLOAD_DIR,
 } from '@/constant';
 import { initDb } from '@/init/initDb';
+import { initFFmpeg } from '@/init/initFFmpeg';
+import { initSRS } from '@/init/initSRS';
 import { CustomError } from '@/model/customError.model';
 import { loadAllRoutes } from '@/router';
-import {
-  chalkERROR,
-  chalkINFO,
-  chalkSUCCESS,
-  chalkWARN,
-} from '@/utils/chalkTip';
+import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 
-import { ffmpegSh } from './ffmpeg';
-
-function runServer() {
+function setupServer() {
   const port = +PROJECT_PORT; // 端口
   const app = new Koa();
   // app.proxyIpHeader 代理 ip 消息头, 默认为 X-Forwarded-For
@@ -45,7 +36,6 @@ function runServer() {
   app.proxy = true;
 
   app.use(catchErrorMiddle); // 全局错误处理
-
   app.use(
     koaBody({
       multipart: true,
@@ -67,7 +57,6 @@ function runServer() {
       // strict: true, // 废弃了。如果启用，则不解析 GET、HEAD、DELETE 请求，默认true。即delete不会解析data数据
     })
   ); // 解析参数
-
   app.use(
     staticService(STATIC_DIR, {
       maxage: 60 * 1000, // 缓存时间：1分钟
@@ -76,7 +65,9 @@ function runServer() {
   app.use(conditional()); // 接口缓存
   app.use(etag()); // 接口缓存
   app.use(corsMiddle); // 设置允许跨域
+
   app.on('error', errorHandler); // 接收全局错误，位置必须得放在最开头？
+
   async function main() {
     try {
       app.use(apiBeforeVerify); // 注意：需要在所有路由加载前使用这个中间件
@@ -94,49 +85,14 @@ function runServer() {
         });
         connectWebSocket(httpServer); // 初始化websocket
       }); // http接口服务
-      connectNodeMediaServer();
+
+      initSRS(); // 初始化srs
+      initFFmpeg(); // 初始化FFmpeg
+
       console.log(chalkSUCCESS(`项目启动成功！`));
       console.log(chalkWARN(`当前监听的端口: ${port}`));
       console.log(chalkWARN(`当前的项目名称: ${PROJECT_NAME}`));
       console.log(chalkWARN(`当前的项目环境: ${PROJECT_ENV}`));
-      try {
-        const srsSh = `sh ${path.resolve(__dirname, '../srs.sh')}`;
-        // const srsSh = `echo ${path.resolve(__dirname, '../srs.sh')}`;
-        const child = exec(srsSh, {}, (error, stream) => {
-          console.log(chalkINFO(`${new Date().toLocaleString()}，srsSh有打印`));
-          console.log(error, stream);
-        });
-        child.on('exit', () => {
-          console.log(
-            chalkINFO(
-              `${new Date().toLocaleString()}，srsSh子进程退出了，${srsSh}`
-            )
-          );
-        });
-      } catch (error) {
-        console.log(error);
-      }
-      try {
-        const ffmpegShCmd = 'echo test' || ffmpegSh;
-        // const ffmpegShCmd = ffmpegSh;
-        const child = exec(ffmpegShCmd);
-        child.on('exit', () => {
-          console.log(
-            chalkINFO(
-              `${new Date().toLocaleString()}，ffmpegSh子进程退出了，${ffmpegShCmd}`
-            )
-          );
-        });
-        child.on('error', () => {
-          console.log(
-            chalkINFO(
-              `${new Date().toLocaleString()}，ffmpegSh子进程错误，${ffmpegShCmd}`
-            )
-          );
-        });
-      } catch (error) {
-        console.log(error);
-      }
     } catch (error) {
       console.log(chalkERROR(`项目启动失败！`));
       console.log(error);
@@ -145,7 +101,7 @@ function runServer() {
   main();
 }
 
-runServer();
+setupServer();
 
 // const numCPUs = cpus().length;
 
