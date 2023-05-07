@@ -1,8 +1,14 @@
 export interface ILive {
   id?: number;
+  system?: number;
   socketId?: string;
   roomId?: string;
-  data?: string;
+  roomName?: string;
+  track_video?: boolean;
+  track_audio?: boolean;
+  coverImg?: string;
+  streamurl?: string;
+  flvurl?: string;
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;

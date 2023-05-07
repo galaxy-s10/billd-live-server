@@ -7,7 +7,7 @@ import { IList, ILive } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveService from '@/service/live.service';
 
-class MusicController {
+class LiveController {
   async getList(ctx: ParameterizedContext, next) {
     const {
       id,
@@ -44,36 +44,6 @@ class MusicController {
     await next();
   }
 
-  async update(ctx: ParameterizedContext, next) {
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        `权限不足！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
-    const id = +ctx.params.id;
-    const { socketId, roomId, data }: ILive = ctx.request.body;
-    const isExist = await liveService.isExist([id]);
-    if (!isExist) {
-      throw new CustomError(
-        `不存在id为${id}的直播！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
-      );
-    }
-    await liveService.update({
-      id,
-      socketId,
-      roomId,
-      data,
-    });
-    successHandler({ ctx });
-
-    await next();
-  }
-
   async create(ctx: ParameterizedContext, next) {
     const hasAuth = await verifyUserAuth(ctx);
     if (!hasAuth) {
@@ -83,11 +53,27 @@ class MusicController {
         ALLOW_HTTP_CODE.forbidden
       );
     }
-    const { socketId, roomId, data }: ILive = ctx.request.body;
+    const {
+      socketId,
+      roomId,
+      roomName,
+      coverImg,
+      track_audio,
+      track_video,
+      system,
+      streamurl,
+      flvurl,
+    }: ILive = ctx.request.body;
     await liveService.create({
       socketId,
       roomId,
-      data,
+      roomName,
+      coverImg,
+      track_audio,
+      track_video,
+      system,
+      streamurl,
+      flvurl,
     });
     successHandler({ ctx });
 
@@ -119,4 +105,4 @@ class MusicController {
   }
 }
 
-export default new MusicController();
+export default new LiveController();

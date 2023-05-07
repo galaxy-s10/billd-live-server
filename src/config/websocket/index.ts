@@ -61,22 +61,31 @@ export const connectWebSocket = (server) => {
       WsMsgTypeEnum.join,
       async (data: {
         roomId: string;
-        roomName: string;
-        data: any;
+        socketId: string;
+        data: {
+          roomName: string;
+          coverImg: string;
+          srs?: { streamurl: string; flvurl: string };
+          track: { audio: boolean; video: boolean };
+        };
         isAdmin?: boolean;
       }) => {
         socket.join(data.roomId);
-        console.log(
-          new Date().toLocaleString(),
-          '收到用户进入房间',
-          { 'socket.id': socket.id, roomId: data.roomId },
-          data
-        );
+        console.log(new Date().toLocaleString(), '收到用户进入房间', {
+          'socket.id': socket.id,
+          roomId: data.roomId,
+        });
         if (data.isAdmin) {
           liveService.create({
             roomId: data.roomId,
             socketId: socket.id,
-            data: JSON.stringify(data),
+            roomName: data.data.roomName,
+            system: 2,
+            track_audio: data.data.track.audio,
+            track_video: data.data.track.video,
+            coverImg: data.data.coverImg,
+            streamurl: data.data.srs?.streamurl,
+            flvurl: data.data.srs?.flvurl,
           });
           socket.emit(WsMsgTypeEnum.joined, data);
         } else {
@@ -88,10 +97,7 @@ export const connectWebSocket = (server) => {
               socketId: socket.id,
               roomId: data.roomId,
             });
-            socket.emit(
-              WsMsgTypeEnum.joined,
-              JSON.parse(res.rows[0].data || '{}')
-            );
+            socket.emit(WsMsgTypeEnum.joined, res.rows[0] || {});
             socket.emit(WsMsgTypeEnum.roomLiveing, data);
             socket
               .to(data.roomId)

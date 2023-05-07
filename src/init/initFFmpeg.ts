@@ -1,9 +1,36 @@
 import { execSync } from 'child_process';
 
+import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import liveService from '@/service/live.service';
 import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
 
-const localFile = '/Users/huangshuisheng/Desktop/fddm_1.mp4';
-const remoteFlv = 'rtmp://localhost/live/livestream';
+let localFile = '/Users/huangshuisheng/Desktop/fddm_2.mp4';
+let streamurl = 'webrtc://localhost.cn:5001/live/livestream/fddm_2';
+let flvurl = 'http://localhost:5001/live/livestream/fddm_2.flv';
+
+const remoteFlv = 'rtmp://localhost/live/livestream/fddm_2';
+
+if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
+  localFile = '/node/fddm_2.mp4';
+  streamurl = 'webrtc://hsslive.cn:5001/live/livestream/fddm_2';
+  flvurl = 'http://hsslive.cn:5001/live/livestream/fddm_2.flv';
+}
+
+async function addLive() {
+  const socketId = 'socketId_fddm_2';
+  await liveService.deleteBySocketId(socketId);
+  liveService.create({
+    roomId: 'roomId_fddm_2',
+    socketId,
+    roomName: '房东的猫',
+    system: 1,
+    track_audio: true,
+    track_video: true,
+    coverImg: '',
+    streamurl,
+    flvurl,
+  });
+}
 
 export const initFFmpeg = () => {
   try {
@@ -20,6 +47,7 @@ export const initFFmpeg = () => {
     console.log(
       chalkSUCCESS(`${new Date().toLocaleString()},初始化FFmpeg成功！`)
     );
+    addLive();
     // const child = exec(ffmpeg, (error, stdout, stderr) => {
     //   console.log(
     //     chalkSUCCESS(`${new Date().toLocaleString()}初始化FFmpeg成功！`)

@@ -92,20 +92,57 @@ class MusicService {
   };
 
   /** 修改直播 */
-  async update({ id, socketId, roomId, data }: ILive) {
+  async update({
+    id,
+    socketId,
+    roomId,
+    roomName,
+    coverImg,
+    track_audio,
+    track_video,
+    system,
+    streamurl,
+    flvurl,
+  }: ILive) {
     const result = await liveModel.update(
-      { socketId, roomId, data },
+      {
+        socketId,
+        roomId,
+        roomName,
+        coverImg,
+        track_audio,
+        track_video,
+        system,
+        streamurl,
+        flvurl,
+      },
       { where: { id } }
     );
     return result;
   }
 
   /** 创建直播 */
-  async create({ socketId, roomId, data }: ILive) {
+  async create({
+    socketId,
+    roomId,
+    roomName,
+    coverImg,
+    track_audio,
+    track_video,
+    system,
+    streamurl,
+    flvurl,
+  }: ILive) {
     const result = await liveModel.create({
       socketId,
       roomId,
-      data,
+      roomName,
+      coverImg,
+      track_audio,
+      track_video,
+      system,
+      streamurl,
+      flvurl,
     });
     return result;
   }

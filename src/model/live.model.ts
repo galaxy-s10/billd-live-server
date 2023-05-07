@@ -22,14 +22,34 @@ const model = sequelize.define<LiveModel>(
       allowNull: false,
       autoIncrement: true,
     },
+    system: {
+      // 1:系统直播;2:用户直播
+      type: DataTypes.INTEGER,
+      defaultValue: 2,
+    },
     socketId: {
       type: DataTypes.STRING(100),
     },
     roomId: {
       type: DataTypes.STRING(100),
     },
-    data: {
+    roomName: {
+      type: DataTypes.STRING(100),
+    },
+    track_video: {
+      type: DataTypes.BOOLEAN,
+    },
+    track_audio: {
+      type: DataTypes.BOOLEAN,
+    },
+    coverImg: {
       type: DataTypes.TEXT,
+    },
+    streamurl: {
+      type: DataTypes.STRING(100),
+    },
+    flvurl: {
+      type: DataTypes.STRING(100),
     },
   },
   {
