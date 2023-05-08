@@ -4,6 +4,8 @@ import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import liveService from '@/service/live.service';
 import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
 
+import { fddm_2_base64 } from './base64';
+
 let localFile = '/Users/huangshuisheng/Desktop/fddm_2.mp4';
 let streamurl = 'webrtc://localhost.cn:5001/live/livestream/fddm_2';
 let flvurl = 'http://localhost:5001/live/livestream/fddm_2.flv';
@@ -26,7 +28,7 @@ async function addLive() {
     system: 1,
     track_audio: true,
     track_video: true,
-    coverImg: '',
+    coverImg: fddm_2_base64,
     streamurl,
     flvurl,
   });
