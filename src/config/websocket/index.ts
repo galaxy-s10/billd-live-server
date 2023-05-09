@@ -109,6 +109,19 @@ export const connectWebSocket = (server) => {
       }
     );
 
+    // 收到用户获取当前在线用户
+    socket.on(WsMsgTypeEnum.getLiveUser, async (data) => {
+      console.log(
+        new Date().toLocaleString(),
+        socket.id,
+        '收到用户获取当前在线用户',
+        data
+      );
+      socket.emit(WsMsgTypeEnum.getLiveUser, { socketId: socket.id });
+      const liveUser = await getAllLiveUser(io);
+      socket.emit(WsMsgTypeEnum.liveUser, liveUser);
+    });
+
     // 收到用户离开房间
     socket.on(WsMsgTypeEnum.leave, async (data) => {
       console.log(

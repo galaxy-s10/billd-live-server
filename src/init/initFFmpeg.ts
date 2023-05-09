@@ -7,15 +7,14 @@ import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
 import { fddm_2_base64 } from './base64';
 
 let localFile = '/Users/huangshuisheng/Desktop/fddm_2.mp4';
-let streamurl = 'webrtc://localhost.cn:5001/live/livestream/fddm_2';
 let flvurl = 'http://localhost:5001/live/livestream/fddm_2.flv';
 
+const streamurl = '';
 const remoteFlv = 'rtmp://localhost/live/livestream/fddm_2';
 
 if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
   localFile = '/node/fddm_2.mp4';
-  streamurl = 'webrtc://hsslive.cn:5001/live/livestream/fddm_2';
-  flvurl = 'https://www.hsslive.cn/srsflv/live/livestream/fddm_2.flv';
+  flvurl = 'https://live.hsslive.cn/srsflv/live/livestream/fddm_2.flv';
 }
 
 async function addLive() {

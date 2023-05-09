@@ -6,7 +6,7 @@ import { chalkSUCCESS } from '@/utils/chalkTip';
 export const initSRS = () => {
   try {
     const srsSh = `sh ${path.resolve(process.cwd(), 'srs.sh')}`;
-    // const srsSh = `echo test initSRS`;
+    // const srsSh = `echo ${path.resolve(process.cwd(), 'srs.sh')}`;
     execSync(srsSh);
     console.log(chalkSUCCESS(`${new Date().toLocaleString()},初始化SRS成功！`));
     // const child = exec(srsSh, {}, (error, stdout, stderr) => {
