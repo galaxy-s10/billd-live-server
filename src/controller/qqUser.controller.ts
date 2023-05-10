@@ -4,9 +4,9 @@ import { ParameterizedContext } from 'koa';
 import { authJwt, signJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import {
-  ADMIN_QQ_CLIENT_ID,
-  ADMIN_QQ_CLIENT_SECRET,
-  ADMIN_QQ_REDIRECT_URI,
+  LIVE_QQ_CLIENT_ID,
+  LIVE_QQ_CLIENT_SECRET,
+  LIVE_QQ_REDIRECT_URI,
 } from '@/config/secret';
 import { ALLOW_HTTP_CODE, THIRD_PLATFORM } from '@/constant';
 import { IList, IQqUser } from '@/interface';
@@ -74,9 +74,9 @@ class QqUserController {
     // 注意此code会在10分钟内过期。
     const params: any = {};
     params.code = code;
-    params.client_id = ADMIN_QQ_CLIENT_ID;
-    params.client_secret = ADMIN_QQ_CLIENT_SECRET;
-    params.redirect_uri = ADMIN_QQ_REDIRECT_URI;
+    params.client_id = LIVE_QQ_CLIENT_ID;
+    params.client_secret = LIVE_QQ_CLIENT_SECRET;
+    params.redirect_uri = LIVE_QQ_REDIRECT_URI;
     params.grant_type = 'authorization_code';
     params.fmt = 'json';
     // https://wiki.connect.qq.com/%E4%BD%BF%E7%94%A8authorization_code%E8%8E%B7%E5%8F%96access_token
@@ -163,14 +163,12 @@ class QqUserController {
       await thirdUserModel.create({
         user_id: userInfo?.id,
         third_user_id: qqUser.id,
-        third_platform: THIRD_PLATFORM.qq_admin,
+        third_platform: THIRD_PLATFORM.qq,
       });
       const token = signJwt({
         userInfo: {
           ...JSON.parse(JSON.stringify(userInfo)),
-          github_users: undefined,
           qq_users: undefined,
-          email_users: undefined,
         },
         exp,
       });
@@ -227,7 +225,7 @@ class QqUserController {
         OauthInfo.unionid
       );
       const thirdUserInfo: any = await thirdUserService.findUser({
-        third_platform: THIRD_PLATFORM.qq_admin,
+        third_platform: THIRD_PLATFORM.qq,
         third_user_id: oldQqUser.id,
       });
       const userInfo: any = await userService.findAccount(
@@ -236,9 +234,7 @@ class QqUserController {
       const token = signJwt({
         userInfo: {
           ...JSON.parse(JSON.stringify(userInfo)),
-          github_users: undefined,
           qq_users: undefined,
-          email_users: undefined,
         },
         exp,
       });
@@ -350,7 +346,7 @@ class QqUserController {
     }
     const result: any = await thirdUserService.findByUserId(userInfo!.id!);
     const ownIsBind = result.filter(
-      (v) => v.third_platform === THIRD_PLATFORM.qq_admin
+      (v) => v.third_platform === THIRD_PLATFORM.qq
     );
     if (ownIsBind.length) {
       throw new CustomError(
@@ -392,47 +388,10 @@ class QqUserController {
     await thirdUserModel.create({
       user_id: userInfo?.id,
       third_user_id: qqUser.id,
-      third_platform: THIRD_PLATFORM.qq_admin,
+      third_platform: THIRD_PLATFORM.qq,
     });
     successHandler({ ctx, message: '绑定qq成功！' });
 
-    await next();
-  };
-
-  /**
-   * 取消绑定qq
-   */
-  cancelBindQQ = async (ctx: ParameterizedContext, next) => {
-    const { code, userInfo, message } = await authJwt(ctx);
-    if (!userInfo) {
-      throw new CustomError(message, code, code);
-    }
-    const result: any[] = await thirdUserService.findByUserId(userInfo.id!);
-    const ownIsBind = result.filter(
-      (v) => v.third_platform === THIRD_PLATFORM.qq_admin
-    );
-    if (!ownIsBind.length) {
-      throw new CustomError(
-        '你没有绑定过qq，不能解绑',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
-      );
-    }
-    // 至少得绑定一个第三方平台，否则不能解绑
-    const user = await userService.findAccount(userInfo.id!);
-    if (
-      Number(user?.github_users!.length) + Number(user?.email_users!.length) ===
-      0
-    ) {
-      throw new CustomError(
-        '不能解绑，至少得绑定一个第三方平台（github、email、qq）！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
-      );
-    }
-    await qqUserService.delete(ownIsBind[0].third_user_id);
-    await thirdUserService.delete(ownIsBind[0].id);
-    successHandler({ ctx, message: '解绑qq成功！' });
     await next();
   };
 

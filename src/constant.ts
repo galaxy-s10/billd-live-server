@@ -78,21 +78,6 @@ export const COMMON_ERR_MSG = {
   shutdown: '停机维护中~',
 };
 
-// 没有用到这个DisableEnum枚举，eslint会报错
-// export enum DisableEnum {
-//   'banIp' = 1,
-//   'adminDisableUser' = 2,
-// }
-
-// 发送邮件结果类型
-export const VERIFY_EMAIL_RESULT_CODE = {
-  ok: '发送成功！',
-  more: '一天只能发5次验证码！',
-  later: '一分钟内只能发1次验证码，请稍后再试！',
-  err: '验证码错误或已过期！',
-  system: '发送邮件错误！',
-};
-
 // redis前缀
 export const REDIS_PREFIX = {
   emailLogin: `${PROJECT_NAME}-${PROJECT_ENV}-emailLogin`, // 登录不区分前后台
@@ -106,46 +91,5 @@ export const REDIS_PREFIX = {
 // 平台类型
 export const THIRD_PLATFORM = {
   website: 1, // 站内（user表里面的用户就是这个类型，但是不记录在third_user表里）
-  qq_www: 2, // qq前台（现在不存在这个类型了）
-  qq_admin: 3, // qq后台
-  github: 4, // github
-  email: 5, // 邮箱
+  qq: 2, // qq
 };
-
-// 监控任务
-export const MONIT_JOB = {
-  MEMORY: 'monitMemoryJob', // 监控内存任务
-  PROCESS: 'monitProcessJob', // 监控node进程任务
-  BACKUPSDB: 'monitBackupsDbJob', // 监控备份数据库任务
-  QINIUCDN: 'monitQiniuCDNJob', // 监控七牛云cdn任务
-  DELETELOG: 'monitDeleteLog', // 监控删除日志
-};
-
-// 监控类型
-export const MONIT_TYPE = {
-  MEMORY_LOG: 1, // 服务器内存日志
-  MEMORY_THRESHOLD: 2, // 服务器内存达到阈值
-  QINIU_CDN: 3, // 监控七牛云
-  VUE3_BLOG_SERVER_NODE_PROCESS: 4, // 监控node进程
-  RESTART_PM2: 5, // 重启pm2
-  CLEAR_CACHE: 6, // 清除buff/cache
-  BACKUPS_DB_OK: 7, // 备份数据库成功
-  BACKUPS_DB_ERR: 8, // 备份数据库失败
-};
-
-// 七牛云文件上传进度类型
-export enum QINIU_UPLOAD_PROGRESS_TYPE {
-  fileProgress = 1,
-  chunkFileProgress = 2,
-}
-export const QINIU_PROGRESS_LOG_V1 = path.join(UPLOAD_DIR, 'progressv1.log'); // 上传文件接口接收到的文件存放的目录
-export const QINIU_PROGRESS_LOG_V2 = path.join(UPLOAD_DIR, 'progressv2.log'); // 上传文件接口接收到的文件存放的目录
-export const QINIU_CDN_DOMAIN = 'resource.hsslive.cn';
-export const QINIU_CDN_URL = 'https://resource.hsslive.cn/';
-export const QINIU_BUCKET = 'hssblog'; // 七牛云bucket
-export enum QINIU_PREFIX {
-  'image/' = 'image/',
-  'backupsDatabase/' = 'backupsDatabase/',
-  'media/' = 'media/',
-  'nuxt-blog-client/' = 'nuxt-blog-client/',
-}

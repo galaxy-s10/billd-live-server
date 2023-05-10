@@ -1,8 +1,6 @@
 import { chalkINFO } from '@/utils/chalkTip';
 
 import Auth from './auth.model';
-import EmailUser from './emailUser.model';
-import GithubUser from './githubUser.model';
 import Log from './log.model';
 import QqUser from './qqUser.model';
 import Role from './role.model';
@@ -146,47 +144,6 @@ Email.hasOne(ThirdUser, {
   constraints: false,
 });
  */
-EmailUser.belongsToMany(User, {
-  foreignKey: 'third_user_id',
-  otherKey: 'user_id',
-  sourceKey: 'id',
-  constraints: false,
-  through: {
-    model: ThirdUser,
-    unique: false, // 不生成唯一索引
-  },
-});
-User.belongsToMany(EmailUser, {
-  foreignKey: 'user_id',
-  otherKey: 'third_user_id',
-  targetKey: 'id',
-  constraints: false,
-  through: {
-    model: ThirdUser,
-    unique: false, // 不生成唯一索引
-  },
-});
-
-GithubUser.belongsToMany(User, {
-  foreignKey: 'third_user_id',
-  otherKey: 'user_id',
-  sourceKey: 'id',
-  constraints: false,
-  through: {
-    model: ThirdUser,
-    unique: false, // 不生成唯一索引
-  },
-});
-User.belongsToMany(GithubUser, {
-  foreignKey: 'user_id',
-  otherKey: 'third_user_id',
-  targetKey: 'id',
-  constraints: false,
-  through: {
-    model: ThirdUser,
-    unique: false, // 不生成唯一索引
-  },
-});
 
 ThirdUser.belongsTo(User, {
   foreignKey: 'third_user_id',

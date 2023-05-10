@@ -9,11 +9,11 @@ import {
   bulkCreateRoleAuth,
 } from '@/init/initData';
 import { initDb } from '@/init/initDb';
-import AuthModel from '@/model/auth.model';
+import authModel from '@/model/auth.model';
 import { CustomError } from '@/model/customError.model';
 import dayDataModel from '@/model/dayData.model';
-import RoleModel from '@/model/role.model';
-import RoleAuthModel from '@/model/roleAuth.model';
+import roleModel from '@/model/role.model';
+import roleAuthModel from '@/model/roleAuth.model';
 import userModel from '@/model/user.model';
 
 const sql1 = `
@@ -45,9 +45,9 @@ const sql3 = `call insert_many_dates(3650)`;
 class InitController {
   // 初始化角色
   async initRole(ctx: ParameterizedContext, next) {
-    const count = await RoleModel.count();
+    const count = await roleModel.count();
     if (count === 0) {
-      await RoleModel.bulkCreate(bulkCreateRole);
+      await roleModel.bulkCreate(bulkCreateRole);
       successHandler({ ctx, message: '初始化角色成功！' });
     } else {
       throw new CustomError(
@@ -61,9 +61,9 @@ class InitController {
 
   // 初始化权限
   async initAuth(ctx: ParameterizedContext, next) {
-    const count = await AuthModel.count();
+    const count = await authModel.count();
     if (count === 0) {
-      await AuthModel.bulkCreate(bulkCreateAuth);
+      await authModel.bulkCreate(bulkCreateAuth);
       successHandler({ ctx, message: '初始化权限成功！' });
     } else {
       throw new CustomError(
@@ -78,9 +78,9 @@ class InitController {
 
   // 初始化角色权限
   async initRoleAuth(ctx: ParameterizedContext) {
-    const count = await RoleAuthModel.count();
+    const count = await roleAuthModel.count();
     if (count === 0) {
-      await RoleAuthModel.bulkCreate(bulkCreateRoleAuth);
+      await roleAuthModel.bulkCreate(bulkCreateRoleAuth);
       successHandler({ ctx, message: '初始化角色权限成功！' });
     } else {
       throw new CustomError(

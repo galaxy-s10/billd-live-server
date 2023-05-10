@@ -6,7 +6,7 @@ import { Server, Socket } from 'socket.io';
 import { pubClient } from '@/config/redis/pub';
 import { REDIS_CONFIG } from '@/config/secret';
 import { PROJECT_ENV, PROJECT_ENV_ENUM, REDIS_PREFIX } from '@/constant';
-import alipayController from '@/controller/alipay.controller';
+import orderController from '@/controller/order.controller';
 import liveService from '@/service/live.service';
 import { chalkINFO } from '@/utils/chalkTip';
 
@@ -44,7 +44,7 @@ export const connectWebSocket = (server) => {
       console.log('过期key监听', redisKey, subscribeName);
       if (redisKey.indexOf(REDIS_PREFIX.order) === 0) {
         const out_trade_no = redisKey.replace(`${REDIS_PREFIX.order}-`, '');
-        alipayController.commonGetPayStatus(out_trade_no);
+        orderController.commonGetPayStatus(out_trade_no);
       }
     }
   );

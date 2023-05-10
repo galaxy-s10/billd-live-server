@@ -2,8 +2,6 @@ import Sequelize from 'sequelize';
 
 import { PROJECT_ENV, THIRD_PLATFORM } from '@/constant';
 import { IList, IUser } from '@/interface';
-import emailModel from '@/model/emailUser.model';
-import githubUserModel from '@/model/githubUser.model';
 import qqUserModel from '@/model/qqUser.model';
 import roleModel from '@/model/role.model';
 import userModel from '@/model/user.model';
@@ -142,25 +140,7 @@ class UserService {
           through: {
             attributes: ['third_platform'],
             where: {
-              third_platform: THIRD_PLATFORM.qq_admin,
-            },
-          },
-        },
-        {
-          model: githubUserModel,
-          through: {
-            attributes: ['third_platform'],
-            where: {
-              third_platform: THIRD_PLATFORM.github,
-            },
-          },
-        },
-        {
-          model: emailModel,
-          through: {
-            attributes: [],
-            where: {
-              third_platform: THIRD_PLATFORM.email,
+              third_platform: THIRD_PLATFORM.qq,
             },
           },
         },
@@ -182,25 +162,7 @@ class UserService {
           through: {
             attributes: ['third_platform'],
             where: {
-              third_platform: THIRD_PLATFORM.qq_admin,
-            },
-          },
-        },
-        {
-          model: githubUserModel,
-          through: {
-            attributes: ['third_platform'],
-            where: {
-              third_platform: THIRD_PLATFORM.github,
-            },
-          },
-        },
-        {
-          model: emailModel,
-          through: {
-            attributes: [],
-            where: {
-              third_platform: THIRD_PLATFORM.email,
+              third_platform: THIRD_PLATFORM.qq,
             },
           },
         },

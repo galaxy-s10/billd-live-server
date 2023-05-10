@@ -7,7 +7,7 @@ import successHandler from '@/app/handler/success-handle';
 import { ALIPAY_LIVE_CONFIG } from '@/config/secret';
 import { REDIS_PREFIX } from '@/constant';
 import redisController from '@/controller/redis.controller';
-import OrderModel from '@/model/order.model';
+import orderModel from '@/model/order.model';
 
 const { Op } = Sequelize;
 
@@ -27,11 +27,11 @@ class AliPayController {
       method: 'alipay.trade.query',
       bizContent,
     });
-    const orderInfo = await OrderModel.findOne({ where: { out_trade_no } });
+    const orderInfo = await orderModel.findOne({ where: { out_trade_no } });
     let tradeStatus = 'error';
     if (orderInfo) {
       if (res.msg === 'Success') {
-        await OrderModel.update(
+        await orderModel.update(
           {
             buyer_logon_id: res.buyerLogonId,
             buyer_pay_amount: res.buyerPayAmount,
@@ -87,7 +87,7 @@ class AliPayController {
       product_code: bizContent.product_code,
       qr_code: res.qrCode,
     };
-    await OrderModel.create(createDate);
+    await orderModel.create(createDate);
     const exp = 60 * 5;
     redisController.setExVal({
       prefix: REDIS_PREFIX.order,
@@ -118,7 +118,7 @@ class AliPayController {
   };
 
   async getList(ctx: ParameterizedContext, next) {
-    const res = await OrderModel.findAndCountAll({
+    const res = await orderModel.findAndCountAll({
       where: {
         trade_status: {
           [Op.or]: ['WAIT_BUYER_PAY', 'TRADE_SUCCESS'],
