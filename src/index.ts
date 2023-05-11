@@ -86,6 +86,7 @@ function setupServer() {
         connectWebSocket(httpServer); // 初始化websocket
       }); // http接口服务
 
+      console.log(initSRS, initFFmpeg);
       initSRS(); // 初始化srs
       initFFmpeg(); // 初始化FFmpeg
 

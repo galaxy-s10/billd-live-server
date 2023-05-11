@@ -1,16 +1,25 @@
-import { execSync } from 'child_process';
+import { execSync, spawnSync } from 'child_process';
 
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import liveService from '@/service/live.service';
+import { resolveApp } from '@/utils';
 import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
 
 import { fddm_2_base64 } from './base64';
 
-let localFile = '/Users/huangshuisheng/Desktop/fddm_2.mp4';
+let localFile = resolveApp('./public/fddm.mp4');
 let flvurl = 'http://localhost:5001/live/livestream/fddm_2.flv';
 
 const streamurl = '';
 const remoteFlv = 'rtmp://localhost/live/livestream/fddm_2';
+
+function ffmpegIsInstalled() {
+  const res = spawnSync('ffmpeg', ['-version']);
+  if (res.status !== 0) {
+    return false;
+  }
+  return true;
+}
 
 if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
   localFile = '/node/fddm_2.mp4';
@@ -34,6 +43,13 @@ async function addLive() {
 }
 
 export const initFFmpeg = () => {
+  const flag = ffmpegIsInstalled();
+  if (flag) {
+    console.log(chalkSUCCESS('ffmpeg已安装，开始运行ffmpeg推流'));
+  } else {
+    console.log(chalkERROR('未安装ffmpeg！'));
+    return;
+  }
   try {
     // ffmpeg后台运行
     // https://www.jianshu.com/p/6ea70e6d8547

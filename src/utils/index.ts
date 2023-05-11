@@ -1,8 +1,13 @@
+import path from 'path';
+
 import { ParameterizedContext } from 'koa';
 import { Model, ModelStatic } from 'sequelize/types';
 
 import sequelize from '@/config/mysql';
 import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
+
+export const resolveApp = (relativePath) =>
+  path.join(__dirname, '../', relativePath);
 
 /**
  * @description: 处理free命令返回的内存信息
