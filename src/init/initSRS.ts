@@ -46,9 +46,9 @@ export const initSRS = () => {
     // 停掉旧的容器
     execSync(`docker stop ${SRS_CONFIG.dockerContainerName}`);
     // 删掉旧的容器
-    execSync(`docker rm ${SRS_CONFIG.dockerContainerName}`);
+    // execSync(`docker rm ${SRS_CONFIG.dockerContainerName}`);
     // 启动新的容器
-    execSync(`docker run -d --name $JOBNAME --rm --env CANDIDATE=$CANDIDATE \
+    execSync(`docker run -d --name ${SRS_CONFIG.dockerContainerName} --rm --env CANDIDATE=${SRS_CONFIG.CANDIDATE} \
     -p 1935:1935 -p 5001:8080 -p 1985:1985 -p 8000:8000/udp \
     registry.cn-hangzhou.aliyuncs.com/ossrs/srs:4 \
     objs/srs -c conf/rtc2rtmp.conf`);
@@ -73,5 +73,6 @@ export const initSRS = () => {
     // });
   } catch (error) {
     console.log(error);
+    console.log(chalkERROR(`${new Date().toLocaleString()},初始化SRS失败！`));
   }
 };

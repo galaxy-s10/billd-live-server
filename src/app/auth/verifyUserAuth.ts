@@ -1,9 +1,8 @@
 import { ParameterizedContext } from 'koa';
 
+import { authJwt } from '@/app/auth/authJwt';
 import { ALLOW_HTTP_CODE } from '@/constant';
 import roleService from '@/service/role.service';
-
-import { authJwt } from './authJwt';
 
 export const verifyUserAuth = async (ctx: ParameterizedContext) => {
   const { code, userInfo, message } = await authJwt(ctx);

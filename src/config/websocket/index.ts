@@ -5,13 +5,15 @@ import { Server, Socket } from 'socket.io';
 
 import { pubClient } from '@/config/redis/pub';
 import { REDIS_CONFIG } from '@/config/secret';
+import {
+  WsConnectStatusEnum,
+  WsMsgTypeEnum,
+} from '@/config/websocket/constant';
+import LiveRedisController from '@/config/websocket/redis.controller';
 import { PROJECT_ENV, PROJECT_ENV_ENUM, REDIS_PREFIX } from '@/constant';
 import orderController from '@/controller/order.controller';
 import liveService from '@/service/live.service';
 import { chalkINFO } from '@/utils/chalkTip';
-
-import { WsConnectStatusEnum, WsMsgTypeEnum } from './constant';
-import LiveRedisController from './redis.controller';
 
 interface IOffer {
   socketId: string;

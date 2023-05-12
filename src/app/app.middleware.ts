@@ -1,12 +1,11 @@
 import { ParameterizedContext } from 'koa';
 
+import { authJwt } from '@/app/auth/authJwt';
 import { ALLOW_HTTP_CODE, ERROR_HTTP_CODE, PROJECT_ENV } from '@/constant';
 import logController from '@/controller/log.controller';
 import { CustomError } from '@/model/customError.model';
 import { isAdmin } from '@/utils';
 import { chalkINFO } from '@/utils/chalkTip';
-
-import { authJwt } from './auth/authJwt';
 
 // 全局错误处理中间件
 export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {

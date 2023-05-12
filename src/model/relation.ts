@@ -1,15 +1,15 @@
-import { chalkINFO } from '@/utils/chalkTip';
+import { loadAllModel } from '@/init/initDb';
+import Auth from '@/model/auth.model';
+import Log from '@/model/log.model';
+import QqUser from '@/model/qqUser.model';
+import Role from '@/model/role.model';
+import RoleAuth from '@/model/roleAuth.model';
+import ThirdUser from '@/model/thirdUser.model';
+import User from '@/model/user.model';
+import UserRole from '@/model/userRole.model';
 
-import Auth from './auth.model';
-import Log from './log.model';
-import QqUser from './qqUser.model';
-import Role from './role.model';
-import RoleAuth from './roleAuth.model';
-import ThirdUser from './thirdUser.model';
-import User from './user.model';
-import UserRole from './userRole.model';
+loadAllModel();
 
-console.log(chalkINFO('加载了relation'));
 /**
  * https://demopark.github.io/sequelize-docs-Zh-CN/core-concepts/assocs.html
  * A 称为 源 模型,而 B 称为 目标 模型.
