@@ -53,12 +53,7 @@ const backendWhiteList = [
 const globalWhiteList = ['/init/'];
 
 // 允许频繁请求的路径白名单
-const frequentlyWhiteList = [
-  '/admin/qiniu_data/upload_chunk',
-  '/admin/qiniu_data/progress',
-  '/article/test',
-  '/admin/article/test',
-];
+const frequentlyWhiteList = [];
 
 async function isPass(ip: string) {
   const nowDate = +new Date();
@@ -96,17 +91,17 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
     console.log(
       chalkINFO(
         `日期：${new Date().toLocaleString()}，ip：${ip}，响应${
-          admin ? '后' : '前'
-        }台接口 ${ctx.request.method} ${url}`
+          ctx.request.method
+        } ${url}`
       )
     );
   };
 
   console.log(
     chalkINFO(
-      `日期：${new Date().toLocaleString()}，ip：${ip}，收到${
-        admin ? '后' : '前'
-      }台接口 ${ctx.request.method} ${url}请求`
+      `日期：${new Date().toLocaleString()}，ip：${ip}，收到接口 ${
+        ctx.request.method
+      } ${url}请求`
     )
   );
 

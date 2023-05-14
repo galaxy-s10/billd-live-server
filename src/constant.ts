@@ -70,6 +70,10 @@ export const BLACKLIST_TYPE = {
   adminDisableUser: 2, // 被管理员禁用
 };
 
+export const SCHEDULE_TYPE = {
+  roomIsLiveing: 'roomIsLiveing',
+};
+
 export const COMMON_ERR_MSG = {
   banIp: '此ip已被禁用，请联系管理员处理！',
   jwtExpired: '登录信息过期！',
@@ -85,6 +89,7 @@ export const REDIS_PREFIX = {
   userBindEmail: `${PROJECT_NAME}-${PROJECT_ENV}-userBindEmail`, // 用户绑定邮箱
   userCancelBindEmail: `${PROJECT_NAME}-${PROJECT_ENV}-userCancelBindEmail`, // 用户取消绑定邮箱
   joined: `${PROJECT_NAME}-${PROJECT_ENV}-joined`, // 游客加入了房间
+  roomIsLiveing: `${PROJECT_NAME}-${PROJECT_ENV}-roomIsLiveing`, // 用户正在直播
   order: `${PROJECT_NAME}-${PROJECT_ENV}-order`, // 订单
 };
 

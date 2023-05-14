@@ -1,3 +1,7 @@
+export enum liveEnum {
+  srs = 1,
+  webrtc,
+}
 export interface ILive {
   id?: number;
   system?: number;

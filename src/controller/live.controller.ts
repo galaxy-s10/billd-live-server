@@ -8,33 +8,54 @@ import { CustomError } from '@/model/customError.model';
 import liveService from '@/service/live.service';
 
 class LiveController {
-  async getList(ctx: ParameterizedContext, next) {
-    const {
-      id,
-      orderBy = 'asc',
-      orderName = 'id',
-      nowPage,
-      pageSize,
-      keyWord,
-      rangTimeType,
-      rangTimeStart,
-      rangTimeEnd,
-    }: IList<ILive> = ctx.request.query;
-    const result = await liveService.getList({
-      id,
-      nowPage,
-      pageSize,
-      orderBy,
-      orderName,
-      keyWord,
-      rangTimeType,
-      rangTimeStart,
-      rangTimeEnd,
-    });
+  common = {
+    getList: async (data) => {
+      const {
+        id,
+        orderBy = 'asc',
+        orderName = 'id',
+        nowPage,
+        pageSize,
+        keyWord,
+        rangTimeType,
+        rangTimeStart,
+        rangTimeEnd,
+      }: IList<ILive> = data;
+      const result = await liveService.getList({
+        id,
+        nowPage,
+        pageSize,
+        orderBy,
+        orderName,
+        keyWord,
+        rangTimeType,
+        rangTimeStart,
+        rangTimeEnd,
+      });
+      return result;
+    },
+    delete: async (id: number, isRoute?: boolean) => {
+      const isExist = await liveService.isExist([id]);
+      if (!isExist) {
+        if (isRoute) {
+          throw new CustomError(
+            `不存在id为${id}的直播！`,
+            ALLOW_HTTP_CODE.paramsError,
+            ALLOW_HTTP_CODE.paramsError
+          );
+        }
+      } else {
+        await liveService.delete(id);
+      }
+    },
+  };
+
+  getList = async (ctx: ParameterizedContext, next) => {
+    const result = await this.common.getList(ctx.request.query);
     successHandler({ ctx, data: result });
 
     await next();
-  }
+  };
 
   async find(ctx: ParameterizedContext, next) {
     const id = +ctx.params.id;
@@ -80,7 +101,7 @@ class LiveController {
     await next();
   }
 
-  async delete(ctx: ParameterizedContext, next) {
+  delete = async (ctx: ParameterizedContext, next) => {
     const hasAuth = await verifyUserAuth(ctx);
     if (!hasAuth) {
       throw new CustomError(
@@ -90,19 +111,11 @@ class LiveController {
       );
     }
     const id = +ctx.params.id;
-    const isExist = await liveService.isExist([id]);
-    if (!isExist) {
-      throw new CustomError(
-        `不存在id为${id}的直播！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
-      );
-    }
-    await liveService.delete(id);
+    await this.common.delete(id, true);
     successHandler({ ctx });
 
     await next();
-  }
+  };
 }
 
 export default new LiveController();

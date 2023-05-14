@@ -25,12 +25,20 @@ class RedisController {
     prefix,
     key,
     value,
+    created_at,
   }: {
     prefix: string;
     key: string;
-    value: string;
+    value: Record<string, any>;
+    created_at?: number;
   }) => {
-    await redisClient.set(`${prefix}-${key}`, value); // string类型
+    await redisClient.set(
+      `${prefix}-${key}`,
+      JSON.stringify({
+        value,
+        created_at: created_at || +new Date(),
+      })
+    );
   };
 
   setExVal = async ({
@@ -38,18 +46,41 @@ class RedisController {
     key,
     value,
     exp,
+    created_at,
+    expired_at,
   }: {
     prefix: string;
     key: string;
-    value: string;
+    value: Record<string, any>;
     /** 有效期，单位：秒 */
     exp: number;
+    created_at?: number;
+    expired_at?: number;
   }) => {
-    await redisClient.setEx(`${prefix}-${key}`, exp, value); // string类型
+    await redisClient.setEx(
+      `${prefix}-${key}`,
+      exp,
+      JSON.stringify({
+        value,
+        created_at: created_at || +new Date(),
+        expired_at: expired_at || +new Date() + exp * 1000,
+      })
+    );
   };
 
-  setHashVal = async (key: string, field: string, value: any) => {
-    const res = await redisClient.hSetNX(key, field, JSON.stringify(value));
+  setHashVal = async (
+    key: string,
+    field: string,
+    value: Record<string, any>
+  ) => {
+    const res = await redisClient.hSetNX(
+      key,
+      field,
+      JSON.stringify({
+        value,
+        created_at: +new Date(),
+      })
+    );
     return res;
   };
 
@@ -73,8 +104,14 @@ class RedisController {
     return res;
   };
 
-  setSetVal = async (key: string, value: string) => {
-    const res = await redisClient.sAdd(key, value);
+  setSetVal = async (key: string, value: Record<string, any>) => {
+    const res = await redisClient.sAdd(
+      key,
+      JSON.stringify({
+        value,
+        created_at: +new Date(),
+      })
+    );
     return res;
   };
 
@@ -83,8 +120,14 @@ class RedisController {
     return res;
   };
 
-  setListVal = async (key: string, value: string) => {
-    const res = await redisClient.lPush(key, value);
+  setListVal = async (key: string, value: Record<string, any>) => {
+    const res = await redisClient.lPush(
+      key,
+      JSON.stringify({
+        value,
+        created_at: +new Date(),
+      })
+    );
     return res;
   };
 

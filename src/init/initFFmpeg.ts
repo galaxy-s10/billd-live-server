@@ -5,13 +5,13 @@ import liveService from '@/service/live.service';
 import { resolveApp } from '@/utils';
 import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
 
-import { fddm_2_base64 } from './base64';
+import { fddm_base64 } from './base64';
 
 let localFile = resolveApp('./public/fddm.mp4');
-let flvurl = 'http://localhost:5001/live/livestream/fddm_2.flv';
+let flvurl = 'http://localhost:5001/live/livestream/fddm.flv';
 
 const streamurl = '';
-const remoteFlv = 'rtmp://localhost/live/livestream/fddm_2';
+const remoteFlv = 'rtmp://localhost/live/livestream/fddm';
 
 function ffmpegIsInstalled() {
   const res = spawnSync('ffmpeg', ['-version']);
@@ -27,16 +27,16 @@ if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
 }
 
 async function addLive() {
-  const socketId = 'socketId_fddm_2';
+  const socketId = 'socketId_fddm';
   await liveService.deleteBySocketId(socketId);
   liveService.create({
-    roomId: 'roomId_fddm_2',
+    roomId: 'roomId_fddm',
     socketId,
     roomName: '房东的猫',
     system: 1,
     track_audio: true,
     track_video: true,
-    coverImg: fddm_2_base64,
+    coverImg: fddm_base64,
     streamurl,
     flvurl,
   });

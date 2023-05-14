@@ -4,6 +4,7 @@ import './init/alias';
 import { connectMysql } from '@/config/mysql';
 import { connectRedis } from '@/config/redis';
 import { createRedisPubSub } from '@/config/redis/pub';
+import { startSchedule } from '@/config/schedule';
 import { MYSQL_CONFIG } from '@/config/secret';
 import { PROJECT_ENV, PROJECT_NAME, PROJECT_PORT } from '@/constant';
 import { handleSecretFile, handleUploadDir } from '@/init';
@@ -24,6 +25,7 @@ async function main() {
     await initDb('load');
     initSRS(); // 初始化srs
     initFFmpeg(); // 初始化FFmpeg
+    startSchedule();
     const port = +PROJECT_PORT;
     (await import('./setup')).setupKoa({ port });
     console.log(chalkSUCCESS(`项目启动成功！`));

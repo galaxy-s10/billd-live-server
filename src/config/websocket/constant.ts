@@ -40,6 +40,10 @@ export enum WsMsgTypeEnum {
   sendBlob = 'sendBlob',
   /** getLiveUser */
   getLiveUser = 'getLiveUser',
+  /** updateJoinInfo */
+  updateJoinInfo = 'updateJoinInfo',
+  /** heartbeat */
+  heartbeat = 'heartbeat',
   offer = 'offer',
   answer = 'answer',
   candidate = 'candidate',

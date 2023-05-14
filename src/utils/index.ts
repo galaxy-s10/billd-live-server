@@ -6,6 +6,16 @@ import { Model, ModelStatic } from 'sequelize/types';
 import sequelize from '@/config/mysql';
 import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 
+export const filterObj = (obj: Record<string, any>, keyArr: string[]) => {
+  const res: Record<string, any> = {};
+  Object.keys(obj).forEach((item) => {
+    if (!keyArr.includes(item)) {
+      res[item] = obj[item];
+    }
+  });
+  return res;
+};
+
 export const resolveApp = (relativePath) =>
   path.join(__dirname, '../', relativePath);
 
