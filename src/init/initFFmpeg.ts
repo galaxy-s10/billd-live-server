@@ -9,9 +9,9 @@ import { fddm_base64 } from './base64';
 
 let localFile = resolveApp('./public/fddm.mp4');
 let flvurl = 'http://localhost:5001/live/livestream/fddm.flv';
+let remoteFlv = 'rtmp://localhost/live/livestream/fddm';
 
 const streamurl = '';
-const remoteFlv = 'rtmp://localhost/live/livestream/fddm';
 
 function ffmpegIsInstalled() {
   const res = spawnSync('ffmpeg', ['-version']);
@@ -23,6 +23,7 @@ function ffmpegIsInstalled() {
 
 if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
   localFile = '/node/fddm_2.mp4';
+  remoteFlv = 'rtmp://localhost/live/livestream/fddm_2';
   flvurl = 'https://live.hsslive.cn/srsflv/live/livestream/fddm_2.flv';
 }
 
