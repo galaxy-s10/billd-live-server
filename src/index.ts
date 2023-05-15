@@ -1,19 +1,34 @@
 // 一定要将import './init';放到最开头,因为它里面初始化了路径别名
 import './init/alias';
 
-import { connectMysql } from '@/config/mysql';
+import { connectMysql, dbName } from '@/config/mysql';
 import { connectRedis } from '@/config/redis';
 import { createRedisPubSub } from '@/config/redis/pub';
 import { startSchedule } from '@/config/schedule';
-import { MYSQL_CONFIG } from '@/config/secret';
 import { PROJECT_ENV, PROJECT_NAME, PROJECT_PORT } from '@/constant';
 import { handleSecretFile, handleUploadDir } from '@/init';
 import { initDb } from '@/init/initDb';
 import { initFFmpeg } from '@/init/initFFmpeg';
 import { initSRS } from '@/init/initSRS';
-import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
+import {
+  chalkERROR,
+  chalkINFO,
+  chalkSUCCESS,
+  chalkWARN,
+} from '@/utils/chalkTip';
 
 async function main() {
+  function adLog() {
+    console.log();
+    console.log(chalkINFO(`赞助打赏: https://live.hsslive.cn/sponsors`));
+    console.log(chalkINFO(`付费支持: https://live.hsslive.cn/support`));
+    console.log(
+      chalkINFO(
+        `欢迎PR:   billd-live目前只有作者一人开发，难免有不足的地方，欢迎提PR或Issue`
+      )
+    );
+    console.log();
+  }
   try {
     handleSecretFile(); // 处理秘钥文件(src.config/secret.ts)
     handleUploadDir(); // 处理文件上传目录(src/upload)
@@ -32,10 +47,12 @@ async function main() {
     console.log(chalkWARN(`监听端口: ${port}`));
     console.log(chalkWARN(`项目名称: ${PROJECT_NAME}`));
     console.log(chalkWARN(`项目环境: ${PROJECT_ENV}`));
-    console.log(chalkWARN(`mysql数据库: ${MYSQL_CONFIG.database}`));
+    console.log(chalkWARN(`mysql数据库: ${dbName}`));
+    adLog();
   } catch (error) {
     console.log(error);
     console.log(chalkERROR('项目启动失败！'));
+    adLog();
   }
 }
 

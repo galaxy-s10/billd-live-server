@@ -37,10 +37,7 @@ export const initSRS = () => {
     -p 1935:1935 -p 5001:8080 -p 1985:1985 -p 8000:8000/udp \
     registry.cn-hangzhou.aliyuncs.com/ossrs/srs:4 \
     objs/srs -c conf/rtc2rtmp.conf`);
-    console.log(
-      chalkSUCCESS(`${new Date().toLocaleString()},初始化SRS成功！`),
-      SRS_CONFIG.CANDIDATE
-    );
+    console.log(chalkSUCCESS(`${new Date().toLocaleString()},初始化SRS成功！`));
     // const child = exec(srsSh, {}, (error, stdout, stderr) => {
     //   console.log(
     //     chalkSUCCESS(`${new Date().toLocaleString()},初始化SRS成功！`)
