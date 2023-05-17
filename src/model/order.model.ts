@@ -1,9 +1,22 @@
-import { DataTypes } from 'sequelize';
+import {
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+} from 'sequelize';
 
 import sequelize from '@/config/mysql';
+import { IOrder, PayStatusEnum } from '@/interface';
 import { initTable } from '@/utils';
 
-const model = sequelize.define(
+interface OrderModel
+  extends Model<
+      InferAttributes<OrderModel>,
+      InferCreationAttributes<OrderModel>
+    >,
+    IOrder {}
+
+const model = sequelize.define<OrderModel>(
   'order',
   {
     id: {
@@ -11,6 +24,9 @@ const model = sequelize.define(
       primaryKey: true,
       allowNull: false,
       autoIncrement: true,
+    },
+    billd_live_user_id: {
+      type: DataTypes.INTEGER,
     },
     out_trade_no: {
       type: DataTypes.STRING(100),
@@ -55,7 +71,7 @@ const model = sequelize.define(
     },
     trade_status: {
       type: DataTypes.STRING(100),
-      defaultValue: 'error',
+      defaultValue: PayStatusEnum.error,
     },
   },
   {

@@ -1,6 +1,7 @@
 import { loadAllModel } from '@/init/initDb';
 import Auth from '@/model/auth.model';
 import Log from '@/model/log.model';
+import Order from '@/model/order.model';
 import QqUser from '@/model/qqUser.model';
 import Role from '@/model/role.model';
 import RoleAuth from '@/model/roleAuth.model';
@@ -116,6 +117,15 @@ Auth.belongsTo(Auth, {
 Auth.hasMany(Auth, {
   as: 'c_auth',
   foreignKey: 'p_id',
+  constraints: false,
+});
+
+User.hasMany(Order, {
+  foreignKey: 'billd_live_user_id',
+  constraints: false,
+});
+Order.belongsTo(User, {
+  foreignKey: 'billd_live_user_id',
   constraints: false,
 });
 

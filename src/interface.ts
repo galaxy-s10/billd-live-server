@@ -2,6 +2,35 @@ export enum liveEnum {
   srs = 1,
   webrtc,
 }
+
+export enum PayStatusEnum {
+  error = 'error',
+  WAIT_BUYER_PAY = 'WAIT_BUYER_PAY',
+  TRADE_SUCCESS = 'TRADE_SUCCESS',
+}
+
+export interface IOrder {
+  id?: number;
+  billd_live_user_id?: number;
+  out_trade_no?: string;
+  total_amount?: string;
+  subject?: string;
+  product_code?: string;
+  qr_code?: string;
+  buyer_logon_id?: string;
+  buyer_pay_amount?: string;
+  buyer_user_id?: string;
+  invoice_amount?: string;
+  point_amount?: string;
+  receipt_amount?: string;
+  send_pay_date?: string;
+  trade_no?: string;
+  trade_status?: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
 export interface ILive {
   id?: number;
   system?: number;

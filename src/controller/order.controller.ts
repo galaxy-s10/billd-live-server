@@ -1,17 +1,16 @@
 import AlipaySdk from 'alipay-sdk';
 import { getRandomString } from 'billd-utils';
 import { ParameterizedContext } from 'koa';
-import Sequelize from 'sequelize';
 
+import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import { ALIPAY_LIVE_CONFIG } from '@/config/secret';
 import { REDIS_PREFIX } from '@/constant';
 import redisController from '@/controller/redis.controller';
-import orderModel from '@/model/order.model';
+import { IList, IOrder, PayStatusEnum } from '@/interface';
+import orderService from '@/service/order.service';
 
-const { Op } = Sequelize;
-
-class AliPayController {
+class OrderController {
   async commonGetPayStatus(out_trade_no) {
     const alipaySdk = new AlipaySdk({
       appId: ALIPAY_LIVE_CONFIG.appId,
@@ -27,29 +26,27 @@ class AliPayController {
       method: 'alipay.trade.query',
       bizContent,
     });
-    const orderInfo = await orderModel.findOne({ where: { out_trade_no } });
-    let tradeStatus = 'error';
+    const orderInfo = await orderService.findByOutTradeNo(out_trade_no);
+    let tradeStatus = PayStatusEnum.error;
     if (orderInfo) {
       if (res.msg === 'Success') {
-        await orderModel.update(
-          {
-            buyer_logon_id: res.buyerLogonId,
-            buyer_pay_amount: res.buyerPayAmount,
-            buyer_user_id: res.buyerUserId,
-            invoice_amount: res.invoiceAmount,
-            point_amount: res.pointAmount,
-            receipt_amount: res.receiptAmount,
-            send_pay_date: res.sendPayDate,
-            trade_no: res.tradeNo,
-            trade_status: res.tradeStatus,
-          },
-          { where: { out_trade_no } }
-        );
+        await orderService.update({
+          id: orderInfo.id,
+          buyer_logon_id: res.buyerLogonId,
+          buyer_pay_amount: res.buyerPayAmount,
+          buyer_user_id: res.buyerUserId,
+          invoice_amount: res.invoiceAmount,
+          point_amount: res.pointAmount,
+          receipt_amount: res.receiptAmount,
+          send_pay_date: res.sendPayDate,
+          trade_no: res.tradeNo,
+          trade_status: res.tradeStatus,
+        });
         if (res.tradeStatus === 'WAIT_BUYER_PAY') {
-          tradeStatus = 'WAIT_BUYER_PAY';
+          tradeStatus = PayStatusEnum.WAIT_BUYER_PAY;
         }
         if (res.tradeStatus === 'TRADE_SUCCESS') {
-          tradeStatus = 'TRADE_SUCCESS';
+          tradeStatus = PayStatusEnum.TRADE_SUCCESS;
         }
       }
     }
@@ -58,6 +55,7 @@ class AliPayController {
   }
 
   async create(ctx: ParameterizedContext, next) {
+    const { userInfo } = await authJwt(ctx);
     const { total_amount, subject, body } = ctx.request.body;
     const alipaySdk = new AlipaySdk({
       appId: ALIPAY_LIVE_CONFIG.appId,
@@ -80,24 +78,21 @@ class AliPayController {
       bizContent,
       // returnUrl: 'https://live.hsslive.cn/auth_pay',
     });
-    const createDate = {
+    const createDate: IOrder = {
+      billd_live_user_id: userInfo?.id,
       out_trade_no: bizContent.out_trade_no,
       total_amount,
       subject,
       product_code: bizContent.product_code,
       qr_code: res.qrCode,
     };
-    await orderModel.create(createDate);
+    await orderService.create(createDate);
     const exp = 60 * 5;
     redisController.setExVal({
       prefix: REDIS_PREFIX.order,
       key: bizContent.out_trade_no,
       exp,
-      value: JSON.stringify({
-        ...createDate,
-        created_at: new Date().toLocaleString(),
-        expired_at: new Date(+new Date() + exp * 1000).toLocaleString(),
-      }),
+      value: createDate,
     });
 
     successHandler({
@@ -118,16 +113,34 @@ class AliPayController {
   };
 
   async getList(ctx: ParameterizedContext, next) {
-    const res = await orderModel.findAndCountAll({
-      where: {
-        trade_status: {
-          [Op.or]: ['WAIT_BUYER_PAY', 'TRADE_SUCCESS'],
-        },
-      },
+    const {
+      id,
+      trade_status,
+      orderBy = 'asc',
+      orderName = 'id',
+      nowPage,
+      pageSize,
+      keyWord,
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    }: IList<IOrder> = ctx.request.query;
+
+    const res = await orderService.getList({
+      id,
+      trade_status,
+      orderBy,
+      orderName,
+      nowPage,
+      pageSize,
+      keyWord,
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
     });
     successHandler({ ctx, data: res });
     await next();
   }
 }
 
-export default new AliPayController();
+export default new OrderController();
