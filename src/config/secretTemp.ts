@@ -26,6 +26,16 @@ export const REDIS_CONFIG = {
   password: '**********',
 }; // redis配置
 
+export const SRS_CONFIG = {
+  // CANDIDATE填你的本机ip地址
+  CANDIDATE:
+    process.env.NODE_ENV === 'development'
+      ? `$(ifconfig en0 inet | grep 'inet ' | awk '{print $2}')`
+      : '42.193.157.44',
+  // dockerContainerName填启动srs-docker时的容器名字（可随便填）
+  dockerContainerName: 'billd-live-server-srs',
+}; // srs配置
+
 export const ALIPAY_LIVE_CONFIG = {
   appId: '**********',
   privateKey:
