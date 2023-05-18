@@ -11,6 +11,4 @@ if (PROJECT_NODE_ENV === 'development') {
   moduleAlias.addAlias('@', path.join(process.cwd(), 'dist'));
 }
 
-export const aliasOk = () => {
-  console.log(chalkSUCCESS('添加路径别名成功！'));
-};
+console.log(chalkSUCCESS('添加路径别名成功！'));

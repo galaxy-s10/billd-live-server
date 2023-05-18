@@ -1,12 +1,12 @@
 // 一定要将import './init';放到最开头,因为它里面初始化了路径别名
 import './init/alias';
+import './init/initFile';
 
 import { connectMysql, dbName } from '@/config/mysql';
 import { connectRedis } from '@/config/redis';
 import { createRedisPubSub } from '@/config/redis/pub';
 import { startSchedule } from '@/config/schedule';
 import { PROJECT_ENV, PROJECT_NAME, PROJECT_PORT } from '@/constant';
-import { handleSecretFile, handleUploadDir } from '@/init';
 import { initDb } from '@/init/initDb';
 import { initFFmpeg } from '@/init/initFFmpeg';
 import { initSRS } from '@/init/initSRS';
@@ -30,8 +30,6 @@ async function main() {
     console.log();
   }
   try {
-    handleSecretFile(); // 处理秘钥文件(src.config/secret.ts)
-    handleUploadDir(); // 处理文件上传目录(src/upload)
     await Promise.all([
       connectMysql(), // 连接mysql
       connectRedis(), // 连接redis
