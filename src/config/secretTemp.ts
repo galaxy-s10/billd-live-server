@@ -30,10 +30,10 @@ export const SRS_CONFIG = {
   // CANDIDATE填你的本机ip地址
   CANDIDATE:
     process.env.NODE_ENV === 'development'
-      ? `$(ifconfig en0 inet | grep 'inet ' | awk '{print $2}')`
-      : '42.193.157.44',
+      ? `$(ifconfig en0 inet | grep 'inet ' | awk '{print $2}')` // WARN mac可以这样获取本机ip，但是win不行，自己找本地ip
+      : '公网ip',
   // dockerContainerName填启动srs-docker时的容器名字（可随便填）
-  dockerContainerName: 'billd-live-server-srs',
+  dockerContainerName: '**********',
 }; // srs配置
 
 export const ALIPAY_LIVE_CONFIG = {
