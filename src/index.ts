@@ -37,7 +37,7 @@ async function main() {
     ]);
     await initDb('load');
     initSRS(); // 初始化srs
-    initFFmpeg(); // 初始化FFmpeg
+    await initFFmpeg(); // 初始化FFmpeg
     startSchedule();
     const port = +PROJECT_PORT;
     (await import('./setup')).setupKoa({ port });

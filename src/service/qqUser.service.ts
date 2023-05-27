@@ -6,7 +6,7 @@ import { handlePaging } from '@/utils';
 
 const { Op } = Sequelize;
 
-class UserService {
+class QQUserService {
   /** 所有应用里面是否存在qq用户 */
   async isExistUnionid(unionid: any) {
     const res = await qqUserModel.count({
@@ -200,4 +200,4 @@ class UserService {
   }
 }
 
-export default new UserService();
+export default new QQUserService();

@@ -7,7 +7,8 @@ import userModel from '@/model/user.model';
 import { handlePaging } from '@/utils';
 
 const { Op } = Sequelize;
-class MusicService {
+
+class OrderService {
   /** 订单是否存在 */
   async isExist(ids: number[]) {
     const res = await orderModel.count({
@@ -186,4 +187,4 @@ class MusicService {
   }
 }
 
-export default new MusicService();
+export default new OrderService();

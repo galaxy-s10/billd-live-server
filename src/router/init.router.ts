@@ -16,6 +16,9 @@ initRouter.post('/auth', initController.initAuth);
 // 初始化角色权限
 initRouter.post('/role_auth', initController.initRoleAuth);
 
+// 初始化商品
+initRouter.post('/goods', initController.initGoods);
+
 // 初始化时间表
 initRouter.post('/day_data', initController.initDayData);
 

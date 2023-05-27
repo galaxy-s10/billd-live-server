@@ -6,7 +6,7 @@ import { handlePaging } from '@/utils';
 
 const { Op } = Sequelize;
 
-class LinkService {
+class BlackListService {
   /** 黑名单是否存在 */
   async isExist(ids: number[]) {
     const res = await blacklistModel.count({
@@ -121,4 +121,4 @@ class LinkService {
   }
 }
 
-export default new LinkService();
+export default new BlackListService();

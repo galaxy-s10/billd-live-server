@@ -30,7 +30,7 @@ if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
 async function addLive() {
   const socketId = 'socketId_fddm';
   await liveService.deleteBySocketId(socketId);
-  liveService.create({
+  await liveService.create({
     roomId: 'roomId_fddm',
     socketId,
     roomName: '房东的猫',
@@ -43,7 +43,7 @@ async function addLive() {
   });
 }
 
-export const initFFmpeg = () => {
+export const initFFmpeg = async () => {
   const flag = ffmpegIsInstalled();
   if (flag) {
     console.log(chalkSUCCESS('ffmpeg已安装，开始运行ffmpeg推流'));
@@ -65,7 +65,7 @@ export const initFFmpeg = () => {
     console.log(
       chalkSUCCESS(`${new Date().toLocaleString()},初始化FFmpeg成功！`)
     );
-    addLive();
+    await addLive();
     // const child = exec(ffmpeg, (error, stdout, stderr) => {
     //   console.log(
     //     chalkSUCCESS(`${new Date().toLocaleString()}初始化FFmpeg成功！`)

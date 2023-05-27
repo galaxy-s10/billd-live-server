@@ -5,7 +5,8 @@ import liveModel from '@/model/live.model';
 import { handlePaging } from '@/utils';
 
 const { Op } = Sequelize;
-class MusicService {
+
+class LiveService {
   /** 直播是否存在 */
   async isExist(ids: number[]) {
     const res = await liveModel.count({
@@ -163,4 +164,4 @@ class MusicService {
   };
 }
 
-export default new MusicService();
+export default new LiveService();

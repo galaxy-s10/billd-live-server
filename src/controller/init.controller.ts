@@ -5,6 +5,7 @@ import sequelize from '@/config/mysql';
 import { ALLOW_HTTP_CODE } from '@/constant';
 import {
   bulkCreateAuth,
+  bulkCreateGoods,
   bulkCreateRole,
   bulkCreateRoleAuth,
 } from '@/init/initData';
@@ -12,6 +13,7 @@ import { initDb } from '@/init/initDb';
 import authModel from '@/model/auth.model';
 import { CustomError } from '@/model/customError.model';
 import dayDataModel from '@/model/dayData.model';
+import goodsModel from '@/model/goods.model';
 import roleModel from '@/model/role.model';
 import roleAuthModel from '@/model/roleAuth.model';
 import userModel from '@/model/user.model';
@@ -76,6 +78,21 @@ class InitController {
     await next();
   }
 
+  // 初始化商品
+  async initGoods(ctx: ParameterizedContext) {
+    const count = await goodsModel.count();
+    if (count === 0) {
+      await goodsModel.bulkCreate(bulkCreateGoods);
+      successHandler({ ctx, message: '初始化商品成功！' });
+    } else {
+      throw new CustomError(
+        '已经初始化过商品了，不能再初始化了！',
+        ALLOW_HTTP_CODE.paramsError,
+        ALLOW_HTTP_CODE.paramsError
+      );
+    }
+  }
+
   // 初始化角色权限
   async initRoleAuth(ctx: ParameterizedContext) {
     const count = await roleAuthModel.count();
@@ -96,7 +113,7 @@ class InitController {
     const queryInterface = sequelize.getQueryInterface();
     const allTables = await queryInterface.showAllTables();
     if (!allTables.length) {
-      await initDb(1);
+      await initDb('force');
       successHandler({ ctx, data: '初始化数据库成功！' });
     } else {
       throw new CustomError(

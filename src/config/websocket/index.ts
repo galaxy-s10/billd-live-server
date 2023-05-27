@@ -15,7 +15,7 @@ import liveController from '@/controller/live.controller';
 import orderController from '@/controller/order.controller';
 import { IUser } from '@/interface';
 import liveService from '@/service/live.service';
-import { chalkINFO } from '@/utils/chalkTip';
+import { chalkINFO, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 
 interface IOffer {
   socketId: string;
@@ -46,13 +46,31 @@ async function updateUserJoinedRoom(data: { socketId: string }) {
     });
   }
 }
+async function updateRoomIsLiveing(liveId: number) {
+  try {
+    const res = await LiveRedisController.getUserLiveing({
+      liveId,
+    });
+    if (res) {
+      const obj = JSON.parse(res);
+      await LiveRedisController.setUserLiveing({
+        liveId,
+        socketId: obj.value.socketId,
+        roomId: obj.value.roomId,
+        userInfo: obj.value.userInfo,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 export const connectWebSocket = (server) => {
   if (PROJECT_ENV === PROJECT_ENV_ENUM.beta) {
-    console.log(chalkINFO('当前是beta环境，不初始化websocket'));
+    console.log(chalkWARN('当前是beta环境，不初始化websocket'));
     return;
   }
-  console.log(chalkINFO('当前不是beta环境，初始化websocket'));
+  console.log(chalkSUCCESS('初始化websocket成功！'));
 
   const io = new Server(server);
 
@@ -106,8 +124,9 @@ export const connectWebSocket = (server) => {
           userInfo?: IUser;
           srs?: { streamurl: string; flvurl: string };
           track: { audio: boolean; video: boolean };
+          liveId?: number;
         };
-        isAdmin?: boolean;
+        isAdmin: boolean;
       }) => {
         prettierInfoLog({
           msg: '收到用户进入房间',
@@ -116,7 +135,7 @@ export const connectWebSocket = (server) => {
         });
         socket.join(data.roomId);
         if (data.isAdmin) {
-          socket.emit(WsMsgTypeEnum.joined, data);
+          let liveId;
           try {
             const res = await liveService.create({
               roomId: data.roomId,
@@ -129,8 +148,9 @@ export const connectWebSocket = (server) => {
               streamurl: data.data.srs?.streamurl,
               flvurl: data.data.srs?.flvurl,
             });
+            liveId = res.id;
             LiveRedisController.setUserLiveing({
-              liveId: res.id!,
+              liveId,
               socketId: socket.id,
               roomId: data.roomId,
               userInfo: data.data.userInfo,
@@ -138,6 +158,9 @@ export const connectWebSocket = (server) => {
           } catch (error) {
             console.log(error);
           }
+          const newdata = { ...data };
+          newdata.data.liveId = liveId;
+          socket.emit(WsMsgTypeEnum.joined, newdata);
         } else {
           const res = await liveService.findByRoomId(data.roomId);
           if (!res.count) {
@@ -169,7 +192,7 @@ export const connectWebSocket = (server) => {
         socketId: socket.id,
         roomId: data.roomId,
       });
-      socket.emit(WsMsgTypeEnum.getLiveUser, { socketId: socket.id });
+      // socket.emit(WsMsgTypeEnum.getLiveUser, { socketId: socket.id });
       const liveUser = await getAllLiveUser(io);
       socket.emit(WsMsgTypeEnum.liveUser, liveUser);
     });
@@ -234,14 +257,27 @@ export const connectWebSocket = (server) => {
     });
 
     // 收到心跳
-    socket.on(WsMsgTypeEnum.heartbeat, (data) => {
-      prettierInfoLog({
-        msg: '收到心跳',
-        socketId: socket.id,
-        roomId: data.roomId,
-      });
-      updateUserJoinedRoom({ socketId: data.socketId });
-    });
+    socket.on(
+      WsMsgTypeEnum.heartbeat,
+      (data: {
+        roomId: string;
+        socketId: string;
+        data?: {
+          liveId: number;
+        };
+        isAdmin: boolean;
+      }) => {
+        prettierInfoLog({
+          msg: '收到心跳',
+          socketId: socket.id,
+          roomId: data.roomId,
+        });
+        updateUserJoinedRoom({ socketId: data.socketId });
+        if (data.data?.liveId) {
+          updateRoomIsLiveing(data.data.liveId);
+        }
+      }
+    );
 
     // 收到更新加入信息
     socket.on(

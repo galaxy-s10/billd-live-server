@@ -9,8 +9,33 @@ export enum PayStatusEnum {
   TRADE_SUCCESS = 'TRADE_SUCCESS',
 }
 
+export enum GoodsTypeEnum {
+  support = 'support',
+  sponsors = 'sponsors',
+  gift = 'gift',
+}
+
+export interface IGoods {
+  id?: number;
+  type?: GoodsTypeEnum;
+  name?: string;
+  desc?: string;
+  short_desc?: string;
+  cover?: string;
+  price?: string;
+  original_price?: string;
+  nums?: number;
+  badge?: string;
+  badge_bg?: string;
+  remark?: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
 export interface IOrder {
   id?: number;
+  user?: any; // 用户信息
   billd_live_user_id?: number;
   out_trade_no?: string;
   total_amount?: string;
