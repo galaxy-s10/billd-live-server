@@ -25,4 +25,7 @@ initRouter.post('/day_data', initController.initDayData);
 // 初始化管理员
 initRouter.post('/admin_user', initController.initAdminUser);
 
+// 删除某个用户（包括他的所有信息）
+initRouter.post('/delete_user', initController.deleteUser);
+
 export default initRouter;

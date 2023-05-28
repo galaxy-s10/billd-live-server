@@ -101,6 +101,8 @@ class OrderService {
   async update({
     id,
     billd_live_user_id,
+    billd_live_goods_id,
+    billd_live_live_room_id,
     out_trade_no,
     total_amount,
     subject,
@@ -119,6 +121,8 @@ class OrderService {
     const result = await orderModel.update(
       {
         billd_live_user_id,
+        billd_live_goods_id,
+        billd_live_live_room_id,
         out_trade_no,
         total_amount,
         subject,
@@ -142,6 +146,8 @@ class OrderService {
   /** 创建订单 */
   async create({
     billd_live_user_id,
+    billd_live_goods_id,
+    billd_live_live_room_id,
     out_trade_no,
     total_amount,
     subject,
@@ -159,6 +165,8 @@ class OrderService {
   }: IOrder) {
     const result = await orderModel.create({
       billd_live_user_id,
+      billd_live_goods_id,
+      billd_live_live_room_id,
       out_trade_no,
       total_amount,
       subject,

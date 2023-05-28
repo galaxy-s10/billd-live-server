@@ -11,7 +11,11 @@ import roleService from '@/service/role.service';
 import userService from '@/service/user.service';
 
 class UserController {
-  async list(ctx: ParameterizedContext, next) {
+  common = {
+    list: (data) => userService.getList(data),
+  };
+
+  list = async (ctx: ParameterizedContext, next) => {
     // @ts-ignore
     const {
       id,
@@ -24,7 +28,7 @@ class UserController {
       rangTimeStart,
       rangTimeEnd,
     }: IList<IUser> = ctx.request.query;
-    const result = await userService.getList({
+    const result = await this.common.list({
       id,
       orderBy,
       orderName,
@@ -38,7 +42,7 @@ class UserController {
     successHandler({ ctx, data: result });
 
     await next();
-  }
+  };
 
   async find(ctx: ParameterizedContext, next) {
     const id = +ctx.params.id;

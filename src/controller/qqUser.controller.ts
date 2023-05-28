@@ -15,6 +15,7 @@ import thirdUserModel from '@/model/thirdUser.model';
 import qqUserService from '@/service/qqUser.service';
 import thirdUserService from '@/service/thirdUser.service';
 import userService from '@/service/user.service';
+import walletService from '@/service/wallet.service';
 import axios from '@/utils/request';
 
 // WARN 有时候qq登录的回调会是这样的：https://admin.hsslive.cn/oauth/qq_login?error=100070&error_description=the+account+has+security+exception&state=99
@@ -160,6 +161,7 @@ class QqUserController {
         password: getRandomString(8),
         avatar: qqUserInfo.figureurl_2,
       });
+      await walletService.create({ user_id: userInfo?.id, balance: '0.00' });
       await thirdUserModel.create({
         user_id: userInfo?.id,
         third_user_id: qqUser.id,

@@ -374,6 +374,19 @@ export const bulkCreateGoods: IGoods[] = [
     cover:
       'https://resource.hsslive.cn/image/d664a7e785e26dd5bd6d34559c2623d1__lZU2GY.webp',
   },
+  {
+    type: GoodsTypeEnum.recharge,
+    name: '自定义充值',
+    desc: '自定义充值',
+    short_desc: '自定义充值',
+    price: '0.00',
+    original_price: '0.00',
+    badge: '',
+    badge_bg: '',
+    remark: '',
+    nums: 1,
+    cover: '',
+  },
 ];
 
 export const bulkCreateRole = initRole();

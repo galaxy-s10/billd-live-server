@@ -33,6 +33,7 @@ const frontendWhiteList = [
   '/email_user/send_cancel_bind_code', // 发送解绑邮箱验证码，这个接口是post的
   '/email_user/register', // 注册，这个接口是post的
   '/order/pay',
+  '/wallet/init',
 ];
 
 // 后台的所有接口都需要判断token，除了白名单内的不需要token

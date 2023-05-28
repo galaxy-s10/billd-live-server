@@ -2,7 +2,7 @@ import { ParameterizedContext } from 'koa';
 
 import successHandler from '@/app/handler/success-handle';
 import sequelize from '@/config/mysql';
-import { ALLOW_HTTP_CODE } from '@/constant';
+import { ALLOW_HTTP_CODE, PROJECT_ENV, THIRD_PLATFORM } from '@/constant';
 import {
   bulkCreateAuth,
   bulkCreateGoods,
@@ -14,9 +14,14 @@ import authModel from '@/model/auth.model';
 import { CustomError } from '@/model/customError.model';
 import dayDataModel from '@/model/dayData.model';
 import goodsModel from '@/model/goods.model';
+import liveRoomModel from '@/model/liveRoom.model';
+import qqUserModel from '@/model/qqUser.model';
 import roleModel from '@/model/role.model';
 import roleAuthModel from '@/model/roleAuth.model';
+import thirdUserModel from '@/model/thirdUser.model';
 import userModel from '@/model/user.model';
+import userLiveRoomModel from '@/model/userLiveRoom.model';
+import userRoleModel from '@/model/userRole.model';
 
 const sql1 = `
 DROP PROCEDURE IF EXISTS insert_many_dates;
@@ -165,6 +170,55 @@ class InitController {
 
     await next();
   }
+
+  deleteUser = async (ctx: ParameterizedContext, next) => {
+    if (PROJECT_ENV !== 'development') {
+      throw new CustomError(
+        '非开发环境，不能删除用户！',
+        ALLOW_HTTP_CODE.paramsError,
+        ALLOW_HTTP_CODE.paramsError
+      );
+    }
+    const { userId } = ctx.request.body;
+    const res1 = await thirdUserModel.findAndCountAll({
+      where: { user_id: userId },
+    });
+    const promise1: any[] = [];
+    res1.rows.forEach((item) => {
+      if (item.third_platform === THIRD_PLATFORM.qq) {
+        promise1.push(
+          qqUserModel.destroy({ where: { id: item.third_user_id } })
+        );
+      }
+    });
+    // 删除该用户的第三方用户信息（qq、github表）
+    await Promise.all(promise1);
+    // 删除该用户（user表）
+    await userModel.destroy({ where: { id: userId } });
+    // 删除该用户的第三方用户信息（third_user表）
+    await thirdUserModel.destroy({ where: { user_id: userId } });
+
+    // 删除该用户的所有角色（user_role表）
+    await userRoleModel.destroy({ where: { user_id: userId } });
+
+    const res2 = await userLiveRoomModel.findAndCountAll({
+      where: { user_id: userId },
+    });
+    const promise2: any[] = [];
+    res2.rows.forEach((item) => {
+      promise2.push(
+        liveRoomModel.destroy({ where: { id: item.live_room_id } })
+      );
+    });
+
+    // 删除该用户的所有直播间（live_room表）
+    await Promise.all(promise2);
+    // 删除该用户的直播间(user_live_room表）
+    await userLiveRoomModel.destroy({ where: { user_id: userId } });
+
+    successHandler({ ctx, data: '删除用户成功！' });
+    await next();
+  };
 }
 
 export default new InitController();

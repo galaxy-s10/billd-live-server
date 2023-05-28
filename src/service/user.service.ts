@@ -5,6 +5,7 @@ import { IList, IUser } from '@/interface';
 import qqUserModel from '@/model/qqUser.model';
 import roleModel from '@/model/role.model';
 import userModel from '@/model/user.model';
+import walletModel from '@/model/wallet.model';
 import { handlePaging } from '@/utils';
 
 const { Op, where, literal } = Sequelize;
@@ -169,6 +170,9 @@ class UserService {
         {
           model: roleModel,
           through: { attributes: [] },
+        },
+        {
+          model: walletModel,
         },
       ],
       attributes: {

@@ -28,6 +28,12 @@ const model = sequelize.define<OrderModel>(
     billd_live_user_id: {
       type: DataTypes.INTEGER,
     },
+    billd_live_goods_id: {
+      type: DataTypes.INTEGER,
+    },
+    billd_live_live_room_id: {
+      type: DataTypes.INTEGER,
+    },
     out_trade_no: {
       type: DataTypes.STRING(100),
     },

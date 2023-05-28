@@ -13,6 +13,87 @@ export enum GoodsTypeEnum {
   support = 'support',
   sponsors = 'sponsors',
   gift = 'gift',
+  recharge = 'recharge',
+}
+
+export interface IWallet {
+  id?: number;
+  user_id?: number;
+  balance?: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+export interface IQqUser {
+  id?: number;
+  client_id?: number;
+  openid?: string;
+  unionid?: string;
+  nickname?: string;
+  figureurl?: string;
+  figureurl_1?: string;
+  figureurl_2?: string;
+  figureurl_qq_1?: string;
+  figureurl_qq_2?: string;
+  constellation?: string;
+  gender?: string;
+  city?: string;
+  province?: string;
+  year?: string;
+  ret?: number;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
+export interface IThirdUser {
+  id?: number;
+  user_id?: number;
+  third_user_id?: number;
+  third_platform?: number;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+export interface IUser {
+  id?: number;
+  username?: string;
+  password?: string;
+  email?: string;
+  status?: number;
+  avatar?: string;
+  desc?: string;
+  token?: string;
+  user_roles?: number[];
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+  qq_users?: IQqUser[];
+  wallet?: IWallet;
+}
+
+export interface ILiveRoom {
+  id?: number;
+  /** 用户信息 */
+  user?: IUser;
+  /** 直播间名字 */
+  roomName?: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
+export interface IUserLiveRoom {
+  id?: number;
+  user_id?: number;
+  live_room_id?: number;
+  /** 用户信息 */
+  user?: IUser;
+  /** 直播间信息 */
+  live_room?: ILiveRoom;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
 }
 
 export interface IGoods {
@@ -35,8 +116,13 @@ export interface IGoods {
 
 export interface IOrder {
   id?: number;
-  user?: any; // 用户信息
+  /** 用户信息 */
+  user?: IUser;
+  /** 商品信息 */
+  goods?: IGoods;
   billd_live_user_id?: number;
+  billd_live_goods_id?: number;
+  billd_live_live_room_id?: number;
   out_trade_no?: string;
   total_amount?: string;
   subject?: string;
@@ -93,38 +179,6 @@ export interface IEmail {
   deleted_at?: string;
 }
 
-export interface IQqUser {
-  id?: number;
-  client_id?: number;
-  openid?: string;
-  unionid?: string;
-  nickname?: string;
-  figureurl?: string;
-  figureurl_1?: string;
-  figureurl_2?: string;
-  figureurl_qq_1?: string;
-  figureurl_qq_2?: string;
-  constellation?: string;
-  gender?: string;
-  city?: string;
-  province?: string;
-  year?: string;
-  ret?: number;
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
-}
-
-export interface IThirdUser {
-  id?: number;
-  user_id?: number;
-  third_user_id?: number;
-  third_platform?: number;
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
-}
-
 export interface ILog {
   id?: number;
   user_id?: number;
@@ -147,22 +201,6 @@ export interface ILog {
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
-}
-
-export interface IUser {
-  id?: number;
-  username?: string;
-  password?: string;
-  email?: string;
-  status?: number;
-  avatar?: string;
-  desc?: string;
-  token?: string;
-  user_roles?: number[];
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
-  qq_users?: IQqUser[];
 }
 
 export interface IAuth {

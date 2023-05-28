@@ -1,7 +1,7 @@
 import { deleteUseLessObjectKey } from 'billd-utils';
 import Sequelize from 'sequelize';
 
-import { IGoods, IList } from '@/interface';
+import { GoodsTypeEnum, IGoods, IList } from '@/interface';
 import goodsModel from '@/model/goods.model';
 import { handlePaging } from '@/utils';
 
@@ -104,12 +104,17 @@ class GoodsService {
     return result;
   }
 
+  /** 查找商品 */
+  async findByType(type: GoodsTypeEnum) {
+    const result = await goodsModel.findOne({ where: { type } });
+    return result;
+  }
+
   /** 修改商品 */
   async update({
     id,
     type,
     name,
-    deleted_at,
     short_desc,
     cover,
     price,
@@ -123,7 +128,6 @@ class GoodsService {
       {
         type,
         name,
-        deleted_at,
         short_desc,
         cover,
         price,
@@ -142,7 +146,6 @@ class GoodsService {
   async create({
     type,
     name,
-    deleted_at,
     short_desc,
     cover,
     price,
@@ -155,7 +158,6 @@ class GoodsService {
     const result = await goodsModel.create({
       type,
       name,
-      deleted_at,
       short_desc,
       cover,
       price,

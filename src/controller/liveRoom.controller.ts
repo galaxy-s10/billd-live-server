@@ -3,27 +3,19 @@ import { ParameterizedContext } from 'koa';
 import { verifyUserAuth } from '@/app/auth/verifyUserAuth';
 import successHandler from '@/app/handler/success-handle';
 import { ALLOW_HTTP_CODE } from '@/constant';
-import { IGoods, IList } from '@/interface';
+import { IList, ILiveRoom } from '@/interface';
 import { CustomError } from '@/model/customError.model';
-import goodsService from '@/service/goods.service';
+import liveRoomService from '@/service/liveRoom.service';
 
-class GoodsController {
+class LiveRoomController {
   common = {
-    create: (data: IGoods) => goodsService.create(data),
-    find: (id: number) => goodsService.find(id),
-    findByType: (type) => goodsService.findByType(type),
+    create: (data: ILiveRoom) => liveRoomService.create(data),
   };
 
   async getList(ctx: ParameterizedContext, next) {
     const {
       id,
-      name,
-      type,
-      desc,
-      short_desc,
-      badge,
-      badge_bg,
-      remark,
+      roomName,
       orderBy = 'asc',
       orderName = 'id',
       nowPage,
@@ -32,16 +24,10 @@ class GoodsController {
       rangTimeType,
       rangTimeStart,
       rangTimeEnd,
-    }: IList<IGoods> = ctx.request.query;
-    const result = await goodsService.getList({
+    }: IList<ILiveRoom> = ctx.request.query;
+    const result = await liveRoomService.getList({
       id,
-      name,
-      type,
-      desc,
-      short_desc,
-      badge,
-      badge_bg,
-      remark,
+      roomName,
       orderBy,
       orderName,
       nowPage,
@@ -55,19 +41,12 @@ class GoodsController {
     await next();
   }
 
-  find = async (ctx: ParameterizedContext, next) => {
+  async find(ctx: ParameterizedContext, next) {
     const id = +ctx.params.id;
-    const result = await this.common.find(id);
+    const result = await liveRoomService.find(id);
     successHandler({ ctx, data: result });
     await next();
-  };
-
-  findByType = async (ctx: ParameterizedContext, next) => {
-    const { type } = ctx.query;
-    const result = await this.common.findByType(type);
-    successHandler({ ctx, data: result });
-    await next();
-  };
+  }
 
   async update(ctx: ParameterizedContext, next) {
     const hasAuth = await verifyUserAuth(ctx);
@@ -79,67 +58,27 @@ class GoodsController {
       );
     }
     const id = +ctx.params.id;
-    const {
-      type,
-      name,
-      short_desc,
-      cover,
-      price,
-      original_price,
-      nums,
-      badge,
-      badge_bg,
-      remark,
-    }: IGoods = ctx.request.body;
-    const isExist = await goodsService.isExist([id]);
+    const { roomName }: ILiveRoom = ctx.request.body;
+    const isExist = await liveRoomService.isExist([id]);
     if (!isExist) {
       throw new CustomError(
-        `不存在id为${id}的商品！`,
+        `不存在id为${id}的直播间！`,
         ALLOW_HTTP_CODE.paramsError,
         ALLOW_HTTP_CODE.paramsError
       );
     }
-    await goodsService.update({
+    await liveRoomService.update({
       id,
-      type,
-      name,
-      short_desc,
-      cover,
-      price,
-      original_price,
-      nums,
-      badge,
-      badge_bg,
-      remark,
+      roomName,
     });
     successHandler({ ctx });
     await next();
   }
 
   async create(ctx: ParameterizedContext, next) {
-    const {
-      type,
-      name,
-      short_desc,
-      cover,
-      price,
-      original_price,
-      nums,
-      badge,
-      badge_bg,
-      remark,
-    }: IGoods = ctx.request.body;
+    const { roomName }: ILiveRoom = ctx.request.body;
     await this.common.create({
-      type,
-      name,
-      short_desc,
-      cover,
-      price,
-      original_price,
-      nums,
-      badge,
-      badge_bg,
-      remark,
+      roomName,
     });
     successHandler({ ctx });
     await next();
@@ -155,18 +94,18 @@ class GoodsController {
       );
     }
     const id = +ctx.params.id;
-    const isExist = await goodsService.isExist([id]);
+    const isExist = await liveRoomService.isExist([id]);
     if (!isExist) {
       throw new CustomError(
-        `不存在id为${id}的商品！`,
+        `不存在id为${id}的直播间！`,
         ALLOW_HTTP_CODE.paramsError,
         ALLOW_HTTP_CODE.paramsError
       );
     }
-    await goodsService.delete(id);
+    await liveRoomService.delete(id);
     successHandler({ ctx });
     await next();
   }
 }
 
-export default new GoodsController();
+export default new LiveRoomController();

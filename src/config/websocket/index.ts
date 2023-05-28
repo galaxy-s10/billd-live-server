@@ -9,7 +9,7 @@ import {
   WsConnectStatusEnum,
   WsMsgTypeEnum,
 } from '@/config/websocket/constant';
-import LiveRedisController from '@/config/websocket/live-redis.controller';
+import liveRedisController from '@/config/websocket/live-redis.controller';
 import { PROJECT_ENV, PROJECT_ENV_ENUM, REDIS_PREFIX } from '@/constant';
 import liveController from '@/controller/live.controller';
 import orderController from '@/controller/order.controller';
@@ -25,20 +25,41 @@ interface IOffer {
 
 async function getAllLiveUser(io) {
   const allSocketsMap = await io.fetchSockets();
-  return Object.keys(allSocketsMap).map((item) => {
+  const res = Object.keys(allSocketsMap).map((item) => {
     return {
       id: allSocketsMap[item].id,
       rooms: [...allSocketsMap[item].rooms.values()],
     };
   });
+  const promise1: Promise<{
+    value: {
+      roomId: string;
+      socketId: string;
+      userInfo: IUser;
+    };
+    created_at?: number;
+    expired_at?: number;
+  } | null>[] = [];
+  res.forEach((item) => {
+    promise1.push(
+      liveRedisController.getUserJoinedRoom({
+        socketId: item.id,
+      })
+    );
+  });
+  const res1 = await Promise.all(promise1);
+  const newRes = res.map((item, index) => {
+    return { userInfo: res1[index]?.value.userInfo, ...item };
+  });
+  return newRes;
 }
 
 async function updateUserJoinedRoom(data: { socketId: string }) {
-  const res = await LiveRedisController.getUserJoinedRoom({
+  const res = await liveRedisController.getUserJoinedRoom({
     socketId: data.socketId,
   });
   if (res) {
-    LiveRedisController.setUserJoinedRoom({
+    liveRedisController.setUserJoinedRoom({
       socketId: res.value.socketId,
       roomId: res.value.roomId,
       userInfo: res.value.userInfo,
@@ -48,12 +69,12 @@ async function updateUserJoinedRoom(data: { socketId: string }) {
 }
 async function updateRoomIsLiveing(liveId: number) {
   try {
-    const res = await LiveRedisController.getUserLiveing({
+    const res = await liveRedisController.getUserLiveing({
       liveId,
     });
     if (res) {
       const obj = JSON.parse(res);
-      await LiveRedisController.setUserLiveing({
+      await liveRedisController.setUserLiveing({
         liveId,
         socketId: obj.value.socketId,
         roomId: obj.value.roomId,
@@ -149,7 +170,7 @@ export const connectWebSocket = (server) => {
               flvurl: data.data.srs?.flvurl,
             });
             liveId = res.id;
-            LiveRedisController.setUserLiveing({
+            liveRedisController.setUserLiveing({
               liveId,
               socketId: socket.id,
               roomId: data.roomId,
@@ -166,7 +187,7 @@ export const connectWebSocket = (server) => {
           if (!res.count) {
             socket.emit(WsMsgTypeEnum.roomNoLive, { roomId: data.roomId });
           } else {
-            LiveRedisController.setUserJoinedRoom({
+            liveRedisController.setUserJoinedRoom({
               socketId: socket.id,
               roomId: data.roomId,
               userInfo: data.data.userInfo,
@@ -296,11 +317,11 @@ export const connectWebSocket = (server) => {
           socketId: socket.id,
           roomId: data.roomId,
         });
-        const res = await LiveRedisController.getUserJoinedRoom({
+        const res = await liveRedisController.getUserJoinedRoom({
           socketId: data.socketId,
         });
         if (res) {
-          LiveRedisController.setUserJoinedRoom({
+          liveRedisController.setUserJoinedRoom({
             socketId: data.socketId,
             roomId: data.roomId,
             userInfo: data.data.userInfo,
@@ -363,7 +384,7 @@ export const connectWebSocket = (server) => {
         liveService.deleteBySocketId(res.rows[0].get().socketId || '-1');
       } else {
         // 不是管理员断开连接
-        const res1 = await LiveRedisController.getUserJoinedRoom({
+        const res1 = await liveRedisController.getUserJoinedRoom({
           socketId: socket.id,
         });
         if (res1) {
@@ -375,7 +396,7 @@ export const connectWebSocket = (server) => {
               socketId: socket.id,
               data: { userInfo },
             });
-            LiveRedisController.delUserJoinedRoom({ socketId: socket.id });
+            liveRedisController.delUserJoinedRoom({ socketId: socket.id });
           } catch (error) {
             console.log(error);
           }
