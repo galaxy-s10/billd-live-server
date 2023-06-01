@@ -11,7 +11,8 @@ function dockerIsInstalled() {
   return true;
 }
 
-export const initSRS = () => {
+export const initSRS = (init = true) => {
+  if (!init) return;
   const flag = dockerIsInstalled();
   if (flag) {
     console.log(chalkSUCCESS('docker已安装，开始运行docker-srs'));

@@ -14,8 +14,6 @@ import Wallet from '@/model/wallet.model';
 
 loadAllModel();
 
-console.log(LiveRoom, UserLiveRoom);
-
 UserLiveRoom.belongsTo(LiveRoom, {
   foreignKey: 'live_room_id',
   constraints: false,

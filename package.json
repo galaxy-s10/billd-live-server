@@ -32,7 +32,9 @@
   },
   "dependencies": {
     "@socket.io/redis-adapter": "^8.0.0",
+    "@types/amqplib": "^0.10.1",
     "alipay-sdk": "^3.3.1",
+    "amqplib": "^0.10.3",
     "axios": "^0.26.1",
     "billd-deploy": "^1.0.16",
     "billd-html-webpack-plugin": "^1.0.1",

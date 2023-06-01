@@ -43,7 +43,8 @@ async function addLive() {
   });
 }
 
-export const initFFmpeg = async () => {
+export const initFFmpeg = async (init = true) => {
+  if (!init) return;
   const flag = ffmpegIsInstalled();
   if (flag) {
     console.log(chalkSUCCESS('ffmpeg已安装，开始运行ffmpeg推流'));
