@@ -13,7 +13,7 @@ export const connectRabbitMQ = async () => {
   channel.val = await connection.createChannel();
   console.log(chalkSUCCESS('RabbitMQ成功'), channel);
   channel.val.assertQueue(orderQueue, { durable: false });
-  channel.val.sendToQueue(orderQueue, Buffer.from('aaa'));
+  channel.val.sendToQueue(orderQueue, Buffer.from(`aaa${new Date()}`));
   // setTimeout(() => {
   //   console.log(chalkWARN('RabbitMQ关闭'));
   //   connection.close();

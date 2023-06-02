@@ -1,21 +1,14 @@
-import { execSync, spawnSync } from 'child_process';
+import { execSync } from 'child_process';
 
 import { SRS_CONFIG } from '@/config/secret';
+import { dockerIsInstalled } from '@/utils';
 import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
 
-function dockerIsInstalled() {
-  const res = spawnSync('docker', ['-v']);
-  if (res.status !== 0) {
-    return false;
-  }
-  return true;
-}
-
-export const initSRS = (init = true) => {
+export const dockerRunSRS = (init = true) => {
   if (!init) return;
   const flag = dockerIsInstalled();
   if (flag) {
-    console.log(chalkSUCCESS('docker已安装，开始运行docker-srs'));
+    console.log(chalkSUCCESS('docker已安装，开始运行SRS'));
   } else {
     console.log(chalkERROR('未安装docker！'));
     return;
@@ -28,13 +21,13 @@ export const initSRS = (init = true) => {
       console.log(error);
     }
     try {
-      // 删掉旧的容器
+      // 停掉旧的容器
       execSync(`docker rm ${SRS_CONFIG.dockerContainerName}`);
     } catch (error) {
       console.log(error);
     }
     // 启动新的容器
-    execSync(`docker run -d --name ${SRS_CONFIG.dockerContainerName} --rm --env CANDIDATE=${SRS_CONFIG.CANDIDATE} \
+    execSync(`docker run -d --rm --name ${SRS_CONFIG.dockerContainerName} --env CANDIDATE=${SRS_CONFIG.CANDIDATE} \
     -p 1935:1935 -p 5001:8080 -p 1985:1985 -p 8000:8000/udp \
     registry.cn-hangzhou.aliyuncs.com/ossrs/srs:4 \
     objs/srs -c conf/rtc2rtmp.conf`);
@@ -49,12 +42,12 @@ export const initSRS = (init = true) => {
     // });
     // child.on('exit', () => {
     //   console.log(
-    //     chalkINFO(`${new Date().toLocaleString()},initSRS子进程退出了,${srsSh}`)
+    //     chalkINFO(`${new Date().toLocaleString()},dockerStartSRS子进程退出了,${srsSh}`)
     //   );
     // });
     // child.on('error', () => {
     //   console.log(
-    //     chalkERROR(`${new Date().toLocaleString()},initSRS子进程错误,${srsSh}`)
+    //     chalkERROR(`${new Date().toLocaleString()},dockerStartSRS子进程错误,${srsSh}`)
     //   );
     // });
   } catch (error) {

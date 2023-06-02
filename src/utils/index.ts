@@ -1,3 +1,4 @@
+import { spawnSync } from 'child_process';
 import path from 'path';
 
 import { ParameterizedContext } from 'koa';
@@ -5,6 +6,14 @@ import { Model, ModelStatic } from 'sequelize/types';
 
 import sequelize from '@/config/mysql';
 import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
+
+export function dockerIsInstalled() {
+  const res = spawnSync('docker', ['-v']);
+  if (res.status !== 0) {
+    return false;
+  }
+  return true;
+}
 
 export const filterObj = (obj: Record<string, any>, keyArr: string[]) => {
   const res: Record<string, any> = {};
