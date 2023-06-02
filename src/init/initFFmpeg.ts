@@ -3,7 +3,7 @@ import { execSync, spawnSync } from 'child_process';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import liveService from '@/service/live.service';
 import { resolveApp } from '@/utils';
-import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
+import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 
 import { fddm_base64 } from './base64';
 
@@ -47,7 +47,7 @@ export const initFFmpeg = async (init = true) => {
   if (!init) return;
   const flag = ffmpegIsInstalled();
   if (flag) {
-    console.log(chalkSUCCESS('ffmpeg已安装，开始运行ffmpeg推流'));
+    console.log(chalkWARN('ffmpeg已安装，开始运行ffmpeg推流'));
   } else {
     console.log(chalkERROR('未安装ffmpeg！'));
     return;
@@ -63,13 +63,11 @@ export const initFFmpeg = async (init = true) => {
     const ffmpeg = `ffmpeg -loglevel quiet -stream_loop -1 -re -i ${localFile} -c copy -f flv ${remoteFlv} 1>/dev/null 2>&1 &`;
     // const ffmpeg = `echo test initFFmpeg`;
     execSync(ffmpeg);
-    console.log(
-      chalkSUCCESS(`${new Date().toLocaleString()},初始化FFmpeg成功！`)
-    );
+    console.log(chalkSUCCESS(`FFmpeg推流成功！`));
     await addLive();
     // const child = exec(ffmpeg, (error, stdout, stderr) => {
     //   console.log(
-    //     chalkSUCCESS(`${new Date().toLocaleString()}初始化FFmpeg成功！`)
+    //     chalkSUCCESS(`初始化FFmpeg成功！`)
     //   );
     //   console.log('error', error);
     //   console.log('stdout', stdout);
@@ -77,18 +75,16 @@ export const initFFmpeg = async (init = true) => {
     // });
     // child.on('exit', () => {
     //   console.log(
-    //     chalkINFO(`${new Date().toLocaleString()},initFFmpeg子进程退出了`)
+    //     chalkINFO(`initFFmpeg子进程退出了`)
     //   );
     // });
     // child.on('error', () => {
     //   console.log(
-    //     chalkINFO(`${new Date().toLocaleString()},initFFmpeg子进程错误`)
+    //     chalkINFO(`initFFmpeg子进程错误`)
     //   );
     // });
   } catch (error) {
-    console.log(
-      chalkERROR(`${new Date().toLocaleString()},初始化FFmpeg错误！`)
-    );
+    console.log(chalkERROR(`FFmpeg推流错误！`));
     console.log(error);
   }
 };

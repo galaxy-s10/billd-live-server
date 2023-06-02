@@ -3,6 +3,8 @@ import './init/alias';
 import './init/initFile';
 
 import { connectMysql, dbName } from '@/config/mysql';
+import { connectRabbitMQ } from '@/config/rabbitmq';
+import { initRabbitMQConsumer } from '@/config/rabbitmq/consumer';
 import { connectRedis } from '@/config/redis';
 import { createRedisPubSub } from '@/config/redis/pub';
 import { startSchedule } from '@/config/schedule';
@@ -36,11 +38,11 @@ async function main() {
       connectRedis(), // 连接redis
       createRedisPubSub(), // 创建redis的发布订阅
     ]);
-    dockerRunRabbitMQ(); // docker运行RabbitMQ
-    // connectRabbitMQ(); // 连接rabbitMQ
-    // initRabbitMQConsumer();
     await initDb('load');
+    dockerRunRabbitMQ(false); // docker运行RabbitMQ
     dockerRunSRS(false); // docker运行SRS
+    initRabbitMQConsumer();
+    connectRabbitMQ(); // 连接rabbitMQ
     await initFFmpeg(false); // 初始化FFmpeg
     startSchedule();
     const port = +PROJECT_PORT;

@@ -48,7 +48,7 @@ pnpm i billd-utils@latest billd-scss@latest billd-html-webpack-plugin@latest bil
 
 > 本地需要有 mysql、redis、docker、ffmpeg 环境！
 >
-> 项目启动后，会在项目的 src/config/目录下生成 secret.ts 文件，请填写里面的信息，MYSQL_CONFIG、REDIS_CONFIG、SRS_CONFIG 必填！
+> 项目启动后，会在项目的 src/config/目录下生成 secret.ts 文件，请填写里面的信息，MYSQL_CONFIG、REDIS_CONFIG、DOCKER_RABBITMQ_CONFIG、DOCKER_SRS_CONFIG 必填！
 >
 > 项目会使用到两个数据库，一个用于生产环境，另一个用于开发环境，配置好 MYSQL_CONFIG 后，记得新建对应的数据库（数据库名看：src/config/mysql/index.ts 里面的 dbName）。新建完数据库后，在项目的 src 目录下的 index.ts 搜`initDb('load');`，改成`initDb('force');`这会给你初始化数据库表。初始化完成后，再将`initDb('force');`，改回`initDb('load');`即可。
 
