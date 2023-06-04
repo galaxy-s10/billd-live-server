@@ -6,6 +6,4 @@ const walletRouter = new Router({ prefix: '/wallet' });
 
 walletRouter.get('/list', walletController.getList);
 
-walletRouter.post('/init', walletController.initUserWallet);
-
 export default walletRouter;

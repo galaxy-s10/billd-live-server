@@ -4,6 +4,7 @@ import './init/initFile';
 
 import { connectMysql, dbName } from '@/config/mysql';
 import { connectRedis } from '@/config/redis';
+import { handleRedisKeyExpired } from '@/config/redis/handleRedisKeyExpired';
 import { createRedisPubSub } from '@/config/redis/pub';
 import { startSchedule } from '@/config/schedule';
 import { PROJECT_ENV, PROJECT_NAME, PROJECT_PORT } from '@/constant';
@@ -37,9 +38,10 @@ async function main() {
       createRedisPubSub(), // 创建redis的发布订阅
     ]);
     await initDb('load');
+    handleRedisKeyExpired();
     dockerRunRabbitMQ(true); // docker运行RabbitMQ
     dockerRunSRS(true); // docker运行SRS
-    await initFFmpeg(true); // 初始化FFmpeg推流
+    initFFmpeg(false); // 初始化FFmpeg推流
     startSchedule();
     const port = +PROJECT_PORT;
     (await import('./setup')).setupKoa({ port });

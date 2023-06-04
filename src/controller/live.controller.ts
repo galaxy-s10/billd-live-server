@@ -76,8 +76,8 @@ class LiveController {
     }
     const {
       socketId,
-      roomId,
-      roomName,
+      live_room_id,
+      user_id,
       coverImg,
       track_audio,
       track_video,
@@ -87,8 +87,8 @@ class LiveController {
     }: ILive = ctx.request.body;
     await liveService.create({
       socketId,
-      roomId,
-      roomName,
+      live_room_id,
+      user_id,
       coverImg,
       track_audio,
       track_video,

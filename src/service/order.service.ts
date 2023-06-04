@@ -6,7 +6,7 @@ import orderModel from '@/model/order.model';
 import userModel from '@/model/user.model';
 import { handlePaging } from '@/utils';
 
-const { Op } = Sequelize;
+const { Op, literal } = Sequelize;
 
 class OrderService {
   /** 订单是否存在 */
@@ -93,7 +93,57 @@ class OrderService {
 
   /** 查找订单 */
   async findByOutTradeNo(out_trade_no: string) {
-    const result = await orderModel.findOne({ where: { out_trade_no } });
+    const result = await orderModel.findOne({
+      where: { out_trade_no },
+    });
+    return result;
+  }
+
+  /** 支付成功 */
+  async updatePayOk({
+    id,
+    billd_live_user_id,
+    billd_live_goods_id,
+    billd_live_live_room_id,
+    billd_live_order_subject,
+    billd_live_order_version,
+    product_code,
+    qr_code,
+    buyer_logon_id,
+    buyer_user_id,
+    buyer_pay_amount,
+    total_amount,
+    invoice_amount,
+    point_amount,
+    receipt_amount,
+    trade_no,
+    out_trade_no,
+    send_pay_date,
+    trade_status,
+  }: IOrder) {
+    const result = await orderModel.update(
+      {
+        billd_live_user_id,
+        billd_live_goods_id,
+        billd_live_live_room_id,
+        billd_live_order_subject,
+        billd_live_order_version: literal('`billd_live_order_version` +1'),
+        product_code,
+        qr_code,
+        buyer_logon_id,
+        buyer_user_id,
+        buyer_pay_amount,
+        total_amount,
+        invoice_amount,
+        point_amount,
+        receipt_amount,
+        trade_no,
+        out_trade_no,
+        send_pay_date,
+        trade_status,
+      },
+      { where: { id, billd_live_order_version } }
+    );
     return result;
   }
 
@@ -103,19 +153,20 @@ class OrderService {
     billd_live_user_id,
     billd_live_goods_id,
     billd_live_live_room_id,
-    out_trade_no,
-    total_amount,
-    subject,
+    billd_live_order_subject,
+    billd_live_order_version,
     product_code,
     qr_code,
     buyer_logon_id,
-    buyer_pay_amount,
     buyer_user_id,
+    buyer_pay_amount,
+    total_amount,
     invoice_amount,
     point_amount,
     receipt_amount,
-    send_pay_date,
     trade_no,
+    out_trade_no,
+    send_pay_date,
     trade_status,
   }: IOrder) {
     const result = await orderModel.update(
@@ -123,19 +174,20 @@ class OrderService {
         billd_live_user_id,
         billd_live_goods_id,
         billd_live_live_room_id,
-        out_trade_no,
-        total_amount,
-        subject,
+        billd_live_order_subject,
+        billd_live_order_version,
         product_code,
         qr_code,
         buyer_logon_id,
-        buyer_pay_amount,
         buyer_user_id,
+        buyer_pay_amount,
+        total_amount,
         invoice_amount,
         point_amount,
         receipt_amount,
-        send_pay_date,
         trade_no,
+        out_trade_no,
+        send_pay_date,
         trade_status,
       },
       { where: { id } }
@@ -148,38 +200,40 @@ class OrderService {
     billd_live_user_id,
     billd_live_goods_id,
     billd_live_live_room_id,
-    out_trade_no,
-    total_amount,
-    subject,
+    billd_live_order_subject,
+    billd_live_order_version,
     product_code,
     qr_code,
     buyer_logon_id,
-    buyer_pay_amount,
     buyer_user_id,
+    buyer_pay_amount,
+    total_amount,
     invoice_amount,
     point_amount,
     receipt_amount,
-    send_pay_date,
     trade_no,
+    out_trade_no,
+    send_pay_date,
     trade_status,
   }: IOrder) {
     const result = await orderModel.create({
       billd_live_user_id,
       billd_live_goods_id,
       billd_live_live_room_id,
-      out_trade_no,
-      total_amount,
-      subject,
+      billd_live_order_subject,
+      billd_live_order_version,
       product_code,
       qr_code,
       buyer_logon_id,
-      buyer_pay_amount,
       buyer_user_id,
+      buyer_pay_amount,
+      total_amount,
       invoice_amount,
       point_amount,
       receipt_amount,
-      send_pay_date,
       trade_no,
+      out_trade_no,
+      send_pay_date,
       trade_status,
     });
     return result;

@@ -1,5 +1,6 @@
 import { loadAllModel } from '@/init/initDb';
 import Auth from '@/model/auth.model';
+import Live from '@/model/live.model';
 import LiveRoom from '@/model/liveRoom.model';
 import Log from '@/model/log.model';
 import Order from '@/model/order.model';
@@ -21,6 +22,21 @@ UserLiveRoom.belongsTo(LiveRoom, {
 
 User.hasOne(Wallet, {
   foreignKey: 'user_id',
+  constraints: false,
+});
+
+Live.belongsTo(User, {
+  foreignKey: 'user_id',
+  constraints: false,
+});
+
+Live.belongsTo(LiveRoom, {
+  foreignKey: 'live_room_id',
+  constraints: false,
+});
+
+LiveRoom.hasOne(Live, {
+  foreignKey: 'live_room_id',
   constraints: false,
 });
 

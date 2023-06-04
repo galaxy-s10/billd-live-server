@@ -7,6 +7,11 @@ import { Model, ModelStatic } from 'sequelize/types';
 import sequelize from '@/config/mysql';
 import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 
+/** 异步包装器 */
+export const asyncWraper = async (fn) => {
+  await fn();
+};
+
 export function dockerIsInstalled() {
   const res = spawnSync('docker', ['-v']);
   if (res.status !== 0) {

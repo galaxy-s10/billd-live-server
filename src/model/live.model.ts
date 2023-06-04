@@ -30,11 +30,11 @@ const model = sequelize.define<LiveModel>(
     socketId: {
       type: DataTypes.STRING(100),
     },
-    roomId: {
-      type: DataTypes.STRING(100),
+    live_room_id: {
+      type: DataTypes.INTEGER,
     },
-    roomName: {
-      type: DataTypes.STRING(100),
+    user_id: {
+      type: DataTypes.INTEGER,
     },
     track_video: {
       type: DataTypes.BOOLEAN,

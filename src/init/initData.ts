@@ -1,4 +1,176 @@
+import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import { devFddmBase64 } from '@/init/base64/dev-fddm';
+import { devFlowerBase64 } from '@/init/base64/dev-flower';
 import { GoodsTypeEnum, IAuth, IGoods, IRole } from '@/interface';
+import { resolveApp } from '@/utils';
+
+import { fddmHyzdwmglBase64 } from './base64/fddm_hyzdwmgl';
+import { fddmMhswBase64 } from './base64/fddm_mhsw';
+import { fddmNewboyBase64 } from './base64/fddm_newboy';
+import { fddmSnjxhBase64 } from './base64/fddm_snjxh';
+import { fddmXyzcslBase64 } from './base64/fddm_xyzcsl';
+import { fddmYycyBase64 } from './base64/fddm_yycy';
+
+export const initUser = {
+  admin: {
+    id: 1,
+    username: 'admin',
+    password: '123456',
+    avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/author.webp',
+    user_roles: [3, 7],
+    live_room: {
+      id: 1,
+      roomName: '房东的猫直播间',
+      localFile:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? '/node/video/fddm_yycy.mp4'
+          : resolveApp('./public/fddm.mp4'),
+      remoteFlv:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? 'rtmp://localhost/live/livestream/fddm_yycy'
+          : 'rtmp://localhost/live/livestream/fddm',
+      flvurl:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? 'https://live.hsslive.cn/srsflv/live/livestream/fddm_yycy.flv'
+          : 'http://localhost:5001/live/livestream/fddm.flv',
+      base64:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod ? fddmYycyBase64 : devFddmBase64,
+    },
+  },
+  systemUser1: {
+    id: 2,
+    username: 'CoCo',
+    password: '123456',
+    user_roles: [5],
+    avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/CoCo.webp',
+    live_room: {
+      id: 2,
+      roomName: 'CoCo的直播间',
+      localFile:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? '/node/video/fddm_mhsw.mp4'
+          : resolveApp('./public/flower.mp4'),
+      remoteFlv:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? 'rtmp://localhost/live/livestream/fddm_mhsw'
+          : 'rtmp://localhost/live/livestream/flower',
+      flvurl:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? 'https://live.hsslive.cn/srsflv/live/livestream/fddm_mhsw.flv'
+          : 'http://localhost:5001/live/livestream/flower.flv',
+      base64:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? fddmMhswBase64
+          : devFlowerBase64,
+    },
+  },
+  systemUser2: {
+    id: 3,
+    username: 'Dukoo',
+    password: '123456',
+    avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/Dukoo.webp',
+    user_roles: [5],
+    live_room: {
+      id: 3,
+      roomName: 'Dukoo的直播间',
+      localFile:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? '/node/video/fddm_hyzdwmgl.mp4'
+          : resolveApp('./public/fddm.mp4'),
+      remoteFlv:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? 'rtmp://localhost/live/livestream/fddm_hyzdwmgl'
+          : 'rtmp://localhost/live/livestream/fddm',
+      flvurl:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? 'https://live.hsslive.cn/srsflv/live/livestream/fddm_hyzdwmgl.flv'
+          : 'http://localhost:5001/live/livestream/fddm.flv',
+      base64:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? fddmHyzdwmglBase64
+          : devFddmBase64,
+    },
+  },
+  systemUser3: {
+    id: 4,
+    username: 'MoonTIT',
+    password: '123456',
+    avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/MoonTIT.webp',
+    user_roles: [5],
+    live_room: {
+      id: 4,
+      roomName: 'MoonTIT的直播间',
+      localFile:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? '/node/video/fddm_snjxh.mp4'
+          : resolveApp('./public/fddm.mp4'),
+      remoteFlv:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? 'rtmp://localhost/live/livestream/fddm_snjxh'
+          : 'rtmp://localhost/live/livestream/fddm',
+      flvurl:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? 'https://live.hsslive.cn/srsflv/live/livestream/fddm_snjxh.flv'
+          : 'http://localhost:5001/live/livestream/fddm.flv',
+      base64:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod ? fddmSnjxhBase64 : devFddmBase64,
+    },
+  },
+  systemUser4: {
+    id: 5,
+    username: 'Nill',
+    password: '123456',
+    avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/Nill.webp',
+    user_roles: [5],
+    live_room: {
+      id: 5,
+      roomName: 'Nill的直播间',
+      localFile:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? '/node/video/fddm_newboy.mp4'
+          : resolveApp('./public/fddm.mp4'),
+      remoteFlv:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? 'rtmp://localhost/live/livestream/fddm_newboy'
+          : 'rtmp://localhost/live/livestream/fddm',
+      flvurl:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? 'https://live.hsslive.cn/srsflv/live/livestream/fddm_newboy.flv'
+          : 'http://localhost:5001/live/livestream/fddm.flv',
+      base64:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? fddmNewboyBase64
+          : devFddmBase64,
+    },
+  },
+  systemUser5: {
+    id: 6,
+    username: 'Ojin',
+    password: '123456',
+    avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/Ojin.webp',
+    user_roles: [5],
+    live_room: {
+      id: 6,
+      roomName: 'Ojin的直播间',
+      localFile:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? '/node/video/fddm_xyzcsl.mp4'
+          : resolveApp('./public/fddm.mp4'),
+      remoteFlv:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? 'rtmp://localhost/live/livestream/fddm_xyzcsl'
+          : 'rtmp://localhost/live/livestream/fddm',
+      flvurl:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? 'https://live.hsslive.cn/srsflv/live/livestream/fddm_xyzcsl.flv'
+          : 'http://localhost:5001/live/livestream/fddm.flv',
+      base64:
+        PROJECT_ENV === PROJECT_ENV_ENUM.prod
+          ? fddmXyzcslBase64
+          : devFddmBase64,
+    },
+  },
+};
 
 const initAuth = () => {
   const deafultAuth: IAuth[] = [

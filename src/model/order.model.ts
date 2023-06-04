@@ -34,13 +34,10 @@ const model = sequelize.define<OrderModel>(
     billd_live_live_room_id: {
       type: DataTypes.INTEGER,
     },
-    out_trade_no: {
-      type: DataTypes.STRING(100),
+    billd_live_order_version: {
+      type: DataTypes.INTEGER,
     },
-    total_amount: {
-      type: DataTypes.STRING(100),
-    },
-    subject: {
+    billd_live_order_subject: {
       type: DataTypes.STRING(100),
     },
     product_code: {
@@ -53,10 +50,13 @@ const model = sequelize.define<OrderModel>(
     buyer_logon_id: {
       type: DataTypes.STRING(100),
     },
+    buyer_user_id: {
+      type: DataTypes.STRING(100),
+    },
     buyer_pay_amount: {
       type: DataTypes.STRING(100),
     },
-    buyer_user_id: {
+    total_amount: {
       type: DataTypes.STRING(100),
     },
     invoice_amount: {
@@ -68,16 +68,18 @@ const model = sequelize.define<OrderModel>(
     receipt_amount: {
       type: DataTypes.STRING(100),
     },
-    send_pay_date: {
-      // 支付时间（支付成功的）
+    trade_no: {
       type: DataTypes.STRING(100),
     },
-    trade_no: {
+    out_trade_no: {
       type: DataTypes.STRING(100),
     },
     trade_status: {
       type: DataTypes.STRING(100),
       defaultValue: PayStatusEnum.error,
+    },
+    send_pay_date: {
+      type: DataTypes.STRING(100),
     },
   },
   {

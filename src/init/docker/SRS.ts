@@ -1,6 +1,7 @@
 import { execSync } from 'child_process';
 
 import { DOCKER_SRS_CONFIG } from '@/config/secret';
+import { PROJECT_ENV } from '@/constant';
 import { dockerIsInstalled } from '@/utils';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 
@@ -13,13 +14,26 @@ export const dockerRunSRS = (init = true) => {
     console.log(chalkERROR('未安装docker！'));
     return;
   }
-  try {
+  let isRunning = false;
+  if (PROJECT_ENV === 'development') {
     try {
-      // 停掉旧的容器
-      execSync(`docker stop ${DOCKER_SRS_CONFIG.container}`);
+      execSync(`docker ps -a | grep ${DOCKER_SRS_CONFIG.container}`);
+      isRunning = true;
     } catch (error) {
       console.log(error);
     }
+  }
+  if (isRunning) {
+    console.log(chalkSUCCESS(`SRS正在运行！`));
+    return;
+  }
+  try {
+    // 停掉旧的容器
+    execSync(`docker stop ${DOCKER_SRS_CONFIG.container}`);
+  } catch (error) {
+    console.log(error);
+  }
+  try {
     // 启动新的容器
     // https://ossrs.net/lts/zh-cn/docs/v4/doc/webrtc#rtc-to-rtmp
     execSync(`docker run -d --rm --name ${DOCKER_SRS_CONFIG.container} --env CANDIDATE=${DOCKER_SRS_CONFIG.CANDIDATE} \

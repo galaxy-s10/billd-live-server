@@ -8,13 +8,17 @@ import {
   bulkCreateGoods,
   bulkCreateRole,
   bulkCreateRoleAuth,
+  initUser,
 } from '@/init/initData';
 import { initDb } from '@/init/initDb';
+import { IUser } from '@/interface';
 import authModel from '@/model/auth.model';
 import { CustomError } from '@/model/customError.model';
 import dayDataModel from '@/model/dayData.model';
 import goodsModel from '@/model/goods.model';
+import liveModel from '@/model/live.model';
 import liveRoomModel from '@/model/liveRoom.model';
+import orderModel from '@/model/order.model';
 import qqUserModel from '@/model/qqUser.model';
 import roleModel from '@/model/role.model';
 import roleAuthModel from '@/model/roleAuth.model';
@@ -22,6 +26,10 @@ import thirdUserModel from '@/model/thirdUser.model';
 import userModel from '@/model/user.model';
 import userLiveRoomModel from '@/model/userLiveRoom.model';
 import userRoleModel from '@/model/userRole.model';
+import walletModel from '@/model/wallet.model';
+import walletService from '@/service/wallet.service';
+
+import userController from './user.controller';
 
 const sql1 = `
 DROP PROCEDURE IF EXISTS insert_many_dates;
@@ -150,19 +158,38 @@ class InitController {
     await next();
   }
 
-  // 初始化管理员
-  async initAdminUser(ctx: ParameterizedContext, next) {
+  // 初始化用户
+  async initUser(ctx: ParameterizedContext, next) {
     const count = await userModel.count();
-    if (count === 0) {
-      const adminUser: any = await userModel.create({
-        username: 'admin',
-        password: '123456',
+    const quequ: Promise<any>[] = [];
+    async function initOneUser(user: IUser) {
+      const userRes = await userModel.create({
+        id: user.id,
+        username: user.username,
+        password: user.password,
+        avatar: user.avatar,
       });
-      adminUser.setRoles([3, 7]);
-      successHandler({ ctx, data: '初始化管理员成功！' });
+      // @ts-ignore
+      userRes.setRoles(user.user_roles);
+      const liveRoom = await liveRoomModel.create({
+        id: user.live_room?.id,
+        roomName: user.live_room?.roomName,
+      });
+      await userLiveRoomModel.create({
+        live_room_id: liveRoom.id,
+        user_id: userRes.id,
+      });
+    }
+    if (count === 0) {
+      Object.keys(initUser).forEach((item) => {
+        console.log(item, initUser[item]);
+        quequ.push(initOneUser(initUser[item]));
+      });
+      await Promise.all(quequ);
+      successHandler({ ctx, data: '初始化用户成功！' });
     } else {
       throw new CustomError(
-        '已经初始化过管理员了，不能再初始化了！',
+        '已经初始化过用户，不能再初始化了！',
         ALLOW_HTTP_CODE.paramsError,
         ALLOW_HTTP_CODE.paramsError
       );
@@ -170,6 +197,62 @@ class InitController {
 
     await next();
   }
+
+  // 初始化用户钱包
+  initUserWallet = async (ctx: ParameterizedContext, next) => {
+    if (PROJECT_ENV !== 'development') {
+      throw new CustomError(
+        '非开发环境，不能初始化用户钱包！',
+        ALLOW_HTTP_CODE.paramsError,
+        ALLOW_HTTP_CODE.paramsError
+      );
+    }
+
+    const userListRes = await userController.common.list({
+      orderBy: 'asc',
+      orderName: 'id',
+    });
+
+    const handleWallert = async (item: IUser) => {
+      const flag = await walletService.findByUserId(item.id!);
+      if (!flag) {
+        await walletService.create({ user_id: item.id, balance: '0.00' });
+      }
+    };
+    const arr: any[] = [];
+    userListRes.rows.forEach((item: IUser) => {
+      arr.push(handleWallert(item));
+    });
+    await Promise.all(arr);
+    successHandler({ ctx, data: '初始化用户钱包成功！' });
+    await next();
+  };
+
+  // 重建表
+  forceTable = async (ctx: ParameterizedContext, next) => {
+    if (PROJECT_ENV !== 'development') {
+      throw new CustomError(
+        '非开发环境，不能截断表！',
+        ALLOW_HTTP_CODE.paramsError,
+        ALLOW_HTTP_CODE.paramsError
+      );
+    }
+
+    await Promise.all([
+      userModel.sync({ force: true }),
+      userLiveRoomModel.sync({ force: true }),
+      userRoleModel.sync({ force: true }),
+      qqUserModel.sync({ force: true }),
+      thirdUserModel.sync({ force: true }),
+      liveModel.sync({ force: true }),
+      liveRoomModel.sync({ force: true }),
+      walletModel.sync({ force: true }),
+      orderModel.sync({ force: true }),
+    ]);
+
+    successHandler({ ctx, data: '重建表成功！' });
+    await next();
+  };
 
   deleteUser = async (ctx: ParameterizedContext, next) => {
     if (PROJECT_ENV !== 'development') {

@@ -2,12 +2,13 @@ import { deleteUseLessObjectKey } from 'billd-utils';
 import Sequelize from 'sequelize';
 
 import { IList, ILiveRoom } from '@/interface';
+import liveModel from '@/model/live.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
 import userLiveRoomModel from '@/model/userLiveRoom.model';
 import { handlePaging } from '@/utils';
 
-const { Op, col, literal, fn } = Sequelize;
+const { Op, col } = Sequelize;
 
 class LiveRoomService {
   /** 直播间是否存在 */
@@ -76,6 +77,9 @@ class LiveRoomService {
           ],
           required: true,
           attributes: [],
+        },
+        {
+          model: liveModel,
         },
       ],
       attributes: {

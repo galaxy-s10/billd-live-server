@@ -2,6 +2,8 @@ import Sequelize from 'sequelize';
 
 import { IList, ILive } from '@/interface';
 import liveModel from '@/model/live.model';
+import liveRoomModel from '@/model/liveRoom.model';
+import userModel from '@/model/user.model';
 import { handlePaging } from '@/utils';
 
 const { Op } = Sequelize;
@@ -64,6 +66,17 @@ class LiveService {
     }
     // @ts-ignore
     const result = await liveModel.findAndCountAll({
+      include: [
+        {
+          model: userModel,
+          attributes: {
+            exclude: ['password', 'token'],
+          },
+        },
+        {
+          model: liveRoomModel,
+        },
+      ],
       order: [[orderName, orderBy]],
       limit,
       offset,
@@ -87,8 +100,8 @@ class LiveService {
   };
 
   /** 查找直播 */
-  findByRoomId = async (roomId: string) => {
-    const res = await liveModel.findAndCountAll({ where: { roomId } });
+  findByRoomId = async (live_room_id: string) => {
+    const res = await liveModel.findAndCountAll({ where: { live_room_id } });
     return res;
   };
 
@@ -96,8 +109,8 @@ class LiveService {
   async update({
     id,
     socketId,
-    roomId,
-    roomName,
+    live_room_id,
+    user_id,
     coverImg,
     track_audio,
     track_video,
@@ -108,8 +121,8 @@ class LiveService {
     const result = await liveModel.update(
       {
         socketId,
-        roomId,
-        roomName,
+        live_room_id,
+        user_id,
         coverImg,
         track_audio,
         track_video,
@@ -125,8 +138,8 @@ class LiveService {
   /** 创建直播 */
   async create({
     socketId,
-    roomId,
-    roomName,
+    live_room_id,
+    user_id,
     coverImg,
     track_audio,
     track_video,
@@ -136,8 +149,8 @@ class LiveService {
   }: ILive) {
     const result = await liveModel.create({
       socketId,
-      roomId,
-      roomName,
+      live_room_id,
+      user_id,
       coverImg,
       track_audio,
       track_video,

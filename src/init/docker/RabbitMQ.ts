@@ -1,6 +1,7 @@
 import { execSync } from 'child_process';
 
 import { DOCKER_RABBITMQ_CONFIG } from '@/config/secret';
+import { PROJECT_ENV } from '@/constant';
 import { dockerIsInstalled } from '@/utils';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 
@@ -11,6 +12,19 @@ export const dockerRunRabbitMQ = (init = true) => {
     console.log(chalkWARN('docker已安装，开始启动RabbitMQ'));
   } else {
     console.log(chalkERROR('未安装docker！'));
+    return;
+  }
+  let isRunning = false;
+  if (PROJECT_ENV === 'development') {
+    try {
+      execSync(`docker ps -a | grep ${DOCKER_RABBITMQ_CONFIG.container}`);
+      isRunning = true;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  if (isRunning) {
+    console.log(chalkSUCCESS(`RabbitMQ正在运行！`));
     return;
   }
   try {

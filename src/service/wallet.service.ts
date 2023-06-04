@@ -6,7 +6,7 @@ import userModel from '@/model/user.model';
 import walletModel from '@/model/wallet.model';
 import { handlePaging } from '@/utils';
 
-const { Op } = Sequelize;
+const { Op, col, cast } = Sequelize;
 
 class WalletService {
   /** 钱包是否存在 */
@@ -58,9 +58,18 @@ class WalletService {
           model: userModel,
         },
       ],
-      order: [[orderName, orderBy]],
+      order:
+        orderName && orderBy && orderName !== 'balance'
+          ? [
+              [cast(col('balance'), 'INTEGER'), 'DESC'],
+              [orderName, orderBy],
+            ]
+          : [[cast(col('balance'), 'INTEGER'), 'DESC']],
       limit,
       offset,
+      attributes: {
+        include: [[cast(col('balance'), 'float'), 'aaa']],
+      },
       where: {
         ...allWhere,
       },
