@@ -41,7 +41,7 @@ async function main() {
     handleRedisKeyExpired();
     dockerRunRabbitMQ(true); // docker运行RabbitMQ
     dockerRunSRS(true); // docker运行SRS
-    initFFmpeg(false); // 初始化FFmpeg推流
+    initFFmpeg(true); // 初始化FFmpeg推流
     startSchedule();
     const port = +PROJECT_PORT;
     (await import('./setup')).setupKoa({ port });
