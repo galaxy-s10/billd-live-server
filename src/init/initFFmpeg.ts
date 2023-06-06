@@ -40,7 +40,6 @@ async function addLive({
   // const ffmpeg = `echo test initFFmpeg`;
   execSync(ffmpeg);
   const socketId = live_room_id;
-  console.log(live_room_id, user_id, 33333333);
   await liveService.deleteBySocketId(socketId);
   await liveService.create({
     live_room_id,
@@ -55,7 +54,7 @@ async function addLive({
   });
 }
 
-export const initFFmpeg = (init = true) => {
+export const initFFmpeg = async (init = true) => {
   if (!init) return;
   const flag = ffmpegIsInstalled();
   if (flag) {
@@ -65,36 +64,42 @@ export const initFFmpeg = (init = true) => {
     return;
   }
   try {
-    console.log(chalkSUCCESS(`FFmpeg推流成功！`));
     if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
-      addLive({
-        live_room_id: initUser.admin.live_room.id,
-        user_id: initUser.admin.id,
-        localFile: initUser.admin.live_room.localFile,
-        remoteFlv: initUser.admin.live_room.remoteFlv,
-        flvurl: initUser.admin.live_room.flvurl,
-        base64: initUser.admin.live_room.base64,
-      });
-      addLive({
-        live_room_id: initUser.systemUser1.live_room.id,
-        user_id: initUser.systemUser1.id,
-        localFile: initUser.systemUser1.live_room.localFile,
-        remoteFlv: initUser.systemUser1.live_room.remoteFlv,
-        flvurl: initUser.systemUser1.live_room.flvurl,
-        base64: initUser.systemUser1.live_room.base64,
-      });
-    } else {
-      Object.keys(initUser).forEach((item) => {
+      await Promise.all([
         addLive({
-          live_room_id: initUser[item].live_room.id,
-          user_id: initUser[item].id,
-          localFile: initUser[item].live_room.localFile,
-          remoteFlv: initUser[item].live_room.remoteFlv,
-          flvurl: initUser[item].live_room.flvurl,
-          base64: initUser[item].live_room.base64,
-        });
+          live_room_id: initUser.admin.live_room.id,
+          user_id: initUser.admin.id,
+          localFile: initUser.admin.live_room.localFile,
+          remoteFlv: initUser.admin.live_room.remoteFlv,
+          flvurl: initUser.admin.live_room.flvurl,
+          base64: initUser.admin.live_room.base64,
+        }),
+        addLive({
+          live_room_id: initUser.systemUser1.live_room.id,
+          user_id: initUser.systemUser1.id,
+          localFile: initUser.systemUser1.live_room.localFile,
+          remoteFlv: initUser.systemUser1.live_room.remoteFlv,
+          flvurl: initUser.systemUser1.live_room.flvurl,
+          base64: initUser.systemUser1.live_room.base64,
+        }),
+      ]);
+    } else {
+      const queue: any[] = [];
+      Object.keys(initUser).forEach((item) => {
+        queue.push(
+          addLive({
+            live_room_id: initUser[item].live_room.id,
+            user_id: initUser[item].id,
+            localFile: initUser[item].live_room.localFile,
+            remoteFlv: initUser[item].live_room.remoteFlv,
+            flvurl: initUser[item].live_room.flvurl,
+            base64: initUser[item].live_room.base64,
+          })
+        );
       });
+      await Promise.all(queue);
     }
+    console.log(chalkSUCCESS(`FFmpeg推流成功！`));
 
     // const child = exec(ffmpeg, (error, stdout, stderr) => {
     //   console.log(

@@ -56,6 +56,9 @@ class WalletService {
       include: [
         {
           model: userModel,
+          attributes: {
+            exclude: ['password', 'token'],
+          },
         },
       ],
       order:

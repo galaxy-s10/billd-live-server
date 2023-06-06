@@ -97,14 +97,6 @@ class OrderController {
     const { price, name: subject } = goodsInfo;
     let total_amount = price;
 
-    if (Number(price) === 0) {
-      throw new CustomError(
-        `付款金额不能为0！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
-      );
-    }
-
     if (goodsInfo.type === GoodsTypeEnum.recharge) {
       const newmoney = Number(money);
       if (newmoney === 0) {
@@ -115,6 +107,12 @@ class OrderController {
         );
       }
       total_amount = Number(newmoney).toFixed(2);
+    } else if (Number(price) === 0) {
+      throw new CustomError(
+        `付款金额不能为0！`,
+        ALLOW_HTTP_CODE.paramsError,
+        ALLOW_HTTP_CODE.paramsError
+      );
     }
 
     const res = await aliPaySdk.precreate({

@@ -9,7 +9,7 @@ class WSController {
     socketId: string;
   }): Promise<{
     value: {
-      roomId: string;
+      roomId: number;
       socketId: string;
       userInfo: IUser;
     };
@@ -26,7 +26,7 @@ class WSController {
   /** 设置用户进入的房间 */
   setUserJoinedRoom = async (data: {
     socketId: string;
-    roomId: string;
+    roomId: number;
     userInfo?: IUser;
     created_at?: number;
     expired_at?: number;
@@ -55,7 +55,7 @@ class WSController {
   setUserLiveing = async (data: {
     liveId: number;
     socketId: string;
-    roomId: string;
+    roomId: number;
     userInfo?: IUser;
     created_at?: number;
     expired_at?: number;

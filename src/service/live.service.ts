@@ -100,8 +100,21 @@ class LiveService {
   };
 
   /** 查找直播 */
-  findByRoomId = async (live_room_id: string) => {
-    const res = await liveModel.findAndCountAll({ where: { live_room_id } });
+  findByRoomId = async (live_room_id: number) => {
+    const res = await liveModel.findOne({
+      include: [
+        {
+          model: userModel,
+          attributes: {
+            exclude: ['password', 'token'],
+          },
+        },
+        {
+          model: liveRoomModel,
+        },
+      ],
+      where: { live_room_id },
+    });
     return res;
   };
 
