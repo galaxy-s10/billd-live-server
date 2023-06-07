@@ -1,8 +1,11 @@
 import { execSync, spawnSync } from 'child_process';
 
+import { getRangeRandom } from 'billd-utils';
+
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import liveService from '@/service/live.service';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
+import { qiniuUtils } from '@/utils/qiniu';
 
 import { initUser } from './initData';
 
@@ -18,8 +21,6 @@ async function addLive({
   live_room_id,
   user_id,
   localFile,
-  remoteFlv,
-  flvurl,
   base64,
 }: {
   live_room_id;
@@ -29,6 +30,12 @@ async function addLive({
   flvurl: string;
   base64: string;
 }) {
+  const isExist = await qiniuUtils.queryAFlow({ roomId: live_room_id });
+  if (!isExist) {
+    await qiniuUtils.createAFlow({ roomId: live_room_id });
+  }
+  const remoteFlv = qiniuUtils.generateRtmpPublishUrl({ roomId: live_room_id });
+  const flvurl = qiniuUtils.getFlvPullUrl({ roomId: live_room_id });
   // ffmpeg后台运行
   // https://www.jianshu.com/p/6ea70e6d8547
   // 1 代表标准输出
@@ -36,10 +43,14 @@ async function addLive({
   // 1>/dev/null 把标准输出导入到null设备,也就是消失不见，如果要重定向到某个文件，可以1>1.txt
   // 2>&1 把标准错误也导入到标准输出同样的地方
   // -loglevel quiet不输出log
-  const ffmpeg = `ffmpeg -loglevel quiet -stream_loop -1 -re -i ${localFile} -c copy -f flv '${remoteFlv}' 1>/dev/null 2>&1 &`;
-  console.log('ffmpeg命令', ffmpeg);
+  // const ffmpeg = `ffmpeg -loglevel quiet -stream_loop -1 -re -i ${localFile} -c copy -f flv '${remoteFlv}' 1>/dev/null 2>&1 &`;
+  const ffmpeg = `ffmpeg -stream_loop -1 -re -i ${localFile} -c copy -f flv '${remoteFlv}' 1>/dev/null 2>&1 &`;
   // const ffmpeg = `echo test initFFmpeg`;
-  execSync(ffmpeg);
+  setTimeout(() => {
+    console.log('推流', ffmpeg);
+    execSync(ffmpeg);
+  }, getRangeRandom(1000, 5000));
+  console.log('ffmpeg命令', ffmpeg);
   const socketId = live_room_id;
   await liveService.deleteBySocketId(socketId);
   await liveService.create({

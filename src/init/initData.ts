@@ -27,15 +27,11 @@ export const initUser = {
       remoteFlv:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? 'rtmp://localhost/live/livestream/fddm_yycy'
-          : // : 'rtmp://localhost/live/livestream/dev_fddm',
-            `rtmp://pili-publish.hsslive.cn/live-hsslive/dev_fddm?expire=1686145895&token=8t_SRFOU0m0oJ6UTIZT0JMkbvs4=`,
-      // `rtmp://pili-publish.hsslive.cn/live-hsslive/dev_fddm?expire=1686119518&token=G6_A33FD2UFuuWoRdBIAKTb6Xnw=`,
-      // `rtmp://${QINIU_LIVE.RTMPPublishDomain}/${QINIU_LIVE.Hub}/dev_fddm?key=${QINIU_LIVE.PublishKey}`,
+          : 'rtmp://localhost/live/livestream/dev_fddm',
       flvurl:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? 'https://live.hsslive.cn/srsflv/live/livestream/fddm_yycy.flv'
-          : `http://pili-live-hdl.hsslive.cn/live-hsslive/dev_fddm.flv`,
-      // : 'http://localhost:5001/live/livestream/dev_fddm.flv',
+          : 'http://localhost:5001/live/livestream/dev_fddm.flv',
       base64:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod ? fddmYycyBase64 : devFddmBase64,
     },

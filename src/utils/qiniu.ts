@@ -1,8 +1,11 @@
 import { AxiosError } from 'axios';
+import { getRangeRandom } from 'billd-utils';
 import qiniu from 'qiniu';
 
 import { QINIU_ACCESSKEY, QINIU_LIVE, QINIU_SECRETKEY } from '@/config/secret';
 import axios from '@/utils/request';
+
+import { chalkERROR } from './chalkTip';
 
 export interface IQiniuKey {
   prefix: string;
@@ -36,55 +39,63 @@ class QiniuClass {
       url,
       reqMethod,
       reqContentType,
-      JSON.stringify(reqBody)
+      JSON.stringify(reqBody),
+      reqHeaders
     );
     return accessToken;
   }
 
   /**
-   * 获取推流地址（静态鉴权）
-   * https://developer.qiniu.com/pili/6678/push-the-current-authentication
+   * 生成rtmp推流地址。
+   * https://developer.qiniu.com/pili/2767/the-rtmp-push-flow-address
    */
-  getPublishUrl = (data: { roomId: number }) => {
-    const url = `rtmp://${QINIU_LIVE.RTMPPublishDomain}/${QINIU_LIVE.Hub}/${data.roomId}?key=${QINIU_LIVE.PublishKey}`;
+  generateRtmpPublishUrl = (data: { roomId: number }) => {
+    const expireAt =
+      Math.floor(Date.now() / 1000) + 60 * 60 + getRangeRandom(10, 50);
+    const path = `/${QINIU_LIVE.Hub}/roomId___${data.roomId}?e=${expireAt}`;
+    const sign = qiniu.util.hmacSha1(path, QINIU_SECRETKEY);
+    const encodedSign = qiniu.util.urlSafeToBase64(sign);
+    const token = `${QINIU_ACCESSKEY}:${encodedSign}`;
+    const url = `rtmp://${QINIU_LIVE.RTMPPublishDomain}/${QINIU_LIVE.Hub}/roomId___${data.roomId}?e=${expireAt}&token=${token}`;
+    return url;
+  };
+
+  /**
+   * 获取flv拉流地址。
+   */
+  getFlvPullUrl = (data: { roomId: number }) => {
+    const url = `http://${QINIU_LIVE.RTMPPublishDomain}/${QINIU_LIVE.Hub}/roomId___${data.roomId}.flv`;
     return url;
   };
 
   /**
    * 查询直播流信息，查询目标直播流基本信息和配置信息
    * https://developer.qiniu.com/pili/2773/query-stream
-   * code 200代表成功；614代表stream already exists
    */
   queryAFlow = async (data: { roomId: number }) => {
-    const encodedStreamTitle = `${Buffer.from(`5555555${data.roomId}`).toString(
-      'base64'
-    )}`; // 经过base64编码的直播流名
-    console.log(encodedStreamTitle, 333);
-    const reqUrl = `https://pili.qiniuapi.com/v2/hubs/${QINIU_LIVE.Hub}`;
-    // const reqUrl = `https://pili.qiniuapi.com/v2/hubs/${QINIU_LIVE.Hub}/stat/play`;
-    // const reqUrl = `https://pili.qiniuapi.com/v2/hubs/${QINIU_LIVE.Hub}/streams`;
-    // const reqUrl = `https://pili.qiniuapi.com/v2/hubs/${QINIU_LIVE.Hub}/streams/${encodedStreamTitle}`;
+    const encodedStreamTitle = `${Buffer.from(
+      `roomId___${data.roomId}`
+    ).toString('base64')}`; // 经过base64编码的直播流名
+    const reqUrl = `https://pili.qiniuapi.com/v2/hubs/${QINIU_LIVE.Hub}/streams/${encodedStreamTitle}`;
     const contentType = 'application/x-www-form-urlencoded';
-    console.log('urlurl', reqUrl);
     const token = this.getAccessToken(reqUrl, 'GET', contentType);
-    console.log(999, token);
-
     let res;
     try {
       const qiniures = await axios.get(reqUrl, {
         headers: {
-          // Accept: contentType,
-          contentType,
+          // WARN 不要省略这些请求头，否则可能会报unauthorized！!!
+          'Content-Type': contentType,
+          Host: 'pili.qiniuapi.com',
           Authorization: `${token}`,
         },
       });
       res = qiniures;
     } catch (error: any) {
       const e: AxiosError = error;
-      console.log(e.isAxiosError, e.response?.status, e.response?.data);
-      // console.log(e);
+      console.log('response.status', e.response?.status);
+      console.log('response.data', e.response?.data);
+      console.log(chalkERROR('查询直播流信息错误！'));
     }
-    console.log(res, 222212);
     return res;
   };
 
@@ -97,30 +108,28 @@ class QiniuClass {
     const reqUrl = `https://pili.qiniuapi.com/v2/hubs/${QINIU_LIVE.Hub}/streams`;
     const contentType = 'application/json';
     const reqBody = {
-      key: `${data.roomId}`, // 直播流名，需要满足的条件为 4-200个数字或字母
-      // key: `${Math.random().toString().slice(2, 4)}${data.roomId}`, // 直播流名，需要满足的条件为 4-200个数字或字母
+      key: `roomId___${data.roomId}`, // 直播流名，需要满足的条件为 4-200个数字或字母
     };
     const token = this.getAccessToken(reqUrl, 'POST', contentType, reqBody);
-    console.log('urlurl', reqUrl);
-    console.log('reqBody', reqBody);
-    console.log(888, token);
     try {
-      const res = await axios({
+      await axios({
         method: 'POST',
         url: reqUrl,
         data: reqBody,
         headers: {
-          contentType,
+          // WARN 不要省略这些请求头，否则可能会报unauthorized！!!
+          'Content-Type': contentType,
+          Host: 'pili.qiniuapi.com',
           Authorization: `${token}`,
         },
       });
-      console.log(332323253, res);
     } catch (error: any) {
       const e: AxiosError = error;
-      console.log(e.isAxiosError, e.response?.status, e.response?.data);
+      console.log('response.status', e.response?.status);
+      console.log('response.data', e.response?.data);
+      console.log(chalkERROR('创建一个直播流错误！'));
     }
-    return `rtmp://${QINIU_LIVE.RTMPPublishDomain}/${QINIU_LIVE.Hub}/${data.roomId}?key=${QINIU_LIVE.PublishKey}`;
   };
 }
 
-export const QiniuUtils = new QiniuClass();
+export const qiniuUtils = new QiniuClass();
