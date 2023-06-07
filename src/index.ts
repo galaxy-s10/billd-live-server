@@ -19,6 +19,8 @@ import {
   chalkWARN,
 } from '@/utils/chalkTip';
 
+import { QiniuUtils } from './utils/qiniu';
+
 async function main() {
   function adLog() {
     console.log();
@@ -32,6 +34,10 @@ async function main() {
     console.log();
   }
   try {
+    // const res = await QiniuUtils.createAFlow({ roomId: 333 });
+    // const res1 = await QiniuUtils.queryAFlow({ roomId: 333 });
+    // console.log(res, '---');
+    // return;
     await Promise.all([
       connectMysql(), // 连接mysql
       connectRedis(), // 连接redis
@@ -42,6 +48,9 @@ async function main() {
     dockerRunRabbitMQ(true); // docker运行RabbitMQ
     dockerRunSRS(true); // docker运行SRS
     await initFFmpeg(true); // 初始化FFmpeg推流
+    const res = await QiniuUtils.createAFlow({ roomId: 333 });
+    const res1 = await QiniuUtils.queryAFlow({ roomId: 333 });
+    return;
     startSchedule();
     const port = +PROJECT_PORT;
     (await import('./setup')).setupKoa({ port });

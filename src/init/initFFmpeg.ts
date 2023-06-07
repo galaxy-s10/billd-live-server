@@ -36,7 +36,8 @@ async function addLive({
   // 1>/dev/null 把标准输出导入到null设备,也就是消失不见，如果要重定向到某个文件，可以1>1.txt
   // 2>&1 把标准错误也导入到标准输出同样的地方
   // -loglevel quiet不输出log
-  const ffmpeg = `ffmpeg -loglevel quiet -stream_loop -1 -re -i ${localFile} -c copy -f flv ${remoteFlv} 1>/dev/null 2>&1 &`;
+  const ffmpeg = `ffmpeg -loglevel quiet -stream_loop -1 -re -i ${localFile} -c copy -f flv '${remoteFlv}' 1>/dev/null 2>&1 &`;
+  console.log('ffmpeg命令', ffmpeg);
   // const ffmpeg = `echo test initFFmpeg`;
   execSync(ffmpeg);
   const socketId = live_room_id;

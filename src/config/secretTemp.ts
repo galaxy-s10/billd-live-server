@@ -45,6 +45,14 @@ export const DOCKER_RABBITMQ_CONFIG = {
   container: 'billd-live-server-rabbitmq',
 }; // docker的RabbitMQ配置
 
+export const QINIU_LIVE = {
+  // 推流鉴权方式：静态鉴权(static)，https://developer.qiniu.com/pili/6678/push-the-current-authentication
+  // 推流地址格式：rtmp://<RTMPPublishDomain>/<Hub>/<streamTitle>?key=<PublishKey>
+  RTMPPublishDomain: '**********', // 推流域名
+  Hub: '**********', // 直播空间名称
+  PublishKey: '**********', // 推流密钥
+};
+
 export const ALIPAY_LIVE_CONFIG = {
   appId: '**********',
   privateKey:
