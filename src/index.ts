@@ -32,10 +32,6 @@ async function main() {
     console.log();
   }
   try {
-    // const res = await QiniuUtils.createAFlow({ roomId: 333 });
-    // const res1 = await QiniuUtils.queryAFlow({ roomId: 333 });
-    // console.log(res, '---');
-    // return;
     await Promise.all([
       connectMysql(), // 连接mysql
       connectRedis(), // 连接redis

@@ -1,5 +1,4 @@
 import { AxiosError } from 'axios';
-import { getRangeRandom } from 'billd-utils';
 import qiniu from 'qiniu';
 
 import { QINIU_ACCESSKEY, QINIU_LIVE, QINIU_SECRETKEY } from '@/config/secret';
@@ -50,13 +49,15 @@ class QiniuClass {
    * https://developer.qiniu.com/pili/2767/the-rtmp-push-flow-address
    */
   generateRtmpPublishUrl = (data: { roomId: number }) => {
-    const expireAt =
-      Math.floor(Date.now() / 1000) + 60 * 60 + getRangeRandom(10, 50);
+    const expireAt = Math.floor(Date.now() / 1000) + 60 * 60;
     const path = `/${QINIU_LIVE.Hub}/roomId___${data.roomId}?e=${expireAt}`;
     const sign = qiniu.util.hmacSha1(path, QINIU_SECRETKEY);
     const encodedSign = qiniu.util.urlSafeToBase64(sign);
     const token = `${QINIU_ACCESSKEY}:${encodedSign}`;
     const url = `rtmp://${QINIU_LIVE.RTMPPublishDomain}/${QINIU_LIVE.Hub}/roomId___${data.roomId}?e=${expireAt}&token=${token}`;
+    console.log('roomId', data.roomId);
+    console.log('过期时间', expireAt);
+    console.log('url', url);
     return url;
   };
 
@@ -83,9 +84,8 @@ class QiniuClass {
     try {
       const qiniures = await axios.get(reqUrl, {
         headers: {
-          // WARN 不要省略这些请求头，否则可能会报unauthorized！!!
+          // WARN 不要省略Content-Type这个请求头，否则报unauthorized！!!
           'Content-Type': contentType,
-          Host: 'pili.qiniuapi.com',
           Authorization: `${token}`,
         },
       });
@@ -117,9 +117,8 @@ class QiniuClass {
         url: reqUrl,
         data: reqBody,
         headers: {
-          // WARN 不要省略这些请求头，否则可能会报unauthorized！!!
+          // TIP 这个接口不带Content-Type这个请求头也没问题。
           'Content-Type': contentType,
-          Host: 'pili.qiniuapi.com',
           Authorization: `${token}`,
         },
       });
