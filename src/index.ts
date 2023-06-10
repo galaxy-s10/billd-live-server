@@ -33,6 +33,7 @@ async function main() {
     ]);
     const port = +PROJECT_PORT;
     await (await import('./setup')).setupKoa({ port });
+    console.log();
     console.log(chalkSUCCESS(`项目启动成功！`));
     console.log(chalkWARN(`监听端口: ${port}`));
     console.log(chalkWARN(`项目名称: ${PROJECT_NAME}`));

@@ -53,7 +53,6 @@ async function addLive({
     // -loglevel quiet不输出log
     const ffmpeg = `ffmpeg -loglevel quiet -stream_loop -1 -re -i ${localFile} -c copy -f flv '${remoteFlv}' 1>/dev/null 2>&1 &`;
     // const ffmpeg = `echo test initFFmpeg`;
-    console.log('ffmpeg命令', ffmpeg);
     execSync(ffmpeg);
     const socketId = `${live_room_id}`;
     await liveService.deleteBySocketId(socketId);
@@ -101,8 +100,13 @@ export const initFFmpeg = async (init = true) => {
   }
   try {
     try {
-      const killOldFFmpeg = `kill -9 $(ps aux | grep ffmpeg | grep -v grep | awk '{print $2}')`;
-      execSync(killOldFFmpeg);
+      const getOldProcess = `ps aux | grep ffmpeg | grep -v grep | awk '{print $2}'`;
+      const res = execSync(getOldProcess);
+      const oldProcess = res.toString().trim();
+      if (oldProcess) {
+        const killOldFFmpeg = `kill -9 $(${getOldProcess}')`;
+        execSync(killOldFFmpeg);
+      }
     } catch (error) {
       console.log(error);
     }
