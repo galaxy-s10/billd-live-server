@@ -51,5 +51,6 @@ const model = sequelize.define<RoleAuthModel>(
   }
 );
 
-initTable(model);
+initTable({ model, sequelize });
+
 export default model;

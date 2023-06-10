@@ -54,5 +54,6 @@ const model = sequelize.define<RoleModel>(
   }
 );
 
-initTable(model);
+initTable({ model, sequelize });
+
 export default model;

@@ -68,5 +68,6 @@ const model = sequelize.define<GoodsModel>(
   }
 );
 
-initTable(model);
+initTable({ model, sequelize });
+
 export default model;

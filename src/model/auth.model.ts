@@ -82,5 +82,5 @@ const model = sequelize.define<AuthModel>(
   }
 );
 
-initTable(model);
+initTable({ model, sequelize });
 export default model;

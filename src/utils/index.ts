@@ -2,9 +2,9 @@ import { spawnSync } from 'child_process';
 import path from 'path';
 
 import { ParameterizedContext } from 'koa';
-import { Model, ModelStatic } from 'sequelize/types';
+import { Model, ModelStatic, Sequelize } from 'sequelize/types';
 
-import sequelize from '@/config/mysql';
+// import sequelize from '@/config/mysql';
 import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 
 /** 异步包装器 */
@@ -97,7 +97,7 @@ export const handlePaging = (
 };
 
 /** 删除所有外键 */
-export const deleteAllForeignKeys = async () => {
+export const deleteAllForeignKeys = async (sequelize: Sequelize) => {
   try {
     const queryInterface = sequelize.getQueryInterface();
     const allTables: string[] = await queryInterface.showAllTables();
@@ -126,7 +126,7 @@ export const deleteAllForeignKeys = async () => {
 };
 
 /** 删除所有索引（除了PRIMARY） */
-export const deleteAllIndexs = async () => {
+export const deleteAllIndexs = async (sequelize: Sequelize) => {
   try {
     const queryInterface = sequelize.getQueryInterface();
     const allTables = await queryInterface.showAllTables();
@@ -162,27 +162,28 @@ export const deleteAllIndexs = async () => {
  * @param model
  * @param method
  */
-export const initTable = (
-  model: ModelStatic<Model>,
-  method?: 'force' | 'alter'
-) => {
+export const initTable = (data: {
+  model: ModelStatic<Model>;
+  method?: 'force' | 'alter';
+  sequelize: Sequelize;
+}) => {
   async function main(
     modelArg: ModelStatic<Model>,
-    methodArg: 'force' | 'alter'
+    methodArg?: 'force' | 'alter'
   ) {
     if (methodArg === 'force') {
-      await deleteAllForeignKeys();
+      await deleteAllForeignKeys(data.sequelize);
       await modelArg.sync({ force: true });
       console.log(chalkSUCCESS(`${modelArg.tableName}表刚刚(重新)创建！`));
     } else if (methodArg === 'alter') {
-      await deleteAllForeignKeys();
+      await deleteAllForeignKeys(data.sequelize);
       await modelArg.sync({ alter: true });
       console.log(chalkSUCCESS(`${modelArg.tableName}表刚刚同步成功！`));
     } else {
       console.log(chalkINFO(`加载数据库表: ${modelArg.tableName}`));
     }
   }
-  main(model, method!).catch((err) => {
+  main(data.model, data.method).catch((err) => {
     console.log(chalkERROR(`initTable失败`), err.message);
     console.log(err);
   });

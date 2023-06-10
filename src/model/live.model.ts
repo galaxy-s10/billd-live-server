@@ -61,5 +61,6 @@ const model = sequelize.define<LiveModel>(
   }
 );
 
-initTable(model);
+initTable({ model, sequelize });
+
 export default model;

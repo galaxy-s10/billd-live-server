@@ -38,5 +38,6 @@ const model = sequelize.define<LiveRoomModel>(
   }
 );
 
-initTable(model);
+initTable({ model, sequelize });
+
 export default model;

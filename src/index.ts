@@ -4,14 +4,8 @@ import './init/initFile';
 
 import { connectMysql, dbName } from '@/config/mysql';
 import { connectRedis } from '@/config/redis';
-import { handleRedisKeyExpired } from '@/config/redis/handleRedisKeyExpired';
 import { createRedisPubSub } from '@/config/redis/pub';
-import { startSchedule } from '@/config/schedule';
 import { PROJECT_ENV, PROJECT_NAME, PROJECT_PORT } from '@/constant';
-import { dockerRunRabbitMQ } from '@/init/docker/RabbitMQ';
-import { dockerRunSRS } from '@/init/docker/SRS';
-import { initDb } from '@/init/initDb';
-import { initFFmpeg } from '@/init/initFFmpeg';
 import {
   chalkERROR,
   chalkINFO,
@@ -37,14 +31,8 @@ async function main() {
       connectRedis(), // 连接redis
       createRedisPubSub(), // 创建redis的发布订阅
     ]);
-    await initDb('load');
-    handleRedisKeyExpired();
-    dockerRunRabbitMQ(true); // docker运行RabbitMQ
-    dockerRunSRS(true); // docker运行SRS
-    await initFFmpeg(true); // 初始化FFmpeg推流
-    startSchedule();
     const port = +PROJECT_PORT;
-    (await import('./setup')).setupKoa({ port });
+    await (await import('./setup')).setupKoa({ port });
     console.log(chalkSUCCESS(`项目启动成功！`));
     console.log(chalkWARN(`监听端口: ${port}`));
     console.log(chalkWARN(`项目名称: ${PROJECT_NAME}`));

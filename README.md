@@ -30,6 +30,26 @@ billd 直播间后端，主要根据[https://github.com/galaxy-s10/vue3-blog-ser
 
 [apifox](https://www.apifox.cn/apidoc/shared-46443f95-e389-4453-9da7-a98ea8c72177)
 
+## F&Q
+
+### 数据库建库建表？
+
+项目会使用到两个数据库，一个用于生产环境，另一个用于开发环境，只需要配置好 MYSQL_CONFIG 即可，因为项目启动时会自动判断是否存在 MYSQL_CONFIG.database，如果不存在，则会根据当前项目环境自动新建数据库。
+
+### 初始化数据（必须！）
+
+项目启动成功后，要做的第一件事情是调用所有初始化接口：[https://apifox.com/apidoc/shared-46443f95-e389-4453-9da7-a98ea8c72177/api-80688503](https://apifox.com/apidoc/shared-46443f95-e389-4453-9da7-a98ea8c72177/api-80688503)
+
+目前的初始化接口有：
+
+- 初始化角色
+- 初始化权限
+- 初始化角色权限
+- 初始化用户
+- 初始化用户钱包
+- 初始化商品
+- 初始化时间表
+
 ## 安装和使用
 
 - 安装依赖
@@ -49,8 +69,6 @@ pnpm i billd-utils@latest billd-scss@latest billd-html-webpack-plugin@latest bil
 > 本地需要有 mysql、redis、docker、ffmpeg 环境！
 >
 > 项目启动后，会在项目的 src/config/目录下生成 secret.ts 文件，请填写里面的信息，MYSQL_CONFIG、REDIS_CONFIG、DOCKER_RABBITMQ_CONFIG、DOCKER_SRS_CONFIG 必填！
->
-> 项目会使用到两个数据库，一个用于生产环境，另一个用于开发环境，配置好 MYSQL_CONFIG 后，记得新建对应的数据库（数据库名看：src/config/mysql/index.ts 里面的 dbName）。新建完数据库后，在项目的 src 目录下的 index.ts 搜`initDb('load');`，改成`initDb('force');`这会给你初始化数据库表。初始化完成后，再将`initDb('force');`，改回`initDb('load');`即可。
 
 ```bash
 # pnpm run dev，运行在4300端口
@@ -64,10 +82,6 @@ pnpm run dev:prod
 ## 赞助
 
 [https://live.hsslive.cn/sponsors](https://live.hsslive.cn/sponsors)
-
-## F&Q
-
-todo
 
 ## 交流
 
@@ -88,6 +102,9 @@ todo
 
 - 操作系统：mac os 13.3.1（macbookpro 2020 m1）
 - node 版本：16.16.0
+- mysql 版本：基于 docker，镜像：mysql:8.0
+- srs 版本：基于 docker，镜像：registry.cn-hangzhou.aliyuncs.com/ossrs/srs:4
+- rabbitmq 版本：基于 docker，镜像：rabbitmq:3.11-management
 
 ## 服务器环境
 

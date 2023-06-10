@@ -47,5 +47,6 @@ const model = sequelize.define<BlacklistModel>(
   }
 );
 
-initTable(model);
+initTable({ model, sequelize });
+
 export default model;

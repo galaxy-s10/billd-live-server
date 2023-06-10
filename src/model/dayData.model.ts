@@ -44,5 +44,6 @@ const model = sequelize.define<DayDataModel>(
   }
 );
 
-initTable(model);
+initTable({ model, sequelize });
+
 export default model;

@@ -9,8 +9,7 @@ import {
   TENCENTCLOUD_SECRETID,
   TENCENTCLOUD_SECRETKEY,
 } from '@/config/secret';
-
-import { chalkERROR, chalkSUCCESS } from './chalkTip';
+import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
 
 function getSignFn({ endpoint, params }) {
   function sort_params(params) {

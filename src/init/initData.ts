@@ -24,14 +24,6 @@ export const initUser = {
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_yycy.mp4'
           : resolveApp('./public/dev_fddm.mp4'),
-      remoteFlv:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? 'rtmp://localhost/live/livestream/fddm_yycy'
-          : 'rtmp://localhost/live/livestream/dev_fddm',
-      flvurl:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? 'https://live.hsslive.cn/srsflv/live/livestream/fddm_yycy.flv'
-          : 'http://localhost:5001/live/livestream/dev_fddm.flv',
       base64:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod ? fddmYycyBase64 : devFddmBase64,
     },
@@ -49,14 +41,6 @@ export const initUser = {
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_mhsw.mp4'
           : resolveApp('./public/dev_flower.mp4'),
-      remoteFlv:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? 'rtmp://localhost/live/livestream/fddm_mhsw'
-          : 'rtmp://localhost/live/livestream/dev_flower',
-      flvurl:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? 'https://live.hsslive.cn/srsflv/live/livestream/fddm_mhsw.flv'
-          : 'http://localhost:5001/live/livestream/dev_flower.flv',
       base64:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? fddmMhswBase64
@@ -76,14 +60,6 @@ export const initUser = {
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_hyzdwmgl.mp4'
           : resolveApp('./public/fddm.mp4'),
-      remoteFlv:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? 'rtmp://localhost/live/livestream/fddm_hyzdwmgl'
-          : 'rtmp://localhost/live/livestream/dev_fddm',
-      flvurl:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? 'https://live.hsslive.cn/srsflv/live/livestream/fddm_hyzdwmgl.flv'
-          : 'http://localhost:5001/live/livestream/dev_fddm.flv',
       base64:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? fddmHyzdwmglBase64
@@ -103,14 +79,6 @@ export const initUser = {
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_snjxh.mp4'
           : resolveApp('./public/fddm.mp4'),
-      remoteFlv:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? 'rtmp://localhost/live/livestream/fddm_snjxh'
-          : 'rtmp://localhost/live/livestream/dev_fddm',
-      flvurl:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? 'https://live.hsslive.cn/srsflv/live/livestream/fddm_snjxh.flv'
-          : 'http://localhost:5001/live/livestream/dev_fddm.flv',
       base64:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod ? fddmSnjxhBase64 : devFddmBase64,
     },
@@ -128,14 +96,6 @@ export const initUser = {
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_newboy.mp4'
           : resolveApp('./public/fddm.mp4'),
-      remoteFlv:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? 'rtmp://localhost/live/livestream/fddm_newboy'
-          : 'rtmp://localhost/live/livestream/dev_fddm',
-      flvurl:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? 'https://live.hsslive.cn/srsflv/live/livestream/fddm_newboy.flv'
-          : 'http://localhost:5001/live/livestream/dev_fddm.flv',
       base64:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? fddmNewboyBase64
@@ -155,14 +115,6 @@ export const initUser = {
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_xyzcsl.mp4'
           : resolveApp('./public/fddm.mp4'),
-      remoteFlv:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? 'rtmp://localhost/live/livestream/fddm_xyzcsl'
-          : 'rtmp://localhost/live/livestream/dev_fddm',
-      flvurl:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? 'https://live.hsslive.cn/srsflv/live/livestream/fddm_xyzcsl.flv'
-          : 'http://localhost:5001/live/livestream/dev_fddm.flv',
       base64:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? fddmXyzcslBase64

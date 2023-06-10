@@ -4,9 +4,6 @@ import initController from '@/controller/init.controller';
 
 const initRouter = new Router({ prefix: '/init' });
 
-// 初始化数据库
-initRouter.post('/database', initController.initDatabase);
-
 // 初始化角色
 initRouter.post('/role', initController.initRole);
 

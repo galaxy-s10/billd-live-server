@@ -20,23 +20,30 @@ async function addLive({
   localFile,
   base64,
 }: {
-  live_room_id;
-  user_id;
+  live_room_id: number;
+  user_id: number;
   localFile: string;
-  remoteFlv: string;
-  flvurl: string;
   base64: string;
 }) {
-  const { res, err } = await tencentcloudUtils.queryLiveStream({
-    roomId: live_room_id,
-  });
-  if (err) {
-    return;
-  }
-  if (res) {
-    const remoteFlv = tencentcloudUtils.getPushUrl({
-      roomId: live_room_id,
-    });
+  async function main({
+    remoteFlv,
+    flvurl,
+  }: {
+    remoteFlv: string;
+    flvurl: string;
+  }) {
+    try {
+      const getOldProcess = `ps aux | grep ffmpeg | grep -v grep | grep '${remoteFlv}' | awk '{print $2}'`;
+      const res = execSync(getOldProcess);
+      const oldProcess = res.toString().trim();
+      if (oldProcess) {
+        const killOldFFmpeg = `kill -9 ${oldProcess}`;
+        execSync(killOldFFmpeg);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
     // ffmpeg后台运行
     // https://www.jianshu.com/p/6ea70e6d8547
     // 1 代表标准输出
@@ -48,8 +55,7 @@ async function addLive({
     // const ffmpeg = `echo test initFFmpeg`;
     console.log('ffmpeg命令', ffmpeg);
     execSync(ffmpeg);
-    const flvurl = tencentcloudUtils.getPullUrl({ roomId: live_room_id }).flv;
-    const socketId = live_room_id;
+    const socketId = `${live_room_id}`;
     await liveService.deleteBySocketId(socketId);
     await liveService.create({
       live_room_id,
@@ -63,6 +69,25 @@ async function addLive({
       flvurl,
     });
   }
+  if (PROJECT_ENV !== PROJECT_ENV_ENUM.prod) {
+    await main({
+      remoteFlv: `rtmp://localhost/livestream/roomId___${live_room_id}`,
+      flvurl: `http://localhost:5001/livestream/roomId___${live_room_id}.flv`,
+    });
+  } else {
+    const { res, err } = await tencentcloudUtils.queryLiveStream({
+      roomId: live_room_id,
+    });
+    if (err) return;
+    if (res) {
+      const remoteFlv = tencentcloudUtils.getPushUrl({
+        roomId: live_room_id,
+      });
+      const flvurl = tencentcloudUtils.getPullUrl({ roomId: live_room_id }).flv;
+
+      await main({ remoteFlv, flvurl });
+    }
+  }
 }
 
 export const initFFmpeg = async (init = true) => {
@@ -75,22 +100,24 @@ export const initFFmpeg = async (init = true) => {
     return;
   }
   try {
+    try {
+      const killOldFFmpeg = `kill -9 $(ps aux | grep ffmpeg | grep -v grep | awk '{print $2}')`;
+      execSync(killOldFFmpeg);
+    } catch (error) {
+      console.log(error);
+    }
     if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
       await Promise.all([
         addLive({
           live_room_id: initUser.admin.live_room.id,
           user_id: initUser.admin.id,
           localFile: initUser.admin.live_room.localFile,
-          remoteFlv: initUser.admin.live_room.remoteFlv,
-          flvurl: initUser.admin.live_room.flvurl,
           base64: initUser.admin.live_room.base64,
         }),
         addLive({
           live_room_id: initUser.systemUser1.live_room.id,
           user_id: initUser.systemUser1.id,
           localFile: initUser.systemUser1.live_room.localFile,
-          remoteFlv: initUser.systemUser1.live_room.remoteFlv,
-          flvurl: initUser.systemUser1.live_room.flvurl,
           base64: initUser.systemUser1.live_room.base64,
         }),
       ]);
@@ -102,8 +129,6 @@ export const initFFmpeg = async (init = true) => {
             live_room_id: initUser[item].live_room.id,
             user_id: initUser[item].id,
             localFile: initUser[item].live_room.localFile,
-            remoteFlv: initUser[item].live_room.remoteFlv,
-            flvurl: initUser[item].live_room.flvurl,
             base64: initUser[item].live_room.base64,
           })
         );

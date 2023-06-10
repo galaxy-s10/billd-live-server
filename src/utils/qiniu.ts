@@ -2,9 +2,8 @@ import { AxiosError } from 'axios';
 import qiniu from 'qiniu';
 
 import { QINIU_ACCESSKEY, QINIU_LIVE, QINIU_SECRETKEY } from '@/config/secret';
+import { chalkERROR } from '@/utils/chalkTip';
 import axios from '@/utils/request';
-
-import { chalkERROR } from './chalkTip';
 
 export interface IQiniuKey {
   prefix: string;

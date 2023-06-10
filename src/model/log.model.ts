@@ -90,5 +90,6 @@ const model = sequelize.define<LogModel>(
   }
 );
 
-initTable(model);
+initTable({ model, sequelize });
+
 export default model;

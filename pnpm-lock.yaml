@@ -27,7 +27,7 @@ specifiers:
   billd-deploy: ^1.0.16
   billd-html-webpack-plugin: ^1.0.1
   billd-scss: ^0.0.6
-  billd-utils: ^0.0.11
+  billd-utils: ^0.0.12
   chalk: ^4.1.2
   commitizen: ^4.2.4
   cross-env: ^7.0.3
@@ -79,7 +79,7 @@ dependencies:
   billd-deploy: 1.0.16_@types+node@16.11.66
   billd-html-webpack-plugin: 1.0.1_@types+node@16.11.66
   billd-scss: 0.0.6
-  billd-utils: 0.0.11_typescript@4.8.4
+  billd-utils: 0.0.12_typescript@4.8.4
   chalk: 4.1.2
   crypto-js: 4.1.1
   dayjs: 1.11.5
@@ -3044,8 +3044,8 @@ packages:
     requiresBuild: true
     dev: false
 
-  /billd-utils/0.0.11_typescript@4.8.4:
-    resolution: {integrity: sha512-evuaF3KHZKkx3FEfJkw0vJWhqRjFUr+LKNcBzFPMf0hTgxxIBhoEWXkpjbWxpIkXWk737CYvdNRvnvGOj077VQ==}
+  /billd-utils/0.0.12_typescript@4.8.4:
+    resolution: {integrity: sha512-bHB/gZk6I9fGKHQiu+QXpqBiCXF72kYi4/xDI8RZwdVsjFd6QqsItlx1MpX4j25GJnhsG2vbrg0tLQ48zXHQoQ==}
     requiresBuild: true
     dependencies:
       '@babel/core': 7.21.5

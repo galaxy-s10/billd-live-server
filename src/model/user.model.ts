@@ -108,5 +108,6 @@ const model = sequelize.define<UserModel>(
   }
 );
 
-initTable(model);
+initTable({ model, sequelize });
+
 export default model;

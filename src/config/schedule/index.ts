@@ -1,9 +1,8 @@
 import schedule from 'node-schedule';
 
+import { handleRoomIsLiving } from '@/config/schedule/isLiveing';
 import { SCHEDULE_TYPE } from '@/constant';
 import { chalkINFO } from '@/utils/chalkTip';
-
-import { handleRoomIsLiving } from './isLiveing';
 
 const rule = new schedule.RecurrenceRule();
 

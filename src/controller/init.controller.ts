@@ -10,7 +10,6 @@ import {
   bulkCreateRoleAuth,
   initUser,
 } from '@/init/initData';
-import { initDb } from '@/init/initDb';
 import { IUser } from '@/interface';
 import authModel from '@/model/auth.model';
 import { CustomError } from '@/model/customError.model';
@@ -28,8 +27,6 @@ import userLiveRoomModel from '@/model/userLiveRoom.model';
 import userRoleModel from '@/model/userRole.model';
 import walletModel from '@/model/wallet.model';
 import walletService from '@/service/wallet.service';
-
-import userController from './user.controller';
 
 const sql1 = `
 DROP PROCEDURE IF EXISTS insert_many_dates;
@@ -121,24 +118,6 @@ class InitController {
     }
   }
 
-  // 初始化数据库
-  async initDatabase(ctx: ParameterizedContext, next) {
-    const queryInterface = sequelize.getQueryInterface();
-    const allTables = await queryInterface.showAllTables();
-    if (!allTables.length) {
-      await initDb('force');
-      successHandler({ ctx, data: '初始化数据库成功！' });
-    } else {
-      throw new CustomError(
-        '已经初始化过数据库了，不能再初始化了！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
-      );
-    }
-
-    await next();
-  }
-
   // 初始化时间表
   async initDayData(ctx: ParameterizedContext, next) {
     const count = await dayDataModel.count();
@@ -208,10 +187,7 @@ class InitController {
       );
     }
 
-    const userListRes = await userController.common.list({
-      orderBy: 'asc',
-      orderName: 'id',
-    });
+    const userListRes = await userModel.findAndCountAll();
 
     const handleWallert = async (item: IUser) => {
       const flag = await walletService.findByUserId(item.id!);

@@ -41,5 +41,6 @@ const model = sequelize.define<WalletModel>(
   }
 );
 
-initTable(model);
+initTable({ model, sequelize });
+
 export default model;

@@ -1,6 +1,7 @@
 import fs from 'fs';
 
-import sequelize from '@/config/mysql';
+import { Sequelize } from 'sequelize';
+
 import { PROJECT_NODE_ENV } from '@/constant';
 import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
 import { deleteAllForeignKeys, deleteAllIndexs } from '@/utils/index';
@@ -20,7 +21,7 @@ export const loadAllModel = () => {
 };
 
 /** 删除所有表 */
-export const deleteAllTable = async () => {
+export const deleteAllTable = async (sequelize: Sequelize) => {
   try {
     loadAllModel();
     await sequelize.drop();
@@ -36,12 +37,15 @@ export const deleteAllTable = async () => {
  * alert:校正现有数据库
  * load:加载数据库表
  */
-export const initDb = async (type: 'force' | 'alert' | 'load') => {
+export const initDb = async (
+  type: 'force' | 'alert' | 'load',
+  sequelize: Sequelize
+) => {
   switch (type) {
     case 'force':
-      await deleteAllForeignKeys();
-      await deleteAllIndexs();
-      await deleteAllTable();
+      await deleteAllForeignKeys(sequelize);
+      await deleteAllIndexs(sequelize);
+      await deleteAllTable(sequelize);
       await sequelize.sync({ force: true }); // 将创建表,如果表已经存在,则将其首先删除
       console.log(chalkSUCCESS('初始化数据库所有表完成！'));
       break;
