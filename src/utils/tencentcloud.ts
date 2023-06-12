@@ -111,6 +111,27 @@ class TencentcloudClass {
   };
 
   /**
+   * 断开直播推流，断开推流连接，但可以重新推流。
+   * https://cloud.tencent.com/document/product/267/20469
+   */
+  dropLiveStream = async (data: { roomId: number }) => {
+    const params = {
+      StreamName: `roomId___${data.roomId}`, // 流名称
+      AppName: TENCENTCLOUD_LIVE.AppName,
+      DomainName: TENCENTCLOUD_LIVE.PushDomain,
+    };
+    try {
+      const res = await this.liveClient.DropLiveStream(params);
+      console.log(chalkSUCCESS('断开直播推流成功！'));
+      return { res };
+    } catch (err) {
+      console.log(err);
+      console.log(chalkERROR('断开直播推流错误！'));
+      return { err };
+    }
+  };
+
+  /**
    * 获取拉流地址。
    */
   getPullUrl = (data: { roomId: number }) => {
@@ -128,6 +149,7 @@ class TencentcloudClass {
    * https://cloud.tencent.com/document/product/267/32720
    */
   getPushUrl = (data: { roomId: number }) => {
+    // 推流鉴权方式：静态鉴权(static)，https://developer.qiniu.com/pili/6678/push-the-current-authentication
     // 推流地址格式：rtmp://<Domain>/<AppName>/<StreamName>?txSecret=xxx&txTime=xxxx
     // https://cloud.tencent.com/document/product/267/32720
     const StreamName = `roomId___${data.roomId}`;

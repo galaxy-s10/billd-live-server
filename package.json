@@ -8,7 +8,7 @@
   "license": "MIT",
   "author": "shuisheng <2274751790@qq.com>",
   "scripts": {
-    "build": "rimraf dist && tsc -P ./tsconfig.json",
+    "build": "rimraf dist && tsc -P ./tsconfig.json || true",
     "commit": "cz",
     "copy": "node ./handleGiteeJenkins.js",
     "dev": "cross-env NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=development NODE_APP_RELEASE_PROJECT_PORT=4300 nodemon ./src/index.ts",

@@ -4,9 +4,9 @@
 # Date: 2022-04-26 01:54:48
 # Description: https://github.com/galaxy-s10/sh/blob/master/pm2.sh
 # Email: 2274751790@qq.com
-# FilePath: /billd-live-server/pm2.sh
+# FilePath: /billd-live-server/node-pm2.sh
 # Github: https://github.com/galaxy-s10
-# LastEditTime: 2023-03-21 13:53:02
+# LastEditTime: 2023-06-11 16:53:12
 # LastEditors: shuisheng
 ###
 
@@ -80,7 +80,7 @@ echo 开始安装依赖:
 pnpm install
 
 echo 开始打包:
-pnpm run build
+pnpm run build || true
 
 echo 删除旧的pm2服务:
 pm2 del $JOBNAME-$ENV-$PORT

@@ -74,6 +74,9 @@ async function addLive({
       flvurl: `http://localhost:5001/livestream/roomId___${live_room_id}.flv`,
     });
   } else {
+    await tencentcloudUtils.dropLiveStream({
+      roomId: live_room_id,
+    });
     const { res, err } = await tencentcloudUtils.queryLiveStream({
       roomId: live_room_id,
     });
@@ -83,7 +86,6 @@ async function addLive({
         roomId: live_room_id,
       });
       const flvurl = tencentcloudUtils.getPullUrl({ roomId: live_room_id }).flv;
-
       await main({ remoteFlv, flvurl });
     }
   }
@@ -100,6 +102,7 @@ export const initFFmpeg = async (init = true) => {
   }
   try {
     try {
+      // const fullCMD = `kill -9 $(ps aux | grep ffmpeg | grep -v grep | awk '{print $2}')`;
       const getOldProcess = `ps aux | grep ffmpeg | grep -v grep | awk '{print $2}'`;
       const res = execSync(getOldProcess);
       const oldProcess = res.toString().trim();

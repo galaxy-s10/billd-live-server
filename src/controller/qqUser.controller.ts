@@ -4,9 +4,9 @@ import { ParameterizedContext } from 'koa';
 import { authJwt, signJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import {
-  LIVE_QQ_CLIENT_ID,
-  LIVE_QQ_CLIENT_SECRET,
-  LIVE_QQ_REDIRECT_URI,
+  QQ_CLIENT_ID,
+  QQ_CLIENT_SECRET,
+  QQ_REDIRECT_URI,
 } from '@/config/secret';
 import { ALLOW_HTTP_CODE, THIRD_PLATFORM } from '@/constant';
 import { IList, IQqUser } from '@/interface';
@@ -75,9 +75,9 @@ class QqUserController {
     // 注意此code会在10分钟内过期。
     const params: any = {};
     params.code = code;
-    params.client_id = LIVE_QQ_CLIENT_ID;
-    params.client_secret = LIVE_QQ_CLIENT_SECRET;
-    params.redirect_uri = LIVE_QQ_REDIRECT_URI;
+    params.client_id = QQ_CLIENT_ID;
+    params.client_secret = QQ_CLIENT_SECRET;
+    params.redirect_uri = QQ_REDIRECT_URI;
     params.grant_type = 'authorization_code';
     params.fmt = 'json';
     // https://wiki.connect.qq.com/%E4%BD%BF%E7%94%A8authorization_code%E8%8E%B7%E5%8F%96access_token

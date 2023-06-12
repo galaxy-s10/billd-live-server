@@ -28,7 +28,7 @@ billd 直播间后端，主要根据[https://github.com/galaxy-s10/vue3-blog-ser
 
 ## 接口文档
 
-[apifox](https://www.apifox.cn/apidoc/shared-46443f95-e389-4453-9da7-a98ea8c72177)
+[apifox](https://apifox.com/apidoc/shared-c7556b54-17b2-494e-a039-572d83f103ed/)
 
 ## F&Q
 
@@ -38,7 +38,7 @@ billd 直播间后端，主要根据[https://github.com/galaxy-s10/vue3-blog-ser
 
 ### 初始化数据（必须！）
 
-项目启动成功后，要做的第一件事情是调用所有初始化接口：[https://apifox.com/apidoc/shared-46443f95-e389-4453-9da7-a98ea8c72177/api-80688503](https://apifox.com/apidoc/shared-46443f95-e389-4453-9da7-a98ea8c72177/api-80688503)
+项目启动成功后，要做的第一件事情是调用所有初始化接口：[https://apifox.com/apidoc/shared-c7556b54-17b2-494e-a039-572d83f103ed/api-80688503](https://apifox.com/apidoc/shared-c7556b54-17b2-494e-a039-572d83f103ed/api-80688503)
 
 目前的初始化接口有：
 
