@@ -67,7 +67,10 @@ export interface ILiveRoom {
   /** 用户信息 */
   user?: IUser;
   /** 直播间名字 */
-  roomName?: string;
+  name?: string;
+  rtmp_url?: string;
+  flv_url?: string;
+  hls_url?: string;
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;

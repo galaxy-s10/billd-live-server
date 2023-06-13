@@ -2,7 +2,12 @@ import { ParameterizedContext } from 'koa';
 
 import successHandler from '@/app/handler/success-handle';
 import sequelize from '@/config/mysql';
-import { ALLOW_HTTP_CODE, PROJECT_ENV, THIRD_PLATFORM } from '@/constant';
+import {
+  ALLOW_HTTP_CODE,
+  PROJECT_ENV,
+  PROJECT_ENV_ENUM,
+  THIRD_PLATFORM,
+} from '@/constant';
 import {
   bulkCreateAuth,
   bulkCreateGoods,
@@ -27,6 +32,7 @@ import userLiveRoomModel from '@/model/userLiveRoom.model';
 import userRoleModel from '@/model/userRole.model';
 import walletModel from '@/model/wallet.model';
 import walletService from '@/service/wallet.service';
+import { tencentcloudUtils } from '@/utils/tencentcloud';
 
 const sql1 = `
 DROP PROCEDURE IF EXISTS insert_many_dates;
@@ -150,9 +156,31 @@ class InitController {
       });
       // @ts-ignore
       userRes.setRoles(user.user_roles);
+      let liveUrl;
+      if (PROJECT_ENV !== PROJECT_ENV_ENUM.prod) {
+        liveUrl = (live_room_id: number) => ({
+          rtmp_url: `rtmp://localhost/livestream/roomId___${live_room_id}`,
+          flv_url: `http://localhost:5001/livestream/roomId___${live_room_id}.flv`,
+          hls_url: `http://localhost:5001/livestream/roomId___${live_room_id}.hls`,
+        });
+      } else {
+        liveUrl = (live_room_id: number) => {
+          const res = tencentcloudUtils.getPullUrl({ roomId: live_room_id });
+          return {
+            rtmp_url: res.rtmp,
+            flv_url: res.flv,
+            hls_url: res.hls,
+          };
+        };
+      }
+
+      const { rtmp_url, flv_url, hls_url } = liveUrl(user.live_room?.id);
       const liveRoom = await liveRoomModel.create({
         id: user.live_room?.id,
-        roomName: user.live_room?.roomName,
+        name: user.live_room?.name,
+        rtmp_url,
+        flv_url,
+        hls_url,
       });
       await userLiveRoomModel.create({
         live_room_id: liveRoom.id,

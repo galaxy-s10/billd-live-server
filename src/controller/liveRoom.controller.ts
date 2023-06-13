@@ -15,7 +15,10 @@ class LiveRoomController {
   async getList(ctx: ParameterizedContext, next) {
     const {
       id,
-      roomName,
+      name,
+      rtmp_url,
+      flv_url,
+      hls_url,
       orderBy = 'asc',
       orderName = 'id',
       nowPage,
@@ -27,7 +30,10 @@ class LiveRoomController {
     }: IList<ILiveRoom> = ctx.request.query;
     const result = await liveRoomService.getList({
       id,
-      roomName,
+      name,
+      rtmp_url,
+      flv_url,
+      hls_url,
       orderBy,
       orderName,
       nowPage,
@@ -48,6 +54,15 @@ class LiveRoomController {
     await next();
   }
 
+  async auth(ctx: ParameterizedContext, next) {
+    const { body } = ctx.request;
+    console.log(body, 'llllll');
+    // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
+    ctx.body = { code: 1, msg: 'OK' };
+    // successHandler({ ctx, data: { code: 200 } });
+    await next();
+  }
+
   async update(ctx: ParameterizedContext, next) {
     const hasAuth = await verifyUserAuth(ctx);
     if (!hasAuth) {
@@ -58,7 +73,7 @@ class LiveRoomController {
       );
     }
     const id = +ctx.params.id;
-    const { roomName }: ILiveRoom = ctx.request.body;
+    const { name, rtmp_url, flv_url, hls_url }: ILiveRoom = ctx.request.body;
     const isExist = await liveRoomService.isExist([id]);
     if (!isExist) {
       throw new CustomError(
@@ -69,16 +84,22 @@ class LiveRoomController {
     }
     await liveRoomService.update({
       id,
-      roomName,
+      name,
+      rtmp_url,
+      flv_url,
+      hls_url,
     });
     successHandler({ ctx });
     await next();
   }
 
   async create(ctx: ParameterizedContext, next) {
-    const { roomName }: ILiveRoom = ctx.request.body;
+    const { name, rtmp_url, flv_url, hls_url }: ILiveRoom = ctx.request.body;
     await this.common.create({
-      roomName,
+      name,
+      rtmp_url,
+      flv_url,
+      hls_url,
     });
     successHandler({ ctx });
     await next();

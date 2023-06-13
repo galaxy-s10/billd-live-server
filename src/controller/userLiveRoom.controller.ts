@@ -107,7 +107,7 @@ class UserLiveRoomController {
       );
     }
     const liveRoom = await liveRoomController.common.create({
-      roomName: getRandomString(5),
+      name: getRandomString(5),
     });
     const result = await this.common.create({
       user_id: userInfo.id,

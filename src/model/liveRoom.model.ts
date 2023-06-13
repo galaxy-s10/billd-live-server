@@ -25,7 +25,16 @@ const model = sequelize.define<LiveRoomModel>(
       allowNull: false,
       autoIncrement: true,
     },
-    roomName: {
+    name: {
+      type: DataTypes.STRING(100),
+    },
+    rtmp_url: {
+      type: DataTypes.STRING(100),
+    },
+    flv_url: {
+      type: DataTypes.STRING(100),
+    },
+    hls_url: {
       type: DataTypes.STRING(100),
     },
   },

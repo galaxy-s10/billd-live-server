@@ -2,6 +2,7 @@ import Sequelize from 'sequelize';
 
 import { PROJECT_ENV, THIRD_PLATFORM } from '@/constant';
 import { IList, IUser } from '@/interface';
+import liveRoomModel from '@/model/liveRoom.model';
 import qqUserModel from '@/model/qqUser.model';
 import roleModel from '@/model/role.model';
 import userModel from '@/model/user.model';
@@ -168,8 +169,10 @@ class UserService {
           },
         },
         {
+          model: liveRoomModel,
+        },
+        {
           model: roleModel,
-          through: { attributes: [] },
         },
         {
           model: walletModel,

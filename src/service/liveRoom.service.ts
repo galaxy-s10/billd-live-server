@@ -26,7 +26,10 @@ class LiveRoomService {
   /** 获取直播间列表 */
   async getList({
     id,
-    roomName,
+    name,
+    rtmp_url,
+    flv_url,
+    hls_url,
     orderBy,
     orderName,
     nowPage,
@@ -44,12 +47,15 @@ class LiveRoomService {
     }
     const allWhere: any = deleteUseLessObjectKey({
       id,
-      roomName,
+      name,
+      rtmp_url,
+      flv_url,
+      hls_url,
     });
     if (keyWord) {
       const keyWordWhere = [
         {
-          roomName: {
+          name: {
             [Op.like]: `%${keyWord}%`,
           },
         },
@@ -106,10 +112,13 @@ class LiveRoomService {
   }
 
   /** 修改直播间 */
-  async update({ id, roomName }: ILiveRoom) {
+  async update({ id, name, rtmp_url, flv_url, hls_url }: ILiveRoom) {
     const result = await liveRoomModel.update(
       {
-        roomName,
+        name,
+        rtmp_url,
+        flv_url,
+        hls_url,
       },
       { where: { id } }
     );
@@ -117,9 +126,12 @@ class LiveRoomService {
   }
 
   /** 创建直播间 */
-  async create({ roomName }: ILiveRoom) {
+  async create({ name, rtmp_url, flv_url, hls_url }: ILiveRoom) {
     const result = await liveRoomModel.create({
-      roomName,
+      name,
+      rtmp_url,
+      flv_url,
+      hls_url,
     });
     return result;
   }

@@ -15,6 +15,35 @@ import Wallet from '@/model/wallet.model';
 
 loadAllModel();
 
+LiveRoom.belongsToMany(User, {
+  foreignKey: 'user_id',
+  otherKey: 'live_room_id',
+  constraints: false,
+  through: {
+    model: UserLiveRoom,
+    unique: false, // 不生成唯一索引
+  },
+});
+
+User.belongsToMany(LiveRoom, {
+  foreignKey: 'live_room_id',
+  otherKey: 'user_id',
+  constraints: false,
+  through: {
+    model: UserLiveRoom,
+    unique: false, // 不生成唯一索引
+  },
+});
+LiveRoom.belongsToMany(User, {
+  foreignKey: 'user_id',
+  otherKey: 'live_room_id',
+  constraints: false,
+  through: {
+    model: UserLiveRoom,
+    unique: false, // 不生成唯一索引
+  },
+});
+
 UserLiveRoom.belongsTo(LiveRoom, {
   foreignKey: 'live_room_id',
   constraints: false,
@@ -53,26 +82,6 @@ LiveRoom.hasOne(UserLiveRoom, {
 UserLiveRoom.belongsTo(User, {
   foreignKey: 'user_id',
   constraints: false,
-});
-
-User.belongsToMany(Role, {
-  foreignKey: 'user_id',
-  otherKey: 'role_id',
-  constraints: false,
-  through: {
-    model: UserRole,
-    unique: false, // 不生成唯一索引
-  },
-});
-
-Role.belongsToMany(User, {
-  foreignKey: 'role_id',
-  otherKey: 'user_id',
-  constraints: false,
-  through: {
-    model: UserRole,
-    unique: false, // 不生成唯一索引
-  },
 });
 
 Role.belongsToMany(Auth, {

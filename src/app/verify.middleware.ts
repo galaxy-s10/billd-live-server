@@ -34,6 +34,7 @@ const frontendWhiteList = [
   '/email_user/register', // 注册，这个接口是post的
   '/order/pay',
   '/wallet/init',
+  '/live_room/auth',
 ];
 
 // 后台的所有接口都需要判断token，除了白名单内的不需要token

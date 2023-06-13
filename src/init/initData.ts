@@ -19,7 +19,7 @@ export const initUser = {
     user_roles: [3, 7],
     live_room: {
       id: 1,
-      roomName: 'admin的直播间',
+      name: 'admin的直播间',
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_yycy.mp4'
@@ -36,7 +36,7 @@ export const initUser = {
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/CoCo.webp',
     live_room: {
       id: 2,
-      roomName: 'CoCo的直播间',
+      name: 'CoCo的直播间',
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_mhsw.mp4'
@@ -55,7 +55,7 @@ export const initUser = {
     user_roles: [5],
     live_room: {
       id: 3,
-      roomName: 'Dukoo的直播间',
+      name: 'Dukoo的直播间',
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_hyzdwmgl.mp4'
@@ -74,7 +74,7 @@ export const initUser = {
     user_roles: [5],
     live_room: {
       id: 4,
-      roomName: 'MoonTIT的直播间',
+      name: 'MoonTIT的直播间',
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_snjxh.mp4'
@@ -91,7 +91,7 @@ export const initUser = {
     user_roles: [5],
     live_room: {
       id: 5,
-      roomName: 'Nill的直播间',
+      name: 'Nill的直播间',
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_newboy.mp4'
@@ -110,7 +110,7 @@ export const initUser = {
     user_roles: [5],
     live_room: {
       id: 6,
-      roomName: 'Ojin的直播间',
+      name: 'Ojin的直播间',
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_xyzcsl.mp4'

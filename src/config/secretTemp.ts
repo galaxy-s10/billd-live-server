@@ -52,10 +52,20 @@ export const REDIS_CONFIG = {
 }; // redis配置
 
 export const DOCKER_SRS_CONFIG = {
-  // docker镜像名，https://ossrs.net/lts/zh-cn/docs/v4/doc/getting-started
-  image: 'registry.cn-hangzhou.aliyuncs.com/ossrs/srs:4',
+  // docker镜像名，https://ossrs.net/lts/zh-cn/docs/v5/doc/getting-started
+  image: 'registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5',
   // docker启动srs时的容器名字（可随便填）
   container: 'billd-live-server-srs',
+  // /usr/local/srs/objs/目录映射
+  objsVolumePath:
+    PROJECT_ENV === PROJECT_ENV_ENUM.development
+      ? '/Users/huangshuisheng/Desktop/docker/srs/objs/'
+      : '/node/docker/srs/objs/',
+  // /usr/local/srs/conf/目录映射
+  confVolumePath:
+    PROJECT_ENV === PROJECT_ENV_ENUM.development
+      ? '/Users/huangshuisheng/Desktop/docker/srs/conf/'
+      : '/node/docker/srs/conf/',
   // CANDIDATE填你的本机ip地址
   CANDIDATE:
     process.env.NODE_ENV === 'development'

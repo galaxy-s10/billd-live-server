@@ -103,7 +103,7 @@ pnpm run dev:prod
 - 操作系统：mac os 13.3.1（macbookpro 2020 m1）
 - node 版本：16.16.0
 - mysql 版本：基于 docker，镜像：mysql:8.0
-- srs 版本：基于 docker，镜像：registry.cn-hangzhou.aliyuncs.com/ossrs/srs:4
+- srs 版本：基于 docker，镜像：registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5
 - rabbitmq 版本：基于 docker，镜像：rabbitmq:3.11-management
 
 ## 服务器环境

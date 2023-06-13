@@ -52,8 +52,9 @@ async function addLive({
     // 2>&1 把标准错误也导入到标准输出同样的地方
     // -loglevel quiet不输出log
     const ffmpeg = `ffmpeg -loglevel quiet -stream_loop -1 -re -i ${localFile} -c copy -f flv '${remoteFlv}' 1>/dev/null 2>&1 &`;
+    const test = `ffmpeg -stream_loop -1 -re -i /Users/huangshuisheng/Desktop/hss/galaxy-s10/billd-live-server/src/public/dev_fddm.mp4 -c copy -f flv 'rtmp://localhost/livestream/roomId___1'`;
     // const ffmpeg = `echo test initFFmpeg`;
-    execSync(ffmpeg);
+    // execSync(ffmpeg);
     const socketId = `${live_room_id}`;
     await liveService.deleteBySocketId(socketId);
     await liveService.create({

@@ -23,10 +23,10 @@ export const dockerRunSRS = (init = true) => {
       console.log(error);
     }
   }
-  if (isRunning) {
-    console.log(chalkSUCCESS(`SRS正在运行！`));
-    return;
-  }
+  // if (isRunning) {
+  //   console.log(chalkSUCCESS(`SRS正在运行！`));
+  //   return;
+  // }
   try {
     // 停掉旧的容器
     execSync(`docker stop ${DOCKER_SRS_CONFIG.container}`);
@@ -35,11 +35,20 @@ export const dockerRunSRS = (init = true) => {
   }
   try {
     // 启动新的容器
-    // https://ossrs.net/lts/zh-cn/docs/v4/doc/webrtc#rtc-to-rtmp
-    execSync(`docker run -d --rm --name ${DOCKER_SRS_CONFIG.container} --env CANDIDATE=${DOCKER_SRS_CONFIG.CANDIDATE} \
-    -p 1935:1935 -p 5001:8080 -p 1985:1985 -p 8000:8000/udp \
-    ${DOCKER_SRS_CONFIG.image} \
-    objs/srs -c conf/rtc2rtmp.conf`);
+    // https://ossrs.net/lts/zh-cn/docs/v5/doc/webrtc#rtc-to-rtmp
+    const srsCmd = `docker run -d --rm \
+    --name ${DOCKER_SRS_CONFIG.container} \
+    --env CANDIDATE=${DOCKER_SRS_CONFIG.CANDIDATE} \
+    -p 1935:1935 \
+    -p 5001:8080 \
+    -p 1985:1985 \
+    -p 8000:8000/udp \
+    -v ${DOCKER_SRS_CONFIG.objsVolumePath}:/usr/local/srs/objs/ \
+    -v ${DOCKER_SRS_CONFIG.confVolumePath}:/usr/local/srs/conf/ \
+    ${DOCKER_SRS_CONFIG.image} objs/srs \
+    -c conf/rtc2rtmp.conf`;
+
+    execSync(srsCmd);
     console.log(chalkSUCCESS(`docker启动SRS成功！`));
     // const child = exec(srsSh, {}, (error, stdout, stderr) => {
     //   console.log(

@@ -51,7 +51,11 @@ async function handleInit() {
     await initSequelize.query(`USE ${dbName}`, { logging: false });
   } catch (error: any) {
     if (error.message.indexOf('Access') !== -1) {
-      console.log(error);
+      console.log(chalkERROR(msg(false)));
+      await initSequelize.close();
+      return;
+    }
+    if (error.message.indexOf('ECONNREFUSED') !== -1) {
       console.log(chalkERROR(msg(false)));
       await initSequelize.close();
       return;
