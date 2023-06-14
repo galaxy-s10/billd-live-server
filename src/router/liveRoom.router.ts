@@ -8,4 +8,6 @@ liveRoomRouter.get('/list', liveRoomController.getList);
 
 liveRoomRouter.post('/auth', liveRoomController.auth);
 
+liveRoomRouter.get('/find/:id', liveRoomController.find);
+
 export default liveRoomRouter;

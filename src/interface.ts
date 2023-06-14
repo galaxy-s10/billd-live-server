@@ -68,6 +68,7 @@ export interface ILiveRoom {
   user?: IUser;
   /** 直播间名字 */
   name?: string;
+  user_live_room?: IUserLiveRoom & { user: IUser };
   rtmp_url?: string;
   flv_url?: string;
   hls_url?: string;

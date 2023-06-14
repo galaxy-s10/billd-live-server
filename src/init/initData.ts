@@ -1,3 +1,5 @@
+import { getRandomString } from 'billd-utils';
+
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import { devFddmBase64 } from '@/init/base64/dev_fddm';
 import { devFlowerBase64 } from '@/init/base64/dev_flower';
@@ -14,7 +16,7 @@ export const initUser = {
   admin: {
     id: 1,
     username: 'admin',
-    password: '123456',
+    password: getRandomString(6),
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/author.webp',
     user_roles: [3, 7],
     live_room: {
@@ -31,7 +33,7 @@ export const initUser = {
   systemUser1: {
     id: 2,
     username: 'CoCo',
-    password: '123456',
+    password: getRandomString(6),
     user_roles: [5],
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/CoCo.webp',
     live_room: {
@@ -50,7 +52,7 @@ export const initUser = {
   systemUser2: {
     id: 3,
     username: 'Dukoo',
-    password: '123456',
+    password: getRandomString(6),
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/Dukoo.webp',
     user_roles: [5],
     live_room: {
@@ -69,7 +71,7 @@ export const initUser = {
   systemUser3: {
     id: 4,
     username: 'MoonTIT',
-    password: '123456',
+    password: getRandomString(6),
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/MoonTIT.webp',
     user_roles: [5],
     live_room: {
@@ -86,7 +88,7 @@ export const initUser = {
   systemUser4: {
     id: 5,
     username: 'Nill',
-    password: '123456',
+    password: getRandomString(6),
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/Nill.webp',
     user_roles: [5],
     live_room: {
@@ -105,7 +107,7 @@ export const initUser = {
   systemUser5: {
     id: 6,
     username: 'Ojin',
-    password: '123456',
+    password: getRandomString(6),
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/Ojin.webp',
     user_roles: [5],
     live_room: {

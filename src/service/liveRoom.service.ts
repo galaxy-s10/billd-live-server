@@ -107,7 +107,50 @@ class LiveRoomService {
 
   /** 查找直播间 */
   async find(id: number) {
-    const result = await liveRoomModel.findOne({ where: { id } });
+    const result = await liveRoomModel.findOne({
+      include: [
+        {
+          model: userLiveRoomModel,
+          include: [
+            {
+              model: userModel,
+              attributes: {
+                exclude: ['password', 'token'],
+              },
+            },
+          ],
+          required: true,
+        },
+        {
+          model: liveModel,
+          attributes: {
+            exclude: ['coverImg'],
+          },
+        },
+      ],
+      where: { id },
+    });
+    return result;
+  }
+
+  async findLiveRoomUserToken(id: number) {
+    const result = await liveRoomModel.findOne({
+      include: [
+        {
+          model: userLiveRoomModel,
+          include: [
+            {
+              model: userModel,
+              attributes: {
+                exclude: ['password'],
+              },
+            },
+          ],
+          required: true,
+        },
+      ],
+      where: { id },
+    });
     return result;
   }
 

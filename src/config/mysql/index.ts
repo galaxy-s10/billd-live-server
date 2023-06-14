@@ -49,6 +49,7 @@ async function handleInit() {
   const initSequelize = newSequelize();
   try {
     await initSequelize.query(`USE ${dbName}`, { logging: false });
+    // await initDb('alert', sequelize);
   } catch (error: any) {
     if (error.message.indexOf('Access') !== -1) {
       console.log(chalkERROR(msg(false)));

@@ -56,7 +56,6 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
     console.log(
       chalkINFO(`catchErrorMiddle中间件通过！http状态码：${ctx.status}`)
     );
-    console.log('2233222', ctx.request.path);
     // if (ctx.request.path === '/live_room/auth') {
     //   return;
     // }

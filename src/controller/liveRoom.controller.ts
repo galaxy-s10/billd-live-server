@@ -1,3 +1,4 @@
+import cryptojs from 'crypto-js';
 import { ParameterizedContext } from 'koa';
 
 import { verifyUserAuth } from '@/app/auth/verifyUserAuth';
@@ -55,11 +56,26 @@ class LiveRoomController {
   }
 
   async auth(ctx: ParameterizedContext, next) {
-    const { body } = ctx.request;
-    console.log(body, 'llllll');
     // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
-    ctx.body = { code: 1, msg: 'OK' };
-    // successHandler({ ctx, data: { code: 200 } });
+    // code等于数字0表示成功，其他错误码代表失败。
+    const { body } = ctx.request;
+    const reg = /^roomId___(.+)/g;
+    const roomId = reg.exec(body.stream)?.[1];
+    if (!roomId) {
+      ctx.body = { code: 1, msg: 'no live_room' };
+    } else {
+      const result = await liveRoomService.findLiveRoomUserToken(
+        Number(roomId)
+      );
+      const usertoken = result?.user_live_room?.user.token;
+      const rtmptoken = cryptojs.MD5(usertoken || '').toString();
+      const paramstoken = body.param.replace('?token=', '');
+      if (rtmptoken !== paramstoken) {
+        ctx.body = { code: 1, msg: 'auth fail' };
+      } else {
+        ctx.body = { code: 0, msg: 'auth success' };
+      }
+    }
     await next();
   }
 

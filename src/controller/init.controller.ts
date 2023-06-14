@@ -1,5 +1,7 @@
+import cryptojs from 'crypto-js';
 import { ParameterizedContext } from 'koa';
 
+import { signJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import sequelize from '@/config/mysql';
 import {
@@ -61,68 +63,194 @@ END
 const sql3 = `call insert_many_dates(3650)`;
 
 class InitController {
-  // 初始化角色
-  async initRole(ctx: ParameterizedContext, next) {
-    const count = await roleModel.count();
-    if (count === 0) {
-      await roleModel.bulkCreate(bulkCreateRole);
-      successHandler({ ctx, message: '初始化角色成功！' });
-    } else {
-      throw new CustomError(
-        '已经初始化过角色，不能再初始化了！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
-      );
-    }
+  common = {
+    initRole: async () => {
+      const count = await roleModel.count();
+      if (count === 0) {
+        await roleModel.bulkCreate(bulkCreateRole);
+      } else {
+        throw new CustomError(
+          '已经初始化过角色，不能再初始化了！',
+          ALLOW_HTTP_CODE.paramsError,
+          ALLOW_HTTP_CODE.paramsError
+        );
+      }
+    },
+    initAuth: async () => {
+      const count = await authModel.count();
+      if (count === 0) {
+        await authModel.bulkCreate(bulkCreateAuth);
+      } else {
+        throw new CustomError(
+          '已经初始化过权限了，不能再初始化了！',
+          ALLOW_HTTP_CODE.paramsError,
+          ALLOW_HTTP_CODE.paramsError
+        );
+      }
+    },
+    initGoods: async () => {
+      const count = await goodsModel.count();
+      if (count === 0) {
+        await goodsModel.bulkCreate(bulkCreateGoods);
+      } else {
+        throw new CustomError(
+          '已经初始化过商品了，不能再初始化了！',
+          ALLOW_HTTP_CODE.paramsError,
+          ALLOW_HTTP_CODE.paramsError
+        );
+      }
+    },
+    initRoleAuth: async () => {
+      const count = await roleAuthModel.count();
+      if (count === 0) {
+        await roleAuthModel.bulkCreate(bulkCreateRoleAuth);
+      } else {
+        throw new CustomError(
+          '已经初始化过角色权限了，不能再初始化了！',
+          ALLOW_HTTP_CODE.paramsError,
+          ALLOW_HTTP_CODE.paramsError
+        );
+      }
+    },
+    initUser: async () => {
+      const count = await userModel.count();
+      const quequ: Promise<any>[] = [];
+      async function initOneUser(user: IUser) {
+        const userInfo = {
+          id: user.id,
+          username: user.username,
+          password: user.password,
+          avatar: user.avatar,
+        };
+        const exp = 24; // token过期时间：24小时
+        const token = signJwt({ userInfo, exp });
+        const userRes = await userModel.create({
+          ...userInfo,
+          token,
+        });
+        // @ts-ignore
+        userRes.setRoles(user.user_roles);
+        let liveUrl;
+        const rtmptoken = cryptojs.MD5(token || '').toString();
+        if (PROJECT_ENV !== PROJECT_ENV_ENUM.prod) {
+          liveUrl = (live_room_id: number) => ({
+            rtmp_url: `rtmp://localhost/livestream/roomId___${live_room_id}?token=${rtmptoken}`,
+            flv_url: `http://localhost:5001/livestream/roomId___${live_room_id}.flv`,
+            hls_url: `http://localhost:5001/livestream/roomId___${live_room_id}.hls`,
+          });
+        } else {
+          liveUrl = (live_room_id: number) => {
+            const res = tencentcloudUtils.getPullUrl({ roomId: live_room_id });
+            return {
+              rtmp_url: res.rtmp,
+              flv_url: res.flv,
+              hls_url: res.hls,
+            };
+          };
+        }
+
+        const { rtmp_url, flv_url, hls_url } = liveUrl(user.live_room?.id);
+        const liveRoom = await liveRoomModel.create({
+          id: user.live_room?.id,
+          name: user.live_room?.name,
+          rtmp_url,
+          flv_url,
+          hls_url,
+        });
+        await userLiveRoomModel.create({
+          live_room_id: liveRoom.id,
+          user_id: userRes.id,
+        });
+      }
+      if (count === 0) {
+        Object.keys(initUser).forEach((item) => {
+          console.log(item, initUser[item]);
+          quequ.push(initOneUser(initUser[item]));
+        });
+        await Promise.all(quequ);
+      } else {
+        throw new CustomError(
+          '已经初始化过用户，不能再初始化了！',
+          ALLOW_HTTP_CODE.paramsError,
+          ALLOW_HTTP_CODE.paramsError
+        );
+      }
+    },
+    initUserWallet: async () => {
+      if (PROJECT_ENV !== 'development') {
+        throw new CustomError(
+          '非开发环境，不能初始化用户钱包！',
+          ALLOW_HTTP_CODE.paramsError,
+          ALLOW_HTTP_CODE.paramsError
+        );
+      }
+      const userListRes = await userModel.findAndCountAll();
+      const handleWallet = async (item: IUser) => {
+        const flag = await walletService.findByUserId(item.id!);
+        if (!flag) {
+          await walletService.create({ user_id: item.id, balance: '0.00' });
+        }
+      };
+      const arr: any[] = [];
+      userListRes.rows.forEach((item: IUser) => {
+        arr.push(handleWallet(item));
+      });
+      await Promise.all(arr);
+    },
+  };
+
+  initDefault = async (ctx: ParameterizedContext, next) => {
+    await this.common.initRole();
+    await this.common.initAuth();
+    await this.common.initRoleAuth();
+    await this.common.initUser();
+    await this.common.initUserWallet();
+    await this.common.initGoods();
+    successHandler({ ctx, message: '初始化默认数据成功！' });
     await next();
-  }
+  };
+
+  // 初始化角色
+  initRole = async (ctx: ParameterizedContext, next) => {
+    await this.common.initRole();
+    successHandler({ ctx, message: '初始化角色成功！' });
+    await next();
+  };
 
   // 初始化权限
-  async initAuth(ctx: ParameterizedContext, next) {
-    const count = await authModel.count();
-    if (count === 0) {
-      await authModel.bulkCreate(bulkCreateAuth);
-      successHandler({ ctx, message: '初始化权限成功！' });
-    } else {
-      throw new CustomError(
-        '已经初始化过权限了，不能再初始化了！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
-      );
-    }
-
+  initAuth = async (ctx: ParameterizedContext, next) => {
+    await this.common.initAuth();
+    successHandler({ ctx, message: '初始化权限成功！' });
     await next();
-  }
+  };
 
   // 初始化商品
-  async initGoods(ctx: ParameterizedContext) {
-    const count = await goodsModel.count();
-    if (count === 0) {
-      await goodsModel.bulkCreate(bulkCreateGoods);
-      successHandler({ ctx, message: '初始化商品成功！' });
-    } else {
-      throw new CustomError(
-        '已经初始化过商品了，不能再初始化了！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
-      );
-    }
-  }
+  initGoods = async (ctx: ParameterizedContext, next) => {
+    await this.common.initGoods();
+    successHandler({ ctx, message: '初始化商品成功！' });
+    await next();
+  };
 
   // 初始化角色权限
-  async initRoleAuth(ctx: ParameterizedContext) {
-    const count = await roleAuthModel.count();
-    if (count === 0) {
-      await roleAuthModel.bulkCreate(bulkCreateRoleAuth);
-      successHandler({ ctx, message: '初始化角色权限成功！' });
-    } else {
-      throw new CustomError(
-        '已经初始化过角色权限了，不能再初始化了！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
-      );
-    }
-  }
+  initRoleAuth = async (ctx: ParameterizedContext, next) => {
+    await this.common.initRoleAuth();
+    successHandler({ ctx, message: '初始化角色权限成功！' });
+    await next();
+  };
+
+  // 初始化用户
+  initUser = async (ctx: ParameterizedContext, next) => {
+    await this.common.initUser();
+    successHandler({ ctx, data: '初始化用户成功！' });
+    await next();
+  };
+
+  // 初始化用户钱包
+  initUserWallet = async (ctx: ParameterizedContext, next) => {
+    await this.common.initUserWallet();
+    successHandler({ ctx, data: '初始化用户钱包成功！' });
+    await next();
+  };
 
   // 初始化时间表
   async initDayData(ctx: ParameterizedContext, next) {
@@ -131,7 +259,6 @@ class InitController {
       await sequelize.query(sql1);
       await sequelize.query(sql2);
       await sequelize.query(sql3);
-      successHandler({ ctx, data: '初始化时间表成功！' });
     } else {
       throw new CustomError(
         '已经初始化过时间表了，不能再初始化了！',
@@ -139,98 +266,9 @@ class InitController {
         ALLOW_HTTP_CODE.paramsError
       );
     }
-
+    successHandler({ ctx, data: '初始化时间表成功！' });
     await next();
   }
-
-  // 初始化用户
-  async initUser(ctx: ParameterizedContext, next) {
-    const count = await userModel.count();
-    const quequ: Promise<any>[] = [];
-    async function initOneUser(user: IUser) {
-      const userRes = await userModel.create({
-        id: user.id,
-        username: user.username,
-        password: user.password,
-        avatar: user.avatar,
-      });
-      // @ts-ignore
-      userRes.setRoles(user.user_roles);
-      let liveUrl;
-      if (PROJECT_ENV !== PROJECT_ENV_ENUM.prod) {
-        liveUrl = (live_room_id: number) => ({
-          rtmp_url: `rtmp://localhost/livestream/roomId___${live_room_id}`,
-          flv_url: `http://localhost:5001/livestream/roomId___${live_room_id}.flv`,
-          hls_url: `http://localhost:5001/livestream/roomId___${live_room_id}.hls`,
-        });
-      } else {
-        liveUrl = (live_room_id: number) => {
-          const res = tencentcloudUtils.getPullUrl({ roomId: live_room_id });
-          return {
-            rtmp_url: res.rtmp,
-            flv_url: res.flv,
-            hls_url: res.hls,
-          };
-        };
-      }
-
-      const { rtmp_url, flv_url, hls_url } = liveUrl(user.live_room?.id);
-      const liveRoom = await liveRoomModel.create({
-        id: user.live_room?.id,
-        name: user.live_room?.name,
-        rtmp_url,
-        flv_url,
-        hls_url,
-      });
-      await userLiveRoomModel.create({
-        live_room_id: liveRoom.id,
-        user_id: userRes.id,
-      });
-    }
-    if (count === 0) {
-      Object.keys(initUser).forEach((item) => {
-        console.log(item, initUser[item]);
-        quequ.push(initOneUser(initUser[item]));
-      });
-      await Promise.all(quequ);
-      successHandler({ ctx, data: '初始化用户成功！' });
-    } else {
-      throw new CustomError(
-        '已经初始化过用户，不能再初始化了！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
-      );
-    }
-
-    await next();
-  }
-
-  // 初始化用户钱包
-  initUserWallet = async (ctx: ParameterizedContext, next) => {
-    if (PROJECT_ENV !== 'development') {
-      throw new CustomError(
-        '非开发环境，不能初始化用户钱包！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
-      );
-    }
-
-    const userListRes = await userModel.findAndCountAll();
-
-    const handleWallert = async (item: IUser) => {
-      const flag = await walletService.findByUserId(item.id!);
-      if (!flag) {
-        await walletService.create({ user_id: item.id, balance: '0.00' });
-      }
-    };
-    const arr: any[] = [];
-    userListRes.rows.forEach((item: IUser) => {
-      arr.push(handleWallert(item));
-    });
-    await Promise.all(arr);
-    successHandler({ ctx, data: '初始化用户钱包成功！' });
-    await next();
-  };
 
   // 重建表
   forceTable = async (ctx: ParameterizedContext, next) => {
@@ -243,7 +281,10 @@ class InitController {
     }
 
     await Promise.all([
-      userModel.sync({ force: true }),
+      roleModel.sync({ force: true }),
+      authModel.sync({ force: true }),
+      roleAuthModel.sync({ force: true }),
+      goodsModel.sync({ force: true }),
       userLiveRoomModel.sync({ force: true }),
       userRoleModel.sync({ force: true }),
       qqUserModel.sync({ force: true }),

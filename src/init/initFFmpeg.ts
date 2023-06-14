@@ -1,8 +1,11 @@
 import { execSync, spawnSync } from 'child_process';
 
+import cryptojs from 'crypto-js';
+
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import { initUser } from '@/init/initData';
 import liveService from '@/service/live.service';
+import userService from '@/service/user.service';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 import { tencentcloudUtils } from '@/utils/tencentcloud';
 
@@ -25,13 +28,7 @@ async function addLive({
   localFile: string;
   base64: string;
 }) {
-  async function main({
-    remoteFlv,
-    flvurl,
-  }: {
-    remoteFlv: string;
-    flvurl: string;
-  }) {
+  async function main({ remoteFlv }: { remoteFlv: string }) {
     try {
       const getOldProcess = `ps aux | grep ffmpeg | grep -v grep | grep '${remoteFlv}' | awk '{print $2}'`;
       const res = execSync(getOldProcess);
@@ -54,26 +51,18 @@ async function addLive({
     const ffmpeg = `ffmpeg -loglevel quiet -stream_loop -1 -re -i ${localFile} -c copy -f flv '${remoteFlv}' 1>/dev/null 2>&1 &`;
     const test = `ffmpeg -stream_loop -1 -re -i /Users/huangshuisheng/Desktop/hss/galaxy-s10/billd-live-server/src/public/dev_fddm.mp4 -c copy -f flv 'rtmp://localhost/livestream/roomId___1'`;
     // const ffmpeg = `echo test initFFmpeg`;
-    // execSync(ffmpeg);
+    execSync(ffmpeg);
     const socketId = `${live_room_id}`;
     await liveService.deleteBySocketId(socketId);
-    await liveService.create({
-      live_room_id,
-      user_id,
-      socketId,
-      system: 1,
-      track_audio: true,
-      track_video: true,
-      coverImg: base64,
-      streamurl: '',
-      flvurl,
-    });
   }
+  const userInfo = await userService.findAndToken(user_id);
+  let flvurl = '';
   if (PROJECT_ENV !== PROJECT_ENV_ENUM.prod) {
+    const rtmptoken = cryptojs.MD5(userInfo?.token || '').toString();
     await main({
-      remoteFlv: `rtmp://localhost/livestream/roomId___${live_room_id}`,
-      flvurl: `http://localhost:5001/livestream/roomId___${live_room_id}.flv`,
+      remoteFlv: `rtmp://localhost/livestream/roomId___${live_room_id}?token=${rtmptoken}`,
     });
+    flvurl = `http://localhost:5001/livestream/roomId___${live_room_id}.flv`;
   } else {
     await tencentcloudUtils.dropLiveStream({
       roomId: live_room_id,
@@ -86,10 +75,21 @@ async function addLive({
       const remoteFlv = tencentcloudUtils.getPushUrl({
         roomId: live_room_id,
       });
-      const flvurl = tencentcloudUtils.getPullUrl({ roomId: live_room_id }).flv;
-      await main({ remoteFlv, flvurl });
+      flvurl = tencentcloudUtils.getPullUrl({ roomId: live_room_id }).flv;
+      await main({ remoteFlv });
     }
   }
+  await liveService.create({
+    live_room_id,
+    user_id,
+    socketId: `${live_room_id}`,
+    system: 1,
+    track_audio: true,
+    track_video: true,
+    coverImg: base64,
+    streamurl: '',
+    flvurl,
+  });
 }
 
 export const initFFmpeg = async (init = true) => {
