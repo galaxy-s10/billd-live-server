@@ -6,7 +6,9 @@ const liveRoomRouter = new Router({ prefix: '/live_room' });
 
 liveRoomRouter.get('/list', liveRoomController.getList);
 
-liveRoomRouter.post('/auth', liveRoomController.auth);
+liveRoomRouter.post('/publish', liveRoomController.publish);
+
+liveRoomRouter.post('/unpublish', liveRoomController.unpublish);
 
 liveRoomRouter.get('/find/:id', liveRoomController.find);
 

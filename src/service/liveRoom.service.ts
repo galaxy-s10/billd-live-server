@@ -95,6 +95,7 @@ class LiveRoomService {
           [col('user_live_room.user.avatar'), 'user_avatar'],
         ],
       },
+      distinct: true,
       order: [[orderName, orderBy]],
       limit,
       offset,

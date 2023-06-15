@@ -16,13 +16,13 @@ export const STATIC_DIR = path.join(__dirname, './public/'); // 静态文件目�
 export const UPLOAD_DIR = path.join(__dirname, './upload/'); // 上传文件接口接收到的文件存放的目录
 export const SECRET_FILE = path.join(
   __dirname,
-  PROJECT_NODE_ENV === 'development'
+  PROJECT_NODE_ENV === PROJECT_ENV_ENUM.development
     ? './config/secret.ts'
     : './config/secret.js'
 ); // 秘钥文件
 export const SECRETTEMP_FILE = path.join(
   __dirname,
-  PROJECT_NODE_ENV === 'development'
+  PROJECT_NODE_ENV === PROJECT_ENV_ENUM.development
     ? './config/secretTemp.ts'
     : './config/secretTemp.js'
 ); // 秘钥文件模板

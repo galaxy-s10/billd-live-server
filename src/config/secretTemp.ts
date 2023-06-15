@@ -38,7 +38,9 @@ export const MYSQL_CONFIG = {
       ? '************'
       : '************',
   password:
-    PROJECT_ENV === PROJECT_ENV_ENUM.development ? '************' : '********',
+    PROJECT_ENV === PROJECT_ENV_ENUM.development
+      ? '***************'
+      : '***************',
   port: 666,
 }; // mysql配置
 
@@ -68,7 +70,7 @@ export const DOCKER_SRS_CONFIG = {
       : '/node/docker/srs/conf/',
   // CANDIDATE填你的本机ip地址
   CANDIDATE:
-    process.env.NODE_ENV === 'development'
+    process.env.NODE_ENV === PROJECT_ENV_ENUM.development
       ? `$(ifconfig en0 inet | grep 'inet ' | awk '{print $2}')` // WARN mac可以这样获取本机ip，但是win不行，自己找本地ip
       : '公网ip',
 }; // docker的SRS配置

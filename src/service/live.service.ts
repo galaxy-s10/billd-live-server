@@ -184,6 +184,12 @@ class LiveService {
   }
 
   /** 删除直播 */
+  deleteByLiveRoomId = async (live_room_id: number) => {
+    const res = await liveModel.destroy({ where: { live_room_id } });
+    return res;
+  };
+
+  /** 删除直播 */
   deleteBySocketId = async (socketId: string) => {
     const res = await liveModel.destroy({ where: { socketId } });
     return res;

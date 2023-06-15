@@ -67,7 +67,7 @@ export async function setupKoa({ port }) {
   }); // http接口服务
   handleRedisKeyExpired();
   startSchedule();
-  dockerRunRabbitMQ(true); // docker运行RabbitMQ
+  dockerRunRabbitMQ(false); // docker运行RabbitMQ
   dockerRunSRS(true); // docker运行SRS
   await initFFmpeg(true); // 初始化FFmpeg推流
 }

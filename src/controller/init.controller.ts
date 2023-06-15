@@ -177,13 +177,6 @@ class InitController {
       }
     },
     initUserWallet: async () => {
-      if (PROJECT_ENV !== 'development') {
-        throw new CustomError(
-          '非开发环境，不能初始化用户钱包！',
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
-        );
-      }
       const userListRes = await userModel.findAndCountAll();
       const handleWallet = async (item: IUser) => {
         const flag = await walletService.findByUserId(item.id!);
@@ -272,14 +265,13 @@ class InitController {
 
   // 重建表
   forceTable = async (ctx: ParameterizedContext, next) => {
-    if (PROJECT_ENV !== 'development') {
+    if (PROJECT_ENV !== PROJECT_ENV_ENUM.development) {
       throw new CustomError(
         '非开发环境，不能截断表！',
         ALLOW_HTTP_CODE.paramsError,
         ALLOW_HTTP_CODE.paramsError
       );
     }
-
     await Promise.all([
       roleModel.sync({ force: true }),
       authModel.sync({ force: true }),
@@ -300,7 +292,7 @@ class InitController {
   };
 
   deleteUser = async (ctx: ParameterizedContext, next) => {
-    if (PROJECT_ENV !== 'development') {
+    if (PROJECT_ENV !== PROJECT_ENV_ENUM.development) {
       throw new CustomError(
         '非开发环境，不能删除用户！',
         ALLOW_HTTP_CODE.paramsError,

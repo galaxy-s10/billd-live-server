@@ -52,6 +52,7 @@ async function addLive({
     const test = `ffmpeg -stream_loop -1 -re -i /Users/huangshuisheng/Desktop/hss/galaxy-s10/billd-live-server/src/public/dev_fddm.mp4 -c copy -f flv 'rtmp://localhost/livestream/roomId___1'`;
     // const ffmpeg = `echo test initFFmpeg`;
     execSync(ffmpeg);
+    console.log('ffmpeg命令', ffmpeg);
     const socketId = `${live_room_id}`;
     await liveService.deleteBySocketId(socketId);
   }
@@ -59,10 +60,10 @@ async function addLive({
   let flvurl = '';
   if (PROJECT_ENV !== PROJECT_ENV_ENUM.prod) {
     const rtmptoken = cryptojs.MD5(userInfo?.token || '').toString();
+    flvurl = `http://localhost:5001/livestream/roomId___${live_room_id}.flv`;
     await main({
       remoteFlv: `rtmp://localhost/livestream/roomId___${live_room_id}?token=${rtmptoken}`,
     });
-    flvurl = `http://localhost:5001/livestream/roomId___${live_room_id}.flv`;
   } else {
     await tencentcloudUtils.dropLiveStream({
       roomId: live_room_id,

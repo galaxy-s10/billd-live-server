@@ -2,7 +2,12 @@ import fs from 'fs';
 
 import Router from 'koa-router';
 
-import { PROJECT_ENV, PROJECT_NAME, PROJECT_NODE_ENV } from '@/constant';
+import {
+  PROJECT_ENV,
+  PROJECT_ENV_ENUM,
+  PROJECT_NAME,
+  PROJECT_NODE_ENV,
+} from '@/constant';
 import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 
 const router = new Router();
@@ -19,7 +24,7 @@ export function loadAllRoutes(app) {
   const err: string[] = [];
   fs.readdirSync(__dirname).forEach((file) => {
     try {
-      if (PROJECT_NODE_ENV === 'development') {
+      if (PROJECT_NODE_ENV === PROJECT_ENV_ENUM.development) {
         if (file === 'index.ts') return;
       } else if (file === 'index.js') return;
 

@@ -29,13 +29,13 @@ const model = sequelize.define<LiveRoomModel>(
       type: DataTypes.STRING(100),
     },
     rtmp_url: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(500),
     },
     flv_url: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(500),
     },
     hls_url: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(500),
     },
   },
   {

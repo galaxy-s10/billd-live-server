@@ -1,6 +1,5 @@
 import schedule from 'node-schedule';
 
-import { handleRoomIsLiving } from '@/config/schedule/isLiveing';
 import { SCHEDULE_TYPE } from '@/constant';
 import { chalkINFO } from '@/utils/chalkTip';
 
@@ -40,6 +39,6 @@ export const startSchedule = () => {
         }定时任务`
       )
     );
-    handleRoomIsLiving();
+    // handleRoomIsLiving();
   });
 };

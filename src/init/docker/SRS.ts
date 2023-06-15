@@ -1,7 +1,7 @@
 import { execSync } from 'child_process';
 
 import { DOCKER_SRS_CONFIG } from '@/config/secret';
-import { PROJECT_ENV } from '@/constant';
+import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import { dockerIsInstalled } from '@/utils';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 
@@ -15,7 +15,7 @@ export const dockerRunSRS = (init = true) => {
     return;
   }
   let isRunning = false;
-  if (PROJECT_ENV === 'development') {
+  if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
     try {
       execSync(`docker ps -a | grep ${DOCKER_SRS_CONFIG.container}`);
       isRunning = true;
