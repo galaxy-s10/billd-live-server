@@ -58,7 +58,7 @@ async function addLive({
   }
   const userInfo = await userService.findAndToken(user_id);
   let flvurl = '';
-  if (PROJECT_ENV !== PROJECT_ENV_ENUM.prod) {
+  if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
     const rtmptoken = cryptojs.MD5(userInfo?.token || '').toString();
     flvurl = `http://localhost:5001/livestream/roomId___${live_room_id}.flv`;
     await main({

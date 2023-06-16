@@ -303,6 +303,14 @@ class InitController {
     const res1 = await thirdUserModel.findAndCountAll({
       where: { user_id: userId },
     });
+    if (!res1.count) {
+      throw new CustomError(
+        // eslint-disable-next-line
+        `不存在id为${userId}的用户！`,
+        ALLOW_HTTP_CODE.paramsError,
+        ALLOW_HTTP_CODE.paramsError
+      );
+    }
     const promise1: any[] = [];
     res1.rows.forEach((item) => {
       if (item.third_platform === THIRD_PLATFORM.qq) {
@@ -320,6 +328,9 @@ class InitController {
 
     // 删除该用户的所有角色（user_role表）
     await userRoleModel.destroy({ where: { user_id: userId } });
+
+    // 删除该用户的钱包（wallet表）
+    await walletModel.destroy({ where: { user_id: userId } });
 
     const res2 = await userLiveRoomModel.findAndCountAll({
       where: { user_id: userId },

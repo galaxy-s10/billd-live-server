@@ -70,9 +70,9 @@ class WalletService {
           : [[cast(col('balance'), 'INTEGER'), 'DESC']],
       limit,
       offset,
-      attributes: {
-        include: [[cast(col('balance'), 'float'), 'aaa']],
-      },
+      // attributes: {
+      //   include: [[cast(col('balance'), 'float'), 'aaa']],
+      // },
       where: {
         ...allWhere,
       },

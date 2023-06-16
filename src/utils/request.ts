@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 const service = axios.create({
-  // baseURL: process.env.NODE_ENV === 'development' ? undefined : '/admin/',
   timeout: 5000,
 });
 

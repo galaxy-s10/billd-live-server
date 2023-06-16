@@ -23,10 +23,10 @@ export const dockerRunSRS = (init = true) => {
       console.log(error);
     }
   }
-  // if (isRunning) {
-  //   console.log(chalkSUCCESS(`SRS正在运行！`));
-  //   return;
-  // }
+  if (isRunning) {
+    console.log(chalkSUCCESS(`SRS正在运行！`));
+    return;
+  }
   try {
     // 停掉旧的容器
     execSync(`docker stop ${DOCKER_SRS_CONFIG.container}`);

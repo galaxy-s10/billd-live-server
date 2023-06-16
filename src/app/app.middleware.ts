@@ -1,7 +1,12 @@
 import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
-import { ALLOW_HTTP_CODE, ERROR_HTTP_CODE, PROJECT_ENV } from '@/constant';
+import {
+  ALLOW_HTTP_CODE,
+  ERROR_HTTP_CODE,
+  PROJECT_ENV,
+  PROJECT_ENV_ENUM,
+} from '@/constant';
 import logController from '@/controller/log.controller';
 import { CustomError } from '@/model/customError.model';
 import { isAdmin } from '@/utils';
@@ -18,7 +23,7 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
     error: string;
     message: string;
   }) => {
-    if (PROJECT_ENV !== 'beta') {
+    if (PROJECT_ENV !== PROJECT_ENV_ENUM.beta) {
       console.log(
         chalkINFO(
           `当前不是beta环境，写入日志，api_status_code：${info.statusCode}`

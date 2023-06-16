@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 
-import { PROJECT_ENV, THIRD_PLATFORM } from '@/constant';
+import { PROJECT_ENV, PROJECT_ENV_ENUM, THIRD_PLATFORM } from '@/constant';
 import { IList, IUser } from '@/interface';
 import liveRoomModel from '@/model/liveRoom.model';
 import qqUserModel from '@/model/qqUser.model';
@@ -146,6 +146,15 @@ class UserService {
             },
           },
         },
+        {
+          model: liveRoomModel,
+          attributes: {
+            exclude: ['rtmp_url'],
+          },
+          through: {
+            attributes: [],
+          },
+        },
       ],
       attributes: {
         exclude: ['password', 'token'],
@@ -226,7 +235,7 @@ class UserService {
   async create(props: IUser) {
     // @ts-ignore
     const result: any = await userModel.create(props);
-    if (PROJECT_ENV === 'prod') {
+    if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
       // 生产环境注册用户权限就是SVIP用户
       await result.setRoles([5]);
     } else {

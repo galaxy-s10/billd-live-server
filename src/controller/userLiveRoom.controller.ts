@@ -114,7 +114,7 @@ class UserLiveRoomController {
     });
     const rtmptoken = cryptojs.MD5(userInfo.token || '').toString();
     let liveUrl;
-    if (PROJECT_ENV !== PROJECT_ENV_ENUM.prod) {
+    if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
       liveUrl = (live_room_id: number) => ({
         rtmp_url: `rtmp://localhost/livestream/roomId___${live_room_id}?type=user&token=${rtmptoken}`,
         flv_url: `http://localhost:5001/livestream/roomId___${live_room_id}.flv`,

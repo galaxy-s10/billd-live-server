@@ -75,6 +75,9 @@ class LiveService {
         },
         {
           model: liveRoomModel,
+          attributes: {
+            exclude: ['rtmp_url'],
+          },
         },
       ],
       order: [[orderName, orderBy]],
