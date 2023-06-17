@@ -12,8 +12,11 @@ export const handleRoomIsLiving = async () => {
   try {
     const res = await liveController.common.getList({});
     res.rows.forEach((item) => {
-      // 不对系统直播做处理
-      if (item.live_room?.type !== LiveRoomTypeEnum.system) {
+      // 不对系统直播和obs直播做处理
+      if (
+        item.live_room?.type !== LiveRoomTypeEnum.system &&
+        item.live_room?.type !== LiveRoomTypeEnum.user_obs
+      ) {
         handleExpired(item.id);
       }
       if (!item.user_id || !item.live_room_id) {

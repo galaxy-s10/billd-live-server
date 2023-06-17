@@ -82,21 +82,25 @@ class LiveRoomController {
       } else {
         console.log('鉴权成功');
         const isLiveing = await liveService.findByRoomId(Number(roomId));
-        const liveRoom = await liveRoomService.find(Number(roomId));
         if (isLiveing) {
           ctx.body = { code: 0, msg: 'room is living' };
         } else {
           ctx.body = { code: 0, msg: 'auth success' };
+          const liveRoom = await liveRoomService.find(Number(roomId));
           if (
             type === LiveRoomTypeEnum.user_obs ||
             type === LiveRoomTypeEnum.system
           ) {
             liveService.create({
               live_room_id: Number(roomId),
-              user_id: liveRoom?.user?.id,
+              user_id: liveRoom?.user_live_room?.user?.id,
               socket_id: '-1',
               track_audio: 1,
               track_video: 1,
+            });
+            liveRoomService.update({
+              id: liveRoom?.id,
+              type: LiveRoomTypeEnum.user_obs,
             });
           }
         }
@@ -116,17 +120,12 @@ class LiveRoomController {
       successHandler({ ctx, data: 'no live_room' });
     } else {
       successHandler({ ctx, data: 'ok' });
-      const params = new URLSearchParams(body.param);
-      const type = params.get('type');
-      if (type === 'user') {
-        liveService.deleteByLiveRoomId(Number(roomId));
-      }
+      liveService.deleteByLiveRoomId(Number(roomId));
     }
     await next();
   }
 
   updateKey = async (ctx: ParameterizedContext, next) => {
-    const id = +ctx.params.id;
     const { code, userInfo, message } = await authJwt(ctx);
     if (userInfo) {
       const liveRoom = await userLiveRoomService.findByUserId(
@@ -148,7 +147,7 @@ class LiveRoomController {
           LiveRoomTypeEnum.user_obs
         }&token=${key}`;
         await this.common.update({
-          id,
+          id: liveRoom.id || -1,
           key,
           rtmp_url,
         });
