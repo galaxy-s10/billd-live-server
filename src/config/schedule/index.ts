@@ -3,6 +3,8 @@ import schedule from 'node-schedule';
 import { SCHEDULE_TYPE } from '@/constant';
 import { chalkINFO } from '@/utils/chalkTip';
 
+import { handleRoomIsLiving } from './isLiveing';
+
 const rule = new schedule.RecurrenceRule();
 
 const allHour = 24;
@@ -39,6 +41,6 @@ export const startSchedule = () => {
         }定时任务`
       )
     );
-    // handleRoomIsLiving();
+    handleRoomIsLiving();
   });
 };

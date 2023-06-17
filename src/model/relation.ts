@@ -15,15 +15,15 @@ import Wallet from '@/model/wallet.model';
 
 loadAllModel();
 
-// LiveRoom.belongsToMany(User, {
-//   foreignKey: 'user_id',
-//   otherKey: 'live_room_id',
-//   constraints: false,
-//   through: {
-//     model: UserLiveRoom,
-//     unique: false, // 不生成唯一索引
-//   },
-// });
+LiveRoom.belongsToMany(User, {
+  foreignKey: 'live_room_id',
+  otherKey: 'user_id',
+  constraints: false,
+  through: {
+    model: UserLiveRoom,
+    unique: false, // 不生成唯一索引
+  },
+});
 
 User.belongsToMany(LiveRoom, {
   foreignKey: 'user_id',

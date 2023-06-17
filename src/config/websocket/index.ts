@@ -13,15 +13,20 @@ import liveRedisController from '@/config/websocket/live-redis.controller';
 import { PROJECT_ENV, PROJECT_ENV_ENUM, REDIS_PREFIX } from '@/constant';
 import liveController from '@/controller/live.controller';
 import orderController from '@/controller/order.controller';
-import { IUser } from '@/interface';
+import {
+  IAnswer,
+  ICandidate,
+  IHeartbeat,
+  IJoin,
+  IMessage,
+  IOffer,
+  IOtherJoin,
+  IUpdateJoinInfo,
+  IUser,
+} from '@/interface';
 import liveService from '@/service/live.service';
+import liveRoomService from '@/service/liveRoom.service';
 import { chalkINFO, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
-
-interface IOffer {
-  socketId: string;
-  roomId: number;
-  sdp: any;
-}
 
 async function getAllLiveUser(io) {
   const allSocketsMap = await io.fetchSockets();
@@ -134,77 +139,70 @@ export const connectWebSocket = (server) => {
     prettierInfoLog({ msg: 'connection' });
 
     // 收到用户进入房间
-    socket.on(
-      WsMsgTypeEnum.join,
-      async (data: {
-        roomId: number;
-        socketId: string;
-        data: {
-          roomName: string;
-          coverImg: string;
-          userInfo?: IUser;
-          srs?: { streamurl: string; flvurl: string };
-          track: { audio: boolean; video: boolean };
-          liveId?: number;
-        };
-        isAdmin: boolean;
-      }) => {
-        prettierInfoLog({
-          msg: '收到用户进入房间',
-          socketId: socket.id,
-          roomId: data.roomId,
-        });
-        socket.join(`${data.roomId}`);
-        if (data.isAdmin) {
-          let liveId;
-          try {
-            const res = await liveService.create({
-              live_room_id: data.roomId,
-              user_id: data.data.userInfo?.id,
-              socketId: socket.id,
-              system: 2,
+    socket.on(WsMsgTypeEnum.join, async (data: IJoin) => {
+      const roomId = data.data.live_room.id || -1;
+      prettierInfoLog({
+        msg: '收到用户进入房间',
+        socketId: socket.id,
+        roomId,
+      });
+      socket.join(`${roomId}`);
+      // 主播开直播
+      if (data.is_anchor) {
+        let liveId;
+        try {
+          const [res] = await Promise.all([
+            liveService.create({
+              live_room_id: roomId,
+              user_id: data.user_info?.id,
+              socket_id: socket.id,
               track_audio: data.data.track.audio,
               track_video: data.data.track.video,
-              coverImg: data.data.coverImg,
-              streamurl: data.data.srs?.streamurl,
-              flvurl: data.data.srs?.flvurl,
-            });
-            liveId = res.id;
-            liveRedisController.setUserLiveing({
-              liveId,
-              socketId: socket.id,
-              roomId: data.roomId,
-              userInfo: data.data.userInfo,
-            });
-          } catch (error) {
-            console.log(error);
-          }
-          const newdata = { ...data };
-          newdata.data.liveId = liveId;
-          socket.emit(WsMsgTypeEnum.joined, newdata);
+            }),
+            liveRoomService.update({
+              id: roomId,
+              cover_img: data.data.live_room.cover_img,
+              type: data.data.live_room.type,
+            }),
+          ]);
+          liveId = res.id;
+          liveRedisController.setUserLiveing({
+            liveId,
+            socketId: socket.id,
+            roomId,
+            userInfo: data.user_info,
+          });
+        } catch (error) {
+          console.log(error);
+        }
+        const newdata = { ...data };
+        newdata.data.live_id = liveId;
+        socket.emit(WsMsgTypeEnum.joined, newdata);
+      } else {
+        // 用户看直播
+        const res = await liveService.findByRoomId(roomId);
+        if (!res) {
+          socket.emit(WsMsgTypeEnum.roomNoLive, {
+            roomId,
+          });
+          liveService.deleteByLiveRoomId(roomId);
         } else {
-          const res = await liveService.findByRoomId(data.roomId);
-          if (!res) {
-            socket.emit(WsMsgTypeEnum.roomNoLive, { roomId: data.roomId });
-          } else {
-            liveRedisController.setUserJoinedRoom({
-              socketId: socket.id,
-              roomId: data.roomId,
-              userInfo: data.data.userInfo,
-            });
-            socket.emit(WsMsgTypeEnum.joined, { data: res.get() || {} });
-            socket.emit(WsMsgTypeEnum.roomLiveing, data);
-            socket.to(`${data.roomId}`).emit(WsMsgTypeEnum.otherJoin, {
-              data: res
-                ? { ...res?.get(), socketId: socket.id }
-                : { socketId: socket.id },
-            });
-            const liveUser = await getAllLiveUser(io);
-            socket.to(`${data.roomId}`).emit(WsMsgTypeEnum.liveUser, liveUser);
-          }
+          liveRedisController.setUserJoinedRoom({
+            socketId: socket.id,
+            roomId,
+            userInfo: data.user_info,
+          });
+          socket.emit(WsMsgTypeEnum.joined, { data: res.get() || {} });
+          socket.emit(WsMsgTypeEnum.roomLiveing, data);
+          const otherJoinData: IOtherJoin = {
+            data: { ...res.get(), join_socket_id: socket.id },
+          };
+          socket.to(`${roomId}`).emit(WsMsgTypeEnum.otherJoin, otherJoinData);
+          const liveUser = await getAllLiveUser(io);
+          socket.to(`${roomId}`).emit(WsMsgTypeEnum.liveUser, liveUser);
         }
       }
-    );
+    });
 
     // 收到用户获取当前在线用户
     socket.on(WsMsgTypeEnum.getLiveUser, async (data) => {
@@ -249,13 +247,13 @@ export const connectWebSocket = (server) => {
     );
 
     // 收到用户发送消息
-    socket.on(WsMsgTypeEnum.message, (data) => {
+    socket.on(WsMsgTypeEnum.message, (data: IMessage) => {
       prettierInfoLog({
         msg: '收到用户发送消息',
         socketId: socket.id,
-        roomId: data.roomId,
+        roomId: data.data.live_room_id,
       });
-      socket.to(data.roomId).emit(WsMsgTypeEnum.message, data);
+      socket.to(`${data.data.live_room_id}`).emit(WsMsgTypeEnum.message, data);
     });
 
     // 收到管理员开始直播
@@ -278,86 +276,67 @@ export const connectWebSocket = (server) => {
     });
 
     // 收到心跳
-    socket.on(
-      WsMsgTypeEnum.heartbeat,
-      (data: {
-        roomId: number;
-        socketId: string;
-        data?: {
-          liveId: number;
-        };
-        isAdmin: boolean;
-      }) => {
-        prettierInfoLog({
-          msg: '收到心跳',
-          socketId: socket.id,
-          roomId: data.roomId,
-        });
-        updateUserJoinedRoom({ socketId: data.socketId });
-        if (data.data?.liveId) {
-          updateRoomIsLiveing(data.data.liveId);
-        }
+    socket.on(WsMsgTypeEnum.heartbeat, (data: IHeartbeat) => {
+      prettierInfoLog({
+        msg: '收到心跳',
+        socketId: socket.id,
+        roomId: data.data?.live_room_id,
+      });
+      updateUserJoinedRoom({ socketId: data.socket_id });
+      if (data.data?.live_id) {
+        updateRoomIsLiveing(data.data.live_id);
       }
-    );
+    });
 
     // 收到更新加入信息
-    socket.on(
-      WsMsgTypeEnum.updateJoinInfo,
-      async (data: {
-        roomId: number;
-        socketId: string;
-        data: {
-          roomName: string;
-          coverImg: string;
-          userInfo: IUser;
-        };
-      }) => {
-        prettierInfoLog({
-          msg: '收到更新加入信息',
-          socketId: socket.id,
-          roomId: data.roomId,
+    socket.on(WsMsgTypeEnum.updateJoinInfo, async (data: IUpdateJoinInfo) => {
+      prettierInfoLog({
+        msg: '收到更新加入信息',
+        socketId: socket.id,
+        roomId: data.data.live_room_id,
+      });
+      const res = await liveRedisController.getUserJoinedRoom({
+        socketId: data.socket_id,
+      });
+      if (res) {
+        liveRedisController.setUserJoinedRoom({
+          socketId: data.socket_id,
+          roomId: data.data.live_room_id,
+          userInfo: data.user_info,
         });
-        const res = await liveRedisController.getUserJoinedRoom({
-          socketId: data.socketId,
-        });
-        if (res) {
-          liveRedisController.setUserJoinedRoom({
-            socketId: data.socketId,
-            roomId: data.roomId,
-            userInfo: data.data.userInfo,
-          });
-        }
       }
-    );
+    });
 
     // 收到offer
     socket.on(WsMsgTypeEnum.offer, (data: IOffer) => {
       prettierInfoLog({
         msg: '收到offer',
         socketId: socket.id,
-        roomId: data.roomId,
+        roomId: data.data.live_room_id,
       });
-      socket.to(`${data.roomId}`).emit(WsMsgTypeEnum.offer, data);
+      socket.to(`${data.data.live_room_id}`).emit(WsMsgTypeEnum.offer, data);
     });
 
     // 收到answer
-    socket.on(WsMsgTypeEnum.answer, (data) => {
+    socket.on(WsMsgTypeEnum.answer, (data: { data: IAnswer }) => {
       prettierInfoLog({
         msg: '收到answer',
         socketId: socket.id,
-        roomId: data.roomId,
+        roomId: data.data.live_room_id,
       });
-      socket.to(data.roomId).emit(WsMsgTypeEnum.answer, data);
+      socket.to(`${data.data.live_room_id}`).emit(WsMsgTypeEnum.answer, data);
     });
 
     // 收到candidate
-    socket.on(WsMsgTypeEnum.candidate, (data) => {
+    socket.on(WsMsgTypeEnum.candidate, (data: ICandidate) => {
       prettierInfoLog({
         msg: '收到candidate',
         socketId: socket.id,
-        roomId: data.roomId,
+        roomId: data.data.live_room_id,
       });
-      socket.to(data.roomId).emit(WsMsgTypeEnum.candidate, data);
+      socket
+        .to(`${data.data.live_room_id}`)
+        .emit(WsMsgTypeEnum.candidate, data);
     });
 
     // 断开连接中
@@ -381,7 +360,7 @@ export const connectWebSocket = (server) => {
         // 是管理员断开连接
         const roomId = `${res.rows[0].live_room_id!}`;
         socket.to(roomId).emit(WsMsgTypeEnum.roomNoLive);
-        liveService.deleteBySocketId(res.rows[0].socketId || '-1');
+        liveService.deleteByLiveRoomId(Number(roomId));
       } else {
         // 不是管理员断开连接
         const res1 = await liveRedisController.getUserJoinedRoom({

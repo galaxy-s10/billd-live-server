@@ -82,9 +82,34 @@ class UserLiveRoomService {
         },
         {
           model: liveRoomModel,
+          attributes: {
+            exclude: ['rtmp_url', 'key'],
+          },
         },
       ],
       where: { user_id },
+    });
+    return result;
+  }
+
+  /** 查找用户直播间 */
+  async findByLiveRoomId(live_room_id: number) {
+    const result = await userLiveRoomModel.findOne({
+      include: [
+        {
+          model: userModel,
+          attributes: {
+            exclude: ['password', 'token'],
+          },
+        },
+        {
+          model: liveRoomModel,
+          attributes: {
+            exclude: ['rtmp_url', 'key'],
+          },
+        },
+      ],
+      where: { live_room_id },
     });
     return result;
   }

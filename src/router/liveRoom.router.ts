@@ -12,4 +12,6 @@ liveRoomRouter.post('/unpublish', liveRoomController.unpublish);
 
 liveRoomRouter.get('/find/:id', liveRoomController.find);
 
+liveRoomRouter.put('/update_key', liveRoomController.updateKey);
+
 export default liveRoomRouter;

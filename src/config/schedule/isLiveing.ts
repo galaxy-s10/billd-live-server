@@ -1,5 +1,6 @@
 import LiveRedisController from '@/config/websocket/live-redis.controller';
 import liveController from '@/controller/live.controller';
+import { LiveRoomTypeEnum } from '@/interface';
 
 export const handleRoomIsLiving = async () => {
   async function handleExpired(liveId) {
@@ -12,8 +13,11 @@ export const handleRoomIsLiving = async () => {
     const res = await liveController.common.getList({});
     res.rows.forEach((item) => {
       // 不对系统直播做处理
-      if (item.system !== 1) {
+      if (item.live_room?.type !== LiveRoomTypeEnum.system) {
         handleExpired(item.id);
+      }
+      if (!item.user_id || !item.live_room_id) {
+        liveController.common.delete(item.id || -1);
       }
     });
   } catch (error) {

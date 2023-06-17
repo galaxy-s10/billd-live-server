@@ -31,6 +31,9 @@ async function main() {
       connectRedis(), // 连接redis
       createRedisPubSub(), // 创建redis的发布订阅
     ]);
+    await (
+      await import('./controller/init.controller')
+    ).default.common.initDefault();
     const port = +PROJECT_PORT;
     await (await import('./setup')).setupKoa({ port });
     console.log();

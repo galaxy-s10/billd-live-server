@@ -89,7 +89,7 @@ class LiveRoomService {
         },
       ],
       attributes: {
-        exclude: ['rtmp_url'],
+        exclude: ['rtmp_url', 'key'],
         include: [
           [col('user_live_room.user.id'), 'user_id'],
           [col('user_live_room.user.username'), 'user_username'],
@@ -125,42 +125,52 @@ class LiveRoomService {
         },
         {
           model: liveModel,
-          attributes: {
-            exclude: ['coverImg'],
-          },
         },
       ],
+      attributes: {
+        exclude: ['rtmp_url', 'key'],
+      },
       where: { id },
     });
     return result;
   }
 
-  async findLiveRoomUserToken(id: number) {
+  /** 查找直播间key */
+  async findKey(id: number) {
     const result = await liveRoomModel.findOne({
+      attributes: ['key'],
+      where: { id },
       include: [
         {
-          model: userLiveRoomModel,
-          include: [
-            {
-              model: userModel,
-              attributes: {
-                exclude: ['password'],
-              },
-            },
-          ],
-          required: true,
+          model: userModel,
+          attributes: {
+            exclude: ['password', 'token'],
+          },
         },
       ],
-      where: { id },
     });
     return result;
   }
 
   /** 修改直播间 */
-  async update({ id, name, rtmp_url, flv_url, hls_url }: ILiveRoom) {
+  async update({
+    id,
+    name,
+    key,
+    type,
+    weight,
+    cover_img,
+    rtmp_url,
+    flv_url,
+    hls_url,
+  }: ILiveRoom) {
     const result = await liveRoomModel.update(
       {
         name,
+        key,
+        type,
+        weight,
+        cover_img,
         rtmp_url,
         flv_url,
         hls_url,
@@ -171,9 +181,22 @@ class LiveRoomService {
   }
 
   /** 创建直播间 */
-  async create({ name, rtmp_url, flv_url, hls_url }: ILiveRoom) {
+  async create({
+    name,
+    key,
+    type,
+    weight,
+    cover_img,
+    rtmp_url,
+    flv_url,
+    hls_url,
+  }: ILiveRoom) {
     const result = await liveRoomModel.create({
       name,
+      key,
+      type,
+      weight,
+      cover_img,
       rtmp_url,
       flv_url,
       hls_url,

@@ -149,7 +149,7 @@ class UserService {
         {
           model: liveRoomModel,
           attributes: {
-            exclude: ['rtmp_url'],
+            exclude: ['rtmp_url', 'key'],
           },
           through: {
             attributes: [],

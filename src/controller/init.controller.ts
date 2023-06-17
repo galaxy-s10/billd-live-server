@@ -1,9 +1,11 @@
+import { getRandomString } from 'billd-utils';
 import cryptojs from 'crypto-js';
 import { ParameterizedContext } from 'koa';
 
 import { signJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import sequelize from '@/config/mysql';
+import { SERVER_LIVE } from '@/config/secret';
 import {
   ALLOW_HTTP_CODE,
   PROJECT_ENV,
@@ -17,7 +19,7 @@ import {
   bulkCreateRoleAuth,
   initUser,
 } from '@/init/initData';
-import { IUser } from '@/interface';
+import { IUser, LiveRoomTypeEnum } from '@/interface';
 import authModel from '@/model/auth.model';
 import { CustomError } from '@/model/customError.model';
 import dayDataModel from '@/model/dayData.model';
@@ -64,6 +66,18 @@ const sql3 = `call insert_many_dates(3650)`;
 
 class InitController {
   common = {
+    initDefault: async () => {
+      try {
+        await this.common.initRole();
+        await this.common.initAuth();
+        await this.common.initRoleAuth();
+        await this.common.initUser();
+        await this.common.initUserWallet();
+        await this.common.initGoods();
+      } catch (error) {
+        console.log();
+      }
+    },
     initRole: async () => {
       const count = await roleModel.count();
       if (count === 0) {
@@ -131,12 +145,14 @@ class InitController {
         // @ts-ignore
         userRes.setRoles(user.user_roles);
         let liveUrl;
-        const rtmptoken = cryptojs.MD5(token || '').toString();
+        const rtmptoken = cryptojs
+          .MD5(`${+new Date()}___${getRandomString(6)}`)
+          .toString();
         if (PROJECT_ENV !== PROJECT_ENV_ENUM.prod) {
           liveUrl = (live_room_id: number) => ({
-            rtmp_url: `rtmp://localhost/livestream/roomId___${live_room_id}?token=${rtmptoken}`,
-            flv_url: `http://localhost:5001/livestream/roomId___${live_room_id}.flv`,
-            hls_url: `http://localhost:5001/livestream/roomId___${live_room_id}.hls`,
+            rtmp_url: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}?token=${rtmptoken}`,
+            flv_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.flv`,
+            hls_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.hls`,
           });
         } else {
           liveUrl = (live_room_id: number) => {
@@ -153,6 +169,9 @@ class InitController {
         const liveRoom = await liveRoomModel.create({
           id: user.live_room?.id,
           name: user.live_room?.name,
+          key: rtmptoken,
+          type: LiveRoomTypeEnum.system,
+          weight: user.live_room?.weight,
           rtmp_url,
           flv_url,
           hls_url,
@@ -192,16 +211,11 @@ class InitController {
     },
   };
 
-  initDefault = async (ctx: ParameterizedContext, next) => {
-    await this.common.initRole();
-    await this.common.initAuth();
-    await this.common.initRoleAuth();
-    await this.common.initUser();
-    await this.common.initUserWallet();
-    await this.common.initGoods();
-    successHandler({ ctx, message: '初始化默认数据成功！' });
-    await next();
-  };
+  // initDefault = async (ctx: ParameterizedContext, next) => {
+  //   await this.common.initDefault();
+  //   successHandler({ ctx, message: '初始化默认数据成功！' });
+  //   await next();
+  // };
 
   // 初始化角色
   initRole = async (ctx: ParameterizedContext, next) => {

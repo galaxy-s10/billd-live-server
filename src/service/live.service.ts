@@ -6,7 +6,7 @@ import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
 import { handlePaging } from '@/utils';
 
-const { Op } = Sequelize;
+const { Op, col } = Sequelize;
 
 class LiveService {
   /** 直播是否存在 */
@@ -76,18 +76,25 @@ class LiveService {
         {
           model: liveRoomModel,
           attributes: {
-            exclude: ['rtmp_url'],
+            exclude: ['rtmp_url', 'key'],
           },
         },
       ],
-      order: [[orderName, orderBy]],
+      attributes: {
+        exclude: ['rtmp_url', 'key'],
+        include: [[col('live_room.weight'), 'live_room_weight']],
+      },
+      order: [
+        ['live_room_weight', 'desc'],
+        [orderName, orderBy],
+      ],
       limit,
       offset,
       where: {
         ...allWhere,
       },
     });
-    return handlePaging(result, nowPage, pageSize);
+    return handlePaging<ILive>(result, nowPage, pageSize);
   }
 
   /** 查找直播 */
@@ -97,12 +104,12 @@ class LiveService {
   }
 
   /** 查找直播 */
-  findBySocketId = async (socketId: string) => {
-    const res = await liveModel.findAndCountAll({ where: { socketId } });
+  findBySocketId = async (socket_id: string) => {
+    const res = await liveModel.findAndCountAll({ where: { socket_id } });
     return res;
   };
 
-  /** 查找直播 */
+  /** 查找直播（禁止对外。） */
   findByRoomId = async (live_room_id: number) => {
     const res = await liveModel.findOne({
       include: [
@@ -124,27 +131,19 @@ class LiveService {
   /** 修改直播 */
   async update({
     id,
-    socketId,
+    socket_id,
     live_room_id,
     user_id,
-    coverImg,
     track_audio,
     track_video,
-    system,
-    streamurl,
-    flvurl,
   }: ILive) {
     const result = await liveModel.update(
       {
-        socketId,
+        socket_id,
         live_room_id,
         user_id,
-        coverImg,
         track_audio,
         track_video,
-        system,
-        streamurl,
-        flvurl,
       },
       { where: { id } }
     );
@@ -153,26 +152,18 @@ class LiveService {
 
   /** 创建直播 */
   async create({
-    socketId,
+    socket_id,
     live_room_id,
     user_id,
-    coverImg,
     track_audio,
     track_video,
-    system,
-    streamurl,
-    flvurl,
   }: ILive) {
     const result = await liveModel.create({
-      socketId,
+      socket_id,
       live_room_id,
       user_id,
-      coverImg,
       track_audio,
       track_video,
-      system,
-      streamurl,
-      flvurl,
     });
     return result;
   }
@@ -193,8 +184,8 @@ class LiveService {
   };
 
   /** 删除直播 */
-  deleteBySocketId = async (socketId: string) => {
-    const res = await liveModel.destroy({ where: { socketId } });
+  deleteBySocketId = async (socket_id: string) => {
+    const res = await liveModel.destroy({ where: { socket_id } });
     return res;
   };
 }

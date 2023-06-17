@@ -5,9 +5,10 @@ import { ParameterizedContext } from 'koa';
 import { authJwt } from '@/app/auth/authJwt';
 import { verifyUserAuth } from '@/app/auth/verifyUserAuth';
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE, PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import { SERVER_LIVE } from '@/config/secret';
+import { ALLOW_HTTP_CODE } from '@/constant';
 import liveRoomController from '@/controller/liveRoom.controller';
-import { IList, IUserLiveRoom } from '@/interface';
+import { IList, IUserLiveRoom, LiveRoomTypeEnum } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveRoomService from '@/service/liveRoom.service';
 import userLiveRoomService from '@/service/userLiveRoom.service';
@@ -109,35 +110,30 @@ class UserLiveRoomController {
       );
     }
 
+    const rtmptoken = cryptojs
+      .MD5(`${+new Date()}___${getRandomString(6)}`)
+      .toString();
     const liveRoom = await liveRoomController.common.create({
-      name: getRandomString(5),
-    });
-    const rtmptoken = cryptojs.MD5(userInfo.token || '').toString();
-    let liveUrl;
-    if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
-      liveUrl = (live_room_id: number) => ({
-        rtmp_url: `rtmp://localhost/livestream/roomId___${live_room_id}?type=user&token=${rtmptoken}`,
-        flv_url: `http://localhost:5001/livestream/roomId___${live_room_id}.flv`,
-        hls_url: `http://localhost:5001/livestream/roomId___${live_room_id}.hls`,
-      });
-    } else {
-      liveUrl = (live_room_id: number) => ({
-        rtmp_url: `rtmp://srs-push.hsslive.cn/livestream/roomId___${live_room_id}?type=user&token=${rtmptoken}`,
-        flv_url: `https://live.hsslive.cn/srsflv/livestream/roomId___${live_room_id}.flv`,
-        hls_url: `https://live.hsslive.cn/srsflv/livestream/roomId___${live_room_id}.hls`,
-      });
-      // liveUrl = (live_room_id: number) => {
-      //   const res = tencentcloudUtils.getPullUrl({ roomId: live_room_id });
-      //   return {
-      //     rtmp_url: res.rtmp,
-      //     flv_url: res.flv,
-      //     hls_url: res.hls,
-      //   };
-      // };
-    }
-    const { rtmp_url, flv_url, hls_url } = liveUrl(liveRoom.id);
-    await liveRoomService.update({
       name: `${userInfo.username!.slice(0, 10)}的直播间`,
+      key: rtmptoken,
+      type: LiveRoomTypeEnum.user_obs,
+      weight: 11,
+    });
+    const liveUrl = (live_room_id: number) => ({
+      rtmp_url: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}?type=${LiveRoomTypeEnum.user_obs}&token=${rtmptoken}`,
+      flv_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.flv`,
+      hls_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.hls`,
+    });
+    // liveUrl = (live_room_id: number) => {
+    //   const res = tencentcloudUtils.getPullUrl({ roomId: live_room_id });
+    //   return {
+    //     rtmp_url: res.rtmp,
+    //     flv_url: res.flv,
+    //     hls_url: res.hls,
+    //   };
+    // };
+    const { rtmp_url, flv_url, hls_url } = liveUrl(liveRoom.id!);
+    await liveRoomService.update({
       rtmp_url,
       flv_url,
       hls_url,

@@ -34,6 +34,7 @@ class LiveController {
       });
       return result;
     },
+
     delete: async (id: number, isRoute?: boolean) => {
       const isExist = await liveService.isExist([id]);
       if (!isExist) {
@@ -75,26 +76,18 @@ class LiveController {
       );
     }
     const {
-      socketId,
+      socket_id,
       live_room_id,
       user_id,
-      coverImg,
       track_audio,
       track_video,
-      system,
-      streamurl,
-      flvurl,
     }: ILive = ctx.request.body;
     await liveService.create({
-      socketId,
+      socket_id,
       live_room_id,
       user_id,
-      coverImg,
       track_audio,
       track_video,
-      system,
-      streamurl,
-      flvurl,
     });
     successHandler({ ctx });
 

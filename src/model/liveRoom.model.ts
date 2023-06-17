@@ -28,6 +28,18 @@ const model = sequelize.define<LiveRoomModel>(
     name: {
       type: DataTypes.STRING(100),
     },
+    key: {
+      type: DataTypes.STRING(100),
+    },
+    type: {
+      type: DataTypes.INTEGER,
+    },
+    weight: {
+      type: DataTypes.INTEGER,
+    },
+    cover_img: {
+      type: DataTypes.TEXT,
+    },
     rtmp_url: {
       type: DataTypes.STRING(500),
     },

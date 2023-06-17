@@ -1,11 +1,11 @@
 import { execSync, spawnSync } from 'child_process';
 
-import cryptojs from 'crypto-js';
-
+import { SERVER_LIVE } from '@/config/secret';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import { initUser } from '@/init/initData';
+import { LiveRoomTypeEnum } from '@/interface';
 import liveService from '@/service/live.service';
-import userService from '@/service/user.service';
+import liveRoomService from '@/service/liveRoom.service';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 import { tencentcloudUtils } from '@/utils/tencentcloud';
 
@@ -53,16 +53,29 @@ async function addLive({
     // const ffmpeg = `echo test initFFmpeg`;
     execSync(ffmpeg);
     console.log('ffmpeg命令', ffmpeg);
-    const socketId = `${live_room_id}`;
-    await liveService.deleteBySocketId(socketId);
+    const isLiveing = await liveService.findByRoomId(live_room_id);
+    if (!isLiveing) {
+      liveService.create({
+        live_room_id,
+        user_id,
+        socket_id: `${live_room_id}`,
+        track_audio: 1,
+        track_video: 1,
+      });
+    }
+    liveRoomService.update({
+      id: live_room_id,
+      cover_img: base64,
+      type: LiveRoomTypeEnum.system,
+    });
   }
-  const userInfo = await userService.findAndToken(user_id);
-  let flvurl = '';
   if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
-    const rtmptoken = cryptojs.MD5(userInfo?.token || '').toString();
-    flvurl = `http://localhost:5001/livestream/roomId___${live_room_id}.flv`;
+    const result = await liveRoomService.findKey(live_room_id);
+    const rtmptoken = result?.key;
     await main({
-      remoteFlv: `rtmp://localhost/livestream/roomId___${live_room_id}?token=${rtmptoken}`,
+      remoteFlv: `${SERVER_LIVE.PushDomain}/${
+        SERVER_LIVE.AppName
+      }/roomId___${live_room_id}?token=${rtmptoken!}`,
     });
   } else {
     await tencentcloudUtils.dropLiveStream({
@@ -76,21 +89,9 @@ async function addLive({
       const remoteFlv = tencentcloudUtils.getPushUrl({
         roomId: live_room_id,
       });
-      flvurl = tencentcloudUtils.getPullUrl({ roomId: live_room_id }).flv;
       await main({ remoteFlv });
     }
   }
-  await liveService.create({
-    live_room_id,
-    user_id,
-    socketId: `${live_room_id}`,
-    system: 1,
-    track_audio: true,
-    track_video: true,
-    coverImg: base64,
-    streamurl: '',
-    flvurl,
-  });
 }
 
 export const initFFmpeg = async (init = true) => {
@@ -115,35 +116,18 @@ export const initFFmpeg = async (init = true) => {
     } catch (error) {
       console.log(error);
     }
-    if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
-      await Promise.all([
+    const queue: any[] = [];
+    Object.keys(initUser).forEach((item) => {
+      queue.push(
         addLive({
-          live_room_id: initUser.admin.live_room.id,
-          user_id: initUser.admin.id,
-          localFile: initUser.admin.live_room.localFile,
-          base64: initUser.admin.live_room.base64,
-        }),
-        addLive({
-          live_room_id: initUser.systemUser1.live_room.id,
-          user_id: initUser.systemUser1.id,
-          localFile: initUser.systemUser1.live_room.localFile,
-          base64: initUser.systemUser1.live_room.base64,
-        }),
-      ]);
-    } else {
-      const queue: any[] = [];
-      Object.keys(initUser).forEach((item) => {
-        queue.push(
-          addLive({
-            live_room_id: initUser[item].live_room.id,
-            user_id: initUser[item].id,
-            localFile: initUser[item].live_room.localFile,
-            base64: initUser[item].live_room.base64,
-          })
-        );
-      });
-      await Promise.all(queue);
-    }
+          live_room_id: initUser[item].live_room.id,
+          user_id: initUser[item].id,
+          localFile: initUser[item].live_room.localFile,
+          base64: initUser[item].live_room.base64,
+        })
+      );
+    });
+    await Promise.all(queue);
     console.log(chalkSUCCESS(`FFmpeg推流成功！`));
 
     // const child = exec(ffmpeg, (error, stdout, stderr) => {

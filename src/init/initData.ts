@@ -1,11 +1,9 @@
 import { getRandomString } from 'billd-utils';
 
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
-import { devFddmBase64 } from '@/init/base64/dev_fddm';
-import { devFlowerBase64 } from '@/init/base64/dev_flower';
 import { fddmHyzdwmglBase64 } from '@/init/base64/fddm_hyzdwmgl';
 import { fddmMhswBase64 } from '@/init/base64/fddm_mhsw';
-import { fddmNewboyBase64 } from '@/init/base64/fddm_newboy';
+import { fddmNswwydjaBase64 } from '@/init/base64/fddm_nswwydja';
 import { fddmSnjxhBase64 } from '@/init/base64/fddm_snjxh';
 import { fddmXyzcslBase64 } from '@/init/base64/fddm_xyzcsl';
 import { fddmYycyBase64 } from '@/init/base64/fddm_yycy';
@@ -25,9 +23,9 @@ export const initUser = {
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_yycy.mp4'
-          : resolveApp('./public/dev_fddm.mp4'),
-      base64:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod ? fddmYycyBase64 : devFddmBase64,
+          : resolveApp('./public/fddm_yycy.mp4'),
+      base64: fddmYycyBase64,
+      weight: 2,
     },
   },
   systemUser1: {
@@ -42,11 +40,9 @@ export const initUser = {
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_mhsw.mp4'
-          : resolveApp('./public/dev_flower.mp4'),
-      base64:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? fddmMhswBase64
-          : devFlowerBase64,
+          : resolveApp('./public/fddm_mhsw.mp4'),
+      base64: fddmMhswBase64,
+      weight: 1,
     },
   },
   systemUser2: {
@@ -61,11 +57,9 @@ export const initUser = {
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_hyzdwmgl.mp4'
-          : resolveApp('./public/fddm.mp4'),
-      base64:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? fddmHyzdwmglBase64
-          : devFddmBase64,
+          : resolveApp('./public/fddm_hyzdwmgl.mp4'),
+      base64: fddmHyzdwmglBase64,
+      weight: 1,
     },
   },
   systemUser3: {
@@ -80,9 +74,9 @@ export const initUser = {
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_snjxh.mp4'
-          : resolveApp('./public/fddm.mp4'),
-      base64:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod ? fddmSnjxhBase64 : devFddmBase64,
+          : resolveApp('./public/fddm_snjxh.mp4'),
+      base64: fddmSnjxhBase64,
+      weight: 1,
     },
   },
   systemUser4: {
@@ -96,12 +90,10 @@ export const initUser = {
       name: 'Nill的直播间',
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? '/node/video/fddm_newboy.mp4'
-          : resolveApp('./public/fddm.mp4'),
-      base64:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? fddmNewboyBase64
-          : devFddmBase64,
+          ? '/node/video/fddm_nswwydja.mp4'
+          : resolveApp('./public/fddm_nswwydja.mp4'),
+      base64: fddmNswwydjaBase64,
+      weight: 10,
     },
   },
   systemUser5: {
@@ -116,11 +108,9 @@ export const initUser = {
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_xyzcsl.mp4'
-          : resolveApp('./public/fddm.mp4'),
-      base64:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? fddmXyzcslBase64
-          : devFddmBase64,
+          : resolveApp('./public/fddm_xyzcsl.mp4'),
+      base64: fddmXyzcslBase64,
+      weight: 1,
     },
   },
 };

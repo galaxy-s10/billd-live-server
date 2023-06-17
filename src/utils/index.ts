@@ -75,7 +75,7 @@ export const isAdmin = (ctx: ParameterizedContext) =>
   ctx.req.url!.indexOf('/admin/') !== -1;
 
 /** 处理返回的分页数据 */
-export const handlePaging = (
+export const handlePaging = <T>(
   result: any,
   nowPage?: string,
   pageSize?: string
@@ -86,7 +86,7 @@ export const handlePaging = (
     pageSize: number;
     hasMore: boolean;
     total: number;
-    rows: any[];
+    rows: T[];
   } = {};
   obj.nowPage = nowPage ? +nowPage : 1;
   obj.pageSize = pageSize ? +pageSize : result.count;

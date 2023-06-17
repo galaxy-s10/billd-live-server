@@ -7,7 +7,7 @@ export const initRabbitMQConsumer = () => {
       orderMQChannel.channel.val.consume(
         orderQueue,
         (msg) => {
-          console.log(msg?.content.toString(), 666);
+          console.log(msg?.content.toString());
         },
         { noAck: true }
       );
