@@ -125,23 +125,45 @@ class QqUserController {
    * https://wiki.connect.qq.com/unionid%e4%bb%8b%e7%bb%8d
    */
   async getMeOauth({ access_token, unionid, fmt }) {
-    const OauthInfo: any = await axios.get('https://graph.qq.com/oauth2.0/me', {
-      headers: { Accept: 'application/json' },
-      params: { access_token, unionid, fmt },
-    });
-    return OauthInfo;
+    try {
+      const OauthInfo: any = await axios.get(
+        'https://graph.qq.com/oauth2.0/me',
+        {
+          headers: { Accept: 'application/json' },
+          params: { access_token, unionid, fmt },
+        }
+      );
+      return { OauthInfo };
+    } catch (error) {
+      return { error };
+    }
   }
 
   login = async (ctx: ParameterizedContext, next) => {
     const { code } = ctx.request.body; // 注意此code会在10分钟内过期。
     const exp = 24; // token过期时间：24小时
     const accessToken = await this.getAccessToken(code);
-    if (accessToken.error) throw new Error(JSON.stringify(accessToken));
-    const OauthInfo: any = await this.getMeOauth({
+    if (accessToken.error) {
+      throw new CustomError(
+        JSON.stringify(accessToken),
+        ALLOW_HTTP_CODE.paramsError,
+        ALLOW_HTTP_CODE.paramsError
+      );
+    }
+    console.log('getAccessToken成功');
+    const { OauthInfo, error }: any = await this.getMeOauth({
       access_token: accessToken.access_token,
       unionid: 1,
       fmt: 'json',
     });
+    if (error) {
+      throw new CustomError(
+        `qq登录getMeOauth错误`,
+        ALLOW_HTTP_CODE.paramsError,
+        ALLOW_HTTP_CODE.paramsError
+      );
+    }
+    console.log('getMeOauth成功');
     const getUserInfoRes: IQqUser = await this.getUserInfo({
       access_token: accessToken.access_token,
       oauth_consumer_key: OauthInfo.client_id, // oauth_consumer_key参数要求填appid，OauthInfo.client_id其实就是appid
@@ -155,6 +177,7 @@ class QqUserController {
     };
     const isExist = await qqUserService.isExistUnionid(OauthInfo.unionid);
     if (!isExist) {
+      console.log('不存在qq账号');
       const qqUser: any = await qqUserService.create(qqUserInfo);
       const userInfo: any = await userService.create({
         username: qqUserInfo.nickname,
@@ -179,6 +202,7 @@ class QqUserController {
         token,
       });
       if (ctx.header.origin?.indexOf('localhost') !== -1) {
+        console.log('不存在qq账号，localhost设置cookie');
         ctx.cookies.set('token', token, {
           httpOnly: false, // 设置httpOnly为true后，document.cookie就拿不到key为token的cookie了，因此设置false
           /**
@@ -199,6 +223,7 @@ class QqUserController {
               : 'hsslive.cn',
         });
       } else {
+        console.log('不存在qq账号，非localhost设置cookie');
         ctx.cookies.set('token', token, {
           httpOnly: false, // 设置httpOnly为true后，document.cookie就拿不到key为token的cookie了，因此设置false
           sameSite: 'none', // 跨站点cookie需要设置sameSite: 'none'，设置sameSite: 'none'后，secure也要跟着设置true！
@@ -222,6 +247,7 @@ class QqUserController {
       }
       successHandler({ ctx, data: token, message: 'qq登录成功！' });
     } else {
+      console.log('已存在qq账号');
       await qqUserService.update(qqUserInfo);
       const oldQqUser: any = await qqUserService.findByUnionid(
         OauthInfo.unionid
@@ -245,6 +271,7 @@ class QqUserController {
         token,
       });
       if (ctx.header.origin?.indexOf('localhost') !== -1) {
+        console.log('已存在qq账号，localhost设置cookie');
         ctx.cookies.set('token', token, {
           httpOnly: false, // 设置httpOnly为true后，document.cookie就拿不到key为token的cookie了，因此设置false
           /**
@@ -265,6 +292,7 @@ class QqUserController {
               : 'hsslive.cn',
         });
       } else {
+        console.log('已存在qq账号，非localhost设置cookie');
         ctx.cookies.set('token', token, {
           httpOnly: false, // 设置httpOnly为true后，document.cookie就拿不到key为token的cookie了，因此设置false
           sameSite: 'none', // 跨站点cookie需要设置sameSite: 'none'，设置sameSite: 'none'后，secure也要跟着设置true！
