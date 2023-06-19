@@ -48,9 +48,15 @@ export const REDIS_CONFIG = {
   database: 666,
   socket: {
     port: 666,
-    host: '**********',
+    host:
+      PROJECT_ENV === PROJECT_ENV_ENUM.development ? '127.0.0.1' : '**********',
   },
-  password: '**********',
+  username:
+    PROJECT_ENV === PROJECT_ENV_ENUM.development
+      ? 'billd_live_redis_test'
+      : '**********',
+  password:
+    PROJECT_ENV === PROJECT_ENV_ENUM.development ? '123456' : '**********',
 }; // redis配置
 
 export const DOCKER_SRS_CONFIG = {

@@ -9,6 +9,7 @@ export const pubClient = createClient({
     port: REDIS_CONFIG.socket.port,
     host: REDIS_CONFIG.socket.host,
   },
+  username: REDIS_CONFIG.username,
   password: REDIS_CONFIG.password,
 });
 

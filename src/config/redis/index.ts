@@ -8,7 +8,9 @@ export const redisClient = createClient({
   socket: {
     port: REDIS_CONFIG.socket.port,
     host: REDIS_CONFIG.socket.host,
+    tls: false,
   },
+  username: REDIS_CONFIG.username,
   password: REDIS_CONFIG.password,
 });
 

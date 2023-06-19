@@ -110,7 +110,7 @@ export const initFFmpeg = async (init = true) => {
       const res = execSync(getOldProcess);
       const oldProcess = res.toString().trim();
       if (oldProcess) {
-        const killOldFFmpeg = `kill -9 $(${getOldProcess}')`;
+        const killOldFFmpeg = `kill -9 $(${getOldProcess})`;
         execSync(killOldFFmpeg);
       }
     } catch (error) {
