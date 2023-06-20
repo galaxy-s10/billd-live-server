@@ -30,63 +30,105 @@ export const TENCENTCLOUD_LIVE = {
   Key: '**********', // 鉴权Key，https://console.cloud.tencent.com/live/domainmanage/detail/185429.push.tlivecloud.com?tab=pushConfig
 };
 
+export const SERVER_LIVE = {
+  PushDomain:
+    PROJECT_ENV === PROJECT_ENV_ENUM.development
+      ? 'rtmp://localhost'
+      : '**********', // 推流域名
+  PullDomain:
+    PROJECT_ENV === PROJECT_ENV_ENUM.development
+      ? 'http://localhost:5001'
+      : '**********', // 拉流域名
+  AppName: 'livestream',
+};
+
 export const MYSQL_CONFIG = {
-  database: '**********',
-  username: '**********',
+  docker: {
+    container: 'billd-live-mysql',
+    image: 'mysql:8.0',
+    port: { 3306: 3306 },
+    MYSQL_ROOT_PASSWORD:
+      PROJECT_ENV === PROJECT_ENV_ENUM.development
+        ? 'mysql123.'
+        : '********************',
+    volume:
+      PROJECT_ENV === PROJECT_ENV_ENUM.development
+        ? '/Users/huangshuisheng/Desktop/docker/mysql'
+        : '********************',
+  },
+  database:
+    PROJECT_ENV === PROJECT_ENV_ENUM.development
+      ? 'billd_live_test'
+      : '*************',
   host:
     PROJECT_ENV === PROJECT_ENV_ENUM.development
-      ? '************'
-      : '************',
+      ? '127.0.0.1'
+      : '********************',
+  port: 3306,
+  username: 'root',
   password:
     PROJECT_ENV === PROJECT_ENV_ENUM.development
-      ? '***************'
-      : '***************',
-  port: 666,
-}; // mysql配置
+      ? 'mysql123.'
+      : '********************',
+}; // Mysql配置
 
 export const REDIS_CONFIG = {
-  database: 666,
+  docker: {
+    container: 'billd-live-redis',
+    image: 'redis:7.0',
+    port: { 6379: 6379 },
+    volume:
+      PROJECT_ENV === PROJECT_ENV_ENUM.development
+        ? '/Users/huangshuisheng/Desktop/docker/redis'
+        : '*************',
+  },
+  database: 0,
   socket: {
-    port: 666,
+    port: 6379,
     host:
       PROJECT_ENV === PROJECT_ENV_ENUM.development ? '127.0.0.1' : '**********',
   },
   username:
     PROJECT_ENV === PROJECT_ENV_ENUM.development
       ? 'billd_live_redis_test'
-      : '**********',
+      : '*************',
   password:
-    PROJECT_ENV === PROJECT_ENV_ENUM.development ? '123456' : '**********',
-}; // redis配置
+    PROJECT_ENV === PROJECT_ENV_ENUM.development ? 'redis123.' : '**********',
+}; // Redis配置
 
-export const DOCKER_SRS_CONFIG = {
-  // docker镜像名，https://ossrs.net/lts/zh-cn/docs/v5/doc/getting-started
-  image: 'registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5',
-  // docker启动srs时的容器名字（可随便填）
-  container: 'billd-live-server-srs',
-  // /usr/local/srs/objs/目录映射
-  objsVolumePath:
-    PROJECT_ENV === PROJECT_ENV_ENUM.development
-      ? '/Users/huangshuisheng/Desktop/docker/srs/objs/'
-      : '/node/docker/srs/objs/',
-  // /usr/local/srs/conf/目录映射
-  confVolumePath:
-    PROJECT_ENV === PROJECT_ENV_ENUM.development
-      ? '/Users/huangshuisheng/Desktop/docker/srs/conf/'
-      : '/node/docker/srs/conf/',
+export const SRS_CONFIG = {
+  docker: {
+    // docker启动srs时的容器名字（可随便填）
+    container: 'billd-live-srs',
+    // docker镜像名，https://ossrs.net/lts/zh-cn/docs/v5/doc/getting-started
+    image: 'registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5',
+    port: {
+      1935: 1935,
+      8080: 5001,
+      1985: 1985,
+      8000: 8000,
+    },
+    volume:
+      PROJECT_ENV === PROJECT_ENV_ENUM.development
+        ? '/Users/huangshuisheng/Desktop/docker/srs'
+        : '*************',
+  },
   // CANDIDATE填你的本机ip地址
   CANDIDATE:
-    process.env.NODE_ENV === PROJECT_ENV_ENUM.development
+    PROJECT_ENV === PROJECT_ENV_ENUM.development
       ? `$(ifconfig en0 inet | grep 'inet ' | awk '{print $2}')` // WARN mac可以这样获取本机ip，但是win不行，自己找本地ip
-      : '公网ip',
-}; // docker的SRS配置
+      : '*************',
+}; // SRS配置
 
-export const DOCKER_RABBITMQ_CONFIG = {
-  // docker镜像名，https://www.rabbitmq.com/download.html
-  image: 'rabbitmq:3.11-management',
-  // docker启动rabbitmq时的容器名字（可随便填）
-  container: 'billd-live-server-rabbitmq',
-}; // docker的RabbitMQ配置
+export const RABBITMQ_CONFIG = {
+  docker: {
+    // docker启动rabbitmq时的容器名字（可随便填）
+    container: 'billd-live-rabbitmq',
+    // docker镜像名，https://www.rabbitmq.com/download.html
+    image: 'rabbitmq:3.11-management',
+    port: { 5672: 5672, 15672: 15672 },
+  },
+}; // RabbitMQ配置
 
 export const ALIPAY_LIVE_CONFIG = {
   appId: '**********',

@@ -1,0 +1,2 @@
+user default on nopass ~* &* +@all
+user billd_live_redis_test on #874b810175570e2b33e44677fee1ce30c5c83282034b047db7b6a0501195f62b ~* &* +@all

@@ -1,55 +1,53 @@
 import { execSync } from 'child_process';
 
-import { DOCKER_SRS_CONFIG } from '@/config/secret';
-import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
-import { dockerIsInstalled } from '@/utils';
-import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
+import { SRS_CONFIG } from '@/config/secret';
+import { chalkERROR, chalkSUCCESS, chalkWARN, emoji } from '@/utils/chalkTip';
 
 export const dockerRunSRS = (init = true) => {
   if (!init) return;
-  const flag = dockerIsInstalled();
-  if (flag) {
-    console.log(chalkWARN('docker已安装，开始启动SRS'));
-  } else {
-    console.log(chalkERROR('未安装docker！'));
-    return;
-  }
-  let isRunning = false;
-  if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
-    try {
-      execSync(`docker ps -a | grep ${DOCKER_SRS_CONFIG.container}`);
-      isRunning = true;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  if (isRunning) {
-    console.log(chalkSUCCESS(`SRS正在运行！`));
-    return;
-  }
+  console.log(chalkWARN('开始启动SRS'));
+
+  // let isRunning = false;
+
+  // if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
+  //   try {
+  //     execSync(`docker ps -a | grep ${SRS_CONFIG.docker.container}`);
+  //     isRunning = true;
+  //   } catch (error) {
+  //     // console.log(error);
+  //   }
+  // }
+
+  // if (isRunning) {
+  //   console.log(chalkWARN(`SRS正在运行！`));
+  //   return;
+  // }
+
   try {
     // 停掉旧的容器
-    execSync(`docker stop ${DOCKER_SRS_CONFIG.container}`);
+    execSync(`docker stop ${SRS_CONFIG.docker.container}`);
   } catch (error) {
-    console.log(error);
+    console.log('停掉旧的srs容器出错');
+    // console.log(error);
   }
+
   try {
     // 启动新的容器
     // https://ossrs.net/lts/zh-cn/docs/v5/doc/webrtc#rtc-to-rtmp
     const srsCmd = `docker run -d --rm \
-    --name ${DOCKER_SRS_CONFIG.container} \
-    --env CANDIDATE=${DOCKER_SRS_CONFIG.CANDIDATE} \
+    --name ${SRS_CONFIG.docker.container} \
+    --env CANDIDATE=${SRS_CONFIG.CANDIDATE} \
     -p 1935:1935 \
     -p 5001:8080 \
     -p 1985:1985 \
     -p 8000:8000/udp \
-    -v ${DOCKER_SRS_CONFIG.objsVolumePath}:/usr/local/srs/objs/ \
-    -v ${DOCKER_SRS_CONFIG.confVolumePath}:/usr/local/srs/conf/ \
-    ${DOCKER_SRS_CONFIG.image} objs/srs \
+    -v ${SRS_CONFIG.docker.volume}/conf:/usr/local/srs/conf/ \
+    -v ${SRS_CONFIG.docker.volume}/objs:/usr/local/srs/objs/ \
+    ${SRS_CONFIG.docker.image} objs/srs \
     -c conf/rtc2rtmp.conf`;
 
     execSync(srsCmd);
-    console.log(chalkSUCCESS(`docker启动SRS成功！`));
+    console.log(chalkSUCCESS(`启动SRS成功！`), emoji.get('✅'));
     // const child = exec(srsSh, {}, (error, stdout, stderr) => {
     //   console.log(
     //     chalkSUCCESS(`${new Date().toLocaleString()},初始化SRS成功！`)
@@ -70,6 +68,6 @@ export const dockerRunSRS = (init = true) => {
     // });
   } catch (error) {
     console.log(error);
-    console.log(chalkERROR(`docker启动SRS失败！`));
+    console.log(chalkERROR(`启动SRS失败！`));
   }
 };

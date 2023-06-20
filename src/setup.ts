@@ -11,8 +11,6 @@ import { handleRedisKeyExpired } from '@/config/redis/handleRedisKeyExpired';
 import { startSchedule } from '@/config/schedule';
 import { connectWebSocket } from '@/config/websocket';
 import { STATIC_DIR, UPLOAD_DIR } from '@/constant';
-import { dockerRunRabbitMQ } from '@/init/docker/RabbitMQ';
-import { dockerRunSRS } from '@/init/docker/SRS';
 import { initFFmpeg } from '@/init/initFFmpeg';
 import { CustomError } from '@/model/customError.model';
 import { loadAllRoutes } from '@/router';
@@ -67,7 +65,5 @@ export async function setupKoa({ port }) {
   }); // http接口服务
   handleRedisKeyExpired();
   startSchedule();
-  dockerRunRabbitMQ(false); // docker运行RabbitMQ
-  dockerRunSRS(true); // docker运行SRS
   await initFFmpeg(true); // 初始化FFmpeg推流
 }

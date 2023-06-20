@@ -2,9 +2,10 @@
 import './init/alias';
 import './init/initFile';
 
-import { connectMysql, dbName } from '@/config/mysql';
+import { connectMysql } from '@/config/mysql';
 import { connectRedis } from '@/config/redis';
 import { createRedisPubSub } from '@/config/redis/pub';
+import { MYSQL_CONFIG } from '@/config/secret';
 import { PROJECT_ENV, PROJECT_NAME, PROJECT_PORT } from '@/constant';
 import {
   chalkERROR,
@@ -41,7 +42,7 @@ async function main() {
     console.log(chalkWARN(`监听端口: ${port}`));
     console.log(chalkWARN(`项目名称: ${PROJECT_NAME}`));
     console.log(chalkWARN(`项目环境: ${PROJECT_ENV}`));
-    console.log(chalkWARN(`mysql数据库: ${dbName}`));
+    console.log(chalkWARN(`mysql数据库: ${MYSQL_CONFIG.database}`));
     adLog();
   } catch (error) {
     console.log(error);

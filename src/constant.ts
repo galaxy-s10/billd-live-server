@@ -6,6 +6,8 @@ export enum PROJECT_ENV_ENUM {
   beta = 'beta',
 }
 
+export const PROJECT_ALIAS = process.env
+  .NODE_APP_RELEASE_PROJECT_ALIAS as string;
 export const PROJECT_NAME = process.env.NODE_APP_RELEASE_PROJECT_NAME as string;
 export const PROJECT_ENV = process.env
   .NODE_APP_RELEASE_PROJECT_ENV as PROJECT_ENV_ENUM;

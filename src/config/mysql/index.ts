@@ -1,7 +1,6 @@
 import { Sequelize } from 'sequelize';
 
 import { MYSQL_CONFIG } from '@/config/secret';
-import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import { initDb } from '@/init/initDb';
 import {
   chalkERROR,
@@ -10,10 +9,7 @@ import {
   chalkWARN,
 } from '@/utils/chalkTip';
 
-export const dbName =
-  PROJECT_ENV !== PROJECT_ENV_ENUM.prod
-    ? `${MYSQL_CONFIG.database}_test`
-    : MYSQL_CONFIG.database;
+export const dbName = MYSQL_CONFIG.database;
 
 export function newSequelize(db?) {
   return new Sequelize({
