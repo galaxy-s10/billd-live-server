@@ -152,7 +152,7 @@ class InitController {
           liveUrl = (live_room_id: number) => ({
             rtmp_url: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}?token=${rtmptoken}`,
             flv_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.flv`,
-            hls_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.hls`,
+            hls_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.m3u8`,
           });
         } else {
           liveUrl = (live_room_id: number) => {
