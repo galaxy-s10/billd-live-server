@@ -72,6 +72,11 @@ export const MYSQL_CONFIG = {
       : '********************',
 }; // Mysql配置
 
+export enum REDIS_DATABASE {
+  blog,
+  live,
+}
+
 export const REDIS_CONFIG = {
   docker: {
     container: 'billd-live-redis',
@@ -86,7 +91,9 @@ export const REDIS_CONFIG = {
   socket: {
     port: 6379,
     host:
-      PROJECT_ENV === PROJECT_ENV_ENUM.development ? '127.0.0.1' : '**********',
+      PROJECT_ENV === PROJECT_ENV_ENUM.development
+        ? '127.0.0.1'
+        : '***********',
   },
   username:
     PROJECT_ENV === PROJECT_ENV_ENUM.development
