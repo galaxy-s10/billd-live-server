@@ -23,7 +23,7 @@ export const initUser = {
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_yycy.mp4'
-          : resolveApp('./public/fddm_yycy.mp4'),
+          : resolveApp('./video/fddm_yycy.mp4'),
       base64: fddmYycyBase64,
       weight: 2,
     },
@@ -40,7 +40,7 @@ export const initUser = {
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_mhsw.mp4'
-          : resolveApp('./public/fddm_mhsw.mp4'),
+          : resolveApp('./video/fddm_mhsw.mp4'),
       base64: fddmMhswBase64,
       weight: 1,
     },
@@ -57,7 +57,7 @@ export const initUser = {
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_hyzdwmgl.mp4'
-          : resolveApp('./public/fddm_hyzdwmgl.mp4'),
+          : resolveApp('./video/fddm_hyzdwmgl.mp4'),
       base64: fddmHyzdwmglBase64,
       weight: 1,
     },
@@ -74,7 +74,7 @@ export const initUser = {
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_snjxh.mp4'
-          : resolveApp('./public/fddm_snjxh.mp4'),
+          : resolveApp('./video/fddm_snjxh.mp4'),
       base64: fddmSnjxhBase64,
       weight: 1,
     },
@@ -91,7 +91,7 @@ export const initUser = {
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_nswwydja.mp4'
-          : resolveApp('./public/fddm_nswwydja.mp4'),
+          : resolveApp('./video/fddm_nswwydja.mp4'),
       base64: fddmNswwydjaBase64,
       weight: 10,
     },
@@ -108,7 +108,7 @@ export const initUser = {
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_xyzcsl.mp4'
-          : resolveApp('./public/fddm_xyzcsl.mp4'),
+          : resolveApp('./video/fddm_xyzcsl.mp4'),
       base64: fddmXyzcslBase64,
       weight: 1,
     },
