@@ -6,7 +6,7 @@
 # Email: 2274751790@qq.com
 # FilePath: /billd-live-server/node-pm2.sh
 # Github: https://github.com/galaxy-s10
-# LastEditTime: 2023-06-11 16:53:12
+# LastEditTime: 2023-06-23 02:30:38
 # LastEditors: shuisheng
 ###
 
@@ -76,11 +76,11 @@ pm2 -v
 # 否则的话约等于在其他目录执行npm run dev,如果所在的目录没有package.json文件就会报错！
 cd $PUBLICDIR/$JOBNAME/$ENV
 
-echo 开始安装依赖:
-pnpm install
+# echo 开始安装依赖:
+# pnpm install
 
-echo 开始打包:
-pnpm run build || true
+# echo 开始打包:
+# pnpm run build || true
 
 echo 删除旧的pm2服务:
 pm2 del $JOBNAME-$ENV-$PORT
