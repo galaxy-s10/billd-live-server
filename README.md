@@ -98,19 +98,40 @@ pnpm run dev:prod
     />
 </div>
 
-## 本地环境
+## 环境配置
 
-- 操作系统：mac os 13.3.1（macbookpro 2020 m1）
+### 本地开发环境
+
+> 配置：macbookpro 2020 m1，8 核 CPU，16G 内存
+
+- 操作系统：mac os 13.3.1
 - node 版本：16.16.0
+- pnpm 版本：8.6.3
+- docker 版本：20.10.24, build 297e128
 - mysql 版本：基于 docker，镜像：mysql:8.0
 - srs 版本：基于 docker，镜像：registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5
-- rabbitmq 版本：基于 docker，镜像：rabbitmq:3.11-management
+- ffmpeg 版本：5.1.2
 
-## 服务器环境
+### 构建/托管服务器环境
+
+> 配置：4 核 CPU，4G 内存，8M 带宽（广州）
 
 - 操作系统：CentOS Linux release 8.2.2004
-- nginx 版本：1.21.4
-- node 版本：14.19.0
-- redis 版本：5.0.3
-- mysql 版本：8.0.26
-- pm2 版本：5.1.2
+- nginx 版本：1.22.1
+- node 版本：v16.19.1
+- pnpm 版本：8.6.3
+- docker 版本：23.0.1, build a5ee5b1
+- redis 版本：基于 docker，镜像：redis:7.0
+- mysql 版本：基于 docker，镜像：mysql:8.0
+
+### 流媒体服务器环境
+
+> 配置：2 核 CPU，2G 内存，带宽 30M（香港）
+
+- 操作系统：Alibaba Cloud Linux release 3 (Soaring Falcon)
+- node 版本：v16.20.0
+- pnpm 版本：8.6.3
+- pm2 版本：5.3.0
+- docker 版本：24.0.2, build cb74dfc
+- srs 版本：基于 docker，镜像：registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5
+- ffmpeg 版本：6.0
