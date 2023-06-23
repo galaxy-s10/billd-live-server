@@ -82,6 +82,42 @@ class AreaService {
     return handlePaging(result, nowPage, pageSize);
   }
 
+  /** 获取分区直播间列表 */
+  async getLiveRoomList({ area_id, nowPage, pageSize }) {
+    let offset;
+    let limit;
+    if (nowPage && pageSize) {
+      offset = (+nowPage - 1) * +pageSize;
+      limit = +pageSize;
+    }
+    const inst = await areaModel.findOne({ where: { id: area_id } });
+    // @ts-ignore
+    const count = (await inst?.countLive_rooms()) || 0;
+    // @ts-ignore
+    const result = await inst.getLive_rooms({
+      limit,
+      offset,
+      include: [
+        {
+          model: areaModel,
+          through: {
+            attributes: [],
+          },
+        },
+        {
+          model: userModel,
+          attributes: {
+            exclude: ['password', 'token'],
+          },
+          through: {
+            attributes: [],
+          },
+        },
+      ],
+    });
+    return handlePaging({ rows: result, count }, nowPage, pageSize);
+  }
+
   /** 获取分区列表 */
   async getAreaLiveRoomList({
     id,

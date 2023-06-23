@@ -124,14 +124,14 @@ export const initUser = {
 export const bulkCreateArea: IArea[] = [
   {
     id: 1,
-    name: '房东的猫',
-    remark: '房东的猫分区',
+    name: '音乐',
+    remark: '音乐分区',
     weight: 10,
   },
   {
     id: 2,
-    name: '周杰伦',
-    remark: '周杰伦分区',
+    name: '知识',
+    remark: '知识分区',
     weight: 9,
   },
   {

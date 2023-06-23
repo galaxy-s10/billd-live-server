@@ -95,6 +95,18 @@ class AreaController {
     await next();
   };
 
+  getLiveRoomList = async (ctx: ParameterizedContext, next) => {
+    const { id, nowPage, pageSize }: IList<IArea> = ctx.request.query;
+    const result = await areaService.getLiveRoomList({
+      area_id: id,
+      nowPage,
+      pageSize,
+    });
+    successHandler({ ctx, data: result });
+
+    await next();
+  };
+
   getAreaLiveRoomList = async (ctx: ParameterizedContext, next) => {
     const result = await this.common.getAreaLiveRoomList(ctx.request.query);
     successHandler({ ctx, data: result });
