@@ -13,6 +13,7 @@ import {
   THIRD_PLATFORM,
 } from '@/constant';
 import {
+  bulkCreateArea,
   bulkCreateAuth,
   bulkCreateGoods,
   bulkCreateRole,
@@ -20,6 +21,7 @@ import {
   initUser,
 } from '@/init/initData';
 import { IUser, LiveRoomTypeEnum } from '@/interface';
+import areaModel from '@/model/area.model';
 import authModel from '@/model/auth.model';
 import { CustomError } from '@/model/customError.model';
 import dayDataModel from '@/model/dayData.model';
@@ -74,8 +76,21 @@ class InitController {
         await this.common.initUser();
         await this.common.initUserWallet();
         await this.common.initGoods();
+        await this.common.initArea();
       } catch (error) {
         console.log();
+      }
+    },
+    initArea: async () => {
+      const count = await areaModel.count();
+      if (count === 0) {
+        await areaModel.bulkCreate(bulkCreateArea);
+      } else {
+        throw new CustomError(
+          '已经初始化过分区，不能再初始化了！',
+          ALLOW_HTTP_CODE.paramsError,
+          ALLOW_HTTP_CODE.paramsError
+        );
       }
     },
     initRole: async () => {
@@ -176,6 +191,8 @@ class InitController {
           flv_url,
           hls_url,
         });
+        // @ts-ignore
+        liveRoom.setAreas(user.live_room?.area);
         await userLiveRoomModel.create({
           live_room_id: liveRoom.id,
           user_id: userRes.id,

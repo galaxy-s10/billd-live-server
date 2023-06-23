@@ -2,6 +2,7 @@ import { deleteUseLessObjectKey } from 'billd-utils';
 import Sequelize from 'sequelize';
 
 import { IList, ILiveRoom } from '@/interface';
+import areaModel from '@/model/area.model';
 import liveModel from '@/model/live.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
@@ -87,6 +88,12 @@ class LiveRoomService {
         {
           model: liveModel,
         },
+        {
+          model: areaModel,
+          through: {
+            attributes: [],
+          },
+        },
       ],
       attributes: {
         exclude: ['rtmp_url', 'key'],
@@ -126,6 +133,12 @@ class LiveRoomService {
         {
           model: liveModel,
         },
+        {
+          model: areaModel,
+          through: {
+            attributes: [],
+          },
+        },
       ],
       attributes: {
         exclude: ['rtmp_url', 'key'],
@@ -145,6 +158,12 @@ class LiveRoomService {
           model: userModel,
           attributes: {
             exclude: ['password', 'token'],
+          },
+        },
+        {
+          model: areaModel,
+          through: {
+            attributes: [],
           },
         },
       ],

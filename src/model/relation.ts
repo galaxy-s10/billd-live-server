@@ -1,4 +1,6 @@
 import { loadAllModel } from '@/init/initDb';
+import Area from '@/model/area.model';
+import AreaLiveRoom from '@/model/areaLiveRoom.model';
 import Auth from '@/model/auth.model';
 import Live from '@/model/live.model';
 import LiveRoom from '@/model/liveRoom.model';
@@ -14,6 +16,36 @@ import UserRole from '@/model/userRole.model';
 import Wallet from '@/model/wallet.model';
 
 loadAllModel();
+
+LiveRoom.belongsToMany(Area, {
+  foreignKey: 'live_room_id',
+  otherKey: 'area_id',
+  constraints: false,
+  through: {
+    model: AreaLiveRoom,
+    unique: false, // 不生成唯一索引
+  },
+});
+
+Area.belongsToMany(LiveRoom, {
+  foreignKey: 'area_id',
+  otherKey: 'live_room_id',
+  constraints: false,
+  through: {
+    model: AreaLiveRoom,
+    unique: false, // 不生成唯一索引
+  },
+});
+
+Area.hasMany(AreaLiveRoom, {
+  foreignKey: 'area_id',
+  constraints: false,
+});
+
+AreaLiveRoom.belongsTo(LiveRoom, {
+  foreignKey: 'live_room_id',
+  constraints: false,
+});
 
 LiveRoom.belongsToMany(User, {
   foreignKey: 'live_room_id',

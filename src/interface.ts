@@ -156,11 +156,26 @@ export enum LiveRoomTypeEnum {
   user_obs, // 主播使用obs/ffmpeg直播（用户只能看flv直播）
 }
 
+export interface IArea {
+  id?: number;
+  name?: string;
+  remark?: string;
+  /** 权重 */
+  weight?: number;
+  area_live_rooms?: IAreaLiveRoom[];
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
 export interface ILiveRoom {
   id?: number;
   /** 用户信息 */
   user?: IUser;
-  /** 直播间名字 */
+  /** 用户信息 */
+  users?: IUser[];
+  /** 分区信息 */
+  area?: IArea;
   name?: string;
   user_live_room?: IUserLiveRoom & { user: IUser };
   /** 权重 */
@@ -175,7 +190,6 @@ export interface ILiveRoom {
   updated_at?: string;
   deleted_at?: string;
 }
-
 export interface IUser {
   id?: number;
   username?: string;
@@ -192,6 +206,19 @@ export interface IUser {
   qq_users?: IQqUser[];
   wallet?: IWallet;
   live_room?: ILiveRoom;
+}
+
+export interface IAreaLiveRoom {
+  id?: number;
+  area_id?: number;
+  live_room_id?: number;
+  /** 分区信息 */
+  area?: IUser;
+  /** 直播间信息 */
+  live_room?: ILiveRoom;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
 }
 
 export interface IUserLiveRoom {

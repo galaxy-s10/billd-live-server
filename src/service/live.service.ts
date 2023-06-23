@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize';
 
 import { IList, ILive } from '@/interface';
+import areaModel from '@/model/area.model';
 import liveModel from '@/model/live.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
@@ -78,6 +79,14 @@ class LiveService {
           attributes: {
             exclude: ['rtmp_url', 'key'],
           },
+          include: [
+            {
+              model: areaModel,
+              through: {
+                attributes: [],
+              },
+            },
+          ],
         },
       ],
       attributes: {
@@ -121,6 +130,14 @@ class LiveService {
         },
         {
           model: liveRoomModel,
+          include: [
+            {
+              model: areaModel,
+              through: {
+                attributes: [],
+              },
+            },
+          ],
         },
       ],
       where: { live_room_id },

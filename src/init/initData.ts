@@ -3,11 +3,11 @@ import { getRandomString } from 'billd-utils';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import { fddmHyzdwmglBase64 } from '@/init/base64/fddm_hyzdwmgl';
 import { fddmMhswBase64 } from '@/init/base64/fddm_mhsw';
-import { fddmNswwydjaBase64 } from '@/init/base64/fddm_nswwydja';
+import { fddmNswwsbddjaBase64 } from '@/init/base64/fddm_nswwsbddja';
 import { fddmSnjxhBase64 } from '@/init/base64/fddm_snjxh';
 import { fddmXyzcslBase64 } from '@/init/base64/fddm_xyzcsl';
 import { fddmYycyBase64 } from '@/init/base64/fddm_yycy';
-import { GoodsTypeEnum, IAuth, IGoods, IRole } from '@/interface';
+import { GoodsTypeEnum, IArea, IAuth, IGoods, IRole } from '@/interface';
 import { resolveApp } from '@/utils';
 
 export const initUser = {
@@ -19,7 +19,8 @@ export const initUser = {
     user_roles: [3, 7],
     live_room: {
       id: 1,
-      name: 'admin的直播间',
+      area: [1],
+      name: '云烟成雨',
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_yycy.mp4'
@@ -36,7 +37,8 @@ export const initUser = {
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/CoCo.webp',
     live_room: {
       id: 2,
-      name: 'CoCo的直播间',
+      name: '美好事物',
+      area: [1],
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_mhsw.mp4'
@@ -53,7 +55,8 @@ export const initUser = {
     user_roles: [5],
     live_room: {
       id: 3,
-      name: 'Dukoo的直播间',
+      name: '和宇宙的温柔关联',
+      area: [1],
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_hyzdwmgl.mp4'
@@ -70,7 +73,8 @@ export const initUser = {
     user_roles: [5],
     live_room: {
       id: 4,
-      name: 'MoonTIT的直播间',
+      name: '所念皆星河',
+      area: [1],
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_snjxh.mp4'
@@ -87,12 +91,13 @@ export const initUser = {
     user_roles: [5],
     live_room: {
       id: 5,
-      name: 'Nill的直播间',
+      name: '你是我为数不多的骄傲',
+      area: [1],
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? '/node/video/fddm_nswwydja.mp4'
-          : resolveApp('./video/fddm_nswwydja.mp4'),
-      base64: fddmNswwydjaBase64,
+          ? '/node/video/fddm_nswwsbddja.mp4'
+          : resolveApp('./video/fddm_nswwsbddja.mp4'),
+      base64: fddmNswwsbddjaBase64,
       weight: 10,
     },
   },
@@ -104,7 +109,8 @@ export const initUser = {
     user_roles: [5],
     live_room: {
       id: 6,
-      name: 'Ojin的直播间',
+      name: '下一站茶山刘',
+      area: [1],
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_xyzcsl.mp4'
@@ -114,6 +120,33 @@ export const initUser = {
     },
   },
 };
+
+export const bulkCreateArea: IArea[] = [
+  {
+    id: 1,
+    name: '房东的猫',
+    remark: '房东的猫分区',
+    weight: 10,
+  },
+  {
+    id: 2,
+    name: '周杰伦',
+    remark: '周杰伦分区',
+    weight: 9,
+  },
+  {
+    id: 3,
+    name: '手游',
+    remark: '和平精英、王者荣耀',
+    weight: 9,
+  },
+  {
+    id: 4,
+    name: '网游',
+    remark: '英雄联盟、CS:GO、DOTA2',
+    weight: 9,
+  },
+];
 
 const initAuth = () => {
   const deafultAuth: IAuth[] = [
