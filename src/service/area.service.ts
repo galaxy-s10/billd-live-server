@@ -4,6 +4,7 @@ import Sequelize from 'sequelize';
 import { IArea, IList } from '@/interface';
 import areaModel from '@/model/area.model';
 import areaLiveRoomModel from '@/model/areaLiveRoom.model';
+import liveModel from '@/model/live.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
 import { handlePaging } from '@/utils';
@@ -103,6 +104,9 @@ class AreaService {
           through: {
             attributes: [],
           },
+        },
+        {
+          model: liveModel,
         },
         {
           model: userModel,

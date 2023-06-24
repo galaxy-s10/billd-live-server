@@ -21,7 +21,7 @@ import {
   initUser,
 } from '@/init/initData';
 import { IUser, LiveRoomTypeEnum } from '@/interface';
-import areaModel from '@/model/area.model';
+import areaLiveRoomModel from '@/model/areaLiveRoom.model';
 import authModel from '@/model/auth.model';
 import { CustomError } from '@/model/customError.model';
 import dayDataModel from '@/model/dayData.model';
@@ -192,7 +192,7 @@ class InitController {
           hls_url,
         });
         // @ts-ignore
-        liveRoom.setAreas(user.live_room?.area);
+        await liveRoom.setAreas(user.live_room?.area);
         await userLiveRoomModel.create({
           live_room_id: liveRoom.id,
           user_id: userRes.id,
@@ -370,6 +370,11 @@ class InitController {
     res2.rows.forEach((item) => {
       promise2.push(
         liveRoomModel.destroy({ where: { id: item.live_room_id } })
+      );
+      promise2.push(
+        areaLiveRoomModel.destroy({
+          where: { live_room_id: item.live_room_id },
+        })
       );
     });
 
