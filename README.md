@@ -2,14 +2,14 @@
   <a href="https://live.hsslive.cn" target="_blank">
     <img
       width="200"
-      src="https://resource.hsslive.cn/image/1613141138717Billd.webp"
+      src="https://github.com/galaxy-s10/billd-live/blob/master/src/assets/img/logo-txt.svg"
       alt="Billd-Live logo"
     />
   </a>
 </p>
 
 <h1 align="center">
-  Billd-Live
+  Billd-Live-Server
 </h1>
 
 <p align="center">
@@ -30,25 +30,12 @@ billd 直播间后端，主要根据[https://github.com/galaxy-s10/vue3-blog-ser
 
 [apifox](https://apifox.com/apidoc/shared-c7556b54-17b2-494e-a039-572d83f103ed/)
 
-## F&Q
+## b 站视频
 
-### 数据库建库建表？
-
-项目会使用到两个数据库，一个用于生产环境，另一个用于开发环境，只需要配置好 MYSQL_CONFIG 即可，因为项目启动时会自动判断是否存在 MYSQL_CONFIG.database，如果不存在，则会根据当前项目环境自动新建数据库。
-
-### 初始化数据（必须！）
-
-项目启动成功后，要做的第一件事情是调用所有初始化接口：[https://apifox.com/apidoc/shared-c7556b54-17b2-494e-a039-572d83f103ed/api-80688503](https://apifox.com/apidoc/shared-c7556b54-17b2-494e-a039-572d83f103ed/api-80688503)
-
-目前的初始化接口有：
-
-- 初始化角色
-- 初始化权限
-- 初始化角色权限
-- 初始化用户
-- 初始化用户钱包
-- 初始化商品
-- 初始化时间表
+- [从零搭建迷你版 b 站 web 直播间（Vue3+WebRTC+Node+SRS），公开课一：项目功能介绍 1](https://www.bilibili.com/video/BV1vW4y1Q7gP)
+- [从零搭建迷你版 b 站 web 直播间（Vue3+WebRTC+Node+SRS），公开课一：项目功能介绍 2](https://www.bilibili.com/video/BV1tP411q7qw)
+- [从零搭建迷你版 b 站 web 直播间（Vue3+WebRTC+Node+SRS），公开课二：本地运行项目 1](https://www.bilibili.com/video/BV1KW4y1D7Z6)
+- [从零搭建迷你版 b 站 web 直播间（Vue3+WebRTC+Node+SRS），公开课二：本地运行项目 2](https://www.bilibili.com/video/BV1jc411u7K9)
 
 ## 安装和使用
 
@@ -79,6 +66,10 @@ pnpm run dev:beta
 pnpm run dev:prod
 ```
 
+## 团队
+
+[https://live.hsslive.cn/about/team](https://live.hsslive.cn/about/team)
+
 ## 赞助
 
 [https://live.hsslive.cn/sponsors](https://live.hsslive.cn/sponsors)
@@ -89,7 +80,7 @@ pnpm run dev:prod
 
 <div>
   <img
-    src="https://resource.hsslive.cn/image/1443d854f04cd03980343ef3d003a427.webp" 
+    src="https://resource.hsslive.cn/image/c582d500f460939a97882ce503f8b6b3.png" 
     style="height:300px"
     />
   <img
