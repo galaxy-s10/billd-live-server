@@ -120,7 +120,7 @@ class UserLiveRoomController {
       weight: 11,
     });
     // @ts-ignore
-    liveRoom.getLive_rooms([1]);
+    liveRoom.setLive_rooms([1]);
     const liveUrl = (live_room_id: number) => ({
       rtmp_url: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}?type=${LiveRoomTypeEnum.user_obs}&token=${rtmptoken}`,
       flv_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.flv`,
