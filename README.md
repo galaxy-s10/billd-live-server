@@ -37,6 +37,10 @@ billd 直播间后端，主要根据[https://github.com/galaxy-s10/vue3-blog-ser
 - [从零搭建迷你版 b 站 web 直播间（Vue3+WebRTC+Node+SRS），公开课二：本地运行项目 1](https://www.bilibili.com/video/BV1KW4y1D7Z6)
 - [从零搭建迷你版 b 站 web 直播间（Vue3+WebRTC+Node+SRS），公开课二：本地运行项目 2](https://www.bilibili.com/video/BV1jc411u7K9)
 
+## TODO
+
+项目里使用到了一些 linux 命令，如`ps`命令，如果你是 windows 系统，会不兼容
+
 ## 安装和使用
 
 - 安装依赖
