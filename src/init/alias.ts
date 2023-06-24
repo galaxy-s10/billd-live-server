@@ -14,3 +14,4 @@ if (PROJECT_ALIAS) {
 }
 
 console.log(chalkSUCCESS('添加路径别名成功！'));
+console.log(process.env.NODE_APP_RELEASE_PROJECT_ENV);
