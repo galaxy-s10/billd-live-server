@@ -8,7 +8,12 @@ import {
   QQ_CLIENT_SECRET,
   QQ_REDIRECT_URI,
 } from '@/config/secret';
-import { ALLOW_HTTP_CODE, THIRD_PLATFORM } from '@/constant';
+import {
+  ALLOW_HTTP_CODE,
+  PROJECT_ENV,
+  PROJECT_ENV_ENUM,
+  THIRD_PLATFORM,
+} from '@/constant';
 import { IList, IQqUser } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import thirdUserModel from '@/model/thirdUser.model';
@@ -184,6 +189,13 @@ class QqUserController {
         password: getRandomString(8),
         avatar: qqUserInfo.figureurl_2,
       });
+      if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
+        // 生产环境注册用户权限就是SVIP用户
+        await userInfo.setRoles([5]);
+      } else {
+        // 非生产环境注册用户权限就是SUPER_ADMIN管理员
+        await userInfo.setRoles([2, 3]);
+      }
       await walletService.create({ user_id: userInfo?.id, balance: '0.00' });
       await thirdUserModel.create({
         user_id: userInfo?.id,

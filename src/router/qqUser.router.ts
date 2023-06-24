@@ -18,10 +18,4 @@ qqUserRouter.post('/login', qqUserController.login);
 // 查找用户
 qqUserRouter.get('/find/:id', qqUserController.find);
 
-// 更新用户
-qqUserRouter.put('/update/:id', qqUserController.update);
-
-// 删除用户
-qqUserRouter.delete('/delete/:id', qqUserController.delete);
-
 export default qqUserRouter;
