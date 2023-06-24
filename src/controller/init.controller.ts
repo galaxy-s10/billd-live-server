@@ -21,6 +21,7 @@ import {
   initUser,
 } from '@/init/initData';
 import { IUser, LiveRoomTypeEnum } from '@/interface';
+import areaModel from '@/model/area.model';
 import areaLiveRoomModel from '@/model/areaLiveRoom.model';
 import authModel from '@/model/auth.model';
 import { CustomError } from '@/model/customError.model';

@@ -1,4 +1,4 @@
-import { arrayUnique } from 'billd-utils';
+import { arrayUnique, getArrayDifference } from 'billd-utils';
 import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
@@ -220,7 +220,7 @@ class RoleController {
     res.forEach((v) => {
       v[0] && result.push(v[0].id);
     });
-    const diff: any[] = arrayGetDifference(result, tmp);
+    const diff: any[] = getArrayDifference(result, tmp);
     const diffQueqe: any[] = [];
     if (diff.length) {
       for (let i = 0; i < diff.length; i += 1) {
@@ -493,7 +493,7 @@ class RoleController {
     }
     const all_child_roles: any = await roleService.findByPid(id);
     const all_child_roles_id = all_child_roles.map((v) => v.id);
-    const hasDiff = arrayGetDifference(c_roles, all_child_roles_id);
+    const hasDiff = getArrayDifference(c_roles, all_child_roles_id);
     if (hasDiff.length) {
       throw new CustomError(
         `${c_roles.toString()}中的角色父级id不是${id}！`,
