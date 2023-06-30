@@ -12,7 +12,6 @@ import {
 import blacklistController from '@/controller/blacklist.controller';
 import logController from '@/controller/log.controller';
 import { CustomError } from '@/model/customError.model';
-import { isAdmin } from '@/utils';
 import { chalkINFO } from '@/utils/chalkTip';
 
 // 前台的所有get和白名单内的接口不需要token
@@ -34,8 +33,9 @@ const frontendWhiteList = [
   '/email_user/register', // 注册，这个接口是post的
   '/order/pay',
   '/wallet/init',
-  '/live_room/publish',
-  '/live_room/unpublish',
+  '/live_room/on_publish',
+  '/live_room/on_play',
+  '/live_room/on_unpublish',
 ];
 
 // 后台的所有接口都需要判断token，除了白名单内的不需要token
@@ -89,13 +89,12 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
   console.log('apiBeforeVerify中间件');
   const url = ctx.request.path;
   const ip = (ctx.request.headers['x-real-ip'] as string) || '127.0.0.1';
-  const admin = isAdmin(ctx);
   const consoleEnd = () => {
     console.log(
       chalkINFO(
-        `日期：${new Date().toLocaleString()}，ip：${ip}，响应${
-          ctx.request.method
-        } ${url}`
+        `日期：${new Date().toLocaleString()}，ip：${ip}，http状态码：${
+          ctx.status
+        }，响应${ctx.request.method} ${url}`
       )
     );
   };

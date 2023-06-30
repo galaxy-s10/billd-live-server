@@ -22,11 +22,13 @@ async function addLive({
   user_id,
   localFile,
   base64,
+  cdn,
 }: {
   live_room_id: number;
   user_id: number;
   localFile: string;
   base64: string;
+  cdn: number;
 }) {
   async function main({ remoteFlv }: { remoteFlv: string }) {
     try {
@@ -69,7 +71,7 @@ async function addLive({
       type: LiveRoomTypeEnum.system,
     });
   }
-  if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
+  if (PROJECT_ENV === PROJECT_ENV_ENUM.development || cdn === 2) {
     const result = await liveRoomService.findKey(live_room_id);
     const rtmptoken = result?.key;
     await main({
@@ -124,6 +126,7 @@ export const initFFmpeg = async (init = true) => {
           user_id: initUser[item].id,
           localFile: initUser[item].live_room.localFile,
           base64: initUser[item].live_room.base64,
+          cdn: initUser[item].live_room.cdn,
         })
       );
     });

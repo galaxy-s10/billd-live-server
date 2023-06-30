@@ -18,6 +18,7 @@ export const initUser = {
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/author.webp',
     user_roles: [3, 7],
     live_room: {
+      cdn: 1, // 1:使用cdn;2:不使用cdn
       id: 1,
       area: [1],
       name: '云烟成雨',
@@ -36,6 +37,7 @@ export const initUser = {
     user_roles: [5],
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/CoCo.webp',
     live_room: {
+      cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 2,
       name: '美好事物',
       area: [1],
@@ -54,6 +56,7 @@ export const initUser = {
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/Dukoo.webp',
     user_roles: [5],
     live_room: {
+      cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 3,
       name: '和宇宙的温柔关联',
       area: [1],
@@ -72,6 +75,7 @@ export const initUser = {
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/MoonTIT.webp',
     user_roles: [5],
     live_room: {
+      cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 4,
       name: '所念皆星河',
       area: [1],
@@ -90,6 +94,7 @@ export const initUser = {
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/Nill.webp',
     user_roles: [5],
     live_room: {
+      cdn: 1, // 1:使用cdn;2:不使用cdn
       id: 5,
       name: '你是我为数不多的骄傲',
       area: [1],
@@ -108,6 +113,7 @@ export const initUser = {
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/Ojin.webp',
     user_roles: [5],
     live_room: {
+      cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 6,
       name: '下一站茶山刘',
       area: [1],

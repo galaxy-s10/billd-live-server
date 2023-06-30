@@ -61,11 +61,62 @@ class LiveRoomController {
     await next();
   }
 
-  async publish(ctx: ParameterizedContext, next) {
+  async onPlay(ctx: ParameterizedContext, next) {
     // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
     // code等于数字0表示成功，其他错误码代表失败。
     const { body } = ctx.request;
     // console.log(body, 'publish参数');
+    const reg = /^roomId___(.+)/g;
+    const roomId = reg.exec(body.stream)?.[1];
+    ctx.body = { code: 0, msg: 'room is living' };
+    await next();
+    return;
+    if (!roomId) {
+      ctx.body = { code: 1, msg: 'no live_room' };
+    } else {
+      const result = await liveRoomService.findKey(Number(roomId));
+      const rtmptoken = result?.key;
+      const params = new URLSearchParams(body.param);
+      const paramstoken = params.get('token');
+      const type = Number(params.get('type'));
+      if (rtmptoken !== paramstoken) {
+        console.log('鉴权失败');
+        ctx.body = { code: 1, msg: 'auth fail' };
+      } else {
+        console.log('鉴权成功');
+        const isLiveing = await liveService.findByRoomId(Number(roomId));
+        if (isLiveing) {
+          ctx.body = { code: 0, msg: 'room is living' };
+        } else {
+          ctx.body = { code: 0, msg: 'auth success' };
+          const liveRoom = await liveRoomService.find(Number(roomId));
+          if (
+            type === LiveRoomTypeEnum.user_obs ||
+            type === LiveRoomTypeEnum.system
+          ) {
+            liveService.create({
+              live_room_id: Number(roomId),
+              user_id: liveRoom?.user_live_room?.user?.id,
+              socket_id: '-1',
+              track_audio: 1,
+              track_video: 1,
+            });
+            liveRoomService.update({
+              id: liveRoom?.id,
+              type: LiveRoomTypeEnum.user_obs,
+            });
+          }
+        }
+      }
+    }
+    await next();
+  }
+
+  async onPublish(ctx: ParameterizedContext, next) {
+    // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
+    // code等于数字0表示成功，其他错误码代表失败。
+    const { body } = ctx.request;
+    console.log(body, 'on_publish参数');
     const reg = /^roomId___(.+)/g;
     const roomId = reg.exec(body.stream)?.[1];
     if (!roomId) {
@@ -109,11 +160,11 @@ class LiveRoomController {
     await next();
   }
 
-  async unpublish(ctx: ParameterizedContext, next) {
+  async onUnpublish(ctx: ParameterizedContext, next) {
     // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
     // code等于数字0表示成功，其他错误码代表失败。
     const { body } = ctx.request;
-    // console.log(body, 'unpublish参数');
+    console.log(body, 'on_unpublish参数');
     const reg = /^roomId___(.+)/g;
     const roomId = reg.exec(body.stream)?.[1];
     if (!roomId) {

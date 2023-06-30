@@ -3,8 +3,68 @@ import fs from 'fs';
 import { Sequelize } from 'sequelize';
 
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
-import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
-import { deleteAllForeignKeys, deleteAllIndexs } from '@/utils/index';
+import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
+
+/** 删除所有外键 */
+export const deleteAllForeignKeys = async (sequelize: Sequelize) => {
+  try {
+    const queryInterface = sequelize.getQueryInterface();
+    const allTables: string[] = await queryInterface.showAllTables();
+    console.log(chalkINFO(`所有表:${allTables.toString()}`));
+    const allConstraint: any = [];
+    allTables.forEach((v) => {
+      allConstraint.push(queryInterface.getForeignKeysForTables([v]));
+    });
+    const res1 = await Promise.all(allConstraint);
+    const allConstraint1: any = [];
+    res1.forEach((v) => {
+      const tableName = Object.keys(v)[0];
+      const constraint: string[] = v[tableName];
+      constraint.forEach((item) => {
+        allConstraint1.push(queryInterface.removeConstraint(tableName, item));
+      });
+      console.log(
+        chalkINFO(`当前${tableName}表的外键: ${constraint.toString()}`)
+      );
+    });
+    await Promise.all(allConstraint1);
+    console.log(chalkSUCCESS('删除所有外键成功！'));
+  } catch (err) {
+    console.log(chalkERROR('删除所有外键失败！'), err);
+  }
+};
+
+/** 删除所有索引（除了PRIMARY） */
+export const deleteAllIndexs = async (sequelize: Sequelize) => {
+  try {
+    const queryInterface = sequelize.getQueryInterface();
+    const allTables = await queryInterface.showAllTables();
+    console.log(chalkINFO(`所有表:${allTables.toString()}`));
+    const allIndexs: any = [];
+    allTables.forEach((v) => {
+      allIndexs.push(queryInterface.showIndex(v));
+    });
+    const res1 = await Promise.all(allIndexs);
+    const allIndexs1: any = [];
+    res1.forEach((v: any[]) => {
+      const { tableName }: { tableName: string } = v[0];
+      const indexStrArr: string[] = [];
+      v.forEach((x) => {
+        indexStrArr.push(x.name);
+        if (x.name !== 'PRIMARY') {
+          allIndexs1.push(queryInterface.removeIndex(tableName, x.name));
+        }
+      });
+      console.log(
+        chalkINFO(`当前${tableName}表的索引: ${indexStrArr.toString()}`)
+      );
+    });
+    await Promise.all(allIndexs1);
+    console.log(chalkSUCCESS('删除所有索引成功！'));
+  } catch (err) {
+    console.log(chalkERROR('删除所有索引失败！'), err);
+  }
+};
 
 /** 加载所有model */
 export const loadAllModel = () => {
