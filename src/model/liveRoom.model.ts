@@ -6,8 +6,8 @@ import {
 } from 'sequelize';
 
 import sequelize from '@/config/mysql';
+import { initTable } from '@/init/initDb';
 import { ILiveRoom } from '@/interface';
-import { initTable } from '@/utils';
 
 interface LiveRoomModel
   extends Model<
@@ -32,6 +32,9 @@ const model = sequelize.define<LiveRoomModel>(
       type: DataTypes.STRING(100),
     },
     type: {
+      type: DataTypes.INTEGER,
+    },
+    cdn: {
       type: DataTypes.INTEGER,
     },
     weight: {

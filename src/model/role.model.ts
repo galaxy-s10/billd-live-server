@@ -6,8 +6,8 @@ import {
 } from 'sequelize';
 
 import sequelize from '@/config/mysql';
+import { initTable } from '@/init/initDb';
 import { IRole } from '@/interface';
-import { initTable } from '@/utils';
 
 interface RoleModel
   extends Model<InferAttributes<RoleModel>, InferCreationAttributes<RoleModel>>,

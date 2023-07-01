@@ -6,8 +6,8 @@ import {
 } from 'sequelize';
 
 import sequelize from '@/config/mysql';
+import { initTable } from '@/init/initDb';
 import { IAuth } from '@/interface';
-import { initTable } from '@/utils';
 
 interface AuthModel
   extends Model<InferAttributes<AuthModel>, InferCreationAttributes<AuthModel>>,

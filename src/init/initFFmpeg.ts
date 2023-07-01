@@ -23,12 +23,14 @@ async function addLive({
   localFile,
   base64,
   cdn,
+  devInitFFmpeg,
 }: {
   live_room_id: number;
   user_id: number;
   localFile: string;
   base64: string;
-  cdn: number;
+  cdn: number; // 1:使用cdn;2:不使用cdn
+  devInitFFmpeg: boolean;
 }) {
   async function main({ remoteFlv }: { remoteFlv: string }) {
     try {
@@ -54,7 +56,7 @@ async function addLive({
     const test = `ffmpeg -stream_loop -1 -re -i /Users/huangshuisheng/Desktop/hss/galaxy-s10/billd-live-server/src/video/fddm_nswwydja.mp4 -c copy -f flv 'rtmp://localhost/livestream/roomId___5?token=1331834ac9304933baa41a5841657193'`;
     // const ffmpeg = `echo test initFFmpeg`;
     execSync(ffmpeg);
-    console.log('ffmpeg命令', ffmpeg);
+    console.log(chalkWARN('ffmpeg命令'), ffmpeg);
     const isLiveing = await liveService.findByRoomId(live_room_id);
     if (!isLiveing) {
       liveService.create({
@@ -71,15 +73,20 @@ async function addLive({
       type: LiveRoomTypeEnum.system,
     });
   }
-  if (PROJECT_ENV === PROJECT_ENV_ENUM.development || cdn === 2) {
-    const result = await liveRoomService.findKey(live_room_id);
-    const rtmptoken = result?.key;
-    await main({
-      remoteFlv: `${SERVER_LIVE.PushDomain}/${
-        SERVER_LIVE.AppName
-      }/roomId___${live_room_id}?token=${rtmptoken!}`,
-    });
-  } else {
+  if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
+    if (devInitFFmpeg) {
+      console.log(devInitFFmpeg, 'devInitFFmpegdevInitFFmpeg');
+      const result = await liveRoomService.findKey(live_room_id);
+      const rtmptoken = result?.key;
+      await main({
+        remoteFlv: `${SERVER_LIVE.PushDomain}/${
+          SERVER_LIVE.AppName
+        }/roomId___${live_room_id}?token=${rtmptoken!}`,
+      });
+    } else {
+      await liveService.deleteByLiveRoomId(live_room_id);
+    }
+  } else if (cdn === 1) {
     await tencentcloudUtils.dropLiveStream({
       roomId: live_room_id,
     });
@@ -93,6 +100,14 @@ async function addLive({
       });
       await main({ remoteFlv });
     }
+  } else if (cdn === 2) {
+    const result = await liveRoomService.findKey(live_room_id);
+    const rtmptoken = result?.key;
+    await main({
+      remoteFlv: `${SERVER_LIVE.PushDomain}/${
+        SERVER_LIVE.AppName
+      }/roomId___${live_room_id}?token=${rtmptoken!}`,
+    });
   }
 }
 
@@ -127,6 +142,7 @@ export const initFFmpeg = async (init = true) => {
           localFile: initUser[item].live_room.localFile,
           base64: initUser[item].live_room.base64,
           cdn: initUser[item].live_room.cdn,
+          devInitFFmpeg: initUser[item].live_room.devInitFFmpeg,
         })
       );
     });

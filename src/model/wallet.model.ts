@@ -6,8 +6,8 @@ import {
 } from 'sequelize';
 
 import sequelize from '@/config/mysql';
+import { initTable } from '@/init/initDb';
 import { IWallet } from '@/interface';
-import { initTable } from '@/utils';
 
 interface WalletModel
   extends Model<

@@ -6,8 +6,8 @@ import {
 } from 'sequelize';
 
 import sequelize from '@/config/mysql';
+import { initTable } from '@/init/initDb';
 import { IOrder, PayStatusEnum } from '@/interface';
-import { initTable } from '@/utils';
 
 interface OrderModel
   extends Model<

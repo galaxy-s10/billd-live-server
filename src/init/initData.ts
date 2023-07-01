@@ -7,6 +7,9 @@ import { fddmNswwsbddjaBase64 } from '@/init/base64/fddm_nswwsbddja';
 import { fddmSnjxhBase64 } from '@/init/base64/fddm_snjxh';
 import { fddmXyzcslBase64 } from '@/init/base64/fddm_xyzcsl';
 import { fddmYycyBase64 } from '@/init/base64/fddm_yycy';
+import { zjlBnsdmmBase64 } from '@/init/base64/zjl_bnsdmm';
+import { zjlQtBase64 } from '@/init/base64/zjl_qt';
+import { zjlYlxbBase64 } from '@/init/base64/zjl_ylxb';
 import { GoodsTypeEnum, IArea, IAuth, IGoods, IRole } from '@/interface';
 import { resolveApp } from '@/utils';
 
@@ -18,10 +21,11 @@ export const initUser = {
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/author.webp',
     user_roles: [3, 7],
     live_room: {
+      devInitFFmpeg: true, // 开发模式初始化ffmpeg
       cdn: 1, // 1:使用cdn;2:不使用cdn
       id: 1,
       area: [1],
-      name: '云烟成雨',
+      name: '房东的猫-云烟成雨',
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_yycy.mp4'
@@ -37,16 +41,17 @@ export const initUser = {
     user_roles: [5],
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/CoCo.webp',
     live_room: {
+      devInitFFmpeg: true, // 开发模式初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 2,
-      name: '美好事物',
+      name: '房东的猫-美好事物',
       area: [1],
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_mhsw.mp4'
           : resolveApp('./video/fddm_mhsw.mp4'),
       base64: fddmMhswBase64,
-      weight: 1,
+      weight: 2,
     },
   },
   systemUser2: {
@@ -56,16 +61,17 @@ export const initUser = {
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/Dukoo.webp',
     user_roles: [5],
     live_room: {
+      devInitFFmpeg: true, // 开发模式初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 3,
-      name: '和宇宙的温柔关联',
+      name: '房东的猫-和宇宙的温柔关联',
       area: [1],
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_hyzdwmgl.mp4'
           : resolveApp('./video/fddm_hyzdwmgl.mp4'),
       base64: fddmHyzdwmglBase64,
-      weight: 1,
+      weight: 2,
     },
   },
   systemUser3: {
@@ -75,16 +81,17 @@ export const initUser = {
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/MoonTIT.webp',
     user_roles: [5],
     live_room: {
+      devInitFFmpeg: true, // 开发模式初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 4,
-      name: '所念皆星河',
+      name: '房东的猫-所念皆星河',
       area: [1],
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_snjxh.mp4'
           : resolveApp('./video/fddm_snjxh.mp4'),
       base64: fddmSnjxhBase64,
-      weight: 1,
+      weight: 2,
     },
   },
   systemUser4: {
@@ -94,9 +101,10 @@ export const initUser = {
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/Nill.webp',
     user_roles: [5],
     live_room: {
+      devInitFFmpeg: false, // 开发模式初始化ffmpeg
       cdn: 1, // 1:使用cdn;2:不使用cdn
       id: 5,
-      name: '你是我为数不多的骄傲',
+      name: '房东的猫-你是我为数不多的骄傲',
       area: [1],
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
@@ -113,16 +121,68 @@ export const initUser = {
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/Ojin.webp',
     user_roles: [5],
     live_room: {
+      devInitFFmpeg: false, // 开发模式初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 6,
-      name: '下一站茶山刘',
+      name: '房东的猫-下一站茶山刘',
       area: [1],
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_xyzcsl.mp4'
           : resolveApp('./video/fddm_xyzcsl.mp4'),
       base64: fddmXyzcslBase64,
-      weight: 1,
+      weight: 2,
+    },
+  },
+  systemUser6: {
+    id: 7,
+    username: 'user-7',
+    password: getRandomString(6),
+    avatar: '',
+    user_roles: [5],
+    live_room: {
+      devInitFFmpeg: false, // 开发模式初始化ffmpeg
+      cdn: 2, // 1:使用cdn;2:不使用cdn
+      id: 7,
+      name: '周杰伦-不能说的秘密',
+      area: [1],
+      localFile: '/node/video/zjl_bnsdmm.mp4',
+      base64: zjlBnsdmmBase64,
+      weight: 9,
+    },
+  },
+  systemUser7: {
+    id: 8,
+    username: 'user-8',
+    password: getRandomString(6),
+    avatar: '',
+    user_roles: [5],
+    live_room: {
+      devInitFFmpeg: false, // 开发模式初始化ffmpeg
+      cdn: 2, // 1:使用cdn;2:不使用cdn
+      id: 8,
+      name: '周杰伦-晴天',
+      area: [1],
+      localFile: '/node/video/zjl_qt.mp4',
+      base64: zjlQtBase64,
+      weight: 2,
+    },
+  },
+  systemUser100: {
+    id: 100,
+    username: 'user-100',
+    password: getRandomString(6),
+    avatar: '',
+    user_roles: [5],
+    live_room: {
+      devInitFFmpeg: false, // 开发模式初始化ffmpeg
+      cdn: 2, // 1:使用cdn;2:不使用cdn
+      id: 100,
+      name: '周杰伦-一路向北',
+      area: [1],
+      localFile: '/node/video/zjl_ylxb.mp4',
+      base64: zjlYlxbBase64,
+      weight: 3,
     },
   },
 };

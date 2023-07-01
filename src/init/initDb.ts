@@ -1,7 +1,9 @@
 import fs from 'fs';
 
 import { Sequelize } from 'sequelize';
+import { Model, ModelStatic } from 'sequelize/types';
 
+// import sequelize from '@/config/mysql';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 
@@ -66,14 +68,47 @@ export const deleteAllIndexs = async (sequelize: Sequelize) => {
   }
 };
 
+/**
+ * 初始化表
+ * @param model
+ * @param method
+ */
+export const initTable = (data: {
+  model: ModelStatic<Model>;
+  method?: 'force' | 'alter';
+  sequelize: Sequelize;
+}) => {
+  async function main(
+    modelArg: ModelStatic<Model>,
+    methodArg?: 'force' | 'alter'
+  ) {
+    if (methodArg === 'force') {
+      await deleteAllForeignKeys(data.sequelize);
+      await modelArg.sync({ force: true });
+      console.log(chalkSUCCESS(`${modelArg.tableName}表刚刚(重新)创建！`));
+    } else if (methodArg === 'alter') {
+      await deleteAllForeignKeys(data.sequelize);
+      await modelArg.sync({ alter: true });
+      console.log(chalkSUCCESS(`${modelArg.tableName}表刚刚同步成功！`));
+    } else {
+      console.log(chalkINFO(`加载数据库表: ${modelArg.tableName}`));
+    }
+  }
+  main(data.model, data.method).catch((err) => {
+    console.log(chalkERROR(`initTable失败`), err.message);
+    console.log(err);
+  });
+};
+
 /** 加载所有model */
 export const loadAllModel = () => {
-  const modelDir = `${process.cwd()}/src/model`;
+  const modelDir = `${process.cwd()}/${
+    PROJECT_ENV === PROJECT_ENV_ENUM.prod ? 'dist' : 'src'
+  }/model`;
   fs.readdirSync(modelDir).forEach((file: string) => {
     if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
       if (file.indexOf('.model.ts') === -1) return;
     } else if (file.indexOf('.model.js') === -1) return;
-
     // eslint-disable-next-line
     require(`${modelDir}/${file}`).default;
   });

@@ -6,8 +6,8 @@ import {
 } from 'sequelize';
 
 import sequelize from '@/config/mysql';
+import { initTable } from '@/init/initDb';
 import { ILog } from '@/interface';
-import { initTable } from '@/utils';
 
 interface LogModel
   extends Model<InferAttributes<LogModel>, InferCreationAttributes<LogModel>>,

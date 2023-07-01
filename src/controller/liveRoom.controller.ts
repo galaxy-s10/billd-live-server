@@ -211,13 +211,14 @@ class LiveRoomController {
   };
 
   async create(ctx: ParameterizedContext, next) {
-    const { name, type, weight, rtmp_url, flv_url, hls_url }: ILiveRoom =
+    const { name, type, weight, rtmp_url, cdn, flv_url, hls_url }: ILiveRoom =
       ctx.request.body;
     await this.common.create({
       name,
       key: cryptojs.MD5(`${+new Date()}___${getRandomString(6)}`).toString(),
       type,
       weight,
+      cdn,
       rtmp_url,
       flv_url,
       hls_url,

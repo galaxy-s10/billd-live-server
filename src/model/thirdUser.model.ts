@@ -7,8 +7,8 @@ import {
 
 import sequelize from '@/config/mysql';
 import { THIRD_PLATFORM } from '@/constant';
+import { initTable } from '@/init/initDb';
 import { IThirdUser } from '@/interface';
-import { initTable } from '@/utils';
 
 interface ThirdUserModel
   extends Model<

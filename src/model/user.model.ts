@@ -8,8 +8,8 @@ import {
 
 import sequelize from '@/config/mysql';
 // import userService from '@/service/user.service';
+import { initTable } from '@/init/initDb';
 import { IUser } from '@/interface';
-import { initTable } from '@/utils';
 // const MD5 = require('crypto-js/md5');
 
 interface UserModel

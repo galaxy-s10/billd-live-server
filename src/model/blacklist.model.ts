@@ -6,8 +6,8 @@ import {
 } from 'sequelize';
 
 import sequelize from '@/config/mysql';
+import { initTable } from '@/init/initDb';
 import { IBlacklist } from '@/interface';
-import { initTable } from '@/utils';
 
 interface BlacklistModel
   extends Model<

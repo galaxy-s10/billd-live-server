@@ -164,13 +164,17 @@ class InitController {
         const rtmptoken = cryptojs
           .MD5(`${+new Date()}___${getRandomString(6)}`)
           .toString();
-        if (PROJECT_ENV !== PROJECT_ENV_ENUM.prod) {
+        if (
+          // @ts-ignore
+          user.live_room.cdn === 2
+        ) {
           liveUrl = (live_room_id: number) => ({
             rtmp_url: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}?token=${rtmptoken}`,
             flv_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.flv`,
             hls_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.m3u8`,
           });
-        } else {
+          // @ts-ignore
+        } else if (user.live_room.cdn === 1) {
           liveUrl = (live_room_id: number) => {
             const res = tencentcloudUtils.getPullUrl({ roomId: live_room_id });
             return {
@@ -188,6 +192,7 @@ class InitController {
           key: rtmptoken,
           type: LiveRoomTypeEnum.system,
           weight: user.live_room?.weight,
+          cdn: user.live_room?.cdn,
           rtmp_url,
           flv_url,
           hls_url,
@@ -201,7 +206,6 @@ class InitController {
       }
       if (count === 0) {
         Object.keys(initUser).forEach((item) => {
-          console.log(item, initUser[item]);
           quequ.push(initOneUser(initUser[item]));
         });
         await Promise.all(quequ);
