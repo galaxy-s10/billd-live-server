@@ -13,7 +13,7 @@
 </h1>
 
 <p align="center">
-  基于Vue3 + WebRtc + Node + SRS + FFmpeg搭建的直播间
+  基于Vue3 + WebRtc + Node + SRS + FFmpeg搭建的直播间。
 </p>
 
 ## 简介
