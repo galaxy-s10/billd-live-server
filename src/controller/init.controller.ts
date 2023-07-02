@@ -18,8 +18,8 @@ import {
   bulkCreateGoods,
   bulkCreateRole,
   bulkCreateRoleAuth,
-  initUser,
 } from '@/init/initData';
+import { initUser } from '@/init/initUser';
 import { IUser, LiveRoomTypeEnum } from '@/interface';
 import areaModel from '@/model/area.model';
 import areaLiveRoomModel from '@/model/areaLiveRoom.model';
@@ -38,7 +38,10 @@ import userModel from '@/model/user.model';
 import userLiveRoomModel from '@/model/userLiveRoom.model';
 import userRoleModel from '@/model/userRole.model';
 import walletModel from '@/model/wallet.model';
+import liveRoomService from '@/service/liveRoom.service';
+import userService from '@/service/user.service';
 import walletService from '@/service/wallet.service';
+import { chalkWARN } from '@/utils/chalkTip';
 import { tencentcloudUtils } from '@/utils/tencentcloud';
 
 const sql1 = `
@@ -143,79 +146,89 @@ class InitController {
       }
     },
     initUser: async () => {
-      const count = await userModel.count();
       const quequ: Promise<any>[] = [];
-      async function initOneUser(user: IUser) {
-        const userInfo = {
-          id: user.id,
-          username: user.username,
-          password: user.password,
-          avatar: user.avatar,
-        };
-        const exp = 24; // token过期时间：24小时
-        const token = signJwt({ userInfo, exp });
-        const userRes = await userModel.create({
-          ...userInfo,
-          token,
-        });
-        // @ts-ignore
-        userRes.setRoles(user.user_roles);
-        let liveUrl;
-        const rtmptoken = cryptojs
-          .MD5(`${+new Date()}___${getRandomString(6)}`)
-          .toString();
-        if (
-          // @ts-ignore
-          user.live_room.cdn === 2
-        ) {
-          liveUrl = (live_room_id: number) => ({
-            rtmp_url: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}?token=${rtmptoken}`,
-            flv_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.flv`,
-            hls_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.m3u8`,
+      const initOneUser = async (user: IUser) => {
+        if (!user.id) return;
+        const userIsExist = await userService.isExist([user.id]);
+        let userRes;
+        if (!userIsExist) {
+          const userInfo = {
+            id: user.id,
+            username: user.username,
+            password: user.password,
+            avatar: user.avatar,
+          };
+          const exp = 24; // token过期时间：24小时
+          const token = signJwt({ userInfo, exp });
+          userRes = await userService.create({
+            ...userInfo,
+            token,
           });
           // @ts-ignore
-        } else if (user.live_room.cdn === 1) {
-          liveUrl = (live_room_id: number) => {
-            const res = tencentcloudUtils.getPullUrl({ roomId: live_room_id });
-            return {
-              rtmp_url: res.rtmp,
-              flv_url: res.flv,
-              hls_url: res.hls,
-            };
-          };
+          userRes.setRoles(user.user_roles);
+        } else {
+          console.log(chalkWARN(`已存在id为：${user.id}的用户！`));
+          return;
         }
 
-        const { rtmp_url, flv_url, hls_url } = liveUrl(user.live_room?.id);
-        const liveRoom = await liveRoomModel.create({
-          id: user.live_room?.id,
-          name: user.live_room?.name,
-          key: rtmptoken,
-          type: LiveRoomTypeEnum.system,
-          weight: user.live_room?.weight,
-          cdn: user.live_room?.cdn,
-          rtmp_url,
-          flv_url,
-          hls_url,
-        });
-        // @ts-ignore
-        await liveRoom.setAreas(user.live_room?.area);
-        await userLiveRoomModel.create({
-          live_room_id: liveRoom.id,
-          user_id: userRes.id,
-        });
-      }
-      if (count === 0) {
-        Object.keys(initUser).forEach((item) => {
-          quequ.push(initOneUser(initUser[item]));
-        });
-        await Promise.all(quequ);
-      } else {
-        throw new CustomError(
-          '已经初始化过用户，不能再初始化了！',
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
-        );
-      }
+        if (!user.live_room?.id) return;
+        const liveRoomIsExist = await liveRoomService.isExist([
+          user.live_room?.id,
+        ]);
+        if (!liveRoomIsExist) {
+          let liveUrl;
+          const rtmptoken = cryptojs
+            .MD5(`${+new Date()}___${getRandomString(6)}`)
+            .toString();
+          if (user.live_room.cdn === 2) {
+            liveUrl = (live_room_id: number) => ({
+              rtmp_url: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}?token=${rtmptoken}`,
+              flv_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.flv`,
+              hls_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.m3u8`,
+            });
+            // @ts-ignore
+          } else if (user.live_room.cdn === 1) {
+            liveUrl = (live_room_id: number) => {
+              const res = tencentcloudUtils.getPullUrl({
+                roomId: live_room_id,
+              });
+              return {
+                rtmp_url: res.rtmp,
+                flv_url: res.flv,
+                hls_url: res.hls,
+              };
+            };
+          }
+
+          const { rtmp_url, flv_url, hls_url } = liveUrl(user.live_room?.id);
+          const liveRoom = await liveRoomModel.create({
+            id: user.live_room?.id,
+            name: user.live_room?.name,
+            key: rtmptoken,
+            type: LiveRoomTypeEnum.system,
+            weight: user.live_room?.weight,
+            cdn: user.live_room?.cdn,
+            cover_img: user.live_room.cover_img,
+            rtmp_url,
+            flv_url,
+            hls_url,
+          });
+          // @ts-ignore
+          await liveRoom.setAreas(user.live_room?.area);
+          await userLiveRoomModel.create({
+            live_room_id: liveRoom.id,
+            user_id: userRes.id,
+          });
+        } else {
+          console.log(chalkWARN(`已存在id为：${user.id}的直播间！`));
+        }
+      };
+
+      Object.keys(initUser).forEach((item) => {
+        quequ.push(initOneUser(initUser[item]));
+      });
+      await Promise.all(quequ);
+      await this.common.initUserWallet();
     },
     initUserWallet: async () => {
       const userListRes = await userModel.findAndCountAll();
@@ -223,6 +236,8 @@ class InitController {
         const flag = await walletService.findByUserId(item.id!);
         if (!flag) {
           await walletService.create({ user_id: item.id, balance: '0.00' });
+        } else {
+          console.log(chalkWARN(`id为${item.id}的用户已存在钱包！`));
         }
       };
       const arr: any[] = [];
@@ -238,6 +253,13 @@ class InitController {
   //   successHandler({ ctx, message: '初始化默认数据成功！' });
   //   await next();
   // };
+
+  // 添加用户
+  addUser = async (ctx: ParameterizedContext, next) => {
+    await this.common.initRole();
+    successHandler({ ctx, message: '初始化角色成功！' });
+    await next();
+  };
 
   // 初始化角色
   initRole = async (ctx: ParameterizedContext, next) => {
@@ -269,6 +291,13 @@ class InitController {
 
   // 初始化用户
   initUser = async (ctx: ParameterizedContext, next) => {
+    // if (PROJECT_ENV !== PROJECT_ENV_ENUM.development) {
+    //   throw new CustomError(
+    //     '非开发环境，不能初始化用户！',
+    //     ALLOW_HTTP_CODE.paramsError,
+    //     ALLOW_HTTP_CODE.paramsError
+    //   );
+    // }
     await this.common.initUser();
     successHandler({ ctx, data: '初始化用户成功！' });
     await next();

@@ -118,6 +118,7 @@ class UserLiveRoomController {
       key: rtmptoken,
       type: LiveRoomTypeEnum.user_obs,
       weight: 11,
+      cdn: 2,
     });
     // @ts-ignore
     await liveRoom.setAreas([1]);

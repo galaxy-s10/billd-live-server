@@ -2,7 +2,7 @@ import { execSync, spawnSync } from 'child_process';
 
 import { SERVER_LIVE } from '@/config/secret';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
-import { initUser } from '@/init/initData';
+import { initUser } from '@/init/initUser';
 import { LiveRoomTypeEnum } from '@/interface';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
@@ -21,14 +21,14 @@ async function addLive({
   live_room_id,
   user_id,
   localFile,
-  base64,
+  cover_img,
   cdn,
   devInitFFmpeg,
 }: {
   live_room_id: number;
   user_id: number;
   localFile: string;
-  base64: string;
+  cover_img: string;
   cdn: number; // 1:使用cdn;2:不使用cdn
   devInitFFmpeg: boolean;
 }) {
@@ -69,7 +69,7 @@ async function addLive({
     }
     liveRoomService.update({
       id: live_room_id,
-      cover_img: base64,
+      cover_img,
       type: LiveRoomTypeEnum.system,
     });
   }
@@ -140,7 +140,7 @@ export const initFFmpeg = async (init = true) => {
           live_room_id: initUser[item].live_room.id,
           user_id: initUser[item].id,
           localFile: initUser[item].live_room.localFile,
-          base64: initUser[item].live_room.base64,
+          cover_img: initUser[item].live_room.cover_img,
           cdn: initUser[item].live_room.cdn,
           devInitFFmpeg: initUser[item].live_room.devInitFFmpeg,
         })
