@@ -36,22 +36,12 @@ const frontendWhiteList = [
   '/live_room/on_publish',
   '/live_room/on_play',
   '/live_room/on_unpublish',
+  '/srs/rtcV1Publish',
+  '/srs/rtcV1Play',
 ];
 
 // 后台的所有接口都需要判断token，除了白名单内的不需要token
-const backendWhiteList = [
-  '/admin/email_user/send_login_code', // 发送登录验证码
-  '/admin/user/login', // 后台的这个接口是post的
-  '/admin/user/code_login', // 验证码登录
-  '/admin/github_user/login', // github登录
-  '/admin/qq_user/login', // 登录接口
-  '/admin/email_user/send_login_code', // 发送登录验证码
-  '/admin/email_user/send_register_code', // 发送注册验证码
-  '/admin/email_user/send_bind_code', // 发送绑定邮箱验证码
-  '/admin/email_user/send_cancel_bind_code', // 发送解绑邮箱验证码
-  '/admin/email_user/login', // 登录
-  '/admin/email_user/register', // 注册
-];
+const backendWhiteList = [];
 
 const globalWhiteList = ['/init/'];
 

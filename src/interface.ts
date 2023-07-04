@@ -108,6 +108,14 @@ export interface ICandidate {
   };
 }
 
+export interface ISrsRTC {
+  api: string;
+  clientip: any;
+  sdp: string;
+  streamurl: string;
+  tid: string;
+}
+
 export interface IWallet {
   id?: number;
   user_id?: number;
@@ -194,6 +202,7 @@ export interface ILiveRoom {
   updated_at?: string;
   deleted_at?: string;
 }
+
 export interface IUser {
   id?: number;
   username?: string;
@@ -306,6 +315,8 @@ export interface ILive {
   socket_id?: string;
   user_id?: number;
   live_room_id?: number;
+  /** ffmpeg进程id */
+  ffmpeg_pid?: number;
   /** 1开启;2关闭 */
   track_video?: number;
   /** 1开启;2关闭 */

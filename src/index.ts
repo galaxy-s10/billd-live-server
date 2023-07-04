@@ -16,15 +16,17 @@ import {
 
 async function main() {
   function adLog() {
-    console.log();
-    console.log(chalkINFO(`赞助打赏: https://live.hsslive.cn/sponsors`));
-    console.log(chalkINFO(`付费支持: https://live.hsslive.cn/support`));
-    console.log(
-      chalkINFO(
-        `欢迎PR:   billd-live目前只有作者一人开发，难免有不足的地方，欢迎提PR或Issue`
-      )
-    );
-    console.log();
+    setTimeout(() => {
+      console.log();
+      console.log(chalkINFO(`支持赞助: https://live.hsslive.cn/sponsors`));
+      console.log(chalkINFO(`付费课程: https://www.hsslive.cn/article/151`));
+      console.log(
+        chalkINFO(
+          `欢迎PR:   billd-live目前只有作者一人开发，难免有不足的地方，欢迎提PR或Issue`
+        )
+      );
+      console.log();
+    }, 1000);
   }
   try {
     await Promise.all([

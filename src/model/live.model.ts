@@ -25,6 +25,9 @@ const model = sequelize.define<LiveModel>(
     socket_id: {
       type: DataTypes.STRING(100),
     },
+    ffmpeg_pid: {
+      type: DataTypes.INTEGER,
+    },
     live_room_id: {
       type: DataTypes.INTEGER,
     },

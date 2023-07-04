@@ -1,4 +1,4 @@
-import { execSync, spawnSync } from 'child_process';
+import { execSync, spawn, spawnSync } from 'child_process';
 
 import { SERVER_LIVE } from '@/config/secret';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
@@ -45,23 +45,35 @@ async function addLive({
       console.log(error);
     }
 
-    // ffmpeg后台运行
-    // https://www.jianshu.com/p/6ea70e6d8547
-    // 1 代表标准输出
-    // 2 代表标准错误
-    // 1>/dev/null 把标准输出导入到null设备,也就是消失不见，如果要重定向到某个文件，可以1>1.txt
-    // 2>&1 把标准错误也导入到标准输出同样的地方
     // -loglevel quiet不输出log
-    const ffmpeg = `ffmpeg -loglevel quiet -stream_loop -1 -re -i ${localFile} -c copy -f flv '${remoteFlv}' 1>/dev/null 2>&1 &`;
-    const test = `ffmpeg -stream_loop -1 -re -i /Users/huangshuisheng/Desktop/hss/galaxy-s10/billd-live-server/src/video/fddm_nswwydja.mp4 -c copy -f flv 'rtmp://localhost/livestream/roomId___5?token=1331834ac9304933baa41a5841657193'`;
-    // const ffmpeg = `echo test initFFmpeg`;
-    execSync(ffmpeg);
+
+    const ffmpeg = spawn(`ffmpeg`, [
+      '-loglevel',
+      'quiet',
+      '-readrate', // 以本地帧频读数据，主要用于模拟捕获设备
+      '1',
+      '-stream_loop', // 设置输入流应循环的次数。Loop 0表示无循环，loop-1表示无限循环。
+      '-1',
+      '-i', // 输入
+      localFile,
+      '-vcodec', // 只拷贝视频部分，不做编解码。
+      'copy',
+      '-acodec', // / 只拷贝音频部分，不做编解码。
+      'copy',
+      '-f', // 强制输入或输出文件格式。通常会自动检测输入文件的格式，并根据输出文件的文件扩展名猜测格式，因此在大多数情况下不需要此选项。
+      'flv',
+      remoteFlv,
+    ]);
+    // `ffmpeg -stream_loop -1 -re -i /Users/huangshuisheng/Desktop/hss/galaxy-s10/billd-live-server/src/video/fddm_nswwydja.mp4 -c copy -f flv 'rtmp://localhost/livestream/roomId___5?token=1331834ac9304933baa41a5841657193'`;
+    const { pid } = ffmpeg;
+    console.log(chalkWARN('ffmpeg进程pid'), pid);
     console.log(chalkWARN('ffmpeg命令'), ffmpeg);
     const isLiveing = await liveService.findByRoomId(live_room_id);
     if (!isLiveing) {
       liveService.create({
         live_room_id,
         user_id,
+        ffmpeg_pid: pid,
         socket_id: `${live_room_id}`,
         track_audio: 1,
         track_video: 1,

@@ -190,6 +190,9 @@ class AreaService {
                     attributes: [],
                   },
                 },
+                {
+                  model: liveModel,
+                },
               ],
             },
           ],

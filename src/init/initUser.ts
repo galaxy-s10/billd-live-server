@@ -23,7 +23,7 @@ export const initUser = {
     avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/author.webp',
     user_roles: [3, 7],
     live_room: {
-      devInitFFmpeg: true, // 开发模式初始化ffmpeg
+      devInitFFmpeg: false, // 开发模式初始化ffmpeg
       cdn: 1, // 1:使用cdn;2:不使用cdn
       id: 1,
       area: [1],
