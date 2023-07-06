@@ -1,13 +1,18 @@
 import { spawnSync } from 'child_process';
 import path from 'path';
 
-import { ParameterizedContext } from 'koa';
-
-// import sequelize from '@/config/mysql';
-
 /** 异步包装器 */
 export const asyncWraper = async (fn) => {
   await fn();
+};
+
+/** 延迟执行 */
+export const delayByPromise = (delay: number) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('ok');
+    }, delay);
+  });
 };
 
 export function dockerIsInstalled() {
@@ -68,9 +73,6 @@ export const getFileExt = (name: string) => {
   const ext = arr[arr.length - 1];
   return ext;
 };
-
-export const isAdmin = (ctx: ParameterizedContext) =>
-  ctx.req.url!.indexOf('/admin/') !== -1;
 
 /** 处理返回的分页数据 */
 export const handlePaging = <T>(

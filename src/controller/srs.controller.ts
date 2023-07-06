@@ -31,6 +31,40 @@ class SRSController {
     });
     await next();
   };
+
+  apiV1StreamsGet = async (ctx: ParameterizedContext, next) => {
+    const res = await axios.get(
+      `http://localhost:${SRS_CONFIG.docker.port[1985]}/api/v1/streams`
+    );
+    successHandler({
+      ctx,
+      data: res,
+    });
+    await next();
+  };
+
+  apiV1ClientsGet = async (ctx: ParameterizedContext, next) => {
+    const res = await axios.get(
+      `http://localhost:${SRS_CONFIG.docker.port[1985]}/api/v1/clients`
+    );
+    successHandler({
+      ctx,
+      data: res,
+    });
+    await next();
+  };
+
+  apiV1StreamsDel = async (ctx: ParameterizedContext, next) => {
+    const { clientid } = ctx.request.body;
+    const res = await axios.delete(
+      `http://localhost:${SRS_CONFIG.docker.port[1985]}/rtc/v1/streams/${clientid}`
+    );
+    successHandler({
+      ctx,
+      data: res,
+    });
+    await next();
+  };
 }
 
 export default new SRSController();

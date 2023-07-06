@@ -315,8 +315,6 @@ export interface ILive {
   socket_id?: string;
   user_id?: number;
   live_room_id?: number;
-  /** ffmpeg进程id */
-  ffmpeg_pid?: number;
   /** 1开启;2关闭 */
   track_video?: number;
   /** 1开启;2关闭 */

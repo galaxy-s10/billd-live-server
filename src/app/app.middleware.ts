@@ -9,7 +9,6 @@ import {
 } from '@/constant';
 import logController from '@/controller/log.controller';
 import { CustomError } from '@/model/customError.model';
-import { isAdmin } from '@/utils';
 import { chalkINFO } from '@/utils/chalkTip';
 
 // 全局错误处理中间件
@@ -34,7 +33,7 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
       logController.common.create({
         user_id: userInfo?.id || -1,
         api_user_agent: ctx.request.headers['user-agent'],
-        api_from: isAdmin(ctx) ? 2 : 1,
+        api_from: 1,
         api_body: JSON.stringify(ctx.request.body || {}),
         api_query: JSON.stringify(ctx.query),
         api_real_ip:

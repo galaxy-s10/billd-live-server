@@ -17,6 +17,21 @@ function ffmpegIsInstalled() {
   return true;
 }
 
+function killOldProcess() {
+  try {
+    // const fullCMD = `kill -9 $(ps aux | grep ffmpeg | grep -v grep | awk '{print $2}')`;
+    const getOldProcess = `ps aux | grep ffmpeg | grep -v grep | awk '{print $2}'`;
+    const res = execSync(getOldProcess);
+    const oldProcess = res.toString().trim();
+    if (oldProcess) {
+      const killOldFFmpeg = `kill -9 $(${getOldProcess})`;
+      execSync(killOldFFmpeg);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 async function addLive({
   live_room_id,
   user_id,
@@ -33,22 +48,8 @@ async function addLive({
   devInitFFmpeg: boolean;
 }) {
   async function main({ remoteFlv }: { remoteFlv: string }) {
-    try {
-      const getOldProcess = `ps aux | grep ffmpeg | grep -v grep | grep '${remoteFlv}' | awk '{print $2}'`;
-      const res = execSync(getOldProcess);
-      const oldProcess = res.toString().trim();
-      if (oldProcess) {
-        const killOldFFmpeg = `kill -9 ${oldProcess}`;
-        execSync(killOldFFmpeg);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-
-    // -loglevel quiet不输出log
-
-    const ffmpeg = spawn(`ffmpeg`, [
-      '-loglevel',
+    const ffmpegCmd = spawn(`ffmpeg`, [
+      '-loglevel', // -loglevel quiet不输出log
       'quiet',
       '-readrate', // 以本地帧频读数据，主要用于模拟捕获设备
       '1',
@@ -64,30 +65,35 @@ async function addLive({
       'flv',
       remoteFlv,
     ]);
-    // `ffmpeg -stream_loop -1 -re -i /Users/huangshuisheng/Desktop/hss/galaxy-s10/billd-live-server/src/video/fddm_nswwydja.mp4 -c copy -f flv 'rtmp://localhost/livestream/roomId___5?token=1331834ac9304933baa41a5841657193'`;
-    const { pid } = ffmpeg;
+    const { pid } = ffmpegCmd;
     console.log(chalkWARN('ffmpeg进程pid'), pid);
-    console.log(chalkWARN('ffmpeg命令'), ffmpeg);
+    // const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec copy -acodec copy -f flv '${remoteFlv}' 1>/dev/null 2>/dev/null &`;
+    // const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i /Users/huangshuisheng/Desktop/hss/galaxy-s10/billd-live-server/src/video/fddm_mhsw.mp4 -vcodec copy -acodec copy -f flv 'rtmp://localhost/livestream/roomId___3?token=eff5e5d9116254a1aea19013f8bd3afe' 1>/dev/null 2>/dev/null &`;
+    // try {
+    //   execSync(ffmpegCmd);
+    //   console.log(chalkSUCCESS(`FFmpeg推流成功！`));
+    // } catch (error) {
+    //   console.log(chalkERROR(`FFmpeg推流错误！`), error);
+    // }
     const isLiveing = await liveService.findByRoomId(live_room_id);
     if (!isLiveing) {
-      liveService.create({
+      await liveService.create({
         live_room_id,
         user_id,
-        ffmpeg_pid: pid,
         socket_id: `${live_room_id}`,
         track_audio: 1,
         track_video: 1,
       });
     }
-    liveRoomService.update({
+    await liveRoomService.update({
       id: live_room_id,
       cover_img,
       type: LiveRoomTypeEnum.system,
     });
   }
+
   if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
     if (devInitFFmpeg) {
-      console.log(devInitFFmpeg, 'devInitFFmpegdevInitFFmpeg');
       const result = await liveRoomService.findKey(live_room_id);
       const rtmptoken = result?.key;
       await main({
@@ -132,19 +138,8 @@ export const initFFmpeg = async (init = true) => {
     console.log(chalkERROR('未安装ffmpeg！'));
     return;
   }
+  // await delayByPromise(5000);
   try {
-    try {
-      // const fullCMD = `kill -9 $(ps aux | grep ffmpeg | grep -v grep | awk '{print $2}')`;
-      const getOldProcess = `ps aux | grep ffmpeg | grep -v grep | awk '{print $2}'`;
-      const res = execSync(getOldProcess);
-      const oldProcess = res.toString().trim();
-      if (oldProcess) {
-        const killOldFFmpeg = `kill -9 $(${getOldProcess})`;
-        execSync(killOldFFmpeg);
-      }
-    } catch (error) {
-      console.log(error);
-    }
     const queue: any[] = [];
     Object.keys(initUser).forEach((item) => {
       queue.push(
@@ -159,7 +154,7 @@ export const initFFmpeg = async (init = true) => {
       );
     });
     await Promise.all(queue);
-    console.log(chalkSUCCESS(`FFmpeg推流成功！`));
+    console.log(chalkSUCCESS(`初始化FFmpeg推流成功！`));
 
     // const child = exec(ffmpeg, (error, stdout, stderr) => {
     //   console.log(
@@ -180,7 +175,7 @@ export const initFFmpeg = async (init = true) => {
     //   );
     // });
   } catch (error) {
-    console.log(chalkERROR(`FFmpeg推流错误！`));
+    console.log(chalkERROR(`初始化FFmpeg推流错误！`));
     console.log(error);
   }
 };

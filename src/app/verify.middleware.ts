@@ -38,6 +38,7 @@ const frontendWhiteList = [
   '/live_room/on_unpublish',
   '/srs/rtcV1Publish',
   '/srs/rtcV1Play',
+  '/srs/rtcV1StreamsDel',
 ];
 
 // 后台的所有接口都需要判断token，除了白名单内的不需要token
