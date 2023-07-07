@@ -1,4 +1,4 @@
-import { execSync, spawn, spawnSync } from 'child_process';
+import { exec, execSync, spawnSync } from 'child_process';
 
 import { SERVER_LIVE } from '@/config/secret';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
@@ -48,33 +48,39 @@ async function addLive({
   devInitFFmpeg: boolean;
 }) {
   async function main({ remoteFlv }: { remoteFlv: string }) {
-    const ffmpegCmd = spawn(`ffmpeg`, [
-      '-loglevel', // -loglevel quiet不输出log
-      'quiet',
-      '-readrate', // 以本地帧频读数据，主要用于模拟捕获设备
-      '1',
-      '-stream_loop', // 设置输入流应循环的次数。Loop 0表示无循环，loop-1表示无限循环。
-      '-1',
-      '-i', // 输入
-      localFile,
-      '-vcodec', // 只拷贝视频部分，不做编解码。
-      'copy',
-      '-acodec', // / 只拷贝音频部分，不做编解码。
-      'copy',
-      '-f', // 强制输入或输出文件格式。通常会自动检测输入文件的格式，并根据输出文件的文件扩展名猜测格式，因此在大多数情况下不需要此选项。
-      'flv',
-      remoteFlv,
-    ]);
-    const { pid } = ffmpegCmd;
-    console.log(chalkWARN('ffmpeg进程pid'), pid);
-    // const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec copy -acodec copy -f flv '${remoteFlv}' 1>/dev/null 2>/dev/null &`;
-    // const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i /Users/huangshuisheng/Desktop/hss/galaxy-s10/billd-live-server/src/video/fddm_mhsw.mp4 -vcodec copy -acodec copy -f flv 'rtmp://localhost/livestream/roomId___3?token=eff5e5d9116254a1aea19013f8bd3afe' 1>/dev/null 2>/dev/null &`;
-    // try {
-    //   execSync(ffmpegCmd);
-    //   console.log(chalkSUCCESS(`FFmpeg推流成功！`));
-    // } catch (error) {
-    //   console.log(chalkERROR(`FFmpeg推流错误！`), error);
-    // }
+    // const ffmpegCmd = spawn(`ffmpeg`, [
+    //   '-loglevel', // -loglevel quiet不输出log
+    //   'quiet',
+    //   '-readrate', // 以本地帧频读数据，主要用于模拟捕获设备
+    //   '1',
+    //   '-stream_loop', // 设置输入流应循环的次数。Loop 0表示无循环，loop-1表示无限循环。
+    //   '-1',
+    //   '-i', // 输入
+    //   localFile,
+    //   '-vcodec', // 只拷贝视频部分，不做编解码。
+    //   'copy',
+    //   '-acodec', // / 只拷贝音频部分，不做编解码。
+    //   'copy',
+    //   '-f', // 强制输入或输出文件格式。通常会自动检测输入文件的格式，并根据输出文件的文件扩展名猜测格式，因此在大多数情况下不需要此选项。
+    //   'flv',
+    //   remoteFlv,
+    // ]);
+    // const { pid } = ffmpegCmd;
+    // console.log(chalkWARN('ffmpeg进程pid'), pid);
+    const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec copy -acodec copy -f flv '${remoteFlv}'`;
+    const ffmpegSyncCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec copy -acodec copy -f flv '${remoteFlv}' 1>/dev/null 2>&1 &`;
+    // const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i /Users/huangshuisheng/Desktop/hss/galaxy-s10/billd-live-server/src/video/fddm_mhsw.mp4 -vcodec copy -acodec copy -f flv 'rtmp://localhost/livestream/roomId___3?token=eff5e5d9116254a1aea19013f8bd3afe' 1>/dev/null 2>&1 &`;
+    try {
+      // WARN 使用execSync的话，命令最后需要添加：1>/dev/null 2>&1 &，否则会自动退出进程；
+      // 但是本地开发环境的时候，因为nodemon的缘故，每次热更新后，在ffmpeg推完流后，触发on_unpublish钩子，删除了live表里的直播记录
+      // 实际上本地还在推流，但是on_unpublish钩子删了live表里的直播记录，不合理。
+      // execSync(ffmpegSyncCmd);
+      // TIP 使用exec，这样命令后面不需要添加：1>/dev/null 2>&1 &，这样每次热更都会重新推流，而且不会触发on_unpublish钩子
+      exec(ffmpegCmd);
+      console.log(chalkSUCCESS(`FFmpeg推流成功！`));
+    } catch (error) {
+      console.log(chalkERROR(`FFmpeg推流错误！`), error);
+    }
     const isLiveing = await liveService.findByRoomId(live_room_id);
     if (!isLiveing) {
       await liveService.create({

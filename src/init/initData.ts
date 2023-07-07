@@ -231,7 +231,7 @@ export const bulkCreateGoods: IGoods[] = [
     remark: '',
     nums: 1,
     cover:
-      'https://resource.hsslive.cn/image/c5258ebf3a79c7d67ef8ae95062c8fe4.webp',
+      'https://resource.hsslive.cn/billd-live/image/c5258ebf3a79c7d67ef8ae95062c8fe4.webp',
   },
   {
     type: GoodsTypeEnum.gift,
@@ -245,7 +245,7 @@ export const bulkCreateGoods: IGoods[] = [
     remark: '',
     nums: 1,
     cover:
-      'https://resource.hsslive.cn/image/3f56506ae5f536864dbc92b52c355bfe.webp',
+      'https://resource.hsslive.cn/billd-live/image/3f56506ae5f536864dbc92b52c355bfe.webp',
   },
   {
     type: GoodsTypeEnum.gift,
@@ -259,7 +259,7 @@ export const bulkCreateGoods: IGoods[] = [
     remark: '',
     nums: 1,
     cover:
-      'https://resource.hsslive.cn/image/3f4e7debdc978741f90515ace48aee22.webp',
+      'https://resource.hsslive.cn/billd-live/image/3f4e7debdc978741f90515ace48aee22.webp',
   },
   {
     type: GoodsTypeEnum.gift,
@@ -273,7 +273,7 @@ export const bulkCreateGoods: IGoods[] = [
     remark: '',
     nums: 1,
     cover:
-      'https://resource.hsslive.cn/image/d9770d31ac7350556103c0b1ed09e01d.webp',
+      'https://resource.hsslive.cn/billd-live/image/d9770d31ac7350556103c0b1ed09e01d.webp',
   },
   {
     type: GoodsTypeEnum.sponsors,
@@ -287,7 +287,7 @@ export const bulkCreateGoods: IGoods[] = [
     remark: '',
     nums: 1,
     cover:
-      'https://resource.hsslive.cn/image/7170e9bbf14b8dcda73e30ccff589132.webp',
+      'https://resource.hsslive.cn/billd-live/image/7170e9bbf14b8dcda73e30ccff589132.webp',
   },
   {
     type: GoodsTypeEnum.sponsors,
@@ -301,7 +301,7 @@ export const bulkCreateGoods: IGoods[] = [
     remark: '',
     nums: 1,
     cover:
-      'https://resource.hsslive.cn/image/ed2e20878ee3cd9d2f71a4c3714e82a9.webp',
+      'https://resource.hsslive.cn/billd-live/image/ed2e20878ee3cd9d2f71a4c3714e82a9.webp',
   },
   {
     type: GoodsTypeEnum.sponsors,
@@ -315,7 +315,7 @@ export const bulkCreateGoods: IGoods[] = [
     remark: '',
     nums: 1,
     cover:
-      'https://resource.hsslive.cn/image/7e9edac32a8d9e0b7ac0b9554eded85c.webp',
+      'https://resource.hsslive.cn/billd-live/image/7e9edac32a8d9e0b7ac0b9554eded85c.webp',
   },
   {
     type: GoodsTypeEnum.sponsors,
@@ -329,7 +329,7 @@ export const bulkCreateGoods: IGoods[] = [
     remark: '',
     nums: 1,
     cover:
-      'https://resource.hsslive.cn/image/8d4ac68c84b6d0cad754e15151869d71.webp',
+      'https://resource.hsslive.cn/billd-live/image/8d4ac68c84b6d0cad754e15151869d71.webp',
   },
   {
     type: GoodsTypeEnum.sponsors,
@@ -343,7 +343,7 @@ export const bulkCreateGoods: IGoods[] = [
     remark: '',
     nums: 1,
     cover:
-      'https://resource.hsslive.cn/image/fd04506d5b3167cf210bd875e5a97c8b.webp',
+      'https://resource.hsslive.cn/billd-live/image/fd04506d5b3167cf210bd875e5a97c8b.webp',
   },
   {
     type: GoodsTypeEnum.sponsors,
@@ -357,7 +357,7 @@ export const bulkCreateGoods: IGoods[] = [
     remark: '',
     nums: 1,
     cover:
-      'https://resource.hsslive.cn/image/3f71039d061fb5b2dc4a2d835a5c66ca.webp',
+      'https://resource.hsslive.cn/billd-live/image/3f71039d061fb5b2dc4a2d835a5c66ca.webp',
   },
   {
     type: GoodsTypeEnum.support,
@@ -371,7 +371,7 @@ export const bulkCreateGoods: IGoods[] = [
     remark: '',
     nums: 1,
     cover:
-      'https://resource.hsslive.cn/image/def9f85caeb1bf7602ae1bc37f00b03d__FfyoWB.webp',
+      'https://resource.hsslive.cn/billd-live/image/b89fcf45fb773d5ea6f173c906ce6a07.webp',
   },
   {
     type: GoodsTypeEnum.support,
@@ -385,7 +385,7 @@ export const bulkCreateGoods: IGoods[] = [
     remark: '',
     nums: 1,
     cover:
-      'https://resource.hsslive.cn/image/959fdd1938b53cbb92108039f7b835e2__8ql7RY.webp',
+      'https://resource.hsslive.cn/billd-live/image/b89fcf45fb773d5ea6f173c906ce6a07.webp',
   },
   {
     type: GoodsTypeEnum.support,
@@ -399,7 +399,21 @@ export const bulkCreateGoods: IGoods[] = [
     remark: '',
     nums: 1,
     cover:
-      'https://resource.hsslive.cn/image/d664a7e785e26dd5bd6d34559c2623d1__lZU2GY.webp',
+      'https://resource.hsslive.cn/billd-live/image/b89fcf45fb773d5ea6f173c906ce6a07.webp',
+  },
+  {
+    type: GoodsTypeEnum.support,
+    name: 'billd-live付费课',
+    desc: '从零搭建迷你版b站直播间',
+    short_desc: '从零搭建迷你版b站直播间',
+    price: '249.00',
+    original_price: '299.00',
+    badge: '',
+    badge_bg: '',
+    remark: 'hot',
+    nums: 1,
+    cover:
+      'https://resource.hsslive.cn/billd-live/image/b89fcf45fb773d5ea6f173c906ce6a07.webp',
   },
   {
     type: GoodsTypeEnum.recharge,

@@ -214,7 +214,7 @@ class QqUserController {
         token,
       });
       if (ctx.header.origin?.indexOf('localhost') !== -1) {
-        console.log('不存在qq账号，localhost设置cookie');
+        console.log('不存在qq账号，localhost设置cookie', token);
         ctx.cookies.set('token', token, {
           httpOnly: false, // 设置httpOnly为true后，document.cookie就拿不到key为token的cookie了，因此设置false
           /**
@@ -235,7 +235,7 @@ class QqUserController {
               : 'hsslive.cn',
         });
       } else {
-        console.log('不存在qq账号，非localhost设置cookie');
+        console.log('不存在qq账号，非localhost设置cookie', token);
         ctx.cookies.set('token', token, {
           httpOnly: false, // 设置httpOnly为true后，document.cookie就拿不到key为token的cookie了，因此设置false
           sameSite: 'none', // 跨站点cookie需要设置sameSite: 'none'，设置sameSite: 'none'后，secure也要跟着设置true！
@@ -268,9 +268,7 @@ class QqUserController {
         third_platform: THIRD_PLATFORM.qq,
         third_user_id: oldQqUser.id,
       });
-      const userInfo: any = await userService.findAccount(
-        thirdUserInfo.user_id
-      );
+      const userInfo: any = await userService.find(thirdUserInfo.user_id);
       const token = signJwt({
         userInfo: {
           ...JSON.parse(JSON.stringify(userInfo)),
@@ -283,7 +281,7 @@ class QqUserController {
         token,
       });
       if (ctx.header.origin?.indexOf('localhost') !== -1) {
-        console.log('已存在qq账号，localhost设置cookie');
+        console.log('已存在qq账号，localhost设置cookie', token);
         ctx.cookies.set('token', token, {
           httpOnly: false, // 设置httpOnly为true后，document.cookie就拿不到key为token的cookie了，因此设置false
           /**
@@ -304,7 +302,7 @@ class QqUserController {
               : 'hsslive.cn',
         });
       } else {
-        console.log('已存在qq账号，非localhost设置cookie');
+        console.log('已存在qq账号，非localhost设置cookie', token);
         ctx.cookies.set('token', token, {
           httpOnly: false, // 设置httpOnly为true后，document.cookie就拿不到key为token的cookie了，因此设置false
           sameSite: 'none', // 跨站点cookie需要设置sameSite: 'none'，设置sameSite: 'none'后，secure也要跟着设置true！

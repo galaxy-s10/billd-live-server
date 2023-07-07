@@ -57,7 +57,7 @@ class SRSController {
   apiV1StreamsDel = async (ctx: ParameterizedContext, next) => {
     const { clientid } = ctx.request.body;
     const res = await axios.delete(
-      `http://localhost:${SRS_CONFIG.docker.port[1985]}/rtc/v1/streams/${clientid}`
+      `http://localhost:${SRS_CONFIG.docker.port[1985]}/api/v1/clients/${clientid}`
     );
     successHandler({
       ctx,

@@ -20,7 +20,8 @@ export const initUser = {
     id: 1,
     username: 'admin',
     password: getRandomString(6),
-    avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/author.webp',
+    avatar:
+      'https://resource.hsslive.cn/billd-live/image/def9f85caeb1bf7602ae1bc37f00b03d.webp',
     user_roles: [3, 7],
     live_room: {
       devInitFFmpeg: false, // 开发模式初始化ffmpeg
@@ -41,7 +42,8 @@ export const initUser = {
     username: 'CoCo',
     password: getRandomString(6),
     user_roles: [5],
-    avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/CoCo.webp',
+    avatar:
+      'https://resource.hsslive.cn/billd-live/image/15a116a978cadb34e9fbf0061a4145bc.webp',
     live_room: {
       devInitFFmpeg: true, // 开发模式初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
@@ -60,7 +62,8 @@ export const initUser = {
     id: 3,
     username: 'Dukoo',
     password: getRandomString(6),
-    avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/Dukoo.webp',
+    avatar:
+      'https://resource.hsslive.cn/billd-live/image/752a40d44811c99278961410da656464.webp',
     user_roles: [5],
     live_room: {
       devInitFFmpeg: true, // 开发模式初始化ffmpeg
@@ -80,7 +83,8 @@ export const initUser = {
     id: 4,
     username: 'MoonTIT',
     password: getRandomString(6),
-    avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/MoonTIT.webp',
+    avatar:
+      'https://resource.hsslive.cn/billd-live/image/2b045c7f02febd23893244e923115535.webp',
     user_roles: [5],
     live_room: {
       devInitFFmpeg: true, // 开发模式初始化ffmpeg
@@ -100,7 +104,8 @@ export const initUser = {
     id: 5,
     username: 'Nill',
     password: getRandomString(6),
-    avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/Nill.webp',
+    avatar:
+      'https://resource.hsslive.cn/billd-live/image/2142b19fe33e1fd7ed848104f64c4fd4.webp',
     user_roles: [5],
     live_room: {
       devInitFFmpeg: false, // 开发模式初始化ffmpeg
@@ -120,7 +125,8 @@ export const initUser = {
     id: 6,
     username: 'Ojin',
     password: getRandomString(6),
-    avatar: 'https://resource.hsslive.cn/live-livehss-cn/image/Ojin.webp',
+    avatar:
+      'https://resource.hsslive.cn/billd-live/image/7e048083bb5dccde76018625b644c84b.webp',
     user_roles: [5],
     live_room: {
       devInitFFmpeg: false, // 开发模式初始化ffmpeg
