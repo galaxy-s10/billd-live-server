@@ -39,7 +39,7 @@ billd 直播间后端，主要根据[https://github.com/galaxy-s10/vue3-blog-ser
 
 ## TODO
 
-项目里使用到了一些 linux 命令，如`ps`命令，如果你是 windows 系统，会不兼容
+~~项目里使用到了一些 linux 命令，如`ps`命令，如果你是 windows 系统，会不兼容~~，不需要用到 ps 命令了。
 
 ## 安装和使用
 

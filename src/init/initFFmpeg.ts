@@ -1,4 +1,4 @@
-import { exec, execSync, spawnSync } from 'child_process';
+import { exec, spawnSync } from 'child_process';
 
 import { SERVER_LIVE } from '@/config/secret';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
@@ -15,21 +15,6 @@ function ffmpegIsInstalled() {
     return false;
   }
   return true;
-}
-
-function killOldProcess() {
-  try {
-    // const fullCMD = `kill -9 $(ps aux | grep ffmpeg | grep -v grep | awk '{print $2}')`;
-    const getOldProcess = `ps aux | grep ffmpeg | grep -v grep | awk '{print $2}'`;
-    const res = execSync(getOldProcess);
-    const oldProcess = res.toString().trim();
-    if (oldProcess) {
-      const killOldFFmpeg = `kill -9 $(${getOldProcess})`;
-      execSync(killOldFFmpeg);
-    }
-  } catch (error) {
-    console.log(error);
-  }
 }
 
 async function addLive({
