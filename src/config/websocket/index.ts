@@ -195,7 +195,7 @@ export const connectWebSocket = (server) => {
           socket.emit(WsMsgTypeEnum.joined, { data: res.get() || {} });
           socket.emit(WsMsgTypeEnum.roomLiveing, data);
           const otherJoinData: IOtherJoin = {
-            data: { ...res.get(), join_socket_id: socket.id },
+            data: { liveRoom: res.get(), join_socket_id: socket.id },
           };
           socket.to(`${roomId}`).emit(WsMsgTypeEnum.otherJoin, otherJoinData);
           const liveUser = await getAllLiveUser(io);
@@ -217,15 +217,15 @@ export const connectWebSocket = (server) => {
     });
 
     // 收到用户离开房间
-    socket.on(WsMsgTypeEnum.leave, async (data) => {
+    socket.on(WsMsgTypeEnum.leave, (data) => {
       prettierInfoLog({
         msg: '收到用户离开房间',
         socketId: socket.id,
         roomId: data.roomId,
       });
       socket.emit(WsMsgTypeEnum.leaved, { socketId: socket.id });
-      const liveUser = await getAllLiveUser(io);
-      socket.to(data.roomId).emit(WsMsgTypeEnum.liveUser, liveUser);
+      // const liveUser = await getAllLiveUser(io);
+      // socket.to(data.roomId).emit(WsMsgTypeEnum.liveUser, liveUser);
     });
 
     // 收到用户发blob
