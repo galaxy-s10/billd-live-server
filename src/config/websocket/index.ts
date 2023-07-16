@@ -298,6 +298,13 @@ export const connectWebSocket = (server) => {
       const res = await liveRedisController.getUserJoinedRoom({
         socketId: data.socket_id,
       });
+      if (data.data.track) {
+        liveService.updateByLoomId({
+          live_room_id: data.data.live_room_id,
+          track_audio: data.data.track.audio,
+          track_video: data.data.track.video,
+        });
+      }
       if (res) {
         liveRedisController.setUserJoinedRoom({
           socketId: data.socket_id,

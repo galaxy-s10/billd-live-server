@@ -117,7 +117,7 @@ class UserLiveRoomController {
       name: `${userInfo.username!.slice(0, 10)}的直播间`,
       key: rtmptoken,
       type: LiveRoomTypeEnum.user_obs,
-      weight: 11,
+      weight: 21,
       cdn: 2,
     });
     // @ts-ignore

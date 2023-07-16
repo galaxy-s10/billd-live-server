@@ -34,6 +34,7 @@ export interface IUpdateJoinInfo {
   user_info?: IUser;
   data: {
     live_room_id: number;
+    track?: { audio: number; video: number };
   };
 }
 

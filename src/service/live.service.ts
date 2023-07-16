@@ -167,6 +167,18 @@ class LiveService {
     return result;
   }
 
+  /** 修改直播 */
+  async updateByLoomId({ live_room_id, track_audio, track_video }: ILive) {
+    const result = await liveModel.update(
+      {
+        track_audio,
+        track_video,
+      },
+      { where: { live_room_id } }
+    );
+    return result;
+  }
+
   /** 创建直播 */
   async create({
     socket_id,

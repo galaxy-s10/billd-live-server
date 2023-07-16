@@ -15,6 +15,8 @@ import { zjlQtBase64 } from '@/init/base64/zjl_qt';
 import { zjlYlxbBase64 } from '@/init/base64/zjl_ylxb';
 import { resolveApp } from '@/utils';
 
+import { hss_20230707_1_30Base64 } from './base64/hss_20230707_1_30';
+
 export const initUser = {
   admin: {
     id: 1,
@@ -225,6 +227,23 @@ export const initUser = {
       localFile: '/node/video/zjl_gq.mp4',
       cover_img: zjlGqBase64,
       weight: 2,
+    },
+  },
+  systemUser11: {
+    id: 12,
+    username: 'user-12',
+    password: getRandomString(6),
+    avatar: '',
+    user_roles: [5],
+    live_room: {
+      devInitFFmpeg: false, // 开发模式初始化ffmpeg
+      cdn: 2, // 1:使用cdn;2:不使用cdn
+      id: 12,
+      name: 'billd-live付费课',
+      area: [1],
+      localFile: '/node/video/hss_20230707_1_30.mp4',
+      cover_img: hss_20230707_1_30Base64,
+      weight: 20,
     },
   },
   systemUser100: {
