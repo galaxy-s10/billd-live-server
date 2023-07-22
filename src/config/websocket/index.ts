@@ -176,7 +176,9 @@ export const connectWebSocket = (server) => {
           socket.emit(WsMsgTypeEnum.joined, {
             data: { live: res.get() } || {},
           });
-          socket.emit(WsMsgTypeEnum.roomLiveing, data);
+          socket.emit(WsMsgTypeEnum.roomLiveing, {
+            data: { live: res.get() } || {},
+          });
           const otherJoinData: IOtherJoin = {
             data: { liveRoom: res.get(), join_socket_id: socket.id },
           };
