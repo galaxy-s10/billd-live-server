@@ -35,6 +35,7 @@ export interface IUpdateJoinInfo {
   data: {
     live_room_id: number;
     track?: { audio: number; video: number };
+    rtmp_url?: string;
   };
 }
 
@@ -61,9 +62,9 @@ export interface IJoin {
   is_anchor: boolean;
   user_info?: IUser;
   data: {
-    live_id?: number;
+    live?: ILive;
     live_room: ILiveRoom;
-    track: { audio: number; video: number };
+    // track: { audio: number; video: number };
   };
 }
 

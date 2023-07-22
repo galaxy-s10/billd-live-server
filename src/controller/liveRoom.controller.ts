@@ -126,34 +126,24 @@ class LiveRoomController {
       const rtmptoken = result?.key;
       const params = new URLSearchParams(body.param);
       const paramstoken = params.get('token');
-      const type = Number(params.get('type'));
       if (rtmptoken !== paramstoken) {
         console.log('鉴权失败');
-        ctx.body = { code: 1, msg: 'auth fail' };
+        ctx.body = { code: 1, msg: 'on_publish auth fail' };
       } else {
         console.log('鉴权成功');
         const isLiveing = await liveService.findByRoomId(Number(roomId));
         if (isLiveing) {
-          ctx.body = { code: 0, msg: 'room is living' };
+          ctx.body = { code: 0, msg: 'on_publish room is living' };
         } else {
-          ctx.body = { code: 0, msg: 'auth success' };
+          ctx.body = { code: 0, msg: 'on_publish auth success' };
           const liveRoom = await liveRoomService.find(Number(roomId));
-          if (
-            type === LiveRoomTypeEnum.user_obs ||
-            type === LiveRoomTypeEnum.system
-          ) {
-            liveService.create({
-              live_room_id: Number(roomId),
-              user_id: liveRoom?.user_live_room?.user?.id,
-              socket_id: '-1',
-              track_audio: 1,
-              track_video: 1,
-            });
-            liveRoomService.update({
-              id: liveRoom?.id,
-              type: LiveRoomTypeEnum.user_obs,
-            });
-          }
+          liveService.create({
+            live_room_id: Number(roomId),
+            user_id: liveRoom?.user_live_room?.user?.id,
+            socket_id: '-1',
+            track_audio: 1,
+            track_video: 1,
+          });
         }
       }
     }
@@ -168,9 +158,9 @@ class LiveRoomController {
     const reg = /^roomId___(.+)/g;
     const roomId = reg.exec(body.stream)?.[1];
     if (!roomId) {
-      successHandler({ ctx, data: 'no live_room' });
+      ctx.body = { code: 1, msg: 'on_unpublish room is living' };
     } else {
-      successHandler({ ctx, data: 'ok' });
+      ctx.body = { code: 0, msg: 'on_unpublish success' };
       liveService.deleteByLiveRoomId(Number(roomId));
     }
     await next();
@@ -194,9 +184,7 @@ class LiveRoomController {
           .toString();
         const rtmp_url = `${SERVER_LIVE.PushDomain}/${
           SERVER_LIVE.AppName
-        }/roomId___${liveRoom.id!}?type=${
-          LiveRoomTypeEnum.user_obs
-        }&token=${key}`;
+        }/roomId___${liveRoom.id!}?token=${key}`;
         await this.common.update({
           id: liveRoom.id || -1,
           key,

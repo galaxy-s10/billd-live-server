@@ -3,16 +3,12 @@ import path from 'path';
 
 import { Server, Socket } from 'socket.io';
 
-import { pubClient } from '@/config/redis/pub';
-import { REDIS_CONFIG } from '@/config/secret';
 import {
   WsConnectStatusEnum,
   WsMsgTypeEnum,
 } from '@/config/websocket/constant';
 import liveRedisController from '@/config/websocket/live-redis.controller';
-import { PROJECT_ENV, PROJECT_ENV_ENUM, REDIS_PREFIX } from '@/constant';
-import liveController from '@/controller/live.controller';
-import orderController from '@/controller/order.controller';
+import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import {
   IAnswer,
   ICandidate,
@@ -100,23 +96,6 @@ export const connectWebSocket = (server) => {
 
   const io = new Server(server);
 
-  pubClient.subscribe(
-    `__keyevent@${REDIS_CONFIG.database}__:expired`,
-    (redisKey, subscribeName) => {
-      console.log('过期key监听', redisKey, subscribeName);
-      // 订单过期
-      if (redisKey.indexOf(REDIS_PREFIX.order) === 0) {
-        const out_trade_no = redisKey.replace(`${REDIS_PREFIX.order}-`, '');
-        orderController.commonGetPayStatus(out_trade_no);
-      }
-      // 房间不直播了
-      if (redisKey.indexOf(REDIS_PREFIX.roomIsLiveing) === 0) {
-        const liveId = redisKey.replace(`${REDIS_PREFIX.roomIsLiveing}-`, '');
-        liveController.common.delete(+liveId);
-      }
-    }
-  );
-
   function prettierInfoLog(data: {
     msg: string;
     socketId?: string;
@@ -149,35 +128,37 @@ export const connectWebSocket = (server) => {
       socket.join(`${roomId}`);
       // 主播开直播
       if (data.is_anchor) {
-        let liveId;
         try {
-          const [res] = await Promise.all([
+          await Promise.all([
             liveService.create({
               live_room_id: roomId,
               user_id: data.user_info?.id,
               socket_id: socket.id,
-              track_audio: data.data.track.audio,
-              track_video: data.data.track.video,
+              track_audio: data.data.live?.track_audio,
+              track_video: data.data.live?.track_video,
             }),
             liveRoomService.update({
               id: roomId,
               cover_img: data.data.live_room.cover_img,
               type: data.data.live_room.type,
+              rtmp_url: data.data.live_room.rtmp_url,
             }),
           ]);
-          liveId = res.id;
-          liveRedisController.setUserLiveing({
-            liveId,
-            socketId: socket.id,
-            roomId,
-            userInfo: data.user_info,
-          });
+          const res1 = await liveService.findByRoomId(roomId);
+          if (res1) {
+            liveRedisController.setUserLiveing({
+              liveId: res1.id!,
+              socketId: socket.id,
+              roomId,
+              userInfo: data.user_info,
+            });
+          }
+          socket.emit(WsMsgTypeEnum.joined, { data: { live: res1 } });
         } catch (error) {
           console.log(error);
         }
-        const newdata = { ...data };
-        newdata.data.live_id = liveId;
-        socket.emit(WsMsgTypeEnum.joined, newdata);
+        // const newdata = { ...data };
+        // newdata.data.live_id = liveId;
       } else {
         // 用户看直播
         const res = await liveService.findByRoomId(roomId);
@@ -192,7 +173,9 @@ export const connectWebSocket = (server) => {
             roomId,
             userInfo: data.user_info,
           });
-          socket.emit(WsMsgTypeEnum.joined, { data: res.get() || {} });
+          socket.emit(WsMsgTypeEnum.joined, {
+            data: { live: res.get() } || {},
+          });
           socket.emit(WsMsgTypeEnum.roomLiveing, data);
           const otherJoinData: IOtherJoin = {
             data: { liveRoom: res.get(), join_socket_id: socket.id },
@@ -298,6 +281,11 @@ export const connectWebSocket = (server) => {
       const res = await liveRedisController.getUserJoinedRoom({
         socketId: data.socket_id,
       });
+      liveRoomService.update({
+        id: data.data.live_room_id,
+        rtmp_url: data.data.rtmp_url,
+      });
+      console.log(333333331212, data.data);
       if (data.data.track) {
         liveService.updateByLoomId({
           live_room_id: data.data.live_room_id,
