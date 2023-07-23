@@ -50,6 +50,7 @@ const globalWhiteList = ['/init/'];
 const frequentlyWhiteList = [];
 
 async function isPass(ip: string) {
+  return true;
   const nowDate = +new Date();
   let flag = true;
   if (IP_WHITE_LIST.includes(ip)) return flag;
