@@ -47,7 +47,7 @@ export const initUser = {
     avatar:
       'https://resource.hsslive.cn/billd-live/image/15a116a978cadb34e9fbf0061a4145bc.webp',
     live_room: {
-      devInitFFmpeg: false, // 开发模式初始化ffmpeg
+      devInitFFmpeg: true, // 开发模式初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 2,
       name: '房东的猫-美好事物',
@@ -89,7 +89,7 @@ export const initUser = {
       'https://resource.hsslive.cn/billd-live/image/2b045c7f02febd23893244e923115535.webp',
     user_roles: [5],
     live_room: {
-      devInitFFmpeg: true, // 开发模式初始化ffmpeg
+      devInitFFmpeg: false, // 开发模式初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 4,
       name: '房东的猫-所念皆星河',

@@ -112,7 +112,7 @@ class LiveRoomController {
     await next();
   }
 
-  async onPublish(ctx: ParameterizedContext, next) {
+  onPublish = async (ctx: ParameterizedContext, next) => {
     // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
     // code等于数字0表示成功，其他错误码代表失败。
     const { body } = ctx.request;
@@ -126,11 +126,18 @@ class LiveRoomController {
       const rtmptoken = result?.key;
       const params = new URLSearchParams(body.param);
       const paramstoken = params.get('token');
+      const paramstype = params.get('type');
       if (rtmptoken !== paramstoken) {
         console.log('鉴权失败');
         ctx.body = { code: 1, msg: 'on_publish auth fail' };
       } else {
         console.log('鉴权成功');
+        if (paramstype) {
+          await this.common.update({
+            id: Number(roomId),
+            type: Number(paramstype),
+          });
+        }
         const isLiveing = await liveService.findByRoomId(Number(roomId));
         if (isLiveing) {
           ctx.body = { code: 0, msg: 'on_publish room is living' };
@@ -148,7 +155,7 @@ class LiveRoomController {
       }
     }
     await next();
-  }
+  };
 
   async onUnpublish(ctx: ParameterizedContext, next) {
     // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
@@ -184,13 +191,13 @@ class LiveRoomController {
           .toString();
         const rtmp_url = `${SERVER_LIVE.PushDomain}/${
           SERVER_LIVE.AppName
-        }/roomId___${liveRoom.id!}?token=${key}`;
+        }/roomId___${liveRoom.live_room!.id!}?token=${key}`;
         await this.common.update({
-          id: liveRoom.id || -1,
+          id: liveRoom.live_room!.id!,
           key,
           rtmp_url,
         });
-        successHandler({ ctx, data: { rtmp_url } });
+        successHandler({ ctx, data: { rtmp_url, liveRoom } });
       }
     } else {
       throw new CustomError(message, code, code);
