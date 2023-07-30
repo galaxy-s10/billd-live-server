@@ -47,7 +47,7 @@ export const initUser = {
     avatar:
       'https://resource.hsslive.cn/billd-live/image/15a116a978cadb34e9fbf0061a4145bc.webp',
     live_room: {
-      devInitFFmpeg: true, // 开发模式初始化ffmpeg
+      devInitFFmpeg: false, // 开发模式初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 2,
       name: '房东的猫-美好事物',
