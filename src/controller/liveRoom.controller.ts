@@ -7,7 +7,7 @@ import { verifyUserAuth } from '@/app/auth/verifyUserAuth';
 import successHandler from '@/app/handler/success-handle';
 import { SERVER_LIVE } from '@/config/secret';
 import { ALLOW_HTTP_CODE } from '@/constant';
-import { IList, ILiveRoom, LiveRoomTypeEnum } from '@/interface';
+import { IList, ILiveRoom } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
@@ -64,51 +64,7 @@ class LiveRoomController {
   async onPlay(ctx: ParameterizedContext, next) {
     // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
     // code等于数字0表示成功，其他错误码代表失败。
-    const { body } = ctx.request;
-    // console.log(body, 'publish参数');
-    const reg = /^roomId___(.+)/g;
-    const roomId = reg.exec(body.stream)?.[1];
     ctx.body = { code: 0, msg: 'room is living' };
-    await next();
-    return;
-    if (!roomId) {
-      ctx.body = { code: 1, msg: 'no live_room' };
-    } else {
-      const result = await liveRoomService.findKey(Number(roomId));
-      const rtmptoken = result?.key;
-      const params = new URLSearchParams(body.param);
-      const paramstoken = params.get('token');
-      const type = Number(params.get('type'));
-      if (rtmptoken !== paramstoken) {
-        console.log('鉴权失败');
-        ctx.body = { code: 1, msg: 'auth fail' };
-      } else {
-        console.log('鉴权成功');
-        const isLiveing = await liveService.findByRoomId(Number(roomId));
-        if (isLiveing) {
-          ctx.body = { code: 0, msg: 'room is living' };
-        } else {
-          ctx.body = { code: 0, msg: 'auth success' };
-          const liveRoom = await liveRoomService.find(Number(roomId));
-          if (
-            type === LiveRoomTypeEnum.user_obs ||
-            type === LiveRoomTypeEnum.system
-          ) {
-            liveService.create({
-              live_room_id: Number(roomId),
-              user_id: liveRoom?.user_live_room?.user?.id,
-              socket_id: '-1',
-              track_audio: 1,
-              track_video: 1,
-            });
-            liveRoomService.update({
-              id: liveRoom?.id,
-              type: LiveRoomTypeEnum.user_obs,
-            });
-          }
-        }
-      }
-    }
     await next();
   }
 

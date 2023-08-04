@@ -137,7 +137,7 @@ class TencentcloudClass {
   getPullUrl = (data: { roomId: number }) => {
     const url = `${TENCENTCLOUD_LIVE.PullDomain}/${TENCENTCLOUD_LIVE.AppName}/roomId___${data.roomId}`;
     return {
-      rtmp: `https://${url}`,
+      rtmp: `rtmp://${url}`,
       flv: `https://${url}.flv`,
       hls: `https://${url}.m3u8`,
       udp: `webrtc://${url}`,

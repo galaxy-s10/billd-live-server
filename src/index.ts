@@ -18,7 +18,7 @@ async function main() {
   function adLog() {
     setTimeout(() => {
       console.log();
-      console.log(chalkINFO(`支持赞助: https://live.hsslive.cn/sponsors`));
+      console.log(chalkINFO(`作者微信: shuisheng9905`));
       console.log(chalkINFO(`付费课程: https://www.hsslive.cn/article/151`));
       console.log(
         chalkINFO(
