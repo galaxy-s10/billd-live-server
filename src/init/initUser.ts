@@ -69,7 +69,7 @@ export const initUser = {
     user_roles: [5],
     live_room: {
       initFFmpeg: false, // 初始化ffmpeg
-      cdn: 1, // 1:使用cdn;2:不使用cdn
+      cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 3,
       name: '房东的猫-和宇宙的温柔关联',
       area: [1],
@@ -90,7 +90,7 @@ export const initUser = {
     user_roles: [5],
     live_room: {
       initFFmpeg: true, // 初始化ffmpeg
-      cdn: 1, // 1:使用cdn;2:不使用cdn
+      cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 4,
       name: '房东的猫-所念皆星河',
       area: [1],
