@@ -36,6 +36,7 @@ async function addLive({
   let hls_url = '';
   let rtmp_url = '';
   async function main() {
+    await liveService.deleteByLiveRoomId(live_room_id);
     // 开发环境时判断initFFmpeg，是true的才初始化ffmpeg
     // 生产环境时不判断initFFmpeg，都初始化
     if (
@@ -75,18 +76,16 @@ async function addLive({
       } catch (error) {
         console.log(chalkERROR(`FFmpeg推流错误！`), error);
       }
-      const isLiveing = await liveService.findByRoomId(live_room_id);
-      if (!isLiveing) {
-        await liveService.create({
-          live_room_id,
-          user_id,
-          socket_id: `${live_room_id}`,
-          track_audio: 1,
-          track_video: 1,
-        });
-      }
-    } else {
-      await liveService.deleteByLiveRoomId(live_room_id);
+      // const isLiveing = await liveService.findByRoomId(live_room_id);
+      // if (!isLiveing) {
+      //   await liveService.create({
+      //     live_room_id,
+      //     user_id,
+      //     socket_id: `${live_room_id}`,
+      //     track_audio: 1,
+      //     track_video: 1,
+      //   });
+      // }
     }
     await liveRoomService.update({
       id: live_room_id,

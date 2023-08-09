@@ -87,7 +87,6 @@ class LiveRoomController {
         console.log('鉴权失败');
         ctx.body = { code: 1, msg: 'on_publish auth fail' };
       } else {
-        console.log('鉴权成功');
         if (paramstype) {
           await this.common.update({
             id: Number(roomId),
@@ -96,10 +95,13 @@ class LiveRoomController {
         }
         const isLiveing = await liveService.findByRoomId(Number(roomId));
         if (isLiveing) {
-          ctx.body = { code: 0, msg: 'on_publish room is living' };
+          console.log('鉴权成功，但是正在直播，不允许推流');
+          ctx.body = { code: 1, msg: 'room is living' };
+          // ctx.body = { code: 0, msg: 'on_publish room is living' };
         } else {
-          ctx.body = { code: 0, msg: 'on_publish auth success' };
+          console.log('鉴权成功，允许推流');
           const liveRoom = await liveRoomService.find(Number(roomId));
+          // if (liveRoom?.type === LiveRoomTypeEnum.system) {
           liveService.create({
             live_room_id: Number(roomId),
             user_id: liveRoom?.user_live_room?.user?.id,
@@ -107,6 +109,8 @@ class LiveRoomController {
             track_audio: 1,
             track_video: 1,
           });
+          // }
+          ctx.body = { code: 0, msg: 'on_publish auth success' };
         }
       }
     }
@@ -121,8 +125,10 @@ class LiveRoomController {
     const reg = /^roomId___(.+)/g;
     const roomId = reg.exec(body.stream)?.[1];
     if (!roomId) {
-      ctx.body = { code: 1, msg: 'on_unpublish room is living' };
+      console.log('on_unpublish错误');
+      ctx.body = { code: 1, msg: 'on_unpublish fail, no is room' };
     } else {
+      console.log('on_unpublish成功');
       ctx.body = { code: 0, msg: 'on_unpublish success' };
       liveService.deleteByLiveRoomId(Number(roomId));
     }

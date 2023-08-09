@@ -17,11 +17,14 @@ import {
   IMessage,
   IOffer,
   IOtherJoin,
+  IRoomLiving,
+  IStartLive,
   IUpdateJoinInfo,
   IUser,
 } from '@/interface';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
+import userLiveRoomService from '@/service/userLiveRoom.service';
 import { chalkINFO, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 
 async function getAllLiveUser(io) {
@@ -126,66 +129,82 @@ export const connectWebSocket = (server) => {
         roomId,
       });
       socket.join(`${roomId}`);
-      // 主播开直播
-      if (data.is_anchor) {
-        try {
-          await Promise.all([
-            liveService.create({
-              live_room_id: roomId,
-              user_id: data.user_info?.id,
-              socket_id: socket.id,
-              track_audio: data.data.live?.track_audio,
-              track_video: data.data.live?.track_video,
-            }),
-            liveRoomService.update({
-              id: roomId,
-              cover_img: data.data.live_room.cover_img,
-              type: data.data.live_room.type,
-              rtmp_url: data.data.live_room.rtmp_url,
-            }),
-          ]);
-          const res1 = await liveService.findByRoomId(roomId);
-          if (res1) {
-            liveRedisController.setUserLiveing({
-              liveId: res1.id!,
-              socketId: socket.id,
-              roomId,
-              userInfo: data.user_info,
-            });
-          }
-          socket.emit(WsMsgTypeEnum.joined, { data: { live: res1 } });
-        } catch (error) {
-          console.log(error);
-        }
-        // const newdata = { ...data };
-        // newdata.data.live_id = liveId;
+
+      const res = await liveService.findByRoomId(roomId);
+      const liveRoomInfo = await liveRoomService.find(roomId);
+      const joinedData: IJoin['data'] = {
+        anchor_info: liveRoomInfo!.user_live_room!.user,
+        live_room: liveRoomInfo!,
+      };
+      socket.emit(WsMsgTypeEnum.joined, { data: joinedData });
+      if (!res) {
+        socket.emit(WsMsgTypeEnum.roomNoLive, {
+          roomId,
+        });
+        liveService.deleteByLiveRoomId(roomId);
       } else {
-        // 用户看直播
-        const res = await liveService.findByRoomId(roomId);
-        if (!res) {
-          socket.emit(WsMsgTypeEnum.roomNoLive, {
-            roomId,
-          });
-          liveService.deleteByLiveRoomId(roomId);
-        } else {
-          liveRedisController.setUserJoinedRoom({
-            socketId: socket.id,
-            roomId,
-            userInfo: data.user_info,
-          });
-          socket.emit(WsMsgTypeEnum.joined, {
-            data: { live: res.get() } || {},
-          });
-          socket.emit(WsMsgTypeEnum.roomLiveing, {
-            data: { live: res.get() } || {},
-          });
-          const otherJoinData: IOtherJoin = {
-            data: { liveRoom: res.get(), join_socket_id: socket.id },
-          };
-          socket.to(`${roomId}`).emit(WsMsgTypeEnum.otherJoin, otherJoinData);
-          const liveUser = await getAllLiveUser(io);
-          socket.to(`${roomId}`).emit(WsMsgTypeEnum.liveUser, liveUser);
-        }
+        const roomLivingData: IRoomLiving['data'] = {
+          live_room: liveRoomInfo!,
+        };
+        socket.emit(WsMsgTypeEnum.roomLiving, { data: roomLivingData });
+        liveRedisController.setUserJoinedRoom({
+          socketId: socket.id,
+          roomId,
+          userInfo: data.user_info,
+        });
+      }
+      const otherJoinData: IOtherJoin = {
+        data: {
+          live_room: liveRoomInfo!,
+          live_room_user_info: liveRoomInfo!.user!,
+          join_socket_id: socket.id,
+          join_user_info: data.user_info,
+        },
+      };
+      socket.to(`${roomId}`).emit(WsMsgTypeEnum.otherJoin, otherJoinData);
+      const liveUser = await getAllLiveUser(io);
+      socket.to(`${roomId}`).emit(WsMsgTypeEnum.liveUser, liveUser);
+    });
+
+    // 收到主播开始直播
+    socket.on(WsMsgTypeEnum.startLive, async (data: IStartLive) => {
+      const userLiveRoomInfo = await userLiveRoomService.findByUserId(
+        data.user_info.id!
+      );
+      const roomId = userLiveRoomInfo!.live_room_id!;
+      prettierInfoLog({
+        msg: '收到主播开始直播',
+        socketId: socket.id,
+        roomId,
+      });
+      try {
+        const [res1] = await Promise.all([
+          liveService.create({
+            live_room_id: roomId,
+            user_id: data.user_info?.id,
+            socket_id: socket.id,
+            track_audio: data.data.live?.track_audio,
+            track_video: data.data.live?.track_video,
+          }),
+          liveRoomService.update({
+            id: roomId,
+            cover_img: data.data.live_room.cover_img,
+            type: data.data.live_room.type,
+            rtmp_url: data.data.live_room.rtmp_url,
+          }),
+        ]);
+        liveRedisController.setUserLiveing({
+          liveId: res1.id!,
+          socketId: socket.id,
+          roomId,
+          userInfo: data.user_info,
+        });
+        const roomLivingData: IRoomLiving['data'] = {
+          live_room: userLiveRoomInfo!.live_room!,
+        };
+        socket.emit(WsMsgTypeEnum.roomLiving, { data: roomLivingData });
+      } catch (error) {
+        console.log(error);
       }
     });
 
@@ -242,13 +261,13 @@ export const connectWebSocket = (server) => {
     });
 
     // 收到管理员开始直播
-    socket.on(WsMsgTypeEnum.roomLiveing, (data) => {
+    socket.on(WsMsgTypeEnum.roomLiving, (data) => {
       prettierInfoLog({
         msg: '收到管理员开始直播',
         socketId: socket.id,
         roomId: data.roomId,
       });
-      socket.to(data.roomId).emit(WsMsgTypeEnum.roomLiveing, data);
+      socket.to(data.roomId).emit(WsMsgTypeEnum.roomLiving, data);
     });
 
     // 收到管理员不在直播
@@ -287,7 +306,6 @@ export const connectWebSocket = (server) => {
         id: data.data.live_room_id,
         rtmp_url: data.data.rtmp_url,
       });
-      console.log(333333331212, data.data);
       if (data.data.track) {
         liveService.updateByLoomId({
           live_room_id: data.data.live_room_id,

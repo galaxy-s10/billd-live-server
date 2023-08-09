@@ -33,7 +33,7 @@ export enum WsMsgTypeEnum {
   /** 用户发送消息 */
   message = 'message',
   /** 房间正在直播 */
-  roomLiveing = 'roomLiveing',
+  roomLiving = 'roomLiving',
   /** 房间不在直播 */
   roomNoLive = 'roomNoLive',
   /** sendBlob */
@@ -47,4 +47,5 @@ export enum WsMsgTypeEnum {
   offer = 'offer',
   answer = 'answer',
   candidate = 'candidate',
+  startLive = 'startLive',
 }
