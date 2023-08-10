@@ -12,14 +12,14 @@ export const handleRedisKeyExpired = () => {
 
       // 订单过期
       if (redisKey.indexOf(REDIS_PREFIX.order) === 0) {
-        const out_trade_no = redisKey.replace(`${REDIS_PREFIX.order}-`, '');
+        const out_trade_no = redisKey.replace(`${REDIS_PREFIX.order}`, '');
         console.log('订单过期', out_trade_no);
         orderController.commonGetPayStatus(out_trade_no, true);
       }
 
       // 房间不直播了
       if (redisKey.indexOf(REDIS_PREFIX.roomIsLiveing) === 0) {
-        const liveId = redisKey.replace(`${REDIS_PREFIX.roomIsLiveing}-`, '');
+        const liveId = redisKey.replace(`${REDIS_PREFIX.roomIsLiveing}`, '');
         console.log('房间不直播了', liveId);
         liveController.common.delete(+liveId);
       }

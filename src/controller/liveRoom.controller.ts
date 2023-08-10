@@ -6,12 +6,15 @@ import { authJwt } from '@/app/auth/authJwt';
 import { verifyUserAuth } from '@/app/auth/verifyUserAuth';
 import successHandler from '@/app/handler/success-handle';
 import { SERVER_LIVE } from '@/config/secret';
+import { wsSocket } from '@/config/websocket';
+import { WsMsgTypeEnum } from '@/config/websocket/constant';
 import { ALLOW_HTTP_CODE } from '@/constant';
-import { IList, ILiveRoom } from '@/interface';
+import { IList, ILiveRoom, IRoomLiving } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
 import userLiveRoomService from '@/service/userLiveRoom.service';
+import { chalkERROR } from '@/utils/chalkTip';
 
 class LiveRoomController {
   common = {
@@ -100,6 +103,21 @@ class LiveRoomController {
           // ctx.body = { code: 0, msg: 'on_publish room is living' };
         } else {
           console.log('鉴权成功，允许推流');
+          const [liveRoomInfo] = await Promise.all([
+            liveRoomService.find(Number(roomId)),
+          ]);
+          if (!liveRoomInfo) {
+            console.log(chalkERROR('liveRoomInfo为空'));
+            return;
+          }
+          const roomLivingData: IRoomLiving['data'] = {
+            live_room: liveRoomInfo,
+          };
+          console.log('----', roomId);
+          wsSocket.io
+            ?.to(roomId)
+            .emit(WsMsgTypeEnum.roomLiving, { data: roomLivingData });
+
           const liveRoom = await liveRoomService.find(Number(roomId));
           // if (liveRoom?.type === LiveRoomTypeEnum.system) {
           liveService.create({

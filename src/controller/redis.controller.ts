@@ -7,17 +7,17 @@ class RedisController {
    * @return {*}
    */
   getTTL = async ({ prefix, key }: { prefix: string; key: string }) => {
-    const res = await redisClient.ttl(`${prefix}-${key}`);
+    const res = await redisClient.ttl(`${prefix}${key}`);
     return res;
   };
 
   del = async ({ prefix, key }: { prefix: string; key: string }) => {
-    const res = await redisClient.del(`${prefix}-${key}`);
+    const res = await redisClient.del(`${prefix}${key}`);
     return res;
   };
 
   getVal = async ({ prefix, key }: { prefix: string; key: string }) => {
-    const res = await redisClient.get(`${prefix}-${key}`);
+    const res = await redisClient.get(`${prefix}${key}`);
     return res;
   };
 
@@ -33,7 +33,7 @@ class RedisController {
     created_at?: number;
   }) => {
     await redisClient.set(
-      `${prefix}-${key}`,
+      `${prefix}${key}`,
       JSON.stringify({
         value,
         created_at: created_at || +new Date(),
@@ -58,7 +58,7 @@ class RedisController {
     expired_at?: number;
   }) => {
     await redisClient.setEx(
-      `${prefix}-${key}`,
+      `${prefix}${key}`,
       exp,
       JSON.stringify({
         value,

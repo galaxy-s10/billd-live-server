@@ -53,16 +53,16 @@ class WSController {
 
   /** 设置用户正在直播 */
   setUserLiveing = async (data: {
-    liveId: number;
     socketId: string;
     roomId: number;
+    liveId?: number;
     userInfo?: IUser;
     created_at?: number;
     expired_at?: number;
   }) => {
     const res = await redisController.setExVal({
       prefix: `${REDIS_PREFIX.roomIsLiveing}`,
-      key: `${data.liveId}`,
+      key: `${data.roomId}`,
       value: filterObj(data, ['created_at', 'expired_at']),
       created_at: data.created_at,
       expired_at: data.expired_at,

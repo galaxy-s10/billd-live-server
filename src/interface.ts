@@ -59,6 +59,12 @@ export interface IOtherJoin {
   };
 }
 
+export interface IRoomNoLive {
+  data: {
+    live_room: ILiveRoom;
+  };
+}
+
 export interface IJoin {
   socket_id: string;
   is_anchor: boolean;
