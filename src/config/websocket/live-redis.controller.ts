@@ -9,12 +9,13 @@ class WSController {
     socketId: string;
   }): Promise<{
     value: {
-      roomId: number;
+      joinRoomId: number;
       socketId: string;
-      userInfo: IUser;
+      userInfo?: IUser;
     };
     created_at?: number;
     expired_at?: number;
+    client_ip?: string;
   } | null> => {
     const res = await redisController.getVal({
       prefix: `${REDIS_PREFIX.joined}`,
@@ -26,18 +27,20 @@ class WSController {
   /** 设置用户进入的房间 */
   setUserJoinedRoom = async (data: {
     socketId: string;
-    roomId: number;
+    joinRoomId: number;
     userInfo?: IUser;
     created_at?: number;
     expired_at?: number;
+    client_ip?: string;
   }) => {
     const res = await redisController.setExVal({
       prefix: `${REDIS_PREFIX.joined}`,
       key: data.socketId,
-      value: filterObj(data, ['created_at', 'expired_at']),
+      value: filterObj(data, ['created_at', 'expired_at', 'client_ip']),
+      exp: 60 * 1,
       created_at: data.created_at,
       expired_at: data.expired_at,
-      exp: 60 * 2,
+      client_ip: data.client_ip,
     });
     return res;
   };
@@ -51,33 +54,54 @@ class WSController {
     return res;
   };
 
-  /** 设置用户正在直播 */
-  setUserLiveing = async (data: {
-    socketId: string;
-    roomId: number;
-    liveId?: number;
-    userInfo?: IUser;
-    created_at?: number;
-    expired_at?: number;
-  }) => {
-    const res = await redisController.setExVal({
+  /** 删除主播正在直播 */
+  delAnchorLiving = async (data: { liveRoomId: number }) => {
+    const res = await redisController.del({
       prefix: `${REDIS_PREFIX.roomIsLiveing}`,
-      key: `${data.roomId}`,
-      value: filterObj(data, ['created_at', 'expired_at']),
-      created_at: data.created_at,
-      expired_at: data.expired_at,
-      exp: 60 * 2,
+      key: `${data.liveRoomId}`,
     });
     return res;
   };
 
-  /** 获取用户正在直播 */
-  getUserLiveing = async (data: { liveId: number }) => {
-    const res = await redisController.getVal({
+  /** 设置主播正在直播 */
+  setAnchorLiving = async (data: {
+    socketId: string;
+    liveRoomId: number;
+    userInfo?: IUser;
+    created_at?: number;
+    expired_at?: number;
+    client_ip?: string;
+  }) => {
+    const res = await redisController.setExVal({
       prefix: `${REDIS_PREFIX.roomIsLiveing}`,
-      key: `${data.liveId}`,
+      key: `${data.liveRoomId}`,
+      value: filterObj(data, ['created_at', 'expired_at', 'client_ip']),
+      exp: 60 * 1,
+      created_at: data.created_at,
+      expired_at: data.expired_at,
+      client_ip: data.client_ip,
     });
     return res;
+  };
+
+  /** 获取主播是否正在直播 */
+  getAnchorLiving = async (data: {
+    liveRoomId: number;
+  }): Promise<{
+    value: {
+      liveRoomId: number;
+      socketId: string;
+      userInfo?: IUser;
+    };
+    created_at?: number;
+    expired_at?: number;
+    client_ip?: string;
+  } | null> => {
+    const res = await redisController.getVal({
+      prefix: `${REDIS_PREFIX.roomIsLiveing}`,
+      key: `${data.liveRoomId}`,
+    });
+    return res ? JSON.parse(res) : null;
   };
 }
 

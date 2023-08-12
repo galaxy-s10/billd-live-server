@@ -157,6 +157,13 @@ module.exports = {
         'import/no-dynamic-require': 0, // 禁止使用动态的require，如：require(`../${name}`)
 
         // @typescript-eslint插件
+        '@typescript-eslint/restrict-template-expressions': [
+          'error',
+          {
+            allowBoolean: true,
+            allowNumber: true,
+          },
+        ], // 强制模板文字表达式为string类型。即const a = {};console.log(`${a}`);会报错
         '@typescript-eslint/no-use-before-define': 2, // 此规则扩展了基本eslint/no-use-before-define规则。它增加了对type,interface和enum声明的支持。
         '@typescript-eslint/no-unused-vars': 2, // 禁止出现未使用过的变量
         '@typescript-eslint/no-shadow': 2, // 禁止变量声明与外层作用域的变量同名

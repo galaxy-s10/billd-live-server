@@ -48,6 +48,7 @@ class RedisController {
     exp,
     created_at,
     expired_at,
+    client_ip,
   }: {
     prefix: string;
     key: string;
@@ -56,6 +57,7 @@ class RedisController {
     exp: number;
     created_at?: number;
     expired_at?: number;
+    client_ip?: string;
   }) => {
     await redisClient.setEx(
       `${prefix}${key}`,
@@ -64,6 +66,7 @@ class RedisController {
         value,
         created_at: created_at || +new Date(),
         expired_at: expired_at || +new Date() + exp * 1000,
+        client_ip: client_ip || '',
       })
     );
   };

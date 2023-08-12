@@ -90,8 +90,8 @@ export const REDIS_PREFIX = {
   emailRegister: `${PROJECT_NAME}-${PROJECT_ENV}-emailRegister___`, // 注册不区分前后台
   userBindEmail: `${PROJECT_NAME}-${PROJECT_ENV}-userBindEmail___`, // 用户绑定邮箱
   userCancelBindEmail: `${PROJECT_NAME}-${PROJECT_ENV}-userCancelBindEmail___`, // 用户取消绑定邮箱
-  joined: `${PROJECT_NAME}-${PROJECT_ENV}-joined___`, // 游客加入了房间
-  roomIsLiveing: `${PROJECT_NAME}-${PROJECT_ENV}-roomIsLiveing___`, // 用户正在直播
+  joined: `${PROJECT_NAME}-${PROJECT_ENV}-joined___`, // 用户加入了房间
+  roomIsLiveing: `${PROJECT_NAME}-${PROJECT_ENV}-roomIsLiveing___`, // 主播正在直播
   order: `${PROJECT_NAME}-${PROJECT_ENV}-order___`, // 订单
 };
 
