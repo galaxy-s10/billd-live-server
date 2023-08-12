@@ -8,6 +8,7 @@ import successHandler from '@/app/handler/success-handle';
 import { SERVER_LIVE } from '@/config/secret';
 import { wsSocket } from '@/config/websocket';
 import { WsMsgTypeEnum } from '@/config/websocket/constant';
+import liveRedisController from '@/config/websocket/live-redis.controller';
 import { ALLOW_HTTP_CODE } from '@/constant';
 import { IList, ILiveRoom, IRoomLiving } from '@/interface';
 import { CustomError } from '@/model/customError.model';
@@ -15,6 +16,8 @@ import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
 import userLiveRoomService from '@/service/userLiveRoom.service';
 import { chalkERROR } from '@/utils/chalkTip';
+
+import liveController from './live.controller';
 
 class LiveRoomController {
   common = {
@@ -113,21 +116,18 @@ class LiveRoomController {
           const roomLivingData: IRoomLiving['data'] = {
             live_room: liveRoomInfo,
           };
-          console.log('----', roomId);
           wsSocket.io
             ?.to(roomId)
             .emit(WsMsgTypeEnum.roomLiving, { data: roomLivingData });
 
           const liveRoom = await liveRoomService.find(Number(roomId));
-          // if (liveRoom?.type === LiveRoomTypeEnum.system) {
-          liveService.create({
+          liveController.common.create({
             live_room_id: Number(roomId),
             user_id: liveRoom?.user_live_room?.user?.id,
             socket_id: '-1',
             track_audio: 1,
             track_video: 1,
           });
-          // }
           ctx.body = { code: 0, msg: 'on_publish auth success' };
         }
       }
@@ -148,7 +148,10 @@ class LiveRoomController {
     } else {
       console.log('on_unpublish成功');
       ctx.body = { code: 0, msg: 'on_unpublish success' };
-      liveService.deleteByLiveRoomId(Number(roomId));
+      liveController.common.deleteByLiveRoomId(Number(roomId));
+      liveRedisController.delAnchorLiving({
+        liveRoomId: Number(roomId),
+      });
     }
     await next();
   }

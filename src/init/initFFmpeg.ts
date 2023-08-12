@@ -19,7 +19,6 @@ function ffmpegIsInstalled() {
 
 async function addLive({
   live_room_id,
-  user_id,
   localFile,
   cover_img,
   cdn,
@@ -91,6 +90,7 @@ async function addLive({
       id: live_room_id,
       cover_img,
       type: LiveRoomTypeEnum.system,
+      cdn,
       rtmp_url,
       flv_url,
       hls_url,

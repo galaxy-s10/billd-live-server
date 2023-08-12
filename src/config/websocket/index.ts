@@ -9,6 +9,8 @@ import {
 } from '@/config/websocket/constant';
 import liveRedisController from '@/config/websocket/live-redis.controller';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import liveController from '@/controller/live.controller';
+import { LiveRoomTypeEnum } from '@/interface';
 import {
   WSGetRoomAllUserType,
   WsAnswerType,
@@ -242,18 +244,7 @@ export const connectWebSocket = (server) => {
           liveUser,
         },
       });
-      const anchorIsLiving = await liveRedisController.getAnchorLiving({
-        liveRoomId: data.data.live_room.id!,
-      });
-      if (!anchorIsLiving) {
-        socketEmit<WsRoomNoLiveType['data']>({
-          socket,
-          msgType: WsMsgTypeEnum.roomNoLive,
-          data: {
-            live_room: liveRoomInfo,
-          },
-        });
-      } else {
+      if (liveRoomInfo.type === LiveRoomTypeEnum.system) {
         socketEmit<WsRoomLivingType['data']>({
           socket,
           msgType: WsMsgTypeEnum.roomLiving,
@@ -267,7 +258,35 @@ export const connectWebSocket = (server) => {
           userInfo: data.user_info,
           client_ip: socket.handshake.address,
         });
+      } else {
+        const anchorIsLiving = await liveRedisController.getAnchorLiving({
+          liveRoomId: data.data.live_room.id!,
+        });
+        if (!anchorIsLiving) {
+          socketEmit<WsRoomNoLiveType['data']>({
+            socket,
+            msgType: WsMsgTypeEnum.roomNoLive,
+            data: {
+              live_room: liveRoomInfo,
+            },
+          });
+        } else {
+          socketEmit<WsRoomLivingType['data']>({
+            socket,
+            msgType: WsMsgTypeEnum.roomLiving,
+            data: {
+              live_room: liveRoomInfo,
+            },
+          });
+          liveRedisController.setUserJoinedRoom({
+            socketId: socket.id,
+            joinRoomId: roomId,
+            userInfo: data.user_info,
+            client_ip: socket.handshake.address,
+          });
+        }
       }
+
       socketEmit<WsOtherJoinType['data']>({
         socket,
         msgType: WsMsgTypeEnum.otherJoin,
@@ -378,15 +397,6 @@ export const connectWebSocket = (server) => {
         roomId: data.roomId,
         msgType: WsMsgTypeEnum.roomLiving,
         data,
-      });
-    });
-
-    // 收到主播不在直播
-    socket.on(WsMsgTypeEnum.roomNoLive, (data) => {
-      prettierInfoLog({
-        msg: '收到主播不在直播',
-        socketId: socket.id,
-        roomId: data.roomId,
       });
     });
 
@@ -513,6 +523,8 @@ export const connectWebSocket = (server) => {
           socketId: socket.id,
         });
         if (res1) {
+          console.log('1111111111');
+
           const { joinRoomId, userInfo } = res1.value;
           const liveUser = await getRoomAllUser(io, joinRoomId);
           liveRedisController.delUserJoinedRoom({ socketId: socket.id });
@@ -534,7 +546,16 @@ export const connectWebSocket = (server) => {
           const res2 = await liveRedisController.getAnchorLiving({
             liveRoomId: joinRoomId,
           });
+          console.log('22222222222');
           if (res2) {
+            console.log(
+              333333333,
+              joinRoomId,
+              res2.value.liveRoomId,
+              socket.id,
+              res2.value.socketId
+            );
+
             if (
               joinRoomId === res2.value.liveRoomId &&
               socket.id === res2.value.socketId
@@ -549,6 +570,8 @@ export const connectWebSocket = (server) => {
                   live_room: liveRoomInfo!,
                 },
               });
+              // 不能只在on_unpublish回调里面删除live记录，因为on_unpublish会延迟几秒
+              liveController.common.deleteByLiveRoomId(joinRoomId);
               liveRedisController.delAnchorLiving({
                 liveRoomId: joinRoomId,
               });

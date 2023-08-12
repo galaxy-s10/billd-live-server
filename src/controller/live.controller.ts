@@ -9,18 +9,32 @@ import liveService from '@/service/live.service';
 
 class LiveController {
   common = {
-    getList: async (data) => {
-      const {
-        id,
-        orderBy = 'asc',
-        orderName = 'id',
-        nowPage,
-        pageSize,
-        keyWord,
-        rangTimeType,
-        rangTimeStart,
-        rangTimeEnd,
-      }: IList<ILive> = data;
+    create: async ({
+      socket_id,
+      live_room_id,
+      user_id,
+      track_audio,
+      track_video,
+    }: ILive) => {
+      await liveService.create({
+        socket_id,
+        live_room_id,
+        user_id,
+        track_audio,
+        track_video,
+      });
+    },
+    getList: async ({
+      id,
+      orderBy = 'asc',
+      orderName = 'id',
+      nowPage,
+      pageSize,
+      keyWord,
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    }: IList<ILive>) => {
       const result = await liveService.getList({
         id,
         nowPage,
@@ -48,6 +62,9 @@ class LiveController {
       } else {
         await liveService.delete(id);
       }
+    },
+    deleteByLiveRoomId: async (liveRoomId: number) => {
+      await liveService.deleteByLiveRoomId(liveRoomId);
     },
   };
 
@@ -82,7 +99,7 @@ class LiveController {
       track_audio,
       track_video,
     }: ILive = ctx.request.body;
-    await liveService.create({
+    await this.common.create({
       socket_id,
       live_room_id,
       user_id,
