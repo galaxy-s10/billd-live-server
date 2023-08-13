@@ -313,6 +313,11 @@ export const connectWebSocket = (server) => {
         return;
       }
       const roomId = userLiveRoomInfo.live_room_id!;
+      liveRoomService.update({
+        id: roomId,
+        cover_img: data.data.cover_img,
+        name: data.data.name,
+      });
       prettierInfoLog({
         msg: '收到主播开始直播',
         socketId: socket.id,
