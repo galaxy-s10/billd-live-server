@@ -2,6 +2,7 @@ import { exec, spawnSync } from 'child_process';
 
 import { SERVER_LIVE } from '@/config/secret';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import liveController from '@/controller/live.controller';
 import { initUser } from '@/init/initUser';
 import { LiveRoomTypeEnum } from '@/interface';
 import liveService from '@/service/live.service';
@@ -19,6 +20,7 @@ function ffmpegIsInstalled() {
 
 async function addLive({
   live_room_id,
+  user_id,
   localFile,
   cover_img,
   cdn,
@@ -75,16 +77,6 @@ async function addLive({
       } catch (error) {
         console.log(chalkERROR(`FFmpeg推流错误！`), error);
       }
-      // const isLiveing = await liveService.findByRoomId(live_room_id);
-      // if (!isLiveing) {
-      //   await liveService.create({
-      //     live_room_id,
-      //     user_id,
-      //     socket_id: `${live_room_id}`,
-      //     track_audio: 1,
-      //     track_video: 1,
-      //   });
-      // }
     }
     await liveRoomService.update({
       id: live_room_id,
@@ -96,7 +88,8 @@ async function addLive({
       hls_url,
     });
   }
-  if (cdn === 1) {
+
+  if (cdn === 1 && PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
     await tencentcloudUtils.dropLiveStream({
       roomId: live_room_id,
     });
@@ -114,8 +107,17 @@ async function addLive({
       flv_url = pullUrlRes.flv;
       hls_url = pullUrlRes.hls;
       await main();
+      liveController.common.create({
+        live_room_id,
+        user_id,
+        socket_id: '-1',
+        track_audio: 1,
+        track_video: 1,
+      });
     }
-  } else if (cdn === 2) {
+  }
+
+  if (cdn === 2) {
     const liveRoomInfo = await liveRoomService.findKey(live_room_id);
     rtmp_url = `${SERVER_LIVE.PushDomain}/${
       SERVER_LIVE.AppName

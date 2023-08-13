@@ -523,8 +523,6 @@ export const connectWebSocket = (server) => {
           socketId: socket.id,
         });
         if (res1) {
-          console.log('1111111111');
-
           const { joinRoomId, userInfo } = res1.value;
           const liveUser = await getRoomAllUser(io, joinRoomId);
           liveRedisController.delUserJoinedRoom({ socketId: socket.id });
@@ -546,16 +544,7 @@ export const connectWebSocket = (server) => {
           const res2 = await liveRedisController.getAnchorLiving({
             liveRoomId: joinRoomId,
           });
-          console.log('22222222222');
           if (res2) {
-            console.log(
-              333333333,
-              joinRoomId,
-              res2.value.liveRoomId,
-              socket.id,
-              res2.value.socketId
-            );
-
             if (
               joinRoomId === res2.value.liveRoomId &&
               socket.id === res2.value.socketId
