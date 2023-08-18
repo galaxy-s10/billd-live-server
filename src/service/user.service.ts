@@ -25,7 +25,7 @@ class UserService {
     return res === ids.length;
   }
 
-  async login(id: number, password: string) {
+  async login({ id, password }: IUser) {
     const result = await userModel.findOne({
       attributes: {
         exclude: ['password', 'token'],

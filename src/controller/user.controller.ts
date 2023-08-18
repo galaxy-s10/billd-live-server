@@ -1,7 +1,7 @@
 import { arrayUnique } from 'billd-utils';
 import { ParameterizedContext } from 'koa';
 
-import { authJwt } from '@/app/auth/authJwt';
+import { authJwt, signJwt } from '@/app/auth/authJwt';
 import { verifyUserAuth } from '@/app/auth/verifyUserAuth';
 import successHandler from '@/app/handler/success-handle';
 import { ALLOW_HTTP_CODE, PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
@@ -13,6 +13,31 @@ import userService from '@/service/user.service';
 class UserController {
   common = {
     list: (data) => userService.getList(data),
+  };
+
+  login = async (ctx: ParameterizedContext, next) => {
+    const { id, password, exp = 24 } = ctx.request.body;
+    const userInfo: any = await userService.login({ id, password });
+    if (!userInfo) {
+      throw new CustomError(
+        '账号或密码错误！',
+        ALLOW_HTTP_CODE.paramsError,
+        ALLOW_HTTP_CODE.paramsError
+      );
+    }
+    const token = signJwt({
+      userInfo,
+      exp,
+    });
+    await userService.update({ token, id: userInfo?.id }); // 每次登录都更新token
+    successHandler({ ctx, data: token, message: '登录成功！' });
+
+    /**
+     * 这个其实是最后一个中间件了，其实加不加调不调用next都没硬性，但是为了防止后面要
+     * 是扩展又加了一个中间件，这里不调用await next()的话，会导致下一个中间件出现404或其他问题，
+     * 因此还是得在这调用一次await next()
+     */
+    await next();
   };
 
   list = async (ctx: ParameterizedContext, next) => {

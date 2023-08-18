@@ -5,6 +5,9 @@ import { ALLOW_HTTP_CODE, COMMON_ERR_MSG } from '@/constant';
 import { IUser } from '@/interface';
 import userService from '@/service/user.service';
 
+/**
+ * 验证jwt
+ */
 const authJwt = (
   ctx
 ): Promise<{ code: number; message: string; userInfo?: IUser }> => {
@@ -74,7 +77,9 @@ const authJwt = (
   });
 };
 
-// 生成jwt
+/**
+ * 生成jwt
+ */
 const signJwt = (value: { userInfo: any; exp: number }): string => {
   const res = jwt.sign(
     { ...value, exp: Math.floor(Date.now() / 1000) + 60 * 60 * value.exp },
