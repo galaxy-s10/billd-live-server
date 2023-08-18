@@ -24,6 +24,7 @@ async function addLive({
   cover_img,
   cdn,
   initFFmpeg,
+  weight,
 }: {
   live_room_id: number;
   user_id: number;
@@ -31,6 +32,7 @@ async function addLive({
   cover_img: string;
   cdn: number; // 1:使用cdn;2:不使用cdn
   initFFmpeg: boolean;
+  weight: number;
 }) {
   let flv_url = '';
   let hls_url = '';
@@ -82,6 +84,7 @@ async function addLive({
       cover_img,
       type: LiveRoomTypeEnum.system,
       cdn,
+      weight,
       rtmp_url,
       flv_url,
       hls_url,
@@ -149,6 +152,7 @@ export const initFFmpeg = async (init = true) => {
           cover_img: initUser[item].live_room.cover_img,
           cdn: initUser[item].live_room.cdn,
           initFFmpeg: initUser[item].live_room.initFFmpeg,
+          weight: initUser[item].live_room.weight,
         })
       );
     });
