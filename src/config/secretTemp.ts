@@ -30,18 +30,6 @@ export const TENCENTCLOUD_LIVE = {
   Key: '**********', // 鉴权Key，https://console.cloud.tencent.com/live/domainmanage/detail/185429.push.tlivecloud.com?tab=pushConfig
 };
 
-export const SERVER_LIVE = {
-  PushDomain:
-    PROJECT_ENV === PROJECT_ENV_ENUM.development
-      ? 'rtmp://localhost'
-      : '**********', // 推流域名
-  PullDomain:
-    PROJECT_ENV === PROJECT_ENV_ENUM.development
-      ? 'http://localhost:5001'
-      : '**********', // 拉流域名
-  AppName: 'livestream',
-};
-
 export const MYSQL_CONFIG = {
   docker: {
     container: 'billd-live-mysql',
@@ -145,3 +133,15 @@ export const ALIPAY_LIVE_CONFIG = {
     '**********************************************************************************************************************************************************************************************************************',
   gateway: '**********',
 }; // 支付宝当面付-自然博客直播
+
+export const SERVER_LIVE = {
+  PushDomain:
+    PROJECT_ENV === PROJECT_ENV_ENUM.development
+      ? 'rtmp://localhost'
+      : '**********', // 推流域名
+  PullDomain:
+    PROJECT_ENV === PROJECT_ENV_ENUM.development
+      ? `http://localhost:${SRS_CONFIG.docker.port['8080']}` // http://localhost:5001、http://localhost:8000/livestream
+      : '**********', // 拉流域名
+  AppName: 'livestream',
+};

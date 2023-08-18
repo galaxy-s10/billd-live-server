@@ -9,21 +9,6 @@ import liveService from '@/service/live.service';
 
 class LiveController {
   common = {
-    create: async ({
-      socket_id,
-      live_room_id,
-      user_id,
-      track_audio,
-      track_video,
-    }: ILive) => {
-      await liveService.create({
-        socket_id,
-        live_room_id,
-        user_id,
-        track_audio,
-        track_video,
-      });
-    },
     getList: async ({
       id,
       orderBy = 'asc',
@@ -79,34 +64,6 @@ class LiveController {
     const id = +ctx.params.id;
     const result = await liveService.find(id);
     successHandler({ ctx, data: result });
-
-    await next();
-  }
-
-  async create(ctx: ParameterizedContext, next) {
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        `权限不足！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
-    const {
-      socket_id,
-      live_room_id,
-      user_id,
-      track_audio,
-      track_video,
-    }: ILive = ctx.request.body;
-    await this.common.create({
-      socket_id,
-      live_room_id,
-      user_id,
-      track_audio,
-      track_video,
-    });
-    successHandler({ ctx });
 
     await next();
   }

@@ -33,9 +33,10 @@ const frontendWhiteList = [
   '/email_user/register', // 注册，这个接口是post的
   '/order/pay',
   '/wallet/init',
-  '/live_room/on_publish',
-  '/live_room/on_play',
-  '/live_room/on_unpublish',
+
+  '/srs/on_publish',
+  '/srs/on_play',
+  '/srs/on_unpublish',
   '/srs/rtcV1Publish',
   '/srs/rtcV1Play',
   '/srs/apiV1StreamsDel',

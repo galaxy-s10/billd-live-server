@@ -2,7 +2,6 @@ import { exec, spawnSync } from 'child_process';
 
 import { SERVER_LIVE } from '@/config/secret';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
-import liveController from '@/controller/live.controller';
 import { initUser } from '@/init/initUser';
 import { LiveRoomTypeEnum } from '@/interface';
 import liveService from '@/service/live.service';
@@ -107,13 +106,6 @@ async function addLive({
       flv_url = pullUrlRes.flv;
       hls_url = pullUrlRes.hls;
       await main();
-      liveController.common.create({
-        live_room_id,
-        user_id,
-        socket_id: '-1',
-        track_audio: 1,
-        track_video: 1,
-      });
     }
   }
 

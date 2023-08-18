@@ -153,6 +153,18 @@ class LiveService {
     user_id,
     track_audio,
     track_video,
+    srs_action,
+    srs_app,
+    srs_client_id,
+    srs_ip,
+    srs_param,
+    srs_server_id,
+    srs_service_id,
+    srs_stream,
+    srs_stream_id,
+    srs_stream_url,
+    srs_tcUrl,
+    srs_vhost,
   }: ILive) {
     const result = await liveModel.update(
       {
@@ -161,6 +173,18 @@ class LiveService {
         user_id,
         track_audio,
         track_video,
+        srs_action,
+        srs_app,
+        srs_client_id,
+        srs_ip,
+        srs_param,
+        srs_server_id,
+        srs_service_id,
+        srs_stream,
+        srs_stream_id,
+        srs_stream_url,
+        srs_tcUrl,
+        srs_vhost,
       },
       { where: { id } }
     );
@@ -168,11 +192,43 @@ class LiveService {
   }
 
   /** 修改直播 */
-  async updateByLoomId({ live_room_id, track_audio, track_video }: ILive) {
+  async updateByLoomId({
+    socket_id,
+    live_room_id,
+    user_id,
+    track_audio,
+    track_video,
+    srs_action,
+    srs_app,
+    srs_client_id,
+    srs_ip,
+    srs_param,
+    srs_server_id,
+    srs_service_id,
+    srs_stream,
+    srs_stream_id,
+    srs_stream_url,
+    srs_tcUrl,
+    srs_vhost,
+  }: ILive) {
     const result = await liveModel.update(
       {
+        socket_id,
+        user_id,
         track_audio,
         track_video,
+        srs_action,
+        srs_app,
+        srs_client_id,
+        srs_ip,
+        srs_param,
+        srs_server_id,
+        srs_service_id,
+        srs_stream,
+        srs_stream_id,
+        srs_stream_url,
+        srs_tcUrl,
+        srs_vhost,
       },
       { where: { live_room_id } }
     );
@@ -186,6 +242,18 @@ class LiveService {
     user_id,
     track_audio,
     track_video,
+    srs_action,
+    srs_app,
+    srs_client_id,
+    srs_ip,
+    srs_param,
+    srs_server_id,
+    srs_service_id,
+    srs_stream,
+    srs_stream_id,
+    srs_stream_url,
+    srs_tcUrl,
+    srs_vhost,
   }: ILive) {
     const result = await liveModel.create({
       socket_id,
@@ -193,6 +261,18 @@ class LiveService {
       user_id,
       track_audio,
       track_video,
+      srs_action,
+      srs_app,
+      srs_client_id,
+      srs_ip,
+      srs_param,
+      srs_server_id,
+      srs_service_id,
+      srs_stream,
+      srs_stream_id,
+      srs_stream_url,
+      srs_tcUrl,
+      srs_vhost,
     });
     return result;
   }

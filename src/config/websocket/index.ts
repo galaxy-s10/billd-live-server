@@ -107,27 +107,6 @@ async function updateUserJoinedRoom(data: {
   }
 }
 
-async function updateRoomIsLiveing(data: {
-  liveRoomId: number;
-  client_ip?: string;
-}) {
-  try {
-    const res = await liveRedisController.getAnchorLiving({
-      liveRoomId: data.liveRoomId,
-    });
-    if (res) {
-      await liveRedisController.setAnchorLiving({
-        liveRoomId: data.liveRoomId,
-        socketId: res.value.socketId,
-        userInfo: res.value.userInfo,
-        client_ip: data.client_ip,
-      });
-    }
-  } catch (error) {
-    console.log(error);
-  }
-}
-
 export const wsSocket: { io?: Server } = {
   io: undefined,
 };
@@ -212,7 +191,10 @@ export const connectWebSocket = (server) => {
         console.log(chalkERROR('roomId为空'));
         return;
       }
-      const [liveRoomInfo] = await Promise.all([liveRoomService.find(roomId)]);
+      const [liveRoomInfo, liveInfo] = await Promise.all([
+        liveRoomService.find(roomId),
+        liveService.findByRoomId(roomId),
+      ]);
       if (!liveRoomInfo) {
         console.log(chalkERROR('liveRoomInfo为空'));
         return;
@@ -244,7 +226,7 @@ export const connectWebSocket = (server) => {
           liveUser,
         },
       });
-      if (liveRoomInfo.type === LiveRoomTypeEnum.system) {
+      if (liveRoomInfo.type === LiveRoomTypeEnum.system && liveInfo) {
         socketEmit<WsRoomLivingType['data']>({
           socket,
           msgType: WsMsgTypeEnum.roomLiving,
@@ -258,33 +240,28 @@ export const connectWebSocket = (server) => {
           userInfo: data.user_info,
           client_ip: socket.handshake.address,
         });
-      } else {
-        const anchorIsLiving = await liveRedisController.getAnchorLiving({
-          liveRoomId: data.data.live_room.id!,
+      } else if (!liveInfo) {
+        socketEmit<WsRoomNoLiveType['data']>({
+          socket,
+          msgType: WsMsgTypeEnum.roomNoLive,
+          data: {
+            live_room: liveRoomInfo,
+          },
         });
-        if (!anchorIsLiving) {
-          socketEmit<WsRoomNoLiveType['data']>({
-            socket,
-            msgType: WsMsgTypeEnum.roomNoLive,
-            data: {
-              live_room: liveRoomInfo,
-            },
-          });
-        } else {
-          socketEmit<WsRoomLivingType['data']>({
-            socket,
-            msgType: WsMsgTypeEnum.roomLiving,
-            data: {
-              live_room: liveRoomInfo,
-            },
-          });
-          liveRedisController.setUserJoinedRoom({
-            socketId: socket.id,
-            joinRoomId: roomId,
-            userInfo: data.user_info,
-            client_ip: socket.handshake.address,
-          });
-        }
+      } else {
+        socketEmit<WsRoomLivingType['data']>({
+          socket,
+          msgType: WsMsgTypeEnum.roomLiving,
+          data: {
+            live_room: liveRoomInfo,
+          },
+        });
+        liveRedisController.setUserJoinedRoom({
+          socketId: socket.id,
+          joinRoomId: roomId,
+          userInfo: data.user_info,
+          client_ip: socket.handshake.address,
+        });
       }
 
       socketEmit<WsOtherJoinType['data']>({
@@ -322,12 +299,6 @@ export const connectWebSocket = (server) => {
         msg: '收到主播开始直播',
         socketId: socket.id,
         roomId,
-      });
-      liveRedisController.setAnchorLiving({
-        liveRoomId: userLiveRoomInfo.live_room_id!,
-        socketId: socket.id,
-        userInfo: data.user_info,
-        client_ip: socket.handshake.address,
       });
     });
 
@@ -422,10 +393,6 @@ export const connectWebSocket = (server) => {
         });
         const liveRoomId = res?.value.userInfo?.live_rooms?.[0].id;
         if (liveRoomId && res?.value.joinRoomId === liveRoomId) {
-          updateRoomIsLiveing({
-            liveRoomId,
-            client_ip: socket.handshake.address,
-          });
         }
       }
     );

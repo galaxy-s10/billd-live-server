@@ -37,6 +37,42 @@ const model = sequelize.define<LiveModel>(
     track_audio: {
       type: DataTypes.INTEGER,
     },
+    srs_server_id: {
+      type: DataTypes.STRING,
+    },
+    srs_service_id: {
+      type: DataTypes.STRING,
+    },
+    srs_action: {
+      type: DataTypes.STRING,
+    },
+    srs_client_id: {
+      type: DataTypes.STRING,
+    },
+    srs_ip: {
+      type: DataTypes.STRING,
+    },
+    srs_vhost: {
+      type: DataTypes.STRING,
+    },
+    srs_app: {
+      type: DataTypes.STRING,
+    },
+    srs_tcUrl: {
+      type: DataTypes.STRING,
+    },
+    srs_stream: {
+      type: DataTypes.STRING,
+    },
+    srs_param: {
+      type: DataTypes.STRING,
+    },
+    srs_stream_url: {
+      type: DataTypes.STRING,
+    },
+    srs_stream_id: {
+      type: DataTypes.STRING,
+    },
   },
   {
     paranoid: true,

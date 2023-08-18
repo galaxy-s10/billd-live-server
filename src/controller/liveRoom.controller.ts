@@ -6,18 +6,11 @@ import { authJwt } from '@/app/auth/authJwt';
 import { verifyUserAuth } from '@/app/auth/verifyUserAuth';
 import successHandler from '@/app/handler/success-handle';
 import { SERVER_LIVE } from '@/config/secret';
-import { wsSocket } from '@/config/websocket';
-import { WsMsgTypeEnum } from '@/config/websocket/constant';
-import liveRedisController from '@/config/websocket/live-redis.controller';
 import { ALLOW_HTTP_CODE } from '@/constant';
-import { IList, ILiveRoom, IRoomLiving } from '@/interface';
+import { IList, ILiveRoom } from '@/interface';
 import { CustomError } from '@/model/customError.model';
-import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
 import userLiveRoomService from '@/service/userLiveRoom.service';
-import { chalkERROR } from '@/utils/chalkTip';
-
-import liveController from './live.controller';
 
 class LiveRoomController {
   common = {
@@ -64,95 +57,6 @@ class LiveRoomController {
     const id = +ctx.params.id;
     const result = await liveRoomService.find(id);
     successHandler({ ctx, data: result });
-    await next();
-  }
-
-  async onPlay(ctx: ParameterizedContext, next) {
-    // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
-    // code等于数字0表示成功，其他错误码代表失败。
-    ctx.body = { code: 0, msg: 'room is living' };
-    await next();
-  }
-
-  onPublish = async (ctx: ParameterizedContext, next) => {
-    // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
-    // code等于数字0表示成功，其他错误码代表失败。
-    const { body } = ctx.request;
-    console.log(body, 'on_publish参数');
-    const reg = /^roomId___(.+)/g;
-    const roomId = reg.exec(body.stream)?.[1];
-    if (!roomId) {
-      ctx.body = { code: 1, msg: 'no live_room' };
-    } else {
-      const result = await liveRoomService.findKey(Number(roomId));
-      const rtmptoken = result?.key;
-      const params = new URLSearchParams(body.param);
-      const paramstoken = params.get('token');
-      const paramstype = params.get('type');
-      if (rtmptoken !== paramstoken) {
-        console.log('鉴权失败');
-        ctx.body = { code: 1, msg: 'on_publish auth fail' };
-      } else {
-        if (paramstype) {
-          await this.common.update({
-            id: Number(roomId),
-            type: Number(paramstype),
-          });
-        }
-        const isLiveing = await liveService.findByRoomId(Number(roomId));
-        if (isLiveing) {
-          console.log('鉴权成功，但是正在直播，不允许推流');
-          ctx.body = { code: 1, msg: 'room is living' };
-          // ctx.body = { code: 0, msg: 'on_publish room is living' };
-        } else {
-          console.log('鉴权成功，允许推流');
-          const [liveRoomInfo] = await Promise.all([
-            liveRoomService.find(Number(roomId)),
-          ]);
-          if (!liveRoomInfo) {
-            console.log(chalkERROR('liveRoomInfo为空'));
-            return;
-          }
-          const roomLivingData: IRoomLiving['data'] = {
-            live_room: liveRoomInfo,
-          };
-          wsSocket.io
-            ?.to(roomId)
-            .emit(WsMsgTypeEnum.roomLiving, { data: roomLivingData });
-
-          const liveRoom = await liveRoomService.find(Number(roomId));
-          liveController.common.create({
-            live_room_id: Number(roomId),
-            user_id: liveRoom?.user_live_room?.user?.id,
-            socket_id: '-1',
-            track_audio: 1,
-            track_video: 1,
-          });
-          ctx.body = { code: 0, msg: 'on_publish auth success' };
-        }
-      }
-    }
-    await next();
-  };
-
-  async onUnpublish(ctx: ParameterizedContext, next) {
-    // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
-    // code等于数字0表示成功，其他错误码代表失败。
-    const { body } = ctx.request;
-    console.log(body, 'on_unpublish参数');
-    const reg = /^roomId___(.+)/g;
-    const roomId = reg.exec(body.stream)?.[1];
-    if (!roomId) {
-      console.log('on_unpublish错误');
-      ctx.body = { code: 1, msg: 'on_unpublish fail, no is room' };
-    } else {
-      console.log('on_unpublish成功');
-      ctx.body = { code: 0, msg: 'on_unpublish success' };
-      liveController.common.deleteByLiveRoomId(Number(roomId));
-      liveRedisController.delAnchorLiving({
-        liveRoomId: Number(roomId),
-      });
-    }
     await next();
   }
 

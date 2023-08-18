@@ -14,4 +14,13 @@ srsRouter.get('/apiV1Clients', srsController.apiV1ClientsGet);
 
 srsRouter.post('/apiV1StreamsDel', srsController.apiV1StreamsDel);
 
+// SRS http回调
+srsRouter.post('/on_publish', srsController.onPublish);
+
+// SRS http回调
+srsRouter.post('/on_play', srsController.onPlay);
+
+// SRS http回调
+srsRouter.post('/on_unpublish', srsController.onUnpublish);
+
 export default srsRouter;

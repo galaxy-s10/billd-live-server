@@ -83,10 +83,12 @@ export const initTable = (data: {
     methodArg?: 'force' | 'alter'
   ) {
     if (methodArg === 'force') {
+      await deleteAllIndexs(data.sequelize);
       await deleteAllForeignKeys(data.sequelize);
       await modelArg.sync({ force: true });
       console.log(chalkSUCCESS(`${modelArg.tableName}表刚刚(重新)创建！`));
     } else if (methodArg === 'alter') {
+      await deleteAllIndexs(data.sequelize);
       await deleteAllForeignKeys(data.sequelize);
       await modelArg.sync({ alter: true });
       console.log(chalkSUCCESS(`${modelArg.tableName}表刚刚同步成功！`));

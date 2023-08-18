@@ -227,12 +227,28 @@ export interface IOrder {
   deleted_at?: string;
 }
 
-export interface ILive {
+export interface ISrsPublishStream {
+  srs_server_id?: string;
+  srs_service_id?: string;
+  srs_action?: string;
+  srs_client_id?: string;
+  srs_ip?: string;
+  srs_vhost?: string;
+  srs_app?: string;
+  srs_tcUrl?: string;
+  srs_stream?: string;
+  srs_param?: string;
+  srs_stream_url?: string;
+  srs_stream_id?: string;
+}
+
+export interface ILive extends ISrsPublishStream {
   id?: number;
   /** 用户信息 */
   user?: IUser;
   /** 直播间信息 */
   live_room?: ILiveRoom;
+
   socket_id?: string;
   user_id?: number;
   live_room_id?: number;
@@ -240,6 +256,7 @@ export interface ILive {
   track_video?: number;
   /** 1开启;2关闭 */
   track_audio?: number;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
