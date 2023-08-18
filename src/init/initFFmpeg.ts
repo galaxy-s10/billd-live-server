@@ -106,6 +106,14 @@ async function addLive({
       flv_url = pullUrlRes.flv;
       hls_url = pullUrlRes.hls;
       await main();
+      // 这个不能省，cdn不是推流到srs的，所以不能用不了srs的onpublish回调
+      liveService.create({
+        live_room_id,
+        user_id,
+        socket_id: '-1',
+        track_audio: 1,
+        track_video: 1,
+      });
     }
   }
 
