@@ -36,7 +36,7 @@ export const initUser = {
           ? '/node/video/fddm_yycy.mp4'
           : resolveApp('./video/fddm_yycy.mp4'),
       cover_img: fddmYycyBase64,
-      weight: 2,
+      weight: 10,
     },
   },
   systemUser1: {
