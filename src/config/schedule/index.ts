@@ -3,7 +3,7 @@ import schedule from 'node-schedule';
 import { SCHEDULE_TYPE } from '@/constant';
 import { chalkINFO } from '@/utils/chalkTip';
 
-import { handleRoomIsLiving } from './isLiveing';
+import { handleVerifyStream } from './verifyStream';
 
 const rule = new schedule.RecurrenceRule();
 
@@ -24,8 +24,8 @@ for (let i = 0; i < allSecond; i += 1) {
   allSecondArr.push(i);
 }
 
-// 每5分钟执行
-rule.minute = allMinuteArr.filter((v) => v % 5 === 0);
+// 每2分钟执行
+rule.minute = allMinuteArr.filter((v) => v % 2 === 0);
 rule.second = 0;
 
 // 每5秒执行
@@ -41,6 +41,6 @@ export const startSchedule = () => {
         }定时任务`
       )
     );
-    handleRoomIsLiving();
+    handleVerifyStream();
   });
 };

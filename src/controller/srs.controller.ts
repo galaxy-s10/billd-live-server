@@ -6,16 +6,32 @@ import { wsSocket } from '@/config/websocket';
 import { WsMsgTypeEnum } from '@/config/websocket/constant';
 import liveRedisController from '@/config/websocket/live-redis.controller';
 import { ISrsRTC } from '@/interface';
+import { IApiV1Streams } from '@/interface-srs';
 import { IRoomLiving } from '@/interface-ws';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
-import axios from '@/utils/request';
+import { myaxios } from '@/utils/request';
 
 class SRSController {
+  common = {
+    getApiV1Clients: () =>
+      myaxios.get(
+        `http://localhost:${SRS_CONFIG.docker.port[1985]}/api/v1/clients`
+      ),
+    getApiV1Streams: () =>
+      myaxios.get<IApiV1Streams>(
+        `http://localhost:${SRS_CONFIG.docker.port[1985]}/api/v1/streams`
+      ),
+    deleteApiV1Clients: (clientId: string) =>
+      myaxios.delete(
+        `http://localhost:${SRS_CONFIG.docker.port[1985]}/api/v1/clients/${clientId}`
+      ),
+  };
+
   rtcV1Publish = async (ctx: ParameterizedContext, next) => {
     const { api, clientip, sdp, streamurl, tid }: ISrsRTC = ctx.request.body;
-    const res = await axios.post(
+    const res = await myaxios.post(
       `http://localhost:${SRS_CONFIG.docker.port[1985]}/rtc/v1/publish/`,
       { api, clientip, sdp, streamurl, tid }
     );
@@ -28,7 +44,7 @@ class SRSController {
 
   rtcV1Play = async (ctx: ParameterizedContext, next) => {
     const { api, clientip, sdp, streamurl, tid }: ISrsRTC = ctx.request.body;
-    const res = await axios.post(
+    const res = await myaxios.post(
       `http://localhost:${SRS_CONFIG.docker.port[1985]}/rtc/v1/play/`,
       { api, clientip, sdp, streamurl, tid }
     );
@@ -39,10 +55,8 @@ class SRSController {
     await next();
   };
 
-  apiV1StreamsGet = async (ctx: ParameterizedContext, next) => {
-    const res = await axios.get(
-      `http://localhost:${SRS_CONFIG.docker.port[1985]}/api/v1/streams`
-    );
+  getApiV1Streams = async (ctx: ParameterizedContext, next) => {
+    const res = await this.common.getApiV1Streams();
     successHandler({
       ctx,
       data: res,
@@ -50,10 +64,8 @@ class SRSController {
     await next();
   };
 
-  apiV1ClientsGet = async (ctx: ParameterizedContext, next) => {
-    const res = await axios.get(
-      `http://localhost:${SRS_CONFIG.docker.port[1985]}/api/v1/clients`
-    );
+  getApiV1Clients = async (ctx: ParameterizedContext, next) => {
+    const res = await this.common.getApiV1Clients();
     successHandler({
       ctx,
       data: res,
@@ -61,11 +73,9 @@ class SRSController {
     await next();
   };
 
-  apiV1StreamsDel = async (ctx: ParameterizedContext, next) => {
-    const { clientid }: { clientid: string } = ctx.request.body;
-    const res = await axios.delete(
-      `http://localhost:${SRS_CONFIG.docker.port[1985]}/api/v1/clients/${clientid}`
-    );
+  deleteApiV1Clients = async (ctx: ParameterizedContext, next) => {
+    const { clientId }: { clientId: string } = ctx.params;
+    const res = await this.common.deleteApiV1Clients(clientId);
     successHandler({
       ctx,
       data: res,
@@ -139,7 +149,6 @@ class SRSController {
         }
 
         ctx.body = { code: 0, msg: '[on_publish] auth success, pass' };
-
         await liveService.create({
           live_room_id: Number(roomId),
           user_id: liveRoomInfo?.user_live_room?.user?.id,
@@ -182,7 +191,7 @@ class SRSController {
       console.log(chalkERROR('[on_unpublish] roomId为空'));
       ctx.body = { code: 1, msg: '[on_unpublish] fail, no roomId' };
     } else {
-      console.log(chalkSUCCESS('[on_unpublish] 成功'));
+      console.log(chalkSUCCESS(`[on_unpublish] 房间id：${roomId}，成功`));
       ctx.body = { code: 0, msg: '[on_unpublish] success' };
       liveService.deleteByLiveRoomId(Number(roomId));
       liveRedisController.delAnchorLiving({

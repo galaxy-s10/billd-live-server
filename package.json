@@ -39,7 +39,7 @@
     "axios": "^1.4.0",
     "billd-deploy": "^1.0.16",
     "billd-html-webpack-plugin": "^1.0.1",
-    "billd-utils": "^0.0.12",
+    "billd-utils": "^0.0.14",
     "chalk": "^4.1.2",
     "crypto-js": "^4.1.1",
     "dayjs": "^1.11.3",

@@ -21,7 +21,7 @@ import qqUserService from '@/service/qqUser.service';
 import thirdUserService from '@/service/thirdUser.service';
 import userService from '@/service/user.service';
 import walletService from '@/service/wallet.service';
-import axios from '@/utils/request';
+import { myaxios } from '@/utils/request';
 
 // WARN 有时候qq登录的回调会是这样的：https://admin.hsslive.cn/oauth/qq_login?error=100070&error_description=the+account+has+security+exception&state=99
 // WARN 即qq那边的回调错误，导致这个的原因可能是科学上网，关掉科学上网或者换个节点应该就能解决。
@@ -86,7 +86,7 @@ class QqUserController {
     params.grant_type = 'authorization_code';
     params.fmt = 'json';
     // https://wiki.connect.qq.com/%E4%BD%BF%E7%94%A8authorization_code%E8%8E%B7%E5%8F%96access_token
-    const accessToken: any = await axios.get(
+    const accessToken: any = await myaxios.get(
       'https://graph.qq.com/oauth2.0/token',
       {
         headers: { Accept: 'application/json' },
@@ -109,7 +109,7 @@ class QqUserController {
    * gender	性别。 如果获取不到则默认返回"男"
    */
   async getUserInfo({ access_token, oauth_consumer_key, openid }) {
-    const UserInfo: any = await axios.get(
+    const UserInfo: any = await myaxios.get(
       'https://graph.qq.com/user/get_user_info',
       {
         headers: { Accept: 'application/json' },
@@ -131,7 +131,7 @@ class QqUserController {
    */
   async getMeOauth({ access_token, unionid, fmt }) {
     try {
-      const OauthInfo: any = await axios.get(
+      const OauthInfo: any = await myaxios.get(
         'https://graph.qq.com/oauth2.0/me',
         {
           headers: { Accept: 'application/json' },

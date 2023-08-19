@@ -24,8 +24,8 @@ dependencies:
     specifier: ^1.0.1
     version: 1.0.1(@types/node@16.11.66)(esbuild@0.15.18)
   billd-utils:
-    specifier: ^0.0.12
-    version: 0.0.12(typescript@4.8.4)
+    specifier: ^0.0.14
+    version: 0.0.14(typescript@4.8.4)
   chalk:
     specifier: ^4.1.2
     version: 4.1.2
@@ -2406,7 +2406,7 @@ packages:
   /@types/resolve@1.17.1:
     resolution: {integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==}
     dependencies:
-      '@types/node': 18.16.3
+      '@types/node': 16.11.66
     dev: false
 
   /@types/serve-static@1.15.0:
@@ -3114,8 +3114,8 @@ packages:
       - webpack-cli
     dev: false
 
-  /billd-utils@0.0.12(typescript@4.8.4):
-    resolution: {integrity: sha512-bHB/gZk6I9fGKHQiu+QXpqBiCXF72kYi4/xDI8RZwdVsjFd6QqsItlx1MpX4j25GJnhsG2vbrg0tLQ48zXHQoQ==}
+  /billd-utils@0.0.14(typescript@4.8.4):
+    resolution: {integrity: sha512-ySmfxTG3xJP6ZCpPiEV58zqqhbSvZTtoSGL2pNgXy/IeUacqW5osttB8wLeLAOvs5PFtfLmSP5jtBmgkrxHIEg==}
     requiresBuild: true
     dependencies:
       '@babel/core': 7.21.5
@@ -5793,7 +5793,7 @@ packages:
     resolution: {integrity: sha512-KWYVV1c4i+jbMpaBC+U++4Va0cp8OisU185o73T1vo99hqi7w8tSJfUXYswwqqrjzwxa6KpRK54WhPvwf5w6PQ==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 18.16.3
+      '@types/node': 16.11.66
       merge-stream: 2.0.0
       supports-color: 7.2.0
     dev: false

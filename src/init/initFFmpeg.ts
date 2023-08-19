@@ -1,5 +1,7 @@
 import { exec, spawnSync } from 'child_process';
 
+import { asyncUpdate } from 'billd-utils';
+
 import { SERVER_LIVE } from '@/config/secret';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import { initUser } from '@/init/initUser';
@@ -133,6 +135,18 @@ async function addLive({
 
 export const initFFmpeg = async (init = true) => {
   if (!init) return;
+  // 开发环境的nodemon热更新会导致每次重启后执行initFFmpeg重新推流，但是重启node进程会导致之前的initFFmpeg子进程断掉，也就是会断开推流，导致触发on_publish。
+  // 因为断开流的on_publish有延迟，所以重启后执行initFFmpeg了，触发onpublish了，过一会才收到了之前的on_publish，导致出问题（on_publish里会删掉数据库live表的记录）
+  // 因此干脆重启一下srs容器？但重启太耗性能了，搞个延迟执行临时解决下先
+  if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
+    setTimeout(() => {
+      console.log(chalkWARN('五秒后初始化FFmpeg推流'));
+    }, 500);
+    // execSync(`docker restart ${SRS_CONFIG.docker.container}`);
+    await asyncUpdate(() => {
+      console.log('ok');
+    }, 5000);
+  }
   const flag = ffmpegIsInstalled();
   if (flag) {
     console.log(chalkWARN('ffmpeg已安装，开始运行ffmpeg推流'));

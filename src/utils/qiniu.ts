@@ -3,7 +3,7 @@ import qiniu from 'qiniu';
 
 import { QINIU_ACCESSKEY, QINIU_LIVE, QINIU_SECRETKEY } from '@/config/secret';
 import { chalkERROR } from '@/utils/chalkTip';
-import axios from '@/utils/request';
+import { myaxios } from '@/utils/request';
 
 export interface IQiniuKey {
   prefix: string;
@@ -81,7 +81,7 @@ class QiniuClass {
     const token = this.getAccessToken(reqUrl, 'GET', contentType);
     let res;
     try {
-      const qiniures = await axios.get(reqUrl, {
+      const qiniures = await myaxios.get(reqUrl, {
         headers: {
           // WARN 不要省略Content-Type这个请求头，否则报unauthorized！!!
           'Content-Type': contentType,

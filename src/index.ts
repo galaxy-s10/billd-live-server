@@ -16,17 +16,15 @@ import {
 
 async function main() {
   function adLog() {
-    setTimeout(() => {
-      console.log();
-      console.log(chalkINFO(`作者微信: shuisheng9905`));
-      console.log(chalkINFO(`付费课程: https://www.hsslive.cn/article/151`));
-      console.log(
-        chalkINFO(
-          `欢迎PR:   billd-live目前只有作者一人开发，难免有不足的地方，欢迎提PR或Issue`
-        )
-      );
-      console.log();
-    }, 1000);
+    console.log();
+    console.log(chalkINFO(`作者微信: shuisheng9905`));
+    console.log(chalkINFO(`付费课程: https://www.hsslive.cn/article/151`));
+    console.log(
+      chalkINFO(
+        `欢迎PR:   billd-live目前只有作者一人开发，难免有不足的地方，欢迎提PR或Issue`
+      )
+    );
+    console.log();
   }
   try {
     await Promise.all([

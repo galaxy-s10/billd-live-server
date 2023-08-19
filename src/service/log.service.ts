@@ -49,11 +49,6 @@ class LogService {
           },
         },
         {
-          api_from: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
           api_real_ip: {
             [Op.like]: `%${keyWord}%`,
           },
@@ -117,7 +112,6 @@ class LogService {
     id,
     user_id,
     api_user_agent,
-    api_from,
     api_referer,
     api_forwarded_for,
     api_real_ip,
@@ -138,7 +132,6 @@ class LogService {
         id,
         user_id,
         api_user_agent,
-        api_from,
         api_referer,
         api_forwarded_for,
         api_real_ip,
@@ -163,7 +156,6 @@ class LogService {
   async create({
     user_id,
     api_user_agent,
-    api_from,
     api_referer,
     api_forwarded_for,
     api_real_ip,
@@ -182,7 +174,6 @@ class LogService {
     const result = await logModel.create({
       user_id,
       api_user_agent,
-      api_from,
       api_referer,
       api_forwarded_for,
       api_real_ip,

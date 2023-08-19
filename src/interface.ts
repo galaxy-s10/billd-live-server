@@ -288,7 +288,6 @@ export interface ILog {
   user_id?: number;
   api_user_agent?: string;
   api_duration?: number;
-  api_from?: number;
   api_forwarded_for?: string;
   api_referer?: string;
   api_real_ip?: string;

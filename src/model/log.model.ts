@@ -32,9 +32,6 @@ const model = sequelize.define<LogModel>(
     api_user_agent: {
       type: DataTypes.TEXT, // qq浏览器的user_agent能达到四百多字符。。。。
     },
-    api_from: {
-      type: DataTypes.INTEGER, // 1:前台 2:后台
-    },
     api_forwarded_for: {
       type: DataTypes.STRING,
     },

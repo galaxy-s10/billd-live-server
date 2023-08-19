@@ -8,11 +8,11 @@ srsRouter.post('/rtcV1Publish', srsController.rtcV1Publish);
 
 srsRouter.post('/rtcV1Play', srsController.rtcV1Play);
 
-srsRouter.get('/apiV1Streams', srsController.apiV1StreamsGet);
+srsRouter.get('/apiV1Streams', srsController.getApiV1Streams);
 
-srsRouter.get('/apiV1Clients', srsController.apiV1ClientsGet);
+srsRouter.get('/apiV1Clients', srsController.getApiV1Clients);
 
-srsRouter.post('/apiV1StreamsDel', srsController.apiV1StreamsDel);
+srsRouter.delete('/apiV1Clients/:clientId', srsController.deleteApiV1Clients);
 
 // SRS http回调
 srsRouter.post('/on_publish', srsController.onPublish);

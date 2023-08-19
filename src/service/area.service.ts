@@ -9,7 +9,7 @@ import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
 import { handlePaging } from '@/utils';
 
-const { Op, col } = Sequelize;
+const { Op } = Sequelize;
 
 class AreaService {
   /** 分区是否存在 */

@@ -1,45 +1,39 @@
 import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
-import {
-  ALLOW_HTTP_CODE,
-  ERROR_HTTP_CODE,
-  PROJECT_ENV,
-  PROJECT_ENV_ENUM,
-} from '@/constant';
+import { ALLOW_HTTP_CODE, ERROR_HTTP_CODE, PROJECT_ENV } from '@/constant';
 import logController from '@/controller/log.controller';
 import { CustomError } from '@/model/customError.model';
-import { chalkINFO } from '@/utils/chalkTip';
+import { chalkINFO, chalkWARN } from '@/utils/chalkTip';
 
 // 全局错误处理中间件
 export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
+  console.log(chalkINFO('catchErrorMiddle中间件开始'));
   // 这个中间件是第一个中间件，得是异步的，否则直接就next到下一个中间件了
-  console.log('catchErrorMiddle中间件');
-  const start = Date.now();
+  const startTime = performance.now();
+  let duration = -1;
   const insertLog = async (info: {
     statusCode: number;
     errorCode: number;
+    duration: number;
     error: string;
     message: string;
   }) => {
-    if (PROJECT_ENV !== PROJECT_ENV_ENUM.beta) {
-      console.log(
-        chalkINFO(
-          `当前不是beta环境，写入日志，api_status_code：${info.statusCode}`
-        )
-      );
+    if (PROJECT_ENV !== 'beta') {
+      console.log(chalkINFO(`当前不是beta环境，写入日志`));
       // 将请求写入日志表
       const { userInfo } = await authJwt(ctx);
       logController.common.create({
         user_id: userInfo?.id || -1,
-        api_user_agent: ctx.request.headers['user-agent'],
-        api_from: 1,
-        api_body: JSON.stringify(ctx.request.body || {}),
-        api_query: JSON.stringify(ctx.query),
+        api_user_agent: ctx.request.headers['user-agent']?.slice(0, 250),
+        api_body: JSON.stringify(ctx.request.body || {}).slice(0, 250),
+        api_query: JSON.stringify(ctx.query).slice(0, 250),
         api_real_ip:
           (ctx.request.headers['x-real-ip'] as string) || '127.0.0.1',
-        api_forwarded_for: ctx.request.headers['x-forwarded-for'] as string,
-        api_referer: ctx.request.headers.referer,
+        api_forwarded_for: JSON.stringify(
+          ctx.request.headers['x-forwarded-for'] || {}
+        ).slice(0, 250),
+        api_referer: ctx.request.headers.referer?.slice(0, 250),
         api_method: ctx.request.method,
         // ctx.request.host存在时获取主机（hostname:port）。当 app.proxy 是 true 时支持 X-Forwarded-Host，否则使用 Host。
         api_host: ctx.request.host, // ctx.request.hostname不带端口号;ctx.request.host带端口号
@@ -49,26 +43,31 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
         api_status_code: info.statusCode,
         api_error: info.error,
         api_err_msg: info.message,
-        api_duration: Date.now() - start,
+        api_duration: info.duration,
         api_err_code: info.errorCode,
       });
     }
   };
   try {
-    console.log('catchErrorMiddle中间件开始...');
     await next();
     console.log(
       chalkINFO(`catchErrorMiddle中间件通过！http状态码：${ctx.status}`)
     );
-    // if (ctx.request.path === '/live_room/auth') {
-    //   return;
-    // }
-    const whiteList = ['/order/pay_status', ''];
+    duration = Math.floor(performance.now() - startTime);
+    console.log(chalkWARN(`catchErrorMiddle中间件耗时：${duration}ms`));
+
+    const whiteList = [
+      '/admin/qiniu_data/upload_chunk',
+      '/admin/qiniu_data/upload',
+      '/admin/qiniu_data/mulit_upload',
+      '/admin/qiniu_data/progress',
+    ];
     if (whiteList.includes(ctx.request.path)) {
       console.log('白名单，不插入日志');
       return;
     }
     const statusCode = ctx.status;
+    const msg = `【ERROR】客户端请求：${ctx.request.method} ${ctx.request.path}，服务端响应http状态码：${statusCode}`;
     /**
      * 如果通过了catchErrorMiddle中间件，但是返回的状态不是200，
      * 代表了在next前面没有设置ctx状态码，因此默认就是返回404！
@@ -80,44 +79,45 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
       statusCode !== ALLOW_HTTP_CODE.ok &&
       statusCode !== ALLOW_HTTP_CODE.apiCache
     ) {
-      if (statusCode === ALLOW_HTTP_CODE.notFound) {
+      if (
+        [ALLOW_HTTP_CODE.notFound, ALLOW_HTTP_CODE.methodNotAllowed].includes(
+          statusCode
+        )
+      ) {
         const defaultSuccess = {
           statusCode,
-          errorCode: ERROR_HTTP_CODE.notFound,
-          error: '这个返回了404的http状态码，请排查问题！',
-          message: '这个返回了404的http状态码，请排查问题！',
+          errorCode: statusCode,
+          error: msg,
+          message: msg,
+          duration,
         };
-        // 404接口写入日志表
+        // 服务端返回http状态码200、304、404、405，写入日志表
         console.log(
-          chalkINFO(`404接口写入日志表，api_status_code：${statusCode}`)
+          chalkINFO(`服务端返回http状态码200、304、404、405，写入日志表`)
         );
         insertLog(defaultSuccess);
       } else {
         const defaultSuccess = {
           statusCode,
           errorCode: ERROR_HTTP_CODE.errStatusCode,
-          error: '返回了即不是200也不是404的http状态码，请排查问题！',
-          message: '返回了即不是200也不是404的http状态码，请排查问题！',
+          error: msg,
+          message: msg,
+          duration,
         };
-        // 既不是200也不是404，写入日志表
+        // 服务端返回http状态码不是200、304、404、405，写入日志表
         console.log(
-          chalkINFO(
-            `既不是200也不是404，写入日志表，api_status_code：${statusCode}`
-          )
+          chalkINFO(`服务端返回http状态码不是200、304、404、405，写入日志表，`)
         );
         insertLog(defaultSuccess);
       }
-      throw new CustomError(
-        '返回了即不是200也不是404的http状态码，请排查问题！',
-        ALLOW_HTTP_CODE.notFound,
-        ALLOW_HTTP_CODE.notFound
-      );
+      throw new CustomError(msg, statusCode, statusCode);
     } else {
       const defaultSuccess = {
         statusCode,
         errorCode: statusCode,
         error: '请求成功！',
         message: '请求成功！',
+        duration,
       };
       // 请求成功写入日志表
       insertLog(defaultSuccess);
@@ -135,6 +135,7 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
         errorCode: ERROR_HTTP_CODE.serverError,
         error: error?.message,
         message: '服务器错误！',
+        duration,
       };
       // 不是CustomError，也写入日志表
       insertLog(defaultError);
@@ -151,6 +152,7 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
         error: error.message,
         errorCode: error.errorCode,
         message: error.message,
+        duration,
       });
     }
   }
@@ -158,7 +160,8 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
 
 // 跨域中间件
 export const corsMiddle = async (ctx: ParameterizedContext, next) => {
-  console.log('corsMiddle跨域中间件');
+  console.log(chalkINFO('corsMiddle跨域中间件开始'), ctx.header.origin);
+  const startTime = performance.now();
   ctx.set(
     'Access-Control-Allow-Headers',
     'Content-Type, Content-Length, Authorization, Accept, X-Requested-With'
@@ -174,6 +177,7 @@ export const corsMiddle = async (ctx: ParameterizedContext, next) => {
       'https://www.hsslive.cn',
       'https://admin.hsslive.cn',
       'https://live.hsslive.cn',
+      'https://live-admin.hsslive.cn',
     ];
     // @ts-ignore
     if (allowOrigin === '*') {
@@ -190,7 +194,9 @@ export const corsMiddle = async (ctx: ParameterizedContext, next) => {
     // 跨域请求时，浏览器会先发送options
     ctx.body = 'ok';
   } else {
+    const duration = Math.floor(performance.now() - startTime);
     await next();
-    console.log(chalkINFO(`corsMiddle中间件通过！ `));
+    console.log(chalkINFO('corsMiddle中间件通过！'), ctx.header.origin);
+    console.log(chalkWARN(`corsMiddle中间件耗时：${duration}ms`));
   }
 };

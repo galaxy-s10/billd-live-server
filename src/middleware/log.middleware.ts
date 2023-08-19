@@ -7,7 +7,6 @@ import { CustomError } from '@/model/customError.model';
 const schema = Joi.object({
   user_id: Joi.number(),
   api_user_agent: Joi.string(),
-  api_from: Joi.number(),
   api_real_ip: Joi.string(),
   api_host: Joi.string(),
   api_hostname: Joi.string(),

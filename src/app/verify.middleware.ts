@@ -12,7 +12,7 @@ import {
 import blacklistController from '@/controller/blacklist.controller';
 import logController from '@/controller/log.controller';
 import { CustomError } from '@/model/customError.model';
-import { chalkINFO } from '@/utils/chalkTip';
+import { chalkINFO, chalkWARN } from '@/utils/chalkTip';
 
 // 前台的所有get和白名单内的接口不需要token
 const frontendWhiteList = [
@@ -20,17 +20,10 @@ const frontendWhiteList = [
   '/init/auth',
   '/init/roleAuth',
   '/init/dayData',
-  '/link/create', // 申请友链，这个接口是post的
-  '/visitor_log/create', // 访客记录，这个接口是post的
+
   '/user/login', // 登录，这个接口是post的
   '/qq_user/login', // 登录，这个接口是post的
-  '/email_user/login', // 登录，这个接口是post的
-  '/github_user/login', // 登录，这个接口是post的
-  '/email_user/send_login_code', // 发送登录验证码，这个接口是post的
-  '/email_user/send_register_code', // 发送注册验证码，这个接口是post的
-  '/email_user/send_bind_code', // 发送绑定邮箱验证码，这个接口是post的
-  '/email_user/send_cancel_bind_code', // 发送解绑邮箱验证码，这个接口是post的
-  '/email_user/register', // 注册，这个接口是post的
+
   '/order/pay',
   '/wallet/init',
 
@@ -45,13 +38,13 @@ const frontendWhiteList = [
 // 后台的所有接口都需要判断token，除了白名单内的不需要token
 const backendWhiteList = [];
 
+// 全局白名单
 const globalWhiteList = ['/init/'];
 
 // 允许频繁请求的路径白名单
 const frequentlyWhiteList = [];
 
 async function isPass(ip: string) {
-  return true;
   const nowDate = +new Date();
   let flag = true;
   if (IP_WHITE_LIST.includes(ip)) return flag;
@@ -79,22 +72,26 @@ async function isPass(ip: string) {
 }
 
 export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
-  console.log('apiBeforeVerify中间件');
+  console.log(chalkINFO('apiBeforeVerify中间件开始'));
+  const startTime = performance.now();
   const url = ctx.request.path;
   const ip = (ctx.request.headers['x-real-ip'] as string) || '127.0.0.1';
   const consoleEnd = () => {
+    const duration = Math.floor(performance.now() - startTime);
+    console.log(chalkINFO('apiBeforeVerify中间件通过！'));
+    console.log(chalkWARN(`apiBeforeVerify中间件耗时：${duration}ms`));
     console.log(
       chalkINFO(
-        `日期：${new Date().toLocaleString()}，ip：${ip}，http状态码：${
-          ctx.status
-        }，响应${ctx.request.method} ${url}`
+        `日期：${new Date().toLocaleString()}，ip：${ip}，响应请求：${
+          ctx.request.method
+        } ${url}`
       )
     );
   };
 
   console.log(
     chalkINFO(
-      `日期：${new Date().toLocaleString()}，ip：${ip}，收到接口 ${
+      `日期：${new Date().toLocaleString()}，ip：${ip}，收到请求 ${
         ctx.request.method
       } ${url}请求`
     )
@@ -128,7 +125,8 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
 
   // 验证是否频繁请求
   if (frequentlyWhiteList.indexOf(url) === -1) {
-    const res = await isPass(ip);
+    const res = true;
+    // const res = await isPass(ip);
     if (!res) {
       const { userInfo } = await authJwt(ctx);
       blacklistController.common.create({
@@ -159,25 +157,6 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
     return;
   }
 
-  // if (admin) {
-  //   if (backendWhiteList.indexOf(url) !== -1) {
-  //     await next();
-  //     consoleEnd();
-  //     return;
-  //   }
-  //   const { code, message } = await authJwt(ctx);
-  //   if (code !== ALLOW_HTTP_CODE.ok) {
-  //     consoleEnd();
-  //     throw new CustomError(message, code, code);
-  //   }
-  //   /**
-  //    * 这里必须await next()，因为路由匹配肯定是先匹配这个app.use的，
-  //    * 如果这里匹配完成后直接next()了，就会返回数据了（404），也就是不会
-  //    * 继续走后面的匹配了！但是如果加了await，就会等待后面的继续匹配完！
-  //    */
-  //   await next();
-  //   consoleEnd();
-  // } else {
   // 前端的get接口都不需要判断token，白名单内的也不需要判断token（如注册登录这些接口是post的）
   if (ctx.request.method === 'GET' || frontendWhiteList.indexOf(url) !== -1) {
     await next();
@@ -197,5 +176,4 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
    */
   await next();
   consoleEnd();
-  // }
 };

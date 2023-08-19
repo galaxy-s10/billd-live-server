@@ -65,7 +65,6 @@ class LogController {
     const {
       user_id,
       api_user_agent,
-      api_from,
       api_referer,
       api_forwarded_for,
       api_real_ip,
@@ -93,7 +92,6 @@ class LogController {
       id,
       user_id,
       api_user_agent,
-      api_from,
       api_referer,
       api_forwarded_for,
       api_real_ip,
@@ -118,7 +116,6 @@ class LogController {
     const {
       user_id,
       api_user_agent,
-      api_from,
       api_referer,
       api_forwarded_for,
       api_real_ip,
@@ -138,7 +135,6 @@ class LogController {
     const result = await this.common.create({
       user_id,
       api_user_agent,
-      api_from,
       api_referer,
       api_forwarded_for,
       api_real_ip,

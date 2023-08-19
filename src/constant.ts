@@ -49,6 +49,7 @@ export const ALLOW_HTTP_CODE = {
   unauthorized: 401, // 未授权
   forbidden: 403, // 权限不足
   notFound: 404, // 未找到
+  methodNotAllowed: 405, // 方法不允许，如：服务端提供了一个get的/api/list接口，但客户端却post了/api/list接口
   serverError: 500, // 服务器错误
 };
 
