@@ -27,8 +27,7 @@ class QiniuClass {
     url: string,
     reqMethod: string,
     reqContentType: string,
-    reqBody?: any,
-    reqHeaders?: any
+    reqBody?: any
   ) {
     // https://developer.qiniu.com/pili/2772/http-requests-authentication
     const mac = new qiniu.auth.digest.Mac(QINIU_ACCESSKEY, QINIU_SECRETKEY);
@@ -37,8 +36,7 @@ class QiniuClass {
       url,
       reqMethod,
       reqContentType,
-      JSON.stringify(reqBody),
-      reqHeaders
+      JSON.stringify(reqBody)
     );
     return accessToken;
   }
@@ -111,10 +109,7 @@ class QiniuClass {
     };
     const token = this.getAccessToken(reqUrl, 'POST', contentType, reqBody);
     try {
-      await axios({
-        method: 'POST',
-        url: reqUrl,
-        data: reqBody,
+      await myaxios.post(reqUrl, reqBody, {
         headers: {
           // TIP 这个接口不带Content-Type这个请求头也没问题。
           'Content-Type': contentType,
