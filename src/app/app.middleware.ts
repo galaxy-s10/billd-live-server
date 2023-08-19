@@ -178,6 +178,7 @@ export const corsMiddle = async (ctx: ParameterizedContext, next) => {
       'https://admin.hsslive.cn',
       'https://live.hsslive.cn',
       'https://live-admin.hsslive.cn',
+      'https://live-api.hsslive.cn',
     ];
     // @ts-ignore
     if (allowOrigin === '*') {
