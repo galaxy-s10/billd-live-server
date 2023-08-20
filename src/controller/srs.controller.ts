@@ -1,13 +1,16 @@
 import { ParameterizedContext } from 'koa';
 
+import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import { SRS_CONFIG } from '@/config/secret';
 import { wsSocket } from '@/config/websocket';
 import { WsMsgTypeEnum } from '@/config/websocket/constant';
 import liveRedisController from '@/config/websocket/live-redis.controller';
+import { ALLOW_HTTP_CODE } from '@/constant';
 import { ISrsRTC } from '@/interface';
 import { IApiV1Streams } from '@/interface-srs';
 import { IRoomLiving } from '@/interface-ws';
+import { CustomError } from '@/model/customError.model';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
@@ -15,9 +18,9 @@ import { myaxios } from '@/utils/request';
 
 class SRSController {
   common = {
-    getApiV1Clients: () =>
+    getApiV1Clients: ({ start, count }: { start: number; count: number }) =>
       myaxios.get(
-        `http://localhost:${SRS_CONFIG.docker.port[1985]}/api/v1/clients`
+        `http://localhost:${SRS_CONFIG.docker.port[1985]}/api/v1/clients?start=${start}&count=${count}`
       ),
     getApiV1Streams: ({ start, count }: { start: number; count: number }) =>
       myaxios.get<IApiV1Streams>(
@@ -57,7 +60,6 @@ class SRSController {
 
   getApiV1Streams = async (ctx: ParameterizedContext, next) => {
     const { start, count }: any = ctx.request.query;
-    console.log(start, count, 3333);
     const res = await this.common.getApiV1Streams({ start, count });
     successHandler({
       ctx,
@@ -67,7 +69,8 @@ class SRSController {
   };
 
   getApiV1Clients = async (ctx: ParameterizedContext, next) => {
-    const res = await this.common.getApiV1Clients();
+    const { start, count }: any = ctx.request.query;
+    const res = await this.common.getApiV1Clients({ start, count });
     successHandler({
       ctx,
       data: res,
@@ -76,6 +79,14 @@ class SRSController {
   };
 
   deleteApiV1Clients = async (ctx: ParameterizedContext, next) => {
+    const { userInfo } = await authJwt(ctx);
+    if (userInfo?.id !== 1) {
+      throw new CustomError(
+        `权限不足！`,
+        ALLOW_HTTP_CODE.forbidden,
+        ALLOW_HTTP_CODE.forbidden
+      );
+    }
     const { clientId }: { clientId: string } = ctx.params;
     const res = await this.common.deleteApiV1Clients(clientId);
     successHandler({
