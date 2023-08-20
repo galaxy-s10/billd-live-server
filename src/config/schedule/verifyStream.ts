@@ -43,7 +43,7 @@ async function verifyBitrateIsOver(info: IApiV1Streams['streams'][0]) {
           `流名称：${info.name}，当前码率：${res[0]}，kbps（recv_30s）：${info.kbps.recv_30s}，kbps（send_30s）：${info.kbps.send_30s}，`
         )
       );
-      if (bitrate > 1000 * 3.5) {
+      if (bitrate > 1000 * 2.5) {
         // 码率超过4m，踢掉
         srsController.common.deleteApiV1Clients(info.publish.cid);
       }
@@ -77,7 +77,7 @@ export const handleVerifyStream = async () => {
       );
       return;
     }
-    if (item.kbps.recv_30s > 1000 * 3.5) {
+    if (item.kbps.recv_30s > 1000 * 2.5) {
       srsController.common.deleteApiV1Clients(item.publish.cid);
     }
   });
