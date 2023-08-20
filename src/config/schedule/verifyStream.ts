@@ -1,6 +1,7 @@
 import { exec } from 'child_process';
 
 import srsController from '@/controller/srs.controller';
+import { initUser } from '@/init/initUser';
 import { IApiV1Streams } from '@/interface-srs';
 import { chalkWARN } from '@/utils/chalkTip';
 
@@ -50,11 +51,17 @@ async function verifyBitrateIsOver(info: IApiV1Streams['streams'][0]) {
   }
 }
 
+const initLiveRoomId: number[] = [];
+Object.keys(initUser).forEach((iten) => {
+  initLiveRoomId.push(initUser[iten].live_room.id);
+});
+
 export const handleVerifyStream = async () => {
   const res = await srsController.common.getApiV1Streams({
     start: 0,
     count: 1000,
   });
+
   res.streams.forEach((item) => {
     // verifyBitrateIsOver(item);
     console.log(
@@ -63,6 +70,13 @@ export const handleVerifyStream = async () => {
         `流名称：${item.name}，kbps（recv_30s推流码率）：${item.kbps.recv_30s}，kbps（send_30s）：${item.kbps.send_30s}，`
       )
     );
+    const liveRoomId = item.name.replace('roomId___', '');
+    if (initLiveRoomId.includes(Number(liveRoomId))) {
+      console.log(
+        chalkWARN(`房间id：${liveRoomId}，它是初始化直播间，不判断码率`)
+      );
+      return;
+    }
     if (item.kbps.recv_30s > 1000 * 3.5) {
       srsController.common.deleteApiV1Clients(item.publish.cid);
     }
