@@ -33,11 +33,11 @@ rule.second = 0;
 // rule.second = allSecondArr.filter((v) => v % 5 === 0);
 
 export const startSchedule = () => {
-  schedule.scheduleJob(SCHEDULE_TYPE.roomIsLiveing, rule, () => {
+  schedule.scheduleJob(SCHEDULE_TYPE.verifyStream, rule, () => {
     console.log(
       chalkINFO(
         `${new Date().toLocaleString()}，执行${
-          SCHEDULE_TYPE.roomIsLiveing
+          SCHEDULE_TYPE.verifyStream
         }定时任务`
       )
     );

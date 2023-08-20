@@ -42,8 +42,8 @@ async function verifyBitrateIsOver(info: IApiV1Streams['streams'][0]) {
           `流名称：${info.name}，当前码率：${res[0]}，kbps（recv_30s）：${info.kbps.recv_30s}，kbps（send_30s）：${info.kbps.send_30s}，`
         )
       );
-      if (bitrate > 1024 * 3) {
-        // 码率超过3m，踢掉
+      if (bitrate > 1000 * 3.5) {
+        // 码率超过4m，踢掉
         srsController.common.deleteApiV1Clients(info.publish.cid);
       }
     }
@@ -55,10 +55,15 @@ export const handleVerifyStream = async () => {
     start: 0,
     count: 1000,
   });
-
   res.streams.forEach((item) => {
     // verifyBitrateIsOver(item);
-    if (item.kbps.recv_30s > 1024 * 4) {
+    console.log(
+      // kbps, kbit/s, kb/s都是同一个意思
+      chalkWARN(
+        `流名称：${item.name}，kbps（recv_30s推流码率）：${item.kbps.recv_30s}，kbps（send_30s）：${item.kbps.send_30s}，`
+      )
+    );
+    if (item.kbps.recv_30s > 1000 * 3.5) {
       srsController.common.deleteApiV1Clients(item.publish.cid);
     }
   });

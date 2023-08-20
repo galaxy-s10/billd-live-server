@@ -74,7 +74,7 @@ export const BLACKLIST_TYPE = {
 };
 
 export const SCHEDULE_TYPE = {
-  roomIsLiveing: 'roomIsLiveing',
+  verifyStream: 'handleVerifyStream',
 };
 
 export const COMMON_ERR_MSG = {
