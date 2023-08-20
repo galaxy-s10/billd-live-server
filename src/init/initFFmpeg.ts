@@ -76,7 +76,7 @@ async function addLive({
         // execSync(ffmpegSyncCmd);
         // TIP 使用exec，这样命令后面不需要添加：1>/dev/null 2>&1 &，这样每次热更都会重新推流，而且不会触发on_unpublish钩子
         exec(ffmpegCmd);
-        console.log(chalkSUCCESS(`FFmpeg推流成功！`));
+        console.log(chalkSUCCESS(`FFmpeg推流成功！`), ffmpegCmd);
       } catch (error) {
         console.log(chalkERROR(`FFmpeg推流错误！`), error);
       }

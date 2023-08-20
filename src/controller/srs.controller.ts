@@ -19,9 +19,9 @@ class SRSController {
       myaxios.get(
         `http://localhost:${SRS_CONFIG.docker.port[1985]}/api/v1/clients`
       ),
-    getApiV1Streams: () =>
+    getApiV1Streams: ({ start, count }: { start: number; count: number }) =>
       myaxios.get<IApiV1Streams>(
-        `http://localhost:${SRS_CONFIG.docker.port[1985]}/api/v1/streams`
+        `http://localhost:${SRS_CONFIG.docker.port[1985]}/api/v1/streams?start=${start}&count=${count}`
       ),
     deleteApiV1Clients: (clientId: string) =>
       myaxios.delete(
@@ -56,7 +56,9 @@ class SRSController {
   };
 
   getApiV1Streams = async (ctx: ParameterizedContext, next) => {
-    const res = await this.common.getApiV1Streams();
+    const { start, count }: any = ctx.request.query;
+    console.log(start, count, 3333);
+    const res = await this.common.getApiV1Streams({ start, count });
     successHandler({
       ctx,
       data: res,

@@ -51,7 +51,10 @@ async function verifyBitrateIsOver(info: IApiV1Streams['streams'][0]) {
 }
 
 export const handleVerifyStream = async () => {
-  const res = await srsController.common.getApiV1Streams();
+  const res = await srsController.common.getApiV1Streams({
+    start: 0,
+    count: 1000,
+  });
 
   res.streams.forEach((item) => {
     // verifyBitrateIsOver(item);
