@@ -1,4 +1,9 @@
-import { DanmuMsgTypeEnum, ILiveRoom, IUser } from './interface';
+import {
+  DanmuMsgTypeEnum,
+  ILiveRoom,
+  IUser,
+  LiveRoomTypeEnum,
+} from './interface';
 
 export interface IWsFormat<T> {
   /** 用户socket_id */
@@ -22,6 +27,7 @@ export type WSGetRoomAllUserType = IWsFormat<{
 
 export type WsRoomLivingType = IWsFormat<{
   live_room: ILiveRoom;
+  anchor_socket_id: string;
 }>;
 
 export type WsGetLiveUserType = IWsFormat<{
@@ -44,6 +50,7 @@ export type WsOtherJoinType = IWsFormat<{
 export type WsStartLiveType = IWsFormat<{
   cover_img: string;
   name: string;
+  type: LiveRoomTypeEnum;
 }>;
 
 export type WsJoinType = IWsFormat<{
@@ -58,7 +65,7 @@ export type WsLeavedType = IWsFormat<{
   user_info?: IUser;
 }>;
 
-export type IRoomLiving = IWsFormat<{
+export type WsRoomNoLiveType = IWsFormat<{
   live_room: ILiveRoom;
 }>;
 

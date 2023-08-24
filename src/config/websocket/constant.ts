@@ -36,16 +36,16 @@ export enum WsMsgTypeEnum {
   roomLiving = 'roomLiving',
   /** 房间不在直播 */
   roomNoLive = 'roomNoLive',
-  /** sendBlob */
-  sendBlob = 'sendBlob',
-  /** getLiveUser */
   getLiveUser = 'getLiveUser',
-  /** updateJoinInfo */
   updateJoinInfo = 'updateJoinInfo',
-  /** heartbeat */
   heartbeat = 'heartbeat',
-  offer = 'offer',
-  answer = 'answer',
-  candidate = 'candidate',
   startLive = 'startLive',
+
+  srsOffer = 'srsOffer',
+  srsAnswer = 'srsAnswer',
+  srsCandidate = 'srsCandidate',
+
+  webrtcOffer = 'webrtcOffer',
+  webrtcAnswer = 'webrtcAnswer',
+  webrtcCandidate = 'webrtcCandidate',
 }

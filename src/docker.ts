@@ -13,17 +13,10 @@ import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
 const flag = dockerIsInstalled();
 if (flag) {
   console.log(chalkSUCCESS('docker已安装'));
-  if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
-    dockerRunMysql(false);
-    dockerRunRedis(false);
-    dockerRunSRS(true);
-    dockerRunRabbitMQ(false);
-  } else {
-    dockerRunMysql(true);
-    dockerRunRedis(true);
-    dockerRunSRS(true);
-    dockerRunRabbitMQ(false);
-  }
+  dockerRunMysql(PROJECT_ENV !== PROJECT_ENV_ENUM.prod);
+  dockerRunRedis(PROJECT_ENV !== PROJECT_ENV_ENUM.prod);
+  dockerRunSRS(true);
+  dockerRunRabbitMQ(false);
 } else {
   console.log(chalkERROR('未安装docker！'));
 }

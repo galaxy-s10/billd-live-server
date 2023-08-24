@@ -9,7 +9,6 @@ import liveRedisController from '@/config/websocket/live-redis.controller';
 import { ALLOW_HTTP_CODE } from '@/constant';
 import { ISrsRTC } from '@/interface';
 import { IApiV1Streams } from '@/interface-srs';
-import { IRoomLiving } from '@/interface-ws';
 import { CustomError } from '@/model/customError.model';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
@@ -117,9 +116,10 @@ class SRSController {
       await next();
     } else {
       const params = new URLSearchParams(body.param);
-      const paramstoken = params.get('token');
-      const paramstype = params.get('type');
-      if (!paramstoken) {
+      const paramsToken = params.get('token');
+      const paramsType = params.get('type');
+      const paramsRandomId = params.get('random_id');
+      if (!paramsToken) {
         console.log(chalkERROR(`[on_publish] 没有推流token`));
         ctx.body = { code: 1, msg: '[on_publish] no token, return' };
         await next();
@@ -127,17 +127,17 @@ class SRSController {
       }
       const result = await liveRoomService.findKey(Number(roomId));
       const rtmptoken = result?.key;
-      if (rtmptoken !== paramstoken) {
+      if (rtmptoken !== paramsToken) {
         console.log(chalkERROR(`[on_publish] 房间id：${roomId}，鉴权失败`));
         // ctx.status = 403;
         ctx.body = { code: 1, msg: '[on_publish] auth fail, return' };
         await next();
         return;
       }
-      if (paramstype) {
+      if (paramsType) {
         await liveRoomService.update({
           id: Number(roomId),
-          type: Number(paramstype),
+          type: Number(paramsType),
         });
       }
       const isLiveing = await liveService.findByRoomId(Number(roomId));
@@ -151,7 +151,8 @@ class SRSController {
         await next();
       } else {
         console.log(
-          chalkSUCCESS(`[on_publish] 房间id：${roomId}，鉴权成功，允许推流`)
+          chalkSUCCESS(`[on_publish] 房间id：${roomId}，鉴权成功，允许推流`),
+          isLiveing
         );
         const [liveRoomInfo] = await Promise.all([
           liveRoomService.find(Number(roomId)),
@@ -165,6 +166,7 @@ class SRSController {
         await liveService.create({
           live_room_id: Number(roomId),
           user_id: liveRoomInfo?.user_live_room?.user?.id,
+          random_id: paramsRandomId!,
           socket_id: '-1',
           track_audio: 1,
           track_video: 1,
@@ -181,12 +183,7 @@ class SRSController {
           srs_tcUrl: body.tcUrl,
           srs_vhost: body.vhost,
         });
-        const roomLivingData: IRoomLiving['data'] = {
-          live_room: liveRoomInfo,
-        };
-        wsSocket.io
-          ?.to(roomId)
-          .emit(WsMsgTypeEnum.roomLiving, { data: roomLivingData });
+        wsSocket.io?.to(roomId).emit(WsMsgTypeEnum.roomLiving);
         await next();
       }
     }
@@ -197,7 +194,8 @@ class SRSController {
     // code等于数字0表示成功，其他错误码代表失败。
     const { body } = ctx.request;
     console.log(chalkWARN(`on_unpublish参数`), body);
-
+    const params = new URLSearchParams(body.param);
+    const paramsRandomId = params.get('random_id');
     const reg = /^roomId___(.+)/g;
     const roomId = reg.exec(body.stream)?.[1];
     if (!roomId) {
@@ -206,7 +204,10 @@ class SRSController {
     } else {
       console.log(chalkSUCCESS(`[on_unpublish] 房间id：${roomId}，成功`));
       ctx.body = { code: 0, msg: '[on_unpublish] success' };
-      liveService.deleteByLiveRoomId(Number(roomId));
+      liveService.deleteByLiveRoomIdAndRandomId({
+        live_room_id: Number(roomId),
+        random_id: paramsRandomId!,
+      });
       liveRedisController.delAnchorLiving({
         liveRoomId: Number(roomId),
       });

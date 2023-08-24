@@ -1,9 +1,10 @@
 import { exec, spawnSync } from 'child_process';
 
-import { asyncUpdate } from 'billd-utils';
+import { getRandomString } from 'billd-utils';
 
 import { SERVER_LIVE } from '@/config/secret';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import srsController from '@/controller/srs.controller';
 import { initUser } from '@/init/initUser';
 import { LiveRoomTypeEnum } from '@/interface';
 import liveService from '@/service/live.service';
@@ -18,7 +19,7 @@ function ffmpegIsInstalled() {
   }
   return true;
 }
-
+const randomId = getRandomString(10);
 async function addLive({
   live_room_id,
   user_id,
@@ -40,6 +41,13 @@ async function addLive({
   let hls_url = '';
   let rtmp_url = '';
   async function main() {
+    const res = await liveService.findAllLiveByRoomId(live_room_id);
+    const queue: any[] = [];
+    res.forEach((item) => {
+      console.log('踢掉它', item.srs_client_id);
+      queue.push(srsController.common.deleteApiV1Clients(item.srs_client_id!));
+    });
+    await Promise.all(queue);
     await liveService.deleteByLiveRoomId(live_room_id);
     // 开发环境时判断initFFmpeg，是true的才初始化ffmpeg
     // 生产环境时不判断initFFmpeg，都初始化
@@ -115,6 +123,7 @@ async function addLive({
       liveService.create({
         live_room_id,
         user_id,
+        random_id: '-1',
         socket_id: '-1',
         track_audio: 1,
         track_video: 1,
@@ -124,9 +133,13 @@ async function addLive({
 
   if (cdn === 2) {
     const liveRoomInfo = await liveRoomService.findKey(live_room_id);
+    // rtmp_url = `${SERVER_LIVE.PushDomain}/${
+    //   SERVER_LIVE.AppName
+    // }/roomId___${live_room_id}?token=${liveRoomInfo!.key!}`;
     rtmp_url = `${SERVER_LIVE.PushDomain}/${
       SERVER_LIVE.AppName
-    }/roomId___${live_room_id}?token=${liveRoomInfo!.key!}`;
+    }/roomId___${live_room_id}?token=${liveRoomInfo!
+      .key!}&random_id=${getRandomString(10)}`;
     flv_url = `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.flv`;
     hls_url = `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.m3u8`;
     await main();
@@ -138,15 +151,15 @@ export const initFFmpeg = async (init = true) => {
   // 开发环境的nodemon热更新会导致每次重启后执行initFFmpeg重新推流，但是重启node进程会导致之前的initFFmpeg子进程断掉，也就是会断开推流，导致触发on_publish。
   // 因为断开流的on_publish有延迟，所以重启后执行initFFmpeg了，触发onpublish了，过一会才收到了之前的on_publish，导致出问题（on_publish里会删掉数据库live表的记录）
   // 因此干脆重启一下srs容器？但重启太耗性能了，搞个延迟执行临时解决下先
-  if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
-    setTimeout(() => {
-      console.log(chalkWARN('五秒后初始化FFmpeg推流'));
-    }, 500);
-    // execSync(`docker restart ${SRS_CONFIG.docker.container}`);
-    await asyncUpdate(() => {
-      console.log('ok');
-    }, 5000);
-  }
+  // if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
+  // setTimeout(() => {
+  //   console.log(chalkWARN('两秒后初始化FFmpeg推流'));
+  // }, 500);
+  // execSync(`docker restart ${SRS_CONFIG.docker.container}`);
+  // await asyncUpdate(() => {
+  //   console.log();
+  // }, 1000);
+  // }
   const flag = ffmpegIsInstalled();
   if (flag) {
     console.log(chalkWARN('ffmpeg已安装，开始运行ffmpeg推流'));
@@ -154,7 +167,6 @@ export const initFFmpeg = async (init = true) => {
     console.log(chalkERROR('未安装ffmpeg！'));
     return;
   }
-  // await delayByPromise(5000);
   try {
     const queue: any[] = [];
     Object.keys(initUser).forEach((item) => {

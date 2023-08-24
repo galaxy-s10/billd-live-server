@@ -228,6 +228,7 @@ export interface IOrder {
 }
 
 export interface ISrsPublishStream {
+  /** 客户端在获取信息时，必须检查ServerID是否改变，改变时就是服务器重启，之前所有的数据都应该作废了。 */
   srs_server_id?: string;
   srs_service_id?: string;
   srs_action?: string;
@@ -249,6 +250,7 @@ export interface ILive extends ISrsPublishStream {
   /** 直播间信息 */
   live_room?: ILiveRoom;
 
+  random_id?: string;
   socket_id?: string;
   user_id?: number;
   live_room_id?: number;
