@@ -39,16 +39,6 @@ async function addLive({
   let hls_url = '';
   let rtmp_url = '';
   async function main() {
-    // 踢掉所有直播
-    const res = await srsController.common.getApiV1Clients({
-      start: 0,
-      count: 9999,
-    });
-    const queue: any[] = [];
-    res.clients.forEach((item) => {
-      queue.push(srsController.common.deleteApiV1Clients(item.id));
-    });
-    await Promise.all(queue);
     await liveService.deleteByLiveRoomId(live_room_id);
     // 开发环境时判断initFFmpeg，是true的才初始化ffmpeg
     // 生产环境时不判断initFFmpeg，都初始化
@@ -164,6 +154,16 @@ export const initFFmpeg = async (init = true) => {
     return;
   }
   try {
+    // 踢掉所有直播
+    const res = await srsController.common.getApiV1Clients({
+      start: 0,
+      count: 9999,
+    });
+    const oldClientsQueue: any[] = [];
+    res.clients.forEach((item) => {
+      oldClientsQueue.push(srsController.common.deleteApiV1Clients(item.id));
+    });
+    await Promise.all(oldClientsQueue);
     const queue: any[] = [];
     Object.keys(initUser).forEach((item) => {
       queue.push(
