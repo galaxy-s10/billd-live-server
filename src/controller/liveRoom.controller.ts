@@ -78,13 +78,13 @@ class LiveRoomController {
           .toString();
         const rtmp_url = `${SERVER_LIVE.PushDomain}/${
           SERVER_LIVE.AppName
-        }/roomId___${liveRoom.live_room!.id!}?token=${key}`;
+        }/roomId___${liveRoom.live_room!.id!}`;
         await this.common.update({
           id: liveRoom.live_room!.id!,
           key,
           rtmp_url,
         });
-        successHandler({ ctx, data: { rtmp_url, liveRoom } });
+        successHandler({ ctx, data: { rtmp_url, key } });
       }
     } else {
       throw new CustomError(message, code, code);

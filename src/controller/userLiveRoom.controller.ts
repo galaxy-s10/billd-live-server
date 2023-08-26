@@ -123,7 +123,7 @@ class UserLiveRoomController {
     // @ts-ignore
     await liveRoom.setAreas([1]);
     const liveUrl = (live_room_id: number) => ({
-      rtmp_url: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}?token=${rtmptoken}`,
+      rtmp_url: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}`,
       flv_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.flv`,
       hls_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.m3u8`,
     });

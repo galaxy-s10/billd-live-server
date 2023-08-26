@@ -38,6 +38,7 @@ async function addLive({
   let flv_url = '';
   let hls_url = '';
   let rtmp_url = '';
+  let token = '';
   async function main() {
     await liveService.deleteByLiveRoomId(live_room_id);
     // 开发环境时判断initFFmpeg，是true的才初始化ffmpeg
@@ -65,9 +66,8 @@ async function addLive({
       // ]);
       // const { pid } = ffmpegCmd;
       // console.log(chalkWARN('ffmpeg进程pid'), pid);
-      const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec copy -acodec copy -f flv '${rtmp_url}'`;
-      const ffmpegSyncCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec copy -acodec copy -f flv '${rtmp_url}' 1>/dev/null 2>&1 &`;
-      // const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i /Users/huangshuisheng/Desktop/hss/galaxy-s10/billd-live-server/src/video/fddm_mhsw.mp4 -vcodec copy -acodec copy -f flv 'rtmp://localhost/livestream/roomId___3?token=eff5e5d9116254a1aea19013f8bd3afe' 1>/dev/null 2>&1 &`;
+      const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec copy -acodec copy -f flv '${rtmp_url}?token=${token}'`;
+      const ffmpegSyncCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec copy -acodec copy -f flv '${rtmp_url}?token=${token}' 1>/dev/null 2>&1 &`;
       try {
         // WARN 使用execSync的话，命令最后需要添加：1>/dev/null 2>&1 &，否则会自动退出进程；
         // 但是本地开发环境的时候，因为nodemon的缘故，每次热更新后，在ffmpeg推完流后，触发on_unpublish钩子，删除了live表里的直播记录
@@ -123,9 +123,8 @@ async function addLive({
 
   if (cdn === 2) {
     const liveRoomInfo = await liveRoomService.findKey(live_room_id);
-    rtmp_url = `${SERVER_LIVE.PushDomain}/${
-      SERVER_LIVE.AppName
-    }/roomId___${live_room_id}?token=${liveRoomInfo!.key!}`;
+    token = liveRoomInfo!.key!;
+    rtmp_url = `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}`;
     flv_url = `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.flv`;
     hls_url = `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.m3u8`;
     await main();
