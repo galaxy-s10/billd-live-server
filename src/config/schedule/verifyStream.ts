@@ -59,7 +59,7 @@ Object.keys(initUser).forEach((iten) => {
 export const handleVerifyStream = async () => {
   const res = await srsController.common.getApiV1Streams({
     start: 0,
-    count: 1000,
+    count: 9999,
   });
 
   res.streams.forEach((item) => {

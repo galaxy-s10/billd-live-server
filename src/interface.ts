@@ -250,7 +250,6 @@ export interface ILive extends ISrsPublishStream {
   /** 直播间信息 */
   live_room?: ILiveRoom;
 
-  random_id?: string;
   socket_id?: string;
   user_id?: number;
   live_room_id?: number;

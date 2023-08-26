@@ -22,9 +22,6 @@ const model = sequelize.define<LiveModel>(
       allowNull: false,
       autoIncrement: true,
     },
-    random_id: {
-      type: DataTypes.STRING(50),
-    },
     socket_id: {
       type: DataTypes.STRING(100),
     },

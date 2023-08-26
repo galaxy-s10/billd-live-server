@@ -153,7 +153,6 @@ class LiveService {
 
   /** 修改直播 */
   async update({
-    random_id,
     id,
     socket_id,
     live_room_id,
@@ -175,7 +174,6 @@ class LiveService {
   }: ILive) {
     const result = await liveModel.update(
       {
-        random_id,
         socket_id,
         live_room_id,
         user_id,
@@ -201,7 +199,6 @@ class LiveService {
 
   /** 修改直播 */
   async updateByLoomId({
-    random_id,
     socket_id,
     live_room_id,
     user_id,
@@ -222,7 +219,6 @@ class LiveService {
   }: ILive) {
     const result = await liveModel.update(
       {
-        random_id,
         socket_id,
         user_id,
         track_audio,
@@ -247,7 +243,6 @@ class LiveService {
 
   /** 创建直播 */
   async create({
-    random_id,
     socket_id,
     live_room_id,
     user_id,
@@ -267,7 +262,6 @@ class LiveService {
     srs_vhost,
   }: ILive) {
     const result = await liveModel.create({
-      random_id,
       socket_id,
       live_room_id,
       user_id,
@@ -299,27 +293,24 @@ class LiveService {
   }
 
   /** 删除直播 */
-  deleteByLiveRoomIdAndRandomId = async (data: {
+  deleteByLiveRoomIdAndSocketId = async (data: {
     live_room_id: number;
-    random_id: string;
+    socket_id: string;
   }) => {
-    console.log('删除直播1');
     const res = await liveModel.destroy({
-      where: { live_room_id: data.live_room_id, random_id: data.random_id },
+      where: { live_room_id: data.live_room_id, socket_id: data.socket_id },
     });
     return res;
   };
 
   /** 删除直播 */
   deleteByLiveRoomId = async (live_room_id: number) => {
-    console.log('删除直播1', live_room_id);
     const res = await liveModel.destroy({ where: { live_room_id } });
     return res;
   };
 
   /** 删除直播 */
   deleteBySocketId = async (socket_id: string) => {
-    console.log('删除直播2', socket_id);
     const res = await liveModel.destroy({ where: { socket_id } });
     return res;
   };

@@ -41,9 +41,9 @@ export enum WsMsgTypeEnum {
   heartbeat = 'heartbeat',
   startLive = 'startLive',
 
-  srsOffer = 'srsOffer',
-  srsAnswer = 'srsAnswer',
-  srsCandidate = 'srsCandidate',
+  offer = 'offer',
+  answer = 'answer',
+  candidate = 'candidate',
 
   webrtcOffer = 'webrtcOffer',
   webrtcAnswer = 'webrtcAnswer',

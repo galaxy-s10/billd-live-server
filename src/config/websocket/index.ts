@@ -288,7 +288,6 @@ export const connectWebSocket = (server) => {
         return;
       }
       const roomId = userLiveRoomInfo.live_room_id!;
-      console.log(data.data, '收到主播开始直播22');
       liveRoomService.update({
         id: roomId,
         cover_img: data.data.cover_img,
@@ -337,13 +336,33 @@ export const connectWebSocket = (server) => {
       });
     });
 
-    // 收到用户离开房间
-    socket.on(WsMsgTypeEnum.leave, (data) => {
+    // 收到主播断开直播
+    socket.on(WsMsgTypeEnum.roomNoLive, async (data: WsRoomNoLiveType) => {
+      const userId = data.user_info?.id;
+      if (!userId) {
+        console.log(chalkERROR('userId为空'));
+        return;
+      }
+      const userLiveRoomInfo = await userLiveRoomService.findByUserId(userId);
+      if (!userLiveRoomInfo) {
+        console.log(chalkERROR('userLiveRoomInfo为空'));
+        return;
+      }
+      const roomId = userLiveRoomInfo.live_room_id!;
       prettierInfoLog({
-        msg: '收到用户离开房间',
+        msg: '收到主播断开直播',
         socketId: socket.id,
-        roomId: data.roomId,
+        roomId,
       });
+      socketEmit<WsRoomNoLiveType['data']>({
+        roomId,
+        socket,
+        msgType: WsMsgTypeEnum.roomNoLive,
+        data: { live_room: userLiveRoomInfo.live_room! },
+      });
+      if (userLiveRoomInfo.live_room?.type === LiveRoomTypeEnum.user_wertc) {
+        liveService.deleteByLiveRoomId(roomId);
+      }
     });
 
     // 收到用户发送消息
@@ -408,35 +427,37 @@ export const connectWebSocket = (server) => {
     );
 
     // 收到offer
-    socket.on(WsMsgTypeEnum.srsOffer, (data: WsOfferType) => {
+    socket.on(WsMsgTypeEnum.offer, (data: WsOfferType) => {
       prettierInfoLog({
         msg: '收到offer',
         socketId: socket.id,
         roomId: data.data.live_room_id,
       });
       socketEmit<WsOfferType['data']>({
+        roomId: data.data.live_room_id,
         socket,
-        msgType: WsMsgTypeEnum.srsOffer,
+        msgType: WsMsgTypeEnum.offer,
         data: data.data,
       });
     });
 
     // 收到answer
-    socket.on(WsMsgTypeEnum.srsAnswer, (data: WsAnswerType) => {
+    socket.on(WsMsgTypeEnum.answer, (data: WsAnswerType) => {
       prettierInfoLog({
         msg: '收到answer',
         socketId: socket.id,
         roomId: data.data.live_room_id,
       });
       socketEmit<WsAnswerType['data']>({
+        roomId: data.data.live_room_id,
         socket,
-        msgType: WsMsgTypeEnum.srsAnswer,
+        msgType: WsMsgTypeEnum.answer,
         data: data.data,
       });
     });
 
     // 收到candidate
-    socket.on(WsMsgTypeEnum.srsCandidate, (data: WsCandidateType) => {
+    socket.on(WsMsgTypeEnum.candidate, (data: WsCandidateType) => {
       prettierInfoLog({
         msg: '收到candidate',
         socketId: socket.id,
@@ -445,7 +466,7 @@ export const connectWebSocket = (server) => {
       socketEmit<WsCandidateType['data']>({
         socket,
         roomId: data.data.live_room_id,
-        msgType: WsMsgTypeEnum.srsCandidate,
+        msgType: WsMsgTypeEnum.candidate,
         data: data.data,
       });
     });
@@ -473,7 +494,7 @@ export const connectWebSocket = (server) => {
         if (res1) {
           const { joinRoomId, userInfo } = res1.value;
           const liveUser = await getRoomAllUser(io, joinRoomId);
-          liveRedisController.delUserJoinedRoom({ socketId: socket.id });
+          // liveRedisController.delUserJoinedRoom({ socketId: socket.id });
           ioEmit<WsLeavedType['data']>({
             roomId: joinRoomId,
             msgType: WsMsgTypeEnum.leaved,
@@ -489,31 +510,51 @@ export const connectWebSocket = (server) => {
               liveUser,
             },
           });
-          const res2 = await liveRedisController.getAnchorLiving({
-            liveRoomId: joinRoomId,
-          });
-          if (res2) {
+          const userId = userInfo?.id;
+          if (!userId) {
+            console.log(chalkERROR('userId为空'));
+            return;
+          }
+          const userLiveRoomInfo = await userLiveRoomService.findByUserId(
+            userId
+          );
+          if (userLiveRoomInfo) {
+            const roomId = userLiveRoomInfo.live_room_id!;
             if (
-              joinRoomId === res2.value.liveRoomId &&
-              socket.id === res2.value.socketId
+              userLiveRoomInfo.live_room?.type === LiveRoomTypeEnum.user_wertc
             ) {
-              const [liveRoomInfo] = await Promise.all([
-                liveRoomService.find(joinRoomId),
-              ]);
-              ioEmit<WsRoomNoLiveType['data']>({
-                roomId: joinRoomId,
-                msgType: WsMsgTypeEnum.roomNoLive,
-                data: {
-                  live_room: liveRoomInfo!,
-                },
-              });
-              // 不能只在on_unpublish回调里面删除live记录，因为on_unpublish会延迟几秒
-              // liveController.common.deleteByLiveRoomId(joinRoomId);
-              liveRedisController.delAnchorLiving({
-                liveRoomId: joinRoomId,
+              liveService.deleteByLiveRoomIdAndSocketId({
+                live_room_id: roomId,
+                socket_id: socket.id,
               });
             }
           }
+
+          // const res2 = await liveRedisController.getAnchorLiving({
+          //   liveRoomId: joinRoomId,
+          // });
+          // if (res2) {
+          //   if (
+          //     joinRoomId === res2.value.liveRoomId &&
+          //     socket.id === res2.value.socketId
+          //   ) {
+          //     const [liveRoomInfo] = await Promise.all([
+          //       liveRoomService.find(joinRoomId),
+          //     ]);
+          //     ioEmit<WsRoomNoLiveType['data']>({
+          //       roomId: joinRoomId,
+          //       msgType: WsMsgTypeEnum.roomNoLive,
+          //       data: {
+          //         live_room: liveRoomInfo!,
+          //       },
+          //     });
+          //     // 不能只在on_unpublish回调里面删除live记录，因为on_unpublish会延迟几秒
+          //     // liveController.common.deleteByLiveRoomId(joinRoomId);
+          //     // liveRedisController.delAnchorLiving({
+          //     //   liveRoomId: joinRoomId,
+          //     // });
+          //   }
+          // }
         }
       } catch (error) {
         console.log(error);
