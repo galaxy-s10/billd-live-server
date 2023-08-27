@@ -77,7 +77,7 @@ class LiveService {
         {
           model: liveRoomModel,
           attributes: {
-            exclude: ['rtmp_url', 'key'],
+            exclude: ['key'],
           },
           include: [
             {
@@ -90,7 +90,7 @@ class LiveService {
         },
       ],
       attributes: {
-        exclude: ['rtmp_url', 'key'],
+        exclude: ['key'],
         include: [[col('live_room.weight'), 'live_room_weight']],
       },
       order: [

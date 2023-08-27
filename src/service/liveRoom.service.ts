@@ -96,7 +96,7 @@ class LiveRoomService {
         },
       ],
       attributes: {
-        exclude: ['rtmp_url', 'key'],
+        exclude: ['key'],
         include: [
           [col('user_live_room.user.id'), 'user_id'],
           [col('user_live_room.user.username'), 'user_username'],
@@ -141,7 +141,7 @@ class LiveRoomService {
         },
       ],
       attributes: {
-        exclude: ['rtmp_url', 'key'],
+        exclude: ['key'],
       },
       where: { id },
     });

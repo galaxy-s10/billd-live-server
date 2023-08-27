@@ -84,7 +84,7 @@ class UserLiveRoomService {
         {
           model: liveRoomModel,
           attributes: {
-            exclude: ['rtmp_url', 'key'],
+            exclude: ['key'],
           },
           include: [
             {
@@ -114,7 +114,7 @@ class UserLiveRoomService {
         {
           model: liveRoomModel,
           attributes: {
-            exclude: ['rtmp_url', 'key'],
+            exclude: ['key'],
           },
           include: [
             {
