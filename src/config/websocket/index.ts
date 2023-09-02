@@ -494,7 +494,6 @@ export const connectWebSocket = (server) => {
         if (res1) {
           const { joinRoomId, userInfo } = res1.value;
           const liveUser = await getRoomAllUser(io, joinRoomId);
-          // liveRedisController.delUserJoinedRoom({ socketId: socket.id });
           ioEmit<WsLeavedType['data']>({
             roomId: joinRoomId,
             msgType: WsMsgTypeEnum.leaved,

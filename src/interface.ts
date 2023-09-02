@@ -79,9 +79,9 @@ export interface IThirdUser {
 /** 直播间类型 */
 export enum LiveRoomTypeEnum {
   system, // 系统直播
-  user_wertc, // 主播使用webrtc直播（用户只能看webrtc直播）
-  user_srs, // 主播使用srs直播（用户可以看webrtc或flv直播）
-  user_obs, // 主播使用obs/ffmpeg直播（用户只能看flv直播）
+  user_wertc, // 主播使用webrtc直播
+  user_srs, // 主播使用srs直播
+  user_obs, // 主播使用obs/ffmpeg直播
 }
 
 export interface IArea {

@@ -182,7 +182,7 @@ class SRSController {
           srs_tcUrl: body.tcUrl,
           srs_vhost: body.vhost,
         });
-        wsSocket.io?.to(roomId).emit(WsMsgTypeEnum.roomLiving);
+        wsSocket.io?.to(roomId).emit(WsMsgTypeEnum.roomLiving, { data: {} });
         await next();
       }
     }
