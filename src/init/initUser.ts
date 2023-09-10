@@ -106,7 +106,7 @@ export const initUser: Record<string, IInitUser> = {
       'https://resource.hsslive.cn/billd-live/image/2b045c7f02febd23893244e923115535.webp',
     user_roles: [5],
     live_room: {
-      initFFmpeg: false, // 初始化ffmpeg
+      initFFmpeg: true, // 初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 4,
       name: '房东的猫-所念皆星河',
