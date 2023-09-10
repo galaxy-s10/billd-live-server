@@ -13,7 +13,7 @@
 </h1>
 
 <p align="center">
-  基于Vue3 + WebRTC + Node + SRS + FFmpeg搭建的直播间
+  基于Nodejs + Typescript + Koa2搭建的直播间后端
 </p>
 
 ## 生态
