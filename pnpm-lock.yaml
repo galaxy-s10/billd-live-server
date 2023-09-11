@@ -19,10 +19,10 @@ dependencies:
     version: 1.4.0
   billd-deploy:
     specifier: ^1.0.16
-    version: 1.0.16(@types/node@16.11.66)(esbuild@0.15.18)
+    version: 1.0.16(@swc/core@1.3.83)(@types/node@16.11.66)(esbuild@0.15.18)
   billd-html-webpack-plugin:
     specifier: ^1.0.1
-    version: 1.0.1(@types/node@16.11.66)(esbuild@0.15.18)
+    version: 1.0.1(@swc/core@1.3.83)(@types/node@16.11.66)(esbuild@0.15.18)
   billd-utils:
     specifier: ^0.0.14
     version: 0.0.14(typescript@4.8.4)
@@ -111,10 +111,13 @@ dependencies:
 devDependencies:
   '@commitlint/cli':
     specifier: ^16.0.1
-    version: 16.3.0
+    version: 16.3.0(@swc/core@1.3.83)
   '@commitlint/config-conventional':
     specifier: ^16.0.0
     version: 16.2.4
+  '@swc-node/register':
+    specifier: ^1.6.7
+    version: 1.6.7(@swc/core@1.3.83)(typescript@4.8.4)
   '@types/amqplib':
     specifier: ^0.10.1
     version: 0.10.1
@@ -168,7 +171,7 @@ devDependencies:
     version: 5.40.0(eslint@8.25.0)(typescript@4.8.4)
   commitizen:
     specifier: ^4.2.4
-    version: 4.2.5
+    version: 4.2.5(@swc/core@1.3.83)
   cross-env:
     specifier: ^7.0.3
     version: 7.0.3
@@ -207,7 +210,7 @@ devDependencies:
     version: 9.5.0
   ts-node:
     specifier: ^10.4.0
-    version: 10.9.1(@types/node@16.11.66)(typescript@4.8.4)
+    version: 10.9.1(@swc/core@1.3.83)(@types/node@16.11.66)(typescript@4.8.4)
   typescript:
     specifier: ^4.8.2
     version: 4.8.4
@@ -1405,14 +1408,14 @@ packages:
       to-fast-properties: 2.0.0
     dev: false
 
-  /@commitlint/cli@16.3.0:
+  /@commitlint/cli@16.3.0(@swc/core@1.3.83):
     resolution: {integrity: sha512-P+kvONlfsuTMnxSwWE1H+ZcPMY3STFaHb2kAacsqoIkNx66O0T7sTpBxpxkMrFPyhkJiLJnJWMhk4bbvYD3BMA==, tarball: https://registry.npm.taobao.org/@commitlint/cli/-/cli-16.3.0.tgz}
     engines: {node: '>=v12'}
     hasBin: true
     dependencies:
       '@commitlint/format': 16.2.1
       '@commitlint/lint': 16.2.4
-      '@commitlint/load': 16.3.0
+      '@commitlint/load': 16.3.0(@swc/core@1.3.83)
       '@commitlint/read': 16.2.1
       '@commitlint/types': 16.2.1
       lodash: 4.17.21
@@ -1493,7 +1496,7 @@ packages:
       '@commitlint/types': 16.2.1
     dev: true
 
-  /@commitlint/load@16.3.0:
+  /@commitlint/load@16.3.0(@swc/core@1.3.83):
     resolution: {integrity: sha512-3tykjV/iwbkv2FU9DG+NZ/JqmP0Nm3b7aDwgCNQhhKV5P74JAuByULkafnhn+zsFGypG1qMtI5u+BZoa9APm0A==, tarball: https://registry.npm.taobao.org/@commitlint/load/-/load-16.3.0.tgz}
     engines: {node: '>=v12'}
     dependencies:
@@ -1504,7 +1507,7 @@ packages:
       '@types/node': 16.11.66
       chalk: 4.1.2
       cosmiconfig: 7.0.1
-      cosmiconfig-typescript-loader: 2.0.2(@types/node@16.11.66)(cosmiconfig@7.0.1)(typescript@4.8.4)
+      cosmiconfig-typescript-loader: 2.0.2(@swc/core@1.3.83)(@types/node@16.11.66)(cosmiconfig@7.0.1)(typescript@4.8.4)
       lodash: 4.17.21
       resolve-from: 5.0.0
       typescript: 4.8.4
@@ -1513,7 +1516,7 @@ packages:
       - '@swc/wasm'
     dev: true
 
-  /@commitlint/load@17.1.2:
+  /@commitlint/load@17.1.2(@swc/core@1.3.83):
     resolution: {integrity: sha512-sk2p/jFYAWLChIfOIp/MGSIn/WzZ0vkc3afw+l4X8hGEYkvDe4gQUUAVxjl/6xMRn0HgnSLMZ04xXh5pkTsmgg==}
     engines: {node: '>=v14'}
     requiresBuild: true
@@ -1528,7 +1531,7 @@ packages:
       cosmiconfig-typescript-loader: 4.1.1(@types/node@14.18.32)(cosmiconfig@7.0.1)(ts-node@10.9.1)(typescript@4.8.4)
       lodash: 4.17.21
       resolve-from: 5.0.0
-      ts-node: 10.9.1(@types/node@14.18.32)(typescript@4.8.4)
+      ts-node: 10.9.1(@swc/core@1.3.83)(@types/node@14.18.32)(typescript@4.8.4)
       typescript: 4.8.4
     transitivePeerDependencies:
       - '@swc/core'
@@ -2140,6 +2143,150 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: false
+
+  /@swc-node/core@1.10.5(@swc/core@1.3.83):
+    resolution: {integrity: sha512-G+Me0sTApMy6WY9mT0TluFxdO633P1GWMllbT3LWeJlknqQxJo8dAQcV0Uc0+rvBVXt7rRo/BMUZNJp88qarzg==}
+    engines: {node: '>= 10'}
+    peerDependencies:
+      '@swc/core': '>= 1.3'
+    dependencies:
+      '@swc/core': 1.3.83
+    dev: true
+
+  /@swc-node/register@1.6.7(@swc/core@1.3.83)(typescript@4.8.4):
+    resolution: {integrity: sha512-+Tccbb4+fN8vYx88fdEGFbsCSnF0zBxbVhZkYkFAbVI7h6zVIgA3Jmlok4ZM+q+1KxzPN7AOfhQVuFOYBzZBeA==}
+    peerDependencies:
+      '@swc/core': '>= 1.3'
+      typescript: '>= 4.3'
+    dependencies:
+      '@swc-node/core': 1.10.5(@swc/core@1.3.83)
+      '@swc-node/sourcemap-support': 0.3.0
+      '@swc/core': 1.3.83
+      colorette: 2.0.19
+      debug: 4.3.4(supports-color@9.2.3)
+      pirates: 4.0.6
+      tslib: 2.6.2
+      typescript: 4.8.4
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
+  /@swc-node/sourcemap-support@0.3.0:
+    resolution: {integrity: sha512-gqBJSmJMWomZFxlppaKea7NeAqFrDrrS0RMt24No92M3nJWcyI9YKGEQKl+EyJqZ5gh6w1s0cTklMHMzRwA1NA==}
+    dependencies:
+      source-map-support: 0.5.21
+      tslib: 2.6.2
+    dev: true
+
+  /@swc/core-darwin-arm64@1.3.83:
+    resolution: {integrity: sha512-Plz2IKeveVLivbXTSCC3OZjD2MojyKYllhPrn9RotkDIZEFRYJZtW5/Ik1tJW/2rzu5HVKuGYrDKdScVVTbOxQ==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    optional: true
+
+  /@swc/core-darwin-x64@1.3.83:
+    resolution: {integrity: sha512-FBGVg5IPF/8jQ6FbK60iDUHjv0H5+LwfpJHKH6wZnRaYWFtm7+pzYgreLu3NTsm3m7/1a7t0+7KURwBGUaJCCw==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    optional: true
+
+  /@swc/core-linux-arm-gnueabihf@1.3.83:
+    resolution: {integrity: sha512-EZcsuRYhGkzofXtzwDjuuBC/suiX9s7zeg2YYXOVjWwyebb6BUhB1yad3mcykFQ20rTLO9JUyIaiaMYDHGobqw==}
+    engines: {node: '>=10'}
+    cpu: [arm]
+    os: [linux]
+    requiresBuild: true
+    optional: true
+
+  /@swc/core-linux-arm64-gnu@1.3.83:
+    resolution: {integrity: sha512-khI41szLHrCD/cFOcN4p2SYvZgHjhhHlcMHz5BksRrDyteSJKu0qtWRZITVom0N/9jWoAleoFhMnFTUs0H8IWA==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+    requiresBuild: true
+    optional: true
+
+  /@swc/core-linux-arm64-musl@1.3.83:
+    resolution: {integrity: sha512-zgT7yNOdbjHcGAwvys79mbfNLK65KBlPJWzeig+Yk7I8TVzmaQge7B6ZS/gwF9/p+8TiLYo/tZ5aF2lqlgdSVw==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+    requiresBuild: true
+    optional: true
+
+  /@swc/core-linux-x64-gnu@1.3.83:
+    resolution: {integrity: sha512-x+mH0Y3NC/G0YNlFmGi3vGD4VOm7IPDhh+tGrx6WtJp0BsShAbOpxtfU885rp1QweZe4qYoEmGqiEjE2WrPIdA==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+    requiresBuild: true
+    optional: true
+
+  /@swc/core-linux-x64-musl@1.3.83:
+    resolution: {integrity: sha512-s5AYhAOmetUwUZwS5g9qb92IYgNHHBGiY2mTLImtEgpAeBwe0LPDj6WrujxCBuZnaS55mKRLLOuiMZE5TpjBNA==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+    requiresBuild: true
+    optional: true
+
+  /@swc/core-win32-arm64-msvc@1.3.83:
+    resolution: {integrity: sha512-yw2rd/KVOGs95lRRB+killLWNaO1dy4uVa8Q3/4wb5txlLru07W1m041fZLzwOg/1Sh0TMjJgGxj0XHGR3ZXhQ==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [win32]
+    requiresBuild: true
+    optional: true
+
+  /@swc/core-win32-ia32-msvc@1.3.83:
+    resolution: {integrity: sha512-POW+rgZ6KWqBpwPGIRd2/3pcf46P+UrKBm4HLt5IwbHvekJ4avIM8ixJa9kK0muJNVJcDpaZgxaU1ELxtJ1j8w==}
+    engines: {node: '>=10'}
+    cpu: [ia32]
+    os: [win32]
+    requiresBuild: true
+    optional: true
+
+  /@swc/core-win32-x64-msvc@1.3.83:
+    resolution: {integrity: sha512-CiWQtkFnZElXQUalaHp+Wacw0Jd+24ncRYhqaJ9YKnEQP1H82CxIIuQqLM8IFaLpn5dpY6SgzaeubWF46hjcLA==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    optional: true
+
+  /@swc/core@1.3.83:
+    resolution: {integrity: sha512-PccHDgGQlFjpExgJxH91qA3a4aifR+axCFJ4RieCoiI0m5gURE4nBhxzTBY5YU/YKTBmPO8Gc5Q6inE3+NquWg==}
+    engines: {node: '>=10'}
+    requiresBuild: true
+    peerDependencies:
+      '@swc/helpers': ^0.5.0
+    peerDependenciesMeta:
+      '@swc/helpers':
+        optional: true
+    dependencies:
+      '@swc/types': 0.1.4
+    optionalDependencies:
+      '@swc/core-darwin-arm64': 1.3.83
+      '@swc/core-darwin-x64': 1.3.83
+      '@swc/core-linux-arm-gnueabihf': 1.3.83
+      '@swc/core-linux-arm64-gnu': 1.3.83
+      '@swc/core-linux-arm64-musl': 1.3.83
+      '@swc/core-linux-x64-gnu': 1.3.83
+      '@swc/core-linux-x64-musl': 1.3.83
+      '@swc/core-win32-arm64-msvc': 1.3.83
+      '@swc/core-win32-ia32-msvc': 1.3.83
+      '@swc/core-win32-x64-msvc': 1.3.83
+
+  /@swc/types@0.1.4:
+    resolution: {integrity: sha512-z/G02d+59gyyUb7KYhKi9jOhicek6QD2oMaotUyG+lUkybpXoV49dY9bj7Ah5Q+y7knK2jU67UTX9FyfGzaxQg==}
 
   /@tootallnate/once@1.1.2:
     resolution: {integrity: sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==}
@@ -2978,7 +3125,7 @@ packages:
     resolution: {integrity: sha512-x1FCFnFifvYDDzTaLII71vG5uvDwgtmDTEVWAxrgeiR8VjMONcCXJx7E+USjDtHlwFmt9MysbqgF9b9Vjr6w+w==}
     engines: {node: '>=4'}
     dependencies:
-      tslib: 2.4.0
+      tslib: 2.6.2
     dev: false
 
   /astral-regex@2.0.0:
@@ -3070,12 +3217,12 @@ packages:
     resolution: {integrity: sha512-pHm4LsMJ6lzgNGVfZHjMoO8sdoRhOzOH4MLmY65Jg70bpxCKu5iOHNJyfF6OyvYw7t8Fpf35RuzUyqnQsj8Vig==}
     dev: false
 
-  /billd-deploy@1.0.16(@types/node@16.11.66)(esbuild@0.15.18):
+  /billd-deploy@1.0.16(@swc/core@1.3.83)(@types/node@16.11.66)(esbuild@0.15.18):
     resolution: {integrity: sha512-T1ZejJOdNUuY6bMjGz6hZl2okoivEVuv1qOaRW45CInypUdWj8LDx21AITcykT0XR/32fJPXhO/eVWhfratQAQ==}
     requiresBuild: true
     dependencies:
       ali-oss: 6.17.1
-      billd-html-webpack-plugin: 1.0.1(@types/node@16.11.66)(esbuild@0.15.18)
+      billd-html-webpack-plugin: 1.0.1(@swc/core@1.3.83)(@types/node@16.11.66)(esbuild@0.15.18)
       esdk-obs-nodejs: 3.21.6
       inquirer: 8.2.4
       node-ssh: 13.1.0
@@ -3095,12 +3242,12 @@ packages:
       - webpack-cli
     dev: false
 
-  /billd-html-webpack-plugin@1.0.1(@types/node@16.11.66)(esbuild@0.15.18):
+  /billd-html-webpack-plugin@1.0.1(@swc/core@1.3.83)(@types/node@16.11.66)(esbuild@0.15.18):
     resolution: {integrity: sha512-ktyHU31TP6VUvCYjy/HdzA6PlYs72VGTHx6Zd8p+cQba7M+pdR5y8lZKQe1JDYf/h1R7TnxrmmiU/tSsC6nLOg==}
     requiresBuild: true
     dependencies:
       vite: 4.3.3(@types/node@16.11.66)
-      webpack: 5.81.0(esbuild@0.15.18)
+      webpack: 5.81.0(@swc/core@1.3.83)(esbuild@0.15.18)
     transitivePeerDependencies:
       - '@swc/core'
       - '@types/node'
@@ -3438,7 +3585,7 @@ packages:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==, tarball: https://registry.npm.taobao.org/color-name/-/color-name-1.1.4.tgz}
 
   /colorette@2.0.19:
-    resolution: {integrity: sha512-3tlv/dIP7FWvj3BsbHrGLJ6l/oKh1O3TcgBqMn+yyCagOxc23fyzDS6HypQbgxWbkpDnf52p1LuR4eWDQ/K9WQ==, tarball: https://registry.npm.taobao.org/colorette/-/colorette-2.0.19.tgz}
+    resolution: {integrity: sha512-3tlv/dIP7FWvj3BsbHrGLJ6l/oKh1O3TcgBqMn+yyCagOxc23fyzDS6HypQbgxWbkpDnf52p1LuR4eWDQ/K9WQ==}
     dev: true
 
   /combined-stream@1.0.8:
@@ -3457,13 +3604,13 @@ packages:
     engines: {node: ^12.20.0 || >=14}
     dev: true
 
-  /commitizen@4.2.5:
+  /commitizen@4.2.5(@swc/core@1.3.83):
     resolution: {integrity: sha512-9sXju8Qrz1B4Tw7kC5KhnvwYQN88qs2zbiB8oyMsnXZyJ24PPGiNM3nHr73d32dnE3i8VJEXddBFIbOgYSEXtQ==, tarball: https://registry.npm.taobao.org/commitizen/-/commitizen-4.2.5.tgz}
     engines: {node: '>= 12'}
     hasBin: true
     dependencies:
       cachedir: 2.3.0
-      cz-conventional-changelog: 3.3.0
+      cz-conventional-changelog: 3.3.0(@swc/core@1.3.83)
       dedent: 0.7.0
       detect-indent: 6.1.0
       find-node-modules: 2.1.3
@@ -3742,7 +3889,7 @@ packages:
       vary: 1.1.2
     dev: false
 
-  /cosmiconfig-typescript-loader@2.0.2(@types/node@16.11.66)(cosmiconfig@7.0.1)(typescript@4.8.4):
+  /cosmiconfig-typescript-loader@2.0.2(@swc/core@1.3.83)(@types/node@16.11.66)(cosmiconfig@7.0.1)(typescript@4.8.4):
     resolution: {integrity: sha512-KmE+bMjWMXJbkWCeY4FJX/npHuZPNr9XF9q9CIQ/bpFwi1qHfCmSiKarrCcRa0LO4fWjk93pVoeRtJAkTGcYNw==, tarball: https://registry.npm.taobao.org/cosmiconfig-typescript-loader/-/cosmiconfig-typescript-loader-2.0.2.tgz}
     engines: {node: '>=12', npm: '>=6'}
     peerDependencies:
@@ -3752,7 +3899,7 @@ packages:
     dependencies:
       '@types/node': 16.11.66
       cosmiconfig: 7.0.1
-      ts-node: 10.9.1(@types/node@16.11.66)(typescript@4.8.4)
+      ts-node: 10.9.1(@swc/core@1.3.83)(@types/node@16.11.66)(typescript@4.8.4)
       typescript: 4.8.4
     transitivePeerDependencies:
       - '@swc/core'
@@ -3770,7 +3917,7 @@ packages:
     dependencies:
       '@types/node': 14.18.32
       cosmiconfig: 7.0.1
-      ts-node: 10.9.1(@types/node@14.18.32)(typescript@4.8.4)
+      ts-node: 10.9.1(@swc/core@1.3.83)(@types/node@14.18.32)(typescript@4.8.4)
       typescript: 4.8.4
     dev: true
     optional: true
@@ -3848,18 +3995,18 @@ packages:
       uid-safe: 2.1.5
     dev: false
 
-  /cz-conventional-changelog@3.3.0:
+  /cz-conventional-changelog@3.3.0(@swc/core@1.3.83):
     resolution: {integrity: sha512-U466fIzU5U22eES5lTNiNbZ+d8dfcHcssH4o7QsdWaCcRs/feIPCxKYSWkYBNs5mny7MvEfwpTLWjvbm94hecw==, tarball: https://registry.npm.taobao.org/cz-conventional-changelog/-/cz-conventional-changelog-3.3.0.tgz}
     engines: {node: '>= 10'}
     dependencies:
       chalk: 2.4.2
-      commitizen: 4.2.5
+      commitizen: 4.2.5(@swc/core@1.3.83)
       conventional-commit-types: 3.0.0
       lodash.map: 4.6.0
       longest: 2.0.1
       word-wrap: 1.2.3
     optionalDependencies:
-      '@commitlint/load': 17.1.2
+      '@commitlint/load': 17.1.2(@swc/core@1.3.83)
     transitivePeerDependencies:
       - '@swc/core'
       - '@swc/wasm'
@@ -7017,6 +7164,11 @@ packages:
     engines: {node: '>=4'}
     dev: true
 
+  /pirates@4.0.6:
+    resolution: {integrity: sha512-saLsH7WeYYPiD25LDuLRRY/i+6HaPYr6G1OUlN39otzkSTxKnubR9RTxS3/Kk50s1g2JTgFwWQDQyplC5/SHZg==}
+    engines: {node: '>= 6'}
+    dev: true
+
   /pkg-dir@4.2.0:
     resolution: {integrity: sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==}
     engines: {node: '>=8'}
@@ -7506,7 +7658,7 @@ packages:
       fs-extra: 10.1.0
       resolve: 1.22.1
       rollup: 2.79.1
-      tslib: 2.4.0
+      tslib: 2.6.2
       typescript: 4.8.4
     dev: false
 
@@ -7539,7 +7691,7 @@ packages:
   /rxjs@7.5.7:
     resolution: {integrity: sha512-z9MzKh/UcOqB3i20H6rtrlaE/CgjLOvheWK/9ILrbhROGTweAi1BaFsTT9FbwZi5Trr1qNRs+MXkhmR06awzQA==}
     dependencies:
-      tslib: 2.4.0
+      tslib: 2.6.2
 
   /safe-buffer@5.1.2:
     resolution: {integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==}
@@ -7879,7 +8031,6 @@ packages:
     dependencies:
       buffer-from: 1.1.2
       source-map: 0.6.1
-    dev: false
 
   /source-map@0.6.1:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
@@ -8141,7 +8292,7 @@ packages:
       - supports-color
     dev: false
 
-  /terser-webpack-plugin@5.3.7(esbuild@0.15.18)(webpack@5.81.0):
+  /terser-webpack-plugin@5.3.7(@swc/core@1.3.83)(esbuild@0.15.18)(webpack@5.81.0):
     resolution: {integrity: sha512-AfKwIktyP7Cu50xNjXF/6Qb5lBNzYaWpU6YfoX3uZicTx0zTy0stDDCsvjDapKsSDvOeWo5MEq4TmdBy2cNoHw==}
     engines: {node: '>= 10.13.0'}
     peerDependencies:
@@ -8158,12 +8309,13 @@ packages:
         optional: true
     dependencies:
       '@jridgewell/trace-mapping': 0.3.18
+      '@swc/core': 1.3.83
       esbuild: 0.15.18
       jest-worker: 27.5.1
       schema-utils: 3.1.2
       serialize-javascript: 6.0.1
       terser: 5.17.1
-      webpack: 5.81.0(esbuild@0.15.18)
+      webpack: 5.81.0(@swc/core@1.3.83)(esbuild@0.15.18)
     dev: false
 
   /terser@5.17.1:
@@ -8278,7 +8430,7 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /ts-node@10.9.1(@types/node@14.18.32)(typescript@4.8.4):
+  /ts-node@10.9.1(@swc/core@1.3.83)(@types/node@14.18.32)(typescript@4.8.4):
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==, tarball: https://registry.npm.taobao.org/ts-node/-/ts-node-10.9.1.tgz}
     hasBin: true
     peerDependencies:
@@ -8293,6 +8445,7 @@ packages:
         optional: true
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
+      '@swc/core': 1.3.83
       '@tsconfig/node10': 1.0.9
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
@@ -8310,7 +8463,7 @@ packages:
     dev: true
     optional: true
 
-  /ts-node@10.9.1(@types/node@16.11.66)(typescript@4.8.4):
+  /ts-node@10.9.1(@swc/core@1.3.83)(@types/node@16.11.66)(typescript@4.8.4):
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==, tarball: https://registry.npm.taobao.org/ts-node/-/ts-node-10.9.1.tgz}
     hasBin: true
     peerDependencies:
@@ -8325,6 +8478,7 @@ packages:
         optional: true
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
+      '@swc/core': 1.3.83
       '@tsconfig/node10': 1.0.9
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
@@ -8358,8 +8512,8 @@ packages:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
     dev: true
 
-  /tslib@2.4.0:
-    resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
+  /tslib@2.6.2:
+    resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
 
   /tsscmp@1.0.6:
     resolution: {integrity: sha512-LxhtAkPDTkVCMQjt2h6eBVY28KCjikZqZfMcC15YBeNjkgUpdCfBu5HoiOTDu86v6smE8yOjyEktJ8hlbANHQA==, tarball: https://registry.npm.taobao.org/tsscmp/-/tsscmp-1.0.6.tgz}
@@ -8684,7 +8838,7 @@ packages:
     engines: {node: '>=10.13.0'}
     dev: false
 
-  /webpack@5.81.0(esbuild@0.15.18):
+  /webpack@5.81.0(@swc/core@1.3.83)(esbuild@0.15.18):
     resolution: {integrity: sha512-AAjaJ9S4hYCVODKLQTgG5p5e11hiMawBwV2v8MYLE0C/6UAGLuAF4n1qa9GOwdxnicaP+5k6M5HrLmD4+gIB8Q==}
     engines: {node: '>=10.13.0'}
     hasBin: true
@@ -8715,7 +8869,7 @@ packages:
       neo-async: 2.6.2
       schema-utils: 3.1.2
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.7(esbuild@0.15.18)(webpack@5.81.0)
+      terser-webpack-plugin: 5.3.7(@swc/core@1.3.83)(esbuild@0.15.18)(webpack@5.81.0)
       watchpack: 2.4.0
       webpack-sources: 3.2.3
     transitivePeerDependencies:
