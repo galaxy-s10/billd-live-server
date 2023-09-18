@@ -1,5 +1,6 @@
 import { exec } from 'child_process';
 
+import { maxBitrate } from '@/constant';
 import srsController from '@/controller/srs.controller';
 import { initUser } from '@/init/initUser';
 import { IApiV1Streams } from '@/interface-srs';
@@ -43,7 +44,7 @@ async function verifyBitrateIsOver(info: IApiV1Streams['streams'][0]) {
           `流名称：${info.name}，当前码率：${res[0]}，kbps（recv_30s）：${info.kbps.recv_30s}，kbps（send_30s）：${info.kbps.send_30s}，`
         )
       );
-      if (bitrate > 1000 * 2.5) {
+      if (bitrate > maxBitrate) {
         // 码率超过4m，踢掉
         srsController.common.deleteApiV1Clients(info.publish.cid);
       }
@@ -77,7 +78,7 @@ export const handleVerifyStream = async () => {
       );
       return;
     }
-    if (item.kbps.recv_30s > 1000 * 2.5) {
+    if (item.kbps.recv_30s > maxBitrate) {
       srsController.common.deleteApiV1Clients(item.publish.cid);
     }
   });

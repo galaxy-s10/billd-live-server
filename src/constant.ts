@@ -33,6 +33,8 @@ export const QQ_MAIL_CONFIG = {
   to: '2274751790@qq.com', // list of receivers
 };
 
+export const maxBitrate = 1000 * 3;
+
 export const ERROR_HTTP_CODE = {
   serverError: 10000, // 服务器错误
   banIp: 1000,
