@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+
 import { Server, Socket } from 'socket.io';
 
 import {
@@ -16,6 +19,7 @@ import {
   WsJoinType,
   WsLeavedType,
   WsMessageType,
+  WsMsrBlobType,
   WsOfferType,
   WsOtherJoinType,
   WsRoomLivingType,
@@ -32,6 +36,7 @@ import {
   chalkSUCCESS,
   chalkWARN,
 } from '@/utils/chalkTip';
+import { webmPushProcess } from '@/utils/webm';
 
 // 获取所有连接的socket客户端
 async function getAllSockets(io) {
@@ -288,6 +293,8 @@ export const connectWebSocket = (server) => {
         return;
       }
       const roomId = userLiveRoomInfo.live_room_id!;
+      const liveRoomInfo = await liveRoomService.findKey(roomId);
+
       liveRoomService.update({
         id: roomId,
         cover_img: data.data.cover_img,
@@ -316,6 +323,20 @@ export const connectWebSocket = (server) => {
             anchor_socket_id: data.socket_id,
           },
         });
+      } else if (data.data.type === LiveRoomTypeEnum.user_msr) {
+        setTimeout(() => {
+          const roomDir = path.resolve(
+            __dirname,
+            `../../webm/roomId_${roomId}`
+          );
+          const txtFile = `${roomDir}/list.txt`;
+          webmPushProcess({
+            listTxt: txtFile,
+            rtmpUrl: userLiveRoomInfo.live_room!.rtmp_url!,
+            token: liveRoomInfo!.key!,
+          });
+          console.log('webmPushProcess推流');
+        }, 5000);
       }
     });
 
@@ -469,6 +490,46 @@ export const connectWebSocket = (server) => {
         msgType: WsMsgTypeEnum.candidate,
         data: data.data,
       });
+    });
+
+    // msrBlob
+    socket.on(WsMsgTypeEnum.msrBlob, async (data: WsMsrBlobType) => {
+      prettierInfoLog({
+        msg: '收到msrBlob',
+        socketId: socket.id,
+        roomId: data.data.live_room_id,
+      });
+      const userId = data.user_info?.id;
+      if (!userId) {
+        console.log(chalkERROR('userId为空'));
+        return;
+      }
+      const userLiveRoomInfo = await userLiveRoomService.findByUserId(userId);
+      if (!userLiveRoomInfo) {
+        console.log(chalkERROR('userLiveRoomInfo为空'));
+        return;
+      }
+      const roomId = userLiveRoomInfo.live_room_id!;
+      const roomDir = path.resolve(__dirname, `../../webm/roomId_${roomId}`);
+      const fileDir = `${roomDir}/file`;
+      const txtFile = `${roomDir}/list.txt`;
+      const blobFile = `${fileDir}/${data.data.blob_id}.webm`;
+
+      if (!fs.existsSync(roomDir)) {
+        fs.mkdirSync(roomDir);
+      }
+      if (!fs.existsSync(fileDir)) {
+        fs.mkdirSync(fileDir);
+      }
+      fs.writeFileSync(blobFile, data.data.blob);
+      if (!fs.existsSync(txtFile)) {
+        fs.writeFileSync(txtFile, '');
+      }
+      const old = fs.readFileSync(txtFile).toString();
+      fs.writeFileSync(
+        txtFile,
+        `${old}${old !== '' ? '\n' : ''}file ${blobFile}`
+      );
     });
 
     // 断开连接中

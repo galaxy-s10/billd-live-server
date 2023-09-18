@@ -3,5 +3,7 @@ node_modules
 dist
 src/config/secret.ts
 src/upload/**/*
+src/webm/**/*
 !src/upload/README.md
+!src/webm/README.md
 !src/video/README.md

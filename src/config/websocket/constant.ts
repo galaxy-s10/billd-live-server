@@ -45,7 +45,5 @@ export enum WsMsgTypeEnum {
   answer = 'answer',
   candidate = 'candidate',
 
-  webrtcOffer = 'webrtcOffer',
-  webrtcAnswer = 'webrtcAnswer',
-  webrtcCandidate = 'webrtcCandidate',
+  msrBlob = 'msrBlob',
 }

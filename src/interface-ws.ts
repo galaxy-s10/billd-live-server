@@ -93,3 +93,9 @@ export type WsCandidateType = IWsFormat<{
   receiver: string;
   sender: string;
 }>;
+
+export type WsMsrBlobType = IWsFormat<{
+  live_room_id: number;
+  blob: any;
+  blob_id: string;
+}>;
