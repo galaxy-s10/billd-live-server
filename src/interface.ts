@@ -1,3 +1,21 @@
+export interface IInitUser {
+  id: number;
+  username: string;
+  password: string;
+  avatar: string;
+  user_roles: number[];
+  live_room: {
+    initFFmpeg: boolean;
+    cdn: number;
+    id: number;
+    area: number[];
+    name: string;
+    localFile: string;
+    cover_img: string;
+    weight: number;
+  };
+}
+
 export enum liveEnum {
   srs = 1,
   webrtc,

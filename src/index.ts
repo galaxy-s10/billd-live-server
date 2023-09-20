@@ -2,6 +2,8 @@
 import './init/alias';
 import './init/initFile';
 
+import { performance } from 'perf_hooks';
+
 import { connectMysql } from '@/config/mysql';
 import { connectRedis } from '@/config/redis';
 import { createRedisPubSub } from '@/config/redis/pub';
@@ -14,6 +16,9 @@ import {
   chalkWARN,
 } from '@/utils/chalkTip';
 
+import { getIpAddress } from './utils';
+
+const start = performance.now();
 async function main() {
   function adLog() {
     console.log();
@@ -37,12 +42,20 @@ async function main() {
     ).default.common.initDefault();
     const port = +PROJECT_PORT;
     await (await import('./setup')).setupKoa({ port });
-    console.log();
-    console.log(chalkSUCCESS(`项目启动成功！`));
     console.log(chalkWARN(`监听端口: ${port}`));
     console.log(chalkWARN(`项目名称: ${PROJECT_NAME}`));
     console.log(chalkWARN(`项目环境: ${PROJECT_ENV}`));
     console.log(chalkWARN(`mysql数据库: ${MYSQL_CONFIG.database}`));
+    console.log();
+    getIpAddress().forEach((ip) => {
+      console.log(chalkSUCCESS(`http://${ip}:${port}/`));
+    });
+    console.log(
+      chalkSUCCESS(
+        `项目启动成功！耗时：${Math.floor(performance.now() - start)}ms`
+      )
+    );
+
     adLog();
   } catch (error) {
     console.log(error);

@@ -20,7 +20,7 @@ import {
   bulkCreateRoleAuth,
 } from '@/init/initData';
 import { initUser } from '@/init/initUser';
-import { IUser, LiveRoomTypeEnum } from '@/interface';
+import { IInitUser, IUser, LiveRoomTypeEnum } from '@/interface';
 import areaModel from '@/model/area.model';
 import areaLiveRoomModel from '@/model/areaLiveRoom.model';
 import authModel from '@/model/auth.model';
@@ -41,7 +41,6 @@ import walletModel from '@/model/wallet.model';
 import liveRoomService from '@/service/liveRoom.service';
 import userService from '@/service/user.service';
 import walletService from '@/service/wallet.service';
-import { chalkWARN } from '@/utils/chalkTip';
 import { tencentcloudUtils } from '@/utils/tencentcloud';
 
 const sql1 = `
@@ -74,15 +73,18 @@ class InitController {
   common = {
     initDefault: async () => {
       try {
-        await this.common.initRole();
-        await this.common.initAuth();
-        await this.common.initRoleAuth();
         await this.common.initUser();
-        await this.common.initUserWallet();
-        await this.common.initGoods();
-        await this.common.initArea();
+        await Promise.all([
+          this.common.initRole(),
+          this.common.initAuth(),
+          this.common.initRoleAuth(),
+          // this.common.initUser(),
+          this.common.initUserWallet(),
+          this.common.initGoods(),
+          this.common.initArea(),
+        ]);
       } catch (error) {
-        console.log();
+        // console.log();
       }
     },
     initArea: async () => {
@@ -147,7 +149,7 @@ class InitController {
     },
     initUser: async () => {
       const quequ: Promise<any>[] = [];
-      const initOneUser = async (user: IUser) => {
+      const initOneUser = async (user: IInitUser) => {
         if (!user.id) return;
         const userIsExist = await userService.isExist([user.id]);
         let userRes;
@@ -167,7 +169,7 @@ class InitController {
           // @ts-ignore
           userRes.setRoles(user.user_roles);
         } else {
-          console.log(chalkWARN(`已存在id为：${user.id}的用户！`));
+          // console.log(chalkWARN(`已存在id为：${user.id}的用户！`));
           return;
         }
 
@@ -220,7 +222,7 @@ class InitController {
             user_id: userRes.id,
           });
         } else {
-          console.log(chalkWARN(`已存在id为：${user.id}的直播间！`));
+          // console.log(chalkWARN(`已存在id为：${user.id}的直播间！`));
         }
       };
 
@@ -237,7 +239,7 @@ class InitController {
         if (!flag) {
           await walletService.create({ user_id: item.id, balance: '0.00' });
         } else {
-          console.log(chalkWARN(`id为${item.id}的用户已存在钱包！`));
+          // console.log(chalkWARN(`id为${item.id!}的用户已存在钱包！`));
         }
       };
       const arr: any[] = [];

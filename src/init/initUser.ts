@@ -13,27 +13,11 @@ import { zjlBnsdmmBase64 } from '@/init/base64/zjl_bnsdmm';
 import { zjlGqBase64 } from '@/init/base64/zjl_gq';
 import { zjlQtBase64 } from '@/init/base64/zjl_qt';
 import { zjlYlxbBase64 } from '@/init/base64/zjl_ylxb';
+import { IInitUser } from '@/interface';
 import { resolveApp } from '@/utils';
 
 import { hss_20230707_1_30Base64 } from './base64/hss_20230707_1_30';
 
-interface IInitUser {
-  id: number;
-  username: string;
-  password: string;
-  avatar: string;
-  user_roles: number[];
-  live_room: {
-    initFFmpeg: boolean;
-    cdn: number;
-    id: number;
-    area: number[];
-    name: string;
-    localFile: string;
-    cover_img: string;
-    weight: number;
-  };
-}
 export const initUser: Record<string, IInitUser> = {
   admin: {
     id: 1,
@@ -64,7 +48,7 @@ export const initUser: Record<string, IInitUser> = {
     avatar:
       'https://resource.hsslive.cn/billd-live/image/15a116a978cadb34e9fbf0061a4145bc.webp',
     live_room: {
-      initFFmpeg: true, // 初始化ffmpeg
+      initFFmpeg: false, // 初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 2,
       name: '房东的猫-美好事物',
@@ -106,7 +90,7 @@ export const initUser: Record<string, IInitUser> = {
       'https://resource.hsslive.cn/billd-live/image/2b045c7f02febd23893244e923115535.webp',
     user_roles: [5],
     live_room: {
-      initFFmpeg: true, // 初始化ffmpeg
+      initFFmpeg: false, // 初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 4,
       name: '房东的猫-所念皆星河',

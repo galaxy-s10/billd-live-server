@@ -4,6 +4,56 @@ import {
   IUser,
   LiveRoomTypeEnum,
 } from './interface';
+// websocket连接状态
+export enum WsConnectStatusEnum {
+  /** 已连接 */
+  connection = 'connection',
+  /** 连接中 */
+  connecting = 'connecting',
+  /** 已连接 */
+  connected = 'connected',
+  /** 断开连接中 */
+  disconnecting = 'disconnecting',
+  /** 已断开连接 */
+  disconnect = 'disconnect',
+  /** 重新连接 */
+  reconnect = 'reconnect',
+  /** 客户端的已连接 */
+  connect = 'connect',
+}
+
+// websocket消息类型
+export enum WsMsgTypeEnum {
+  /** 用户进入聊天 */
+  join = 'join',
+  /** 用户进入聊天完成 */
+  joined = 'joined',
+  /** 用户进入聊天 */
+  otherJoin = 'otherJoin',
+  /** 用户退出聊天 */
+  leave = 'leave',
+  /** 用户退出聊天完成 */
+  leaved = 'leaved',
+  /** 当前所有在线用户 */
+  liveUser = 'liveUser',
+  /** 用户发送消息 */
+  message = 'message',
+  /** 房间正在直播 */
+  roomLiving = 'roomLiving',
+  /** 房间不在直播 */
+  roomNoLive = 'roomNoLive',
+  getLiveUser = 'getLiveUser',
+  updateJoinInfo = 'updateJoinInfo',
+  heartbeat = 'heartbeat',
+  startLive = 'startLive',
+  endLive = 'endLive',
+
+  offer = 'offer',
+  answer = 'answer',
+  candidate = 'candidate',
+
+  msrBlob = 'msrBlob',
+}
 
 export interface IWsFormat<T> {
   /** 用户socket_id */
@@ -52,6 +102,9 @@ export type WsStartLiveType = IWsFormat<{
   name: string;
   type: LiveRoomTypeEnum;
 }>;
+export type WsEndLiveType = IWsFormat<{
+  type: LiveRoomTypeEnum;
+}>;
 
 export type WsJoinType = IWsFormat<{
   socket_id: string;
@@ -98,4 +151,5 @@ export type WsMsrBlobType = IWsFormat<{
   live_room_id: number;
   blob: any;
   blob_id: string;
+  delay: number;
 }>;

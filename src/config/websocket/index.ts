@@ -1,12 +1,10 @@
+import { exec } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
+import { rimrafSync } from 'rimraf';
 import { Server, Socket } from 'socket.io';
 
-import {
-  WsConnectStatusEnum,
-  WsMsgTypeEnum,
-} from '@/config/websocket/constant';
 import liveRedisController from '@/config/websocket/live-redis.controller';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import { LiveRoomTypeEnum } from '@/interface';
@@ -14,11 +12,13 @@ import {
   WSGetRoomAllUserType,
   WsAnswerType,
   WsCandidateType,
+  WsConnectStatusEnum,
   WsGetLiveUserType,
   WsHeartbeatType,
   WsJoinType,
   WsLeavedType,
   WsMessageType,
+  WsMsgTypeEnum,
   WsMsrBlobType,
   WsOfferType,
   WsOtherJoinType,
@@ -36,7 +36,7 @@ import {
   chalkSUCCESS,
   chalkWARN,
 } from '@/utils/chalkTip';
-import { webmPushProcess } from '@/utils/webm';
+import { webmPushProcess, webmToMp4 } from '@/utils/process';
 
 // 获取所有连接的socket客户端
 async function getAllSockets(io) {
@@ -136,8 +136,10 @@ export const connectWebSocket = (server) => {
     return;
   }
   console.log(chalkSUCCESS('初始化websocket成功！'));
-
-  const io = new Server(server);
+  const oneK = 1000;
+  const io = new Server(server, {
+    maxHttpBufferSize: oneK * 1000 * 100,
+  });
 
   function ioEmit<T>({
     roomId,
@@ -324,19 +326,32 @@ export const connectWebSocket = (server) => {
           },
         });
       } else if (data.data.type === LiveRoomTypeEnum.user_msr) {
+        const roomDir = path.resolve(__dirname, `../../webm/roomId_${roomId}`);
+        const txtFile = `${roomDir}/list.txt`;
+        const fileDir = `${roomDir}/file`;
+        rimrafSync(roomDir);
+        let str = '';
+        const allTime = 60; // 24小时对应的秒数
+        // const allTime = 60 * 60 * 24; // 24小时对应的秒数
+        for (let i = 1; i < allTime / 2; i += 1) {
+          str += `${i !== 1 ? '\n' : ''}file ${fileDir}/${i}.mp4`;
+        }
+        if (!fs.existsSync(roomDir)) {
+          fs.mkdirSync(roomDir);
+        }
+        if (!fs.existsSync(fileDir)) {
+          fs.mkdirSync(fileDir);
+        }
+        console.log(str);
+        fs.writeFileSync(txtFile, str);
         setTimeout(() => {
-          const roomDir = path.resolve(
-            __dirname,
-            `../../webm/roomId_${roomId}`
-          );
-          const txtFile = `${roomDir}/list.txt`;
           webmPushProcess({
             listTxt: txtFile,
             rtmpUrl: userLiveRoomInfo.live_room!.rtmp_url!,
             token: liveRoomInfo!.key!,
           });
           console.log('webmPushProcess推流');
-        }, 5000);
+        }, 3000);
       }
     });
 
@@ -370,6 +385,7 @@ export const connectWebSocket = (server) => {
         return;
       }
       const roomId = userLiveRoomInfo.live_room_id!;
+      const rtmpUrl = userLiveRoomInfo.live_room!.rtmp_url!;
       prettierInfoLog({
         msg: '收到主播断开直播',
         socketId: socket.id,
@@ -383,6 +399,14 @@ export const connectWebSocket = (server) => {
       });
       if (userLiveRoomInfo.live_room?.type === LiveRoomTypeEnum.user_wertc) {
         liveService.deleteByLiveRoomId(roomId);
+      } else if (
+        userLiveRoomInfo.live_room?.type === LiveRoomTypeEnum.user_msr
+      ) {
+        liveService.deleteByLiveRoomId(roomId);
+        const cmd = `ps aux | grep ${rtmpUrl} | grep -v grep | awk '{print $2}'`;
+        exec(cmd, (err, stdout, stderr) => {
+          console.log(err, stdout, stderr);
+        });
       }
     });
 
@@ -403,10 +427,10 @@ export const connectWebSocket = (server) => {
 
     // 收到心跳
     socket.on(WsMsgTypeEnum.heartbeat, (data: WsHeartbeatType['data']) => {
-      prettierInfoLog({
-        msg: '收到心跳',
-        socketId: socket.id,
-      });
+      // prettierInfoLog({
+      //   msg: '收到心跳',
+      //   socketId: socket.id,
+      // });
       updateUserJoinedRoom({
         socketId: data.socket_id,
         client_ip: socket.handshake.address,
@@ -525,11 +549,10 @@ export const connectWebSocket = (server) => {
       if (!fs.existsSync(txtFile)) {
         fs.writeFileSync(txtFile, '');
       }
-      const old = fs.readFileSync(txtFile).toString();
-      fs.writeFileSync(
-        txtFile,
-        `${old}${old !== '' ? '\n' : ''}file ${blobFile}`
-      );
+      webmToMp4({
+        input: blobFile,
+        output: blobFile.replace('.webm', '.mp4'),
+      });
     });
 
     // 断开连接中

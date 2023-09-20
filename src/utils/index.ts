@@ -1,5 +1,26 @@
 import { spawnSync } from 'child_process';
+import os from 'os';
 import path from 'path';
+
+/**
+ * 获取当前机器的ip地址
+ */
+export function getIpAddress() {
+  const interfaces = os.networkInterfaces();
+  const res: string[] = [];
+  Object.keys(interfaces).forEach((dev) => {
+    const iface = interfaces[dev];
+    if (iface) {
+      for (let i = 0; i < iface.length; i += 1) {
+        const { family, address } = iface[i];
+        if (family === 'IPv4') {
+          res.push(address);
+        }
+      }
+    }
+  });
+  return res;
+}
 
 /** 异步包装器 */
 export const asyncWraper = async (fn) => {

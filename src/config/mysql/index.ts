@@ -31,6 +31,7 @@ export function newSequelize(db?) {
       idle: 10000,
     },
     timezone: '+08:00',
+    logging: false,
   });
 }
 
