@@ -4,6 +4,7 @@ import {
   IUser,
   LiveRoomTypeEnum,
 } from './interface';
+
 // websocket连接状态
 export enum WsConnectStatusEnum {
   /** 已连接 */
@@ -101,9 +102,7 @@ export type WsStartLiveType = IWsFormat<{
   cover_img: string;
   name: string;
   type: LiveRoomTypeEnum;
-}>;
-export type WsEndLiveType = IWsFormat<{
-  type: LiveRoomTypeEnum;
+  chunkDelay: number;
 }>;
 
 export type WsJoinType = IWsFormat<{

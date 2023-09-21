@@ -24,7 +24,8 @@ async function addLive({
   localFile,
   cover_img,
   cdn,
-  initFFmpeg,
+  devFFmpeg,
+  prodFFmpeg,
   weight,
 }: {
   live_room_id: number;
@@ -32,7 +33,8 @@ async function addLive({
   localFile: string;
   cover_img: string;
   cdn: number; // 1:使用cdn;2:不使用cdn
-  initFFmpeg: boolean;
+  devFFmpeg: boolean;
+  prodFFmpeg: boolean;
   weight: number;
 }) {
   let flv_url = '';
@@ -41,11 +43,11 @@ async function addLive({
   let token = '';
   async function main() {
     await liveService.deleteByLiveRoomId(live_room_id);
-    // 开发环境时判断initFFmpeg，是true的才初始化ffmpeg
-    // 生产环境时不判断initFFmpeg，都初始化
+    // 开发环境时判断devFFmpeg，是true的才初始化ffmpeg
+    // 生产环境时判断prodFFmpeg，是true的才初始化ffmpeg
     if (
-      (PROJECT_ENV === PROJECT_ENV_ENUM.development && initFFmpeg) ||
-      PROJECT_ENV === PROJECT_ENV_ENUM.prod
+      (PROJECT_ENV === PROJECT_ENV_ENUM.development && devFFmpeg) ||
+      (PROJECT_ENV === PROJECT_ENV_ENUM.prod && prodFFmpeg)
     ) {
       // const ffmpegCmd = spawn(`ffmpeg`, [
       //   '-loglevel', // -loglevel quiet不输出log
@@ -77,7 +79,10 @@ async function addLive({
         // execSync(ffmpegSyncCmd);
         // TIP 使用exec，这样命令后面不需要添加：1>/dev/null 2>&1 &，这样每次热更都会重新推流，而且不会触发on_unpublish钩子
         exec(ffmpegCmd);
-        console.log(chalkSUCCESS(`FFmpeg推流成功！`), ffmpegCmd);
+        console.log(
+          chalkSUCCESS(`FFmpeg推流成功！roomId：${live_room_id}`),
+          ffmpegCmd
+        );
       } catch (error) {
         console.log(chalkERROR(`FFmpeg推流错误！`), error);
       }
@@ -174,7 +179,8 @@ export const initFFmpeg = async (init = true) => {
           localFile: initUser[item].live_room.localFile,
           cover_img: initUser[item].live_room.cover_img,
           cdn: initUser[item].live_room.cdn,
-          initFFmpeg: initUser[item].live_room.initFFmpeg,
+          devFFmpeg: initUser[item].live_room.devFFmpeg,
+          prodFFmpeg: initUser[item].live_room.prodFFmpeg,
           weight: initUser[item].live_room.weight,
         })
       );

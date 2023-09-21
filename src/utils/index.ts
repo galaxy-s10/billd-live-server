@@ -55,7 +55,7 @@ export const filterObj = (obj: Record<string, any>, keyArr: string[]) => {
 };
 
 export const resolveApp = (relativePath) =>
-  path.join(__dirname, '../', relativePath);
+  path.join(__dirname, '../../', relativePath);
 
 /**
  * @description: 处理free命令返回的内存信息

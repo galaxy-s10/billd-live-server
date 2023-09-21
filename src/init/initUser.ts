@@ -27,7 +27,8 @@ export const initUser: Record<string, IInitUser> = {
       'https://resource.hsslive.cn/billd-live/image/def9f85caeb1bf7602ae1bc37f00b03d.webp',
     user_roles: [3, 7],
     live_room: {
-      initFFmpeg: false, // 初始化ffmpeg
+      devFFmpeg: false, // 初始化ffmpeg
+      prodFFmpeg: true, // 初始化ffmpeg
       cdn: 1, // 1:使用cdn;2:不使用cdn
       id: 1,
       area: [1],
@@ -35,7 +36,7 @@ export const initUser: Record<string, IInitUser> = {
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_yycy.mp4'
-          : resolveApp('./video/fddm_yycy.mp4'),
+          : resolveApp('/src/video/fddm_yycy.mp4'),
       cover_img: fddmYycyBase64,
       weight: 10,
     },
@@ -48,7 +49,8 @@ export const initUser: Record<string, IInitUser> = {
     avatar:
       'https://resource.hsslive.cn/billd-live/image/15a116a978cadb34e9fbf0061a4145bc.webp',
     live_room: {
-      initFFmpeg: false, // 初始化ffmpeg
+      devFFmpeg: false, // 初始化ffmpeg
+      prodFFmpeg: false, // 初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 2,
       name: '房东的猫-美好事物',
@@ -56,7 +58,7 @@ export const initUser: Record<string, IInitUser> = {
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_mhsw.mp4'
-          : resolveApp('./video/fddm_mhsw.mp4'),
+          : resolveApp('/src/video/fddm_mhsw.mp4'),
       cover_img: fddmMhswBase64,
       weight: 2,
     },
@@ -69,7 +71,8 @@ export const initUser: Record<string, IInitUser> = {
       'https://resource.hsslive.cn/billd-live/image/752a40d44811c99278961410da656464.webp',
     user_roles: [5],
     live_room: {
-      initFFmpeg: false, // 初始化ffmpeg
+      devFFmpeg: false, // 初始化ffmpeg
+      prodFFmpeg: true, // 初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 3,
       name: '房东的猫-和宇宙的温柔关联',
@@ -77,7 +80,7 @@ export const initUser: Record<string, IInitUser> = {
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_hyzdwmgl.mp4'
-          : resolveApp('./video/fddm_hyzdwmgl.mp4'),
+          : resolveApp('/src/video/fddm_hyzdwmgl.mp4'),
       cover_img: fddmHyzdwmglBase64,
       weight: 2,
     },
@@ -90,7 +93,8 @@ export const initUser: Record<string, IInitUser> = {
       'https://resource.hsslive.cn/billd-live/image/2b045c7f02febd23893244e923115535.webp',
     user_roles: [5],
     live_room: {
-      initFFmpeg: false, // 初始化ffmpeg
+      devFFmpeg: false, // 初始化ffmpeg
+      prodFFmpeg: true, // 初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 4,
       name: '房东的猫-所念皆星河',
@@ -98,7 +102,7 @@ export const initUser: Record<string, IInitUser> = {
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_snjxh.mp4'
-          : resolveApp('./video/fddm_snjxh.mp4'),
+          : resolveApp('/src/video/fddm_snjxh.mp4'),
       cover_img: fddmSnjxhBase64,
       weight: 2,
     },
@@ -111,7 +115,8 @@ export const initUser: Record<string, IInitUser> = {
       'https://resource.hsslive.cn/billd-live/image/2142b19fe33e1fd7ed848104f64c4fd4.webp',
     user_roles: [5],
     live_room: {
-      initFFmpeg: false, // 初始化ffmpeg
+      devFFmpeg: false, // 初始化ffmpeg
+      prodFFmpeg: true, // 初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 5,
       name: '房东的猫-你是我为数不多的骄傲',
@@ -119,7 +124,7 @@ export const initUser: Record<string, IInitUser> = {
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_nswwsbddja.mp4'
-          : resolveApp('./video/fddm_nswwsbddja.mp4'),
+          : resolveApp('/src/video/fddm_nswwsbddja.mp4'),
       cover_img: fddmNswwsbddjaBase64,
       weight: 10,
     },
@@ -132,7 +137,8 @@ export const initUser: Record<string, IInitUser> = {
       'https://resource.hsslive.cn/billd-live/image/7e048083bb5dccde76018625b644c84b.webp',
     user_roles: [5],
     live_room: {
-      initFFmpeg: false, // 初始化ffmpeg
+      devFFmpeg: true, // 初始化ffmpeg
+      prodFFmpeg: true, // 初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 6,
       name: '房东的猫-下一站茶山刘',
@@ -140,7 +146,7 @@ export const initUser: Record<string, IInitUser> = {
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? '/node/video/fddm_xyzcsl.mp4'
-          : resolveApp('./video/fddm_xyzcsl.mp4'),
+          : resolveApp('/src/video/fddm_xyzcsl.mp4'),
       cover_img: fddmXyzcslBase64,
       weight: 2,
     },
@@ -152,7 +158,8 @@ export const initUser: Record<string, IInitUser> = {
     avatar: '',
     user_roles: [5],
     live_room: {
-      initFFmpeg: false, // 初始化ffmpeg
+      devFFmpeg: false, // 初始化ffmpeg
+      prodFFmpeg: true, // 初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 7,
       name: '周杰伦-不能说的秘密',
@@ -169,7 +176,8 @@ export const initUser: Record<string, IInitUser> = {
     avatar: '',
     user_roles: [5],
     live_room: {
-      initFFmpeg: false, // 初始化ffmpeg
+      devFFmpeg: false, // 初始化ffmpeg
+      prodFFmpeg: false, // 初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 8,
       name: '周杰伦-晴天',
@@ -186,7 +194,8 @@ export const initUser: Record<string, IInitUser> = {
     avatar: '',
     user_roles: [5],
     live_room: {
-      initFFmpeg: false, // 初始化ffmpeg
+      devFFmpeg: false, // 初始化ffmpeg
+      prodFFmpeg: true, // 初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 9,
       name: '房东的猫-一次就好',
@@ -203,7 +212,8 @@ export const initUser: Record<string, IInitUser> = {
     avatar: '',
     user_roles: [5],
     live_room: {
-      initFFmpeg: false, // 初始化ffmpeg
+      devFFmpeg: false, // 初始化ffmpeg
+      prodFFmpeg: true, // 初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 10,
       name: '七龙珠-渐渐被你吸引',
@@ -220,7 +230,8 @@ export const initUser: Record<string, IInitUser> = {
     avatar: '',
     user_roles: [5],
     live_room: {
-      initFFmpeg: false, // 初始化ffmpeg
+      devFFmpeg: false, // 初始化ffmpeg
+      prodFFmpeg: false, // 初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 11,
       name: '周杰伦-搁浅',
@@ -237,7 +248,8 @@ export const initUser: Record<string, IInitUser> = {
     avatar: '',
     user_roles: [5],
     live_room: {
-      initFFmpeg: false, // 初始化ffmpeg
+      devFFmpeg: false, // 初始化ffmpeg
+      prodFFmpeg: true, // 初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 12,
       name: 'billd-live付费课',
@@ -254,7 +266,8 @@ export const initUser: Record<string, IInitUser> = {
     avatar: '',
     user_roles: [5],
     live_room: {
-      initFFmpeg: false, // 初始化ffmpeg
+      devFFmpeg: false, // 初始化ffmpeg
+      prodFFmpeg: true, // 初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 100,
       name: '周杰伦-一路向北',

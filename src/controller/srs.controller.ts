@@ -1,4 +1,5 @@
 import { ParameterizedContext } from 'koa';
+import { rimrafSync } from 'rimraf';
 
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
@@ -11,6 +12,7 @@ import { WsMsgTypeEnum } from '@/interface-ws';
 import { CustomError } from '@/model/customError.model';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
+import { resolveApp } from '@/utils';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 import { myaxios } from '@/utils/request';
 
@@ -195,6 +197,7 @@ class SRSController {
     console.log(chalkWARN(`on_unpublish参数`), body);
     const reg = /^roomId___(.+)/g;
     const roomId = reg.exec(body.stream)?.[1];
+
     if (!roomId) {
       console.log(chalkERROR('[on_unpublish] roomId为空'));
       ctx.body = { code: 1, msg: '[on_unpublish] fail, no roomId' };
@@ -203,6 +206,8 @@ class SRSController {
       ctx.body = { code: 0, msg: '[on_unpublish] success' };
       liveService.deleteByLiveRoomId(Number(roomId));
       wsSocket.io?.to(roomId).emit(WsMsgTypeEnum.roomNoLive);
+      const roomDir = resolveApp(`/src/webm/roomId_${roomId}`);
+      rimrafSync(roomDir);
     }
     await next();
   }

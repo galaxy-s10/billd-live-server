@@ -5,7 +5,8 @@ export interface IInitUser {
   avatar: string;
   user_roles: number[];
   live_room: {
-    initFFmpeg: boolean;
+    devFFmpeg: boolean;
+    prodFFmpeg: boolean;
     cdn: number;
     id: number;
     area: number[];
