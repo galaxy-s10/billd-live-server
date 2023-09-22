@@ -12,6 +12,7 @@ import { tencentcloudUtils } from '@/utils/tencentcloud';
 
 function ffmpegIsInstalled() {
   const res = spawnSync('ffmpeg', ['-version']);
+  console.log('ffmpegIsInstalled', res, res.status);
   if (res.status !== 0) {
     return false;
   }

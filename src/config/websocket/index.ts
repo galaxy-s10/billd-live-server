@@ -329,12 +329,13 @@ export const connectWebSocket = (server) => {
         const roomDir = resolveApp(`/src/webm/roomId_${roomId}`);
         const txtFile = `${roomDir}/list.txt`;
         const fileDir = `${roomDir}/file`;
+        console.log('删除roomDir111');
         rimrafSync(roomDir);
         let str = '';
         // const allTime = 60; // 24小时对应的秒数
         const allTime = 60 * 60 * 24; // 24小时对应的秒数
         for (let i = 1; i < allTime / (data.data.chunkDelay / 1000); i += 1) {
-          str += `${i !== 1 ? '\n' : ''}file './file/${i}.mp4'`;
+          str += `${i !== 1 ? '\n' : ''}file '${fileDir}/${i}.mp4'`;
         }
         if (!fs.existsSync(roomDir)) {
           fs.mkdirSync(roomDir);
@@ -349,7 +350,7 @@ export const connectWebSocket = (server) => {
             rtmpUrl: userLiveRoomInfo.live_room!.rtmp_url!,
             token: liveRoomInfo!.key!,
           });
-        }, 5000);
+        }, 1000 * 5);
       }
     });
 
@@ -405,8 +406,9 @@ export const connectWebSocket = (server) => {
         exec(cmd, (err, stdout, stderr) => {
           console.log(err, stdout, stderr);
         });
-        const roomDir = resolveApp(`/src/webm/roomId_${roomId}`);
-        rimrafSync(roomDir);
+        // const roomDir = resolveApp(`/src/webm/roomId_${roomId}`);
+        // console.log('删除roomDir222');
+        // rimrafSync(roomDir);
       }
     });
 
@@ -536,7 +538,6 @@ export const connectWebSocket = (server) => {
       const roomId = userLiveRoomInfo.live_room_id!;
       const roomDir = resolveApp(`/src/webm/roomId_${roomId}`);
       const fileDir = `${roomDir}/file`;
-      const txtFile = `${roomDir}/list.txt`;
       const blobFile = `${fileDir}/${data.data.blob_id}.webm`;
 
       if (!fs.existsSync(roomDir)) {
@@ -546,17 +547,14 @@ export const connectWebSocket = (server) => {
         fs.mkdirSync(fileDir);
       }
       fs.writeFileSync(blobFile, data.data.blob);
-      if (!fs.existsSync(txtFile)) {
-        fs.writeFileSync(txtFile, '');
-      }
       const mp4File = blobFile.replace('.webm', '.mp4');
       webmToMp4({
         input: blobFile,
         output: mp4File,
       });
-      setTimeout(() => {
-        rimrafSync([blobFile, mp4File]);
-      }, 1000 * 10);
+      // setTimeout(() => {
+      //   rimrafSync([blobFile, mp4File]);
+      // }, 1000 * 30);
     });
 
     // 断开连接中

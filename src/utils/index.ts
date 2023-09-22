@@ -53,9 +53,11 @@ export const filterObj = (obj: Record<string, any>, keyArr: string[]) => {
   });
   return res;
 };
-
-export const resolveApp = (relativePath) =>
-  path.join(__dirname, '../../', relativePath);
+const appDir = process.cwd();
+export const resolveApp = (relativePath) => {
+  return path.join(appDir, relativePath);
+  // return path.join(__dirname, '../../', relativePath);
+};
 
 /**
  * @description: 处理free命令返回的内存信息

@@ -137,7 +137,7 @@ export const initUser: Record<string, IInitUser> = {
       'https://resource.hsslive.cn/billd-live/image/7e048083bb5dccde76018625b644c84b.webp',
     user_roles: [5],
     live_room: {
-      devFFmpeg: true, // 初始化ffmpeg
+      devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
       cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 6,

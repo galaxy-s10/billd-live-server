@@ -1,4 +1,4 @@
-import path from 'path';
+import { resolveApp } from './utils';
 
 export enum PROJECT_ENV_ENUM {
   development = 'development',
@@ -14,20 +14,27 @@ export const PROJECT_ENV = process.env
 export const PROJECT_PORT = process.env.NODE_APP_RELEASE_PROJECT_PORT as string;
 export const PROJECT_NODE_ENV = process.env.NODE_ENV as string;
 
-export const STATIC_DIR = path.join(__dirname, './public/'); // 静态文件目录
-export const UPLOAD_DIR = path.join(__dirname, './upload/'); // 上传文件接口接收到的文件存放的目录
-export const SECRET_FILE = path.join(
-  __dirname,
+export const STATIC_DIR =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
-    ? './config/secret.js'
-    : './config/secret.ts'
-); // 秘钥文件
-export const SECRETTEMP_FILE = path.join(
-  __dirname,
+    ? resolveApp('/dist/public/')
+    : resolveApp('/src/public/'); // 静态文件目录
+
+export const UPLOAD_DIR =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
-    ? './config/secretTemp.js'
-    : './config/secretTemp.ts'
-); // 秘钥文件模板
+    ? resolveApp('/dist/upload/')
+    : resolveApp('/src/upload/'); // 上传文件接口接收到的文件存放的目录
+
+export const SECRET_FILE =
+  PROJECT_ENV === PROJECT_ENV_ENUM.prod
+    ? resolveApp('/dist/config/secret.js')
+    : resolveApp('/src/config/secret.ts');
+// 秘钥文件
+
+export const SECRETTEMP_FILE =
+  PROJECT_ENV === PROJECT_ENV_ENUM.prod
+    ? resolveApp('/dist/config/secretTemp.js')
+    : resolveApp('/src/config/secretTemp.ts'); // 秘钥文件模板
+
 export const QQ_MAIL_CONFIG = {
   from: '2274751790@qq.com', // sender address
   to: '2274751790@qq.com', // list of receivers
