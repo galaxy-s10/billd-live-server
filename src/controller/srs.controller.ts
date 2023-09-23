@@ -1,5 +1,4 @@
 import { ParameterizedContext } from 'koa';
-import { rimrafSync } from 'rimraf';
 
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
@@ -12,7 +11,6 @@ import { WsMsgTypeEnum } from '@/interface-ws';
 import { CustomError } from '@/model/customError.model';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
-import { resolveApp } from '@/utils';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 import { myaxios } from '@/utils/request';
 
@@ -206,9 +204,9 @@ class SRSController {
       ctx.body = { code: 0, msg: '[on_unpublish] success' };
       liveService.deleteByLiveRoomId(Number(roomId));
       wsSocket.io?.to(roomId).emit(WsMsgTypeEnum.roomNoLive);
-      const roomDir = resolveApp(`/src/webm/roomId_${roomId}`);
-      console.log('删除roomDir333');
-      rimrafSync(roomDir);
+      // const roomDir = resolveApp(`/src/webm/roomId_${roomId}`);
+      // console.log('删除roomDir333');
+      // rimrafSync(roomDir);
     }
     await next();
   }

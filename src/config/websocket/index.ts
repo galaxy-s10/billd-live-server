@@ -334,7 +334,8 @@ export const connectWebSocket = (server) => {
         let str = '';
         const allTime = 60 * 60 * 24; // 24小时对应的秒数
         for (let i = 1; i < allTime / (data.data.chunkDelay / 1000); i += 1) {
-          str += `${i !== 1 ? '\n' : ''}file './file/${i}.mp4'`;
+          str += `${i !== 1 ? '\n' : ''}file '${fileDir}/${i}.mp4'`;
+          // str += `${i !== 1 ? '\n' : ''}file 'file/${i}.mp4'`;
         }
         if (!fs.existsSync(roomDir)) {
           fs.mkdirSync(roomDir);
@@ -349,7 +350,7 @@ export const connectWebSocket = (server) => {
             rtmpUrl: userLiveRoomInfo.live_room!.rtmp_url!,
             token: liveRoomInfo!.key!,
           });
-        }, 1000 * 5);
+        }, 1000 * 10);
       }
     });
 
@@ -551,9 +552,9 @@ export const connectWebSocket = (server) => {
         input: blobFile,
         output: mp4File,
       });
-      setTimeout(() => {
-        rimrafSync([blobFile, mp4File]);
-      }, 1000 * 10);
+      // setTimeout(() => {
+      //   rimrafSync([blobFile, mp4File]);
+      // }, 1000 * 30);
     });
 
     // 断开连接中
