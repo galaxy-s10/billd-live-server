@@ -552,9 +552,9 @@ export const connectWebSocket = (server) => {
         input: blobFile,
         output: mp4File,
       });
-      // setTimeout(() => {
-      //   rimrafSync([blobFile, mp4File]);
-      // }, 1000 * 30);
+      setTimeout(() => {
+        rimrafSync([blobFile, mp4File]);
+      }, 1000 * 60);
     });
 
     // 断开连接中

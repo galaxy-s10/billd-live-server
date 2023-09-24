@@ -21,7 +21,8 @@ export function mp4PushRtmp(data: {
 }
 
 export function webmToMp4(data: { input: string; output: string }) {
-  const cmd = `ffmpeg -i ${data.input} -vcodec copy -an ${data.output}`;
+  const cmd = `ffmpeg -i ${data.input} -vcodec copy -acodec aac ${data.output}`;
+  // const cmd = `ffmpeg -i ${data.input} -vcodec copy -an ${data.output}`;
   // console.log(cmd, 'webmToMp4');
   exec(cmd);
 }
