@@ -184,6 +184,15 @@ class AreaService {
                 {
                   model: liveModel,
                 },
+                {
+                  model: userModel,
+                  attributes: {
+                    exclude: ['password', 'token'],
+                  },
+                  through: {
+                    attributes: [],
+                  },
+                },
               ],
             },
           ],
