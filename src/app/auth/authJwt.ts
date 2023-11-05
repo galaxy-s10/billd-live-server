@@ -19,7 +19,6 @@ const authJwt = (
     }
 
     const token = ctx.req.headers.authorization?.split(' ')[1];
-
     jwt.verify(token, JWT_SECRET, (err, decoded) => {
       // 判断非法/过期token
       if (err) {
