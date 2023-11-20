@@ -212,6 +212,17 @@ class SRSController {
     }
     await next();
   }
+
+  async onDvr(ctx: ParameterizedContext, next) {
+    // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
+    // code等于数字0表示成功，其他错误码代表失败。
+    const { body } = ctx.request;
+    console.log(chalkWARN(`on_dvr参数`), body);
+    const reg = /^roomId___(.+)/g;
+    const roomId = reg.exec(body.stream)?.[1];
+    ctx.body = { code: 0, msg: '[on_dvr] success' };
+    await next();
+  }
 }
 
 export default new SRSController();

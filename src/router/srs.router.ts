@@ -23,4 +23,7 @@ srsRouter.post('/on_play', srsController.onPlay);
 // SRS http回调
 srsRouter.post('/on_unpublish', srsController.onUnpublish);
 
+// SRS http回调
+srsRouter.post('/on_dvr', srsController.onDvr);
+
 export default srsRouter;

@@ -30,9 +30,7 @@ const frontendWhiteList = [
   '/srs/on_publish',
   '/srs/on_play',
   '/srs/on_unpublish',
-  '/srs/rtcV1Publish',
-  '/srs/rtcV1Play',
-  '/srs/apiV1StreamsDel',
+  '/srs/on_dvr',
 ];
 
 // 后台的所有接口都需要判断token，除了白名单内的不需要token

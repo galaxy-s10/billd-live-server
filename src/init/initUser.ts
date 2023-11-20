@@ -28,17 +28,17 @@ export const initUser: Record<string, IInitUser> = {
     user_roles: [3, 7],
     live_room: {
       devFFmpeg: false, // 初始化ffmpeg
-      prodFFmpeg: true, // 初始化ffmpeg
-      cdn: 1, // 1:使用cdn;2:不使用cdn
+      prodFFmpeg: false, // 初始化ffmpeg
+      cdn: 2, // 1:使用cdn;2:不使用cdn
       id: 1,
+      name: '房东的猫-美好事物',
       area: [1],
-      name: '房东的猫-云烟成雨',
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? '/node/video/fddm_yycy.mp4'
-          : resolveApp('/src/video/fddm_yycy.mp4'),
-      cover_img: fddmYycyBase64,
-      weight: 10,
+          ? '/node/video/fddm_mhsw.mp4'
+          : resolveApp('/src/video/fddm_mhsw.mp4'),
+      cover_img: fddmMhswBase64,
+      weight: 2,
     },
   },
   systemUser1: {
@@ -50,17 +50,17 @@ export const initUser: Record<string, IInitUser> = {
       'https://resource.hsslive.cn/billd-live/image/15a116a978cadb34e9fbf0061a4145bc.webp',
     live_room: {
       devFFmpeg: false, // 初始化ffmpeg
-      prodFFmpeg: false, // 初始化ffmpeg
-      cdn: 2, // 1:使用cdn;2:不使用cdn
+      prodFFmpeg: true, // 初始化ffmpeg
+      cdn: 1, // 1:使用cdn;2:不使用cdn
       id: 2,
-      name: '房东的猫-美好事物',
+      name: '房东的猫-云烟成雨',
       area: [1],
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? '/node/video/fddm_mhsw.mp4'
-          : resolveApp('/src/video/fddm_mhsw.mp4'),
-      cover_img: fddmMhswBase64,
-      weight: 2,
+          ? '/node/video/fddm_yycy.mp4'
+          : resolveApp('/src/video/fddm_yycy.mp4'),
+      cover_img: fddmYycyBase64,
+      weight: 10,
     },
   },
   systemUser2: {
