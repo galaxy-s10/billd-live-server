@@ -1,5 +1,6 @@
 import amqp from 'amqplib';
 
+import { LOCALHOST_URL } from '@/constant';
 import { chalkSUCCESS } from '@/utils/chalkTip';
 
 // @ts-ignore
@@ -18,7 +19,7 @@ class RabbitMQClass {
   }
 
   connect = async () => {
-    this.connection = await amqp.connect('amqp://localhost');
+    this.connection = await amqp.connect(`amqp://${LOCALHOST_URL}`);
     console.log(chalkSUCCESS('连接RabbitMQ成功！'));
     this.channel = await this.connection.createChannel();
     console.log(chalkSUCCESS('RabbitMQ创建channel成功！'));

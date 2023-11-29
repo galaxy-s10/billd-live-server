@@ -1,4 +1,4 @@
-import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import { LOCALHOST_URL, PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 
 export const JWT_SECRET = '**********'; // jwt秘钥
 
@@ -137,11 +137,11 @@ export const ALIPAY_LIVE_CONFIG = {
 export const SERVER_LIVE = {
   PushDomain:
     PROJECT_ENV === PROJECT_ENV_ENUM.development
-      ? 'rtmp://localhost'
+      ? `rtmp://${LOCALHOST_URL}`
       : '**********', // 推流域名
   PullDomain:
     PROJECT_ENV === PROJECT_ENV_ENUM.development
-      ? `http://localhost:${SRS_CONFIG.docker.port['8080']}` // http://localhost:5001、http://localhost:8000/livestream
+      ? `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port['8080']}`
       : '**********', // 拉流域名
   AppName: 'livestream',
 };

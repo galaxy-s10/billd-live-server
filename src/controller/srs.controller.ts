@@ -5,7 +5,7 @@ import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import { SRS_CONFIG } from '@/config/secret';
 import { wsSocket } from '@/config/websocket';
-import { ALLOW_HTTP_CODE } from '@/constant';
+import { ALLOW_HTTP_CODE, LOCALHOST_URL } from '@/constant';
 import { ISrsRTC } from '@/interface';
 import { IApiV1Clients, IApiV1Streams } from '@/interface-srs';
 import { WsMsgTypeEnum } from '@/interface-ws';
@@ -20,26 +20,26 @@ class SRSController {
   common = {
     getApiV1ClientDetail: (clientId: string) =>
       myaxios.get(
-        `http://localhost:${SRS_CONFIG.docker.port[1985]}/api/v1/clients/${clientId}`
+        `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port[1985]}/api/v1/clients/${clientId}`
       ),
     getApiV1Clients: ({ start, count }: { start: number; count: number }) =>
       myaxios.get<IApiV1Clients>(
-        `http://localhost:${SRS_CONFIG.docker.port[1985]}/api/v1/clients?start=${start}&count=${count}`
+        `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port[1985]}/api/v1/clients?start=${start}&count=${count}`
       ),
     getApiV1Streams: ({ start, count }: { start: number; count: number }) =>
       myaxios.get<IApiV1Streams>(
-        `http://localhost:${SRS_CONFIG.docker.port[1985]}/api/v1/streams?start=${start}&count=${count}`
+        `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port[1985]}/api/v1/streams?start=${start}&count=${count}`
       ),
     deleteApiV1Clients: (clientId: string) =>
       myaxios.delete(
-        `http://localhost:${SRS_CONFIG.docker.port[1985]}/api/v1/clients/${clientId}`
+        `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port[1985]}/api/v1/clients/${clientId}`
       ),
   };
 
   rtcV1Publish = async (ctx: ParameterizedContext, next) => {
     const { api, clientip, sdp, streamurl, tid }: ISrsRTC = ctx.request.body;
     const res = await myaxios.post(
-      `http://localhost:${SRS_CONFIG.docker.port[1985]}/rtc/v1/publish/`,
+      `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port[1985]}/rtc/v1/publish/`,
       { api, clientip, sdp, streamurl, tid }
     );
     successHandler({
@@ -52,7 +52,7 @@ class SRSController {
   rtcV1Play = async (ctx: ParameterizedContext, next) => {
     const { api, clientip, sdp, streamurl, tid }: ISrsRTC = ctx.request.body;
     const res = await myaxios.post(
-      `http://localhost:${SRS_CONFIG.docker.port[1985]}/rtc/v1/play/`,
+      `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port[1985]}/rtc/v1/play/`,
       { api, clientip, sdp, streamurl, tid }
     );
     successHandler({

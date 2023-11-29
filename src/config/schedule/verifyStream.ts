@@ -1,6 +1,6 @@
 import { exec } from 'child_process';
 
-import { maxBitrate } from '@/constant';
+import { LOCALHOST_URL, maxBitrate } from '@/constant';
 import srsController from '@/controller/srs.controller';
 import { initUser } from '@/init/initUser';
 import { IApiV1Streams } from '@/interface-srs';
@@ -31,7 +31,7 @@ function executeCommandWithTimeout(command, timeout) {
 async function verifyBitrateIsOver(info: IApiV1Streams['streams'][0]) {
   try {
     await executeCommandWithTimeout(
-      `ffmpeg -i rtmp://localhost/livestream/${info.name}`,
+      `ffmpeg -i rtmp://${LOCALHOST_URL}/livestream/${info.name}`,
       5000
     );
   } catch (error: any) {

@@ -27,8 +27,7 @@ export const UPLOAD_DIR =
 export const SECRET_FILE =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
     ? resolveApp('/dist/config/secret.js')
-    : resolveApp('/src/config/secret.ts');
-// 秘钥文件
+    : resolveApp('/src/config/secret.ts'); // 秘钥文件
 
 export const SECRETTEMP_FILE =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
@@ -41,6 +40,8 @@ export const QQ_MAIL_CONFIG = {
 };
 
 export const maxBitrate = 1000 * 3;
+
+export const LOCALHOST_URL = 'localhost'; // 本地地址，一般是localhost或者127.0.0.1，但也可以是其他本地地址，如192.168.x.x
 
 export const ERROR_HTTP_CODE = {
   serverError: 10000, // 服务器错误
