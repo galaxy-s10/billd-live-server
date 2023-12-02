@@ -1,3 +1,12 @@
+export enum AUTH_ENUM {
+  ALL_AUTH = 'ALL_AUTH',
+  USER_MANAGE = 'USER_MANAGE',
+  ROLE_MANAGE = 'ROLE_MANAGE',
+  AUTH_MANAGE = 'AUTH_MANAGE',
+  LIVE_MANAGE = 'LIVE_MANAGE',
+  LIVE_PULL = 'LIVE_PULL',
+}
+
 export interface IInitUser {
   id: number;
   username: string;
@@ -14,6 +23,7 @@ export interface IInitUser {
     localFile: string;
     cover_img: string;
     weight: number;
+    pull_is_should_auth: LiveRoomPullIsShouldAuthEnum;
   };
 }
 
@@ -97,16 +107,30 @@ export interface IThirdUser {
 
 /** 直播间类型 */
 export enum LiveRoomTypeEnum {
-  system, // 系统直播
-  user_wertc, // 主播使用webrtc直播
-  user_srs, // 主播使用srs直播
-  user_obs, // 主播使用obs/ffmpeg直播
-  user_msr, // 主播使用msr直播
+  /** 系统直播 */
+  system,
+  /** 主播使用webrtc直播 */
+  user_wertc,
+  /** 主播使用srs直播 */
+  user_srs,
+  /** 主播使用obs/ffmpeg直播 */
+  user_obs,
+  /** 主播使用msr直播 */
+  user_msr,
+}
+
+/** 拉流是否需要鉴权 */
+export enum LiveRoomPullIsShouldAuthEnum {
+  /** 需要鉴权 */
+  yes,
+  /** 不需要鉴权 */
+  no,
 }
 
 export interface IArea {
   id?: number;
   name?: string;
+  /** 备注 */
   remark?: string;
   /** 权重 */
   weight?: number;
@@ -132,8 +156,12 @@ export interface ILiveRoom {
   cdn?: number;
   /** 权重 */
   weight?: number;
+  /** 推流秘钥 */
   key?: string;
+  /** 直播间类型 */
   type?: LiveRoomTypeEnum;
+  /** 拉流是否需要鉴权 */
+  pull_is_should_auth?: LiveRoomPullIsShouldAuthEnum;
   cover_img?: string;
   rtmp_url?: string;
   flv_url?: string;

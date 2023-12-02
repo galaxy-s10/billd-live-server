@@ -177,8 +177,8 @@ class RoleService {
   }
 
   /** 根据角色id查找对应的权限 */
-  async getRoleAuth(id: number) {
-    const role: any = await roleModel.findByPk(id);
+  async getRoleAuth(roleId: number) {
+    const role: any = await roleModel.findByPk(roleId);
     const auths = await role.getAuths();
     const result: any = [];
     auths.forEach((v) => {
@@ -197,7 +197,7 @@ class RoleService {
       throw new Error(`不存在id为${id}的用户！`);
     }
     const roles: any[] = await user.getRoles();
-    const result: any = [];
+    const result: any[] = [];
     roles.forEach((v) => {
       const obj = v.get();
       delete obj.user_role;

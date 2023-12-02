@@ -13,7 +13,7 @@ export const verifyUserAuth = async (ctx: ParameterizedContext) => {
   const result: any = await roleService.getMyRole(userInfo!.id!);
   const roles = result.map((v) => v.role_value);
   if (roles.includes('SUPER_ADMIN')) {
-    return true;
+    return userInfo!;
   }
   return false;
 };

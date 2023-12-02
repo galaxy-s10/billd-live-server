@@ -1,4 +1,11 @@
-import { GoodsTypeEnum, IArea, IAuth, IGoods, IRole } from '@/interface';
+import {
+  AUTH_ENUM,
+  GoodsTypeEnum,
+  IArea,
+  IAuth,
+  IGoods,
+  IRole,
+} from '@/interface';
 
 export const bulkCreateArea: IArea[] = [
   {
@@ -30,177 +37,110 @@ export const bulkCreateArea: IArea[] = [
 const initAuth = () => {
   const deafultAuth: IAuth[] = [
     {
-      auth_name: '文章管理',
-      auth_value: 'ARTICLE_MANAGE',
+      id: 1,
+      auth_name: '全部权限',
+      auth_value: AUTH_ENUM.ALL_AUTH,
+      type: 1,
+      priority: 99,
+      p_id: 0,
     },
     {
-      auth_name: '评论管理',
-      auth_value: 'COMMENT_MANAGE',
-    },
-    {
-      auth_name: '点赞管理',
-      auth_value: 'STAR_MANAGE',
-    },
-    {
-      auth_name: '分类管理',
-      auth_value: 'TYPE_MANAGE',
-    },
-    {
-      auth_name: '标签管理',
-      auth_value: 'TAG_MANAGE',
-    },
-    {
-      auth_name: '友链管理',
-      auth_value: 'LINK_MANAGE',
-    },
-    {
-      auth_name: '音乐管理',
-      auth_value: 'MUSIC_MANAGE',
-    },
-    {
+      id: 2,
       auth_name: '用户管理',
-      auth_value: 'USER_MANAGE',
+      auth_value: AUTH_ENUM.USER_MANAGE,
+      type: 1,
+      priority: 99,
+      p_id: 1,
     },
     {
+      id: 3,
       auth_name: '角色管理',
-      auth_value: 'ROLE_MANAGE',
+      auth_value: AUTH_ENUM.ROLE_MANAGE,
+      type: 1,
+      priority: 99,
+      p_id: 1,
     },
     {
+      id: 4,
       auth_name: '权限管理',
-      auth_value: 'AUTH_MANAGE',
+      auth_value: AUTH_ENUM.AUTH_MANAGE,
+      type: 1,
+      priority: 99,
+      p_id: 1,
     },
     {
-      auth_name: '主题管理',
-      auth_value: 'THEME_MANAGE',
+      id: 5,
+      auth_name: '直播管理',
+      auth_value: AUTH_ENUM.LIVE_MANAGE,
+      type: 1,
+      priority: 99,
+      p_id: 1,
     },
     {
-      auth_name: '作品管理',
-      auth_value: 'WORK_MANAGE',
-    },
-    {
-      auth_name: '设置管理',
-      auth_value: 'SETTING_MANAGE',
-    },
-    {
-      auth_name: '访客管理',
-      auth_value: 'VISITOR_MANAGE',
-    },
-    {
-      auth_name: '日志管理',
-      auth_value: 'LOG_MANAGE',
-    },
-    {
-      auth_name: '七牛云管理',
-      auth_value: 'QINIU_MANAGE',
-    },
-    {
-      auth_name: '任务管理',
-      auth_value: 'TASK_MANAGE',
+      id: 6,
+      auth_name: '直播拉流',
+      auth_value: AUTH_ENUM.LIVE_PULL,
+      type: 1,
+      priority: 99,
+      p_id: 5,
     },
   ];
-  const authResult: IAuth[] = [];
 
-  let id = 1;
-
-  deafultAuth.forEach((v) => {
-    const obj: IAuth = { ...v };
-    id += 1;
-    obj.id = id;
-    obj.p_id = 1;
-    obj.type = 1;
-    obj.priority = 99;
-    authResult.push(obj);
-  });
-
-  authResult.unshift({
-    auth_name: '全部权限',
-    auth_value: 'ALL_AUTH',
-    id: 1,
-    p_id: 0,
-    type: 1,
-    priority: 99,
-  });
-  return authResult;
+  return deafultAuth;
 };
 
 const initRole = () => {
-  const deafultRole: IRole[] = [
+  const defaultRole: IRole[] = [
     {
+      id: 1,
+      role_name: '全部角色',
+      role_value: 'ALL_ROLE',
+      type: 1,
+      priority: 99,
+      p_id: 0,
+    },
+    {
+      id: 2,
       role_name: '管理员',
       role_value: 'ADMIN',
+      type: 1,
+      priority: 99,
+      p_id: 1,
     },
     {
+      id: 3,
       role_name: '超级管理员',
       role_value: 'SUPER_ADMIN',
+      type: 1,
+      priority: 99,
+      p_id: 2,
     },
     {
+      id: 4,
       role_name: '用户',
       role_value: 'USER',
+      type: 1,
+      priority: 99,
+      p_id: 1,
     },
     {
+      id: 5,
       role_name: 'VIP用户',
       role_value: 'VIP_USER',
+      type: 1,
+      priority: 99,
+      p_id: 4,
     },
     {
+      id: 6,
       role_name: '游客',
       role_value: 'TOURIST_USER',
-    },
-    {
-      role_name: '开发部门',
-      role_value: 'DEVELOP',
-    },
-    {
-      role_name: '前端组',
-      role_value: 'FRONTEND	',
-    },
-    {
-      role_name: '前端实习',
-      role_value: 'FRONTEND_TRAINEE',
-    },
-    {
-      role_name: '前端经理',
-      role_value: 'FRONTEND_MANAGER',
-    },
-    {
-      role_name: '后端组',
-      role_value: 'BACKEND',
-    },
-    {
-      role_name: '业务部门',
-      role_value: 'BUSINESS',
-    },
-    {
-      role_name: '产品',
-      role_value: 'PRODUCT',
-    },
-    {
-      role_name: '运营',
-      role_value: 'OPERATE',
+      type: 1,
+      priority: 99,
+      p_id: 4,
     },
   ];
-  const roleResult: IRole[] = [];
-
-  let id = 1;
-
-  deafultRole.forEach((v) => {
-    const obj: IAuth = { ...v };
-    id += 1;
-    obj.id = id;
-    obj.p_id = 1;
-    obj.type = 1;
-    obj.priority = 99;
-    roleResult.push(obj);
-  });
-
-  roleResult.unshift({
-    role_name: '全部角色',
-    role_value: 'ALL_ROLE',
-    id: 1,
-    p_id: 0,
-    type: 1,
-    priority: 99,
-  });
-  return roleResult;
+  return defaultRole;
 };
 
 const initRoleAuth = () => {

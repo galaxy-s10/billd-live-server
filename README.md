@@ -18,11 +18,14 @@
 
 ## 生态
 
-| 名称       | 仓库                                                                 | star & fork                                                                                                                                                                                                                                                                                                 | 线上地址                                                       |
-| ---------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| 直播间前台 | [billd-live](https://github.com/galaxy-s10/billd-live)               | [![github](https://img.shields.io/github/stars/galaxy-s10/billd-live?label=star&logo=GitHub)](https://github.com/galaxy-s10/billd-live) [![github](https://img.shields.io/github/forks/galaxy-s10/billd-live?label=fork&logo=GitHub)](https://github.com/galaxy-s10/billd-live)                             | [https://live.hsslive.cn](https://live.hsslive.cn)             |
-| 直播间后台 | [billd-live-admin](https://github.com/galaxy-s10/billd-live-admin)   | [![github](https://img.shields.io/github/stars/galaxy-s10/billd-live-admin?label=star&logo=GitHub)](https://github.com/galaxy-s10/billd-live-admin) [![github](https://img.shields.io/github/forks/galaxy-s10/billd-live-admin?label=fork&logo=GitHub)](https://github.com/galaxy-s10/billd-live-admin)     | [https://live-admin.hsslive.cn](https://live-admin.hsslive.cn) |
-| 直播间后端 | [billd-live-server](https://github.com/galaxy-s10/billd-live-server) | [![github](https://img.shields.io/github/stars/galaxy-s10/billd-live-server?label=star&logo=GitHub)](https://github.com/galaxy-s10/billd-live-server) [![github](https://img.shields.io/github/forks/galaxy-s10/billd-live-server?label=fork&logo=GitHub)](https://github.com/galaxy-s10/billd-live-server) | [https://live-api.hsslive.cn](https://live-api.hsslive.cn)     |
+| 名称         | 仓库                                                                             | star & fork                                                                                                                                                                                                                                                                                                                         | 线上地址                                                       |
+| ------------ | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| 直播间网页端 | [billd-live](https://github.com/galaxy-s10/billd-live)                           | [![github](https://img.shields.io/github/stars/galaxy-s10/billd-live?label=star&logo=GitHub)](https://github.com/galaxy-s10/billd-live) [![github](https://img.shields.io/github/forks/galaxy-s10/billd-live?label=fork&logo=GitHub)](https://github.com/galaxy-s10/billd-live)                                                     | [https://live.hsslive.cn](https://live.hsslive.cn)             |
+| 直播间移动端 | [billd-live-react-native](https://github.com/galaxy-s10/billd-live-react-native) | [![github](https://img.shields.io/github/stars/galaxy-s10/billd-live-react-native?label=star&logo=GitHub)](https://github.com/galaxy-s10/billd-live-react-native) [![github](https://img.shields.io/github/forks/galaxy-s10/billd-live-react-native?label=fork&logo=GitHub)](https://github.com/galaxy-s10/billd-live-react-native) |                                                                |
+| 直播间移动端 | [billd-live-flutter](https://github.com/galaxy-s10/billd-live-flutter)           | [![github](https://img.shields.io/github/stars/galaxy-s10/billd-live-flutter?label=star&logo=GitHub)](https://github.com/galaxy-s10/billd-live-flutter) [![github](https://img.shields.io/github/forks/galaxy-s10/billd-live-flutter?label=fork&logo=GitHub)](https://github.com/galaxy-s10/billd-live-flutter)                     |                                                                |
+| 直播间移动端 | [billd-live-kotlin](https://github.com/galaxy-s10/billd-live-kotlin)             | [![github](https://img.shields.io/github/stars/galaxy-s10/billd-live-kotlin?label=star&logo=GitHub)](https://github.com/galaxy-s10/billd-live-kotlin) [![github](https://img.shields.io/github/forks/galaxy-s10/billd-live-kotlin?label=fork&logo=GitHub)](https://github.com/galaxy-s10/billd-live-kotlin)                         |                                                                |
+| 直播间后台   | [billd-live-admin](https://github.com/galaxy-s10/billd-live-admin)               | [![github](https://img.shields.io/github/stars/galaxy-s10/billd-live-admin?label=star&logo=GitHub)](https://github.com/galaxy-s10/billd-live-admin) [![github](https://img.shields.io/github/forks/galaxy-s10/billd-live-admin?label=fork&logo=GitHub)](https://github.com/galaxy-s10/billd-live-admin)                             | [https://live-admin.hsslive.cn](https://live-admin.hsslive.cn) |
+| 直播间后端   | [billd-live-server](https://github.com/galaxy-s10/billd-live-server)             | [![github](https://img.shields.io/github/stars/galaxy-s10/billd-live-server?label=star&logo=GitHub)](https://github.com/galaxy-s10/billd-live-server) [![github](https://img.shields.io/github/forks/galaxy-s10/billd-live-server?label=fork&logo=GitHub)](https://github.com/galaxy-s10/billd-live-server)                         | [https://live-api.hsslive.cn](https://live-api.hsslive.cn)     |
 
 ## 简介
 
@@ -32,9 +35,10 @@ billd 直播间，目前实现了类似 [bilibili 的 Web 在线直播](https://
 
 - [x] 原生 webrtc 推拉流
 - [x] srs webrtc 推流，`http-flv` 或 `hls`拉流
+- [x] msr 推流，ffmpeg 转码，`http-flv` 或 `hls`拉流
 - [x] 前端混流
-- [x] [OBS](https://github.com/obsproject/obs-studio)、[FFmpeg](https://ffmpeg.org)推流
 - [x] 推流鉴权
+- [x] [OBS](https://github.com/obsproject/obs-studio)、[FFmpeg](https://ffmpeg.org)推流
 - [x] 用户模块（qq 登录）
 - [x] 支付模块（支付宝当面付）
 - [x] 订单模块
@@ -50,11 +54,22 @@ billd 直播间，目前实现了类似 [bilibili 的 Web 在线直播](https://
 - 流媒体服务器相关：[SRS](https://ossrs.net)、 [FFmpeg](https://ffmpeg.org)、[Coturn](https://github.com/coturn/coturn)
 - Docker 相关：[Docker](https://www.docker.com)
 
+## 接口文档
+
+apifox：[https://apifox.com/apidoc/shared-c7556b54-17b2-494e-a039-572d83f103ed](https://apifox.com/apidoc/shared-c7556b54-17b2-494e-a039-572d83f103ed)
+
+## 客户端下载
+
+安卓端：[点击下载](https://resource.hsslive.cn/billd-live/image/e859ec0e1fac824ce92b6522104f53ed.apk)
+苹果端：TODO
+Windows 端：TODO
+Mac 端：TODO
+
 ## 预览
 
 线上地址：[https://live.hsslive.cn](https://live.hsslive.cn)
 
-### 电脑端
+### 电脑端（web）
 
 - 首页
 
@@ -84,7 +99,7 @@ billd 直播间，目前实现了类似 [bilibili 的 Web 在线直播](https://
   style="width:800px"
 />
 
-### 移动端
+### 移动端（web）
 
 - 首页
 
@@ -100,9 +115,58 @@ billd 直播间，目前实现了类似 [bilibili 的 Web 在线直播](https://
   style="height:500px"
 />
 
+### 安卓端
+
+- 首页、分区、排行
+
+<img
+  src="https://resource.hsslive.cn/billd-live/image/38a0fae4c5104913ca0b7617ca58b518.webp" 
+  style="width:300px"
+/><img
+  src="https://resource.hsslive.cn/billd-live/image/8fa5423182476341ade6d74dba9eac0f.webp" 
+  style="width:300px"
+/><img
+  src="https://resource.hsslive.cn/billd-live/image/a6df703d48c3c3e5ec708ebf0b48f345.webp" 
+  style="width:300px"
+/>
+
+- 直播间详情、分区详情
+
+<img
+  src="https://resource.hsslive.cn/billd-live/image/420a663259487309a51cdc0d44b01246.webp" 
+  style="width:300px"
+/> <img
+  src="https://resource.hsslive.cn/billd-live/image/da8d31cda66f51b95cd8b34f4cbeb680.webp" 
+  style="width:300px"
+/>
+
+- 我的已登录/未登录
+
+<img
+  src="https://resource.hsslive.cn/billd-live/image/3a777718d31f94e6d25071d29f5e5185.webp" 
+  style="width:300px"
+/> <img
+  src="https://resource.hsslive.cn/billd-live/image/e785bc308c2d24460baf36f65aa39c5e.webp" 
+  style="width:300px"
+/>
+
+- 直播中心
+
+<img
+  src="https://resource.hsslive.cn/billd-live/image/77b89ccf7a10be1663f7e9d5bc69565d.jpg" 
+  style="width:300px"
+/> <img
+  src="https://resource.hsslive.cn/billd-live/image/90f505de2580b69aed73ea5c5717e669.jpg" 
+  style="width:300px"
+/>
+
 ## 本地启动
 
-> b 站视频：[从零搭建迷你版 b 站 web 直播间合集](https://space.bilibili.com/381307133/channel/collectiondetail?sid=1458070)
+> b 站教程：[从零搭建迷你版 b 站 web 直播间合集](https://space.bilibili.com/381307133/channel/collectiondetail?sid=1458070)，看里面带 `从零搭建迷你b站直播间` 封面的视频。
+>
+> billd-live 付费课：[https://www.hsslive.cn/article/151](https://www.hsslive.cn/article/151)
+
+### billd-live
 
 - 安装依赖（建议使用 node 版本：16.16.0）
 
@@ -117,6 +181,30 @@ pnpm i billd-utils@latest billd-scss@latest billd-html-webpack-plugin@latest
 ```
 
 - 运行
+
+```bash
+npm run start
+```
+
+- 打包
+
+```bash
+npm run build
+```
+
+### billd-live-server
+
+- 安装依赖（建议使用 node 版本：16.16.0）
+
+```bash
+pnpm i
+```
+
+> 更新 billd 相关依赖：
+
+```bash
+pnpm i billd-utils@latest billd-scss@latest billd-html-webpack-plugin@latest
+```
 
 > 本地必须要有 docker、ffmpeg 环境！
 >
@@ -151,6 +239,7 @@ pnpm run dev
 - pnpm 版本：8.6.3
 - docker 版本：24.0.5, build ced0996
 - mysql 版本：基于 docker，镜像：mysql:8.0
+- redis 版本：基于 docker，镜像：redis:7.0
 - srs 版本：基于 docker，镜像：registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5.0.170
 - ffmpeg 版本：5.1.2
 
@@ -163,8 +252,8 @@ pnpm run dev
 - node 版本：v16.19.1
 - pnpm 版本：8.6.3
 - docker 版本：23.0.1, build a5ee5b1
-- redis 版本：基于 docker，镜像：redis:7.0
 - mysql 版本：基于 docker，镜像：mysql:8.0
+- redis 版本：基于 docker，镜像：redis:7.0
 
 ### 流媒体服务器环境
 

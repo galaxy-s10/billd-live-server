@@ -211,6 +211,7 @@ class InitController {
             weight: user.live_room?.weight,
             cdn: user.live_room?.cdn,
             cover_img: user.live_room.cover_img,
+            pull_is_should_auth: user.live_room.pull_is_should_auth,
             rtmp_url,
             flv_url,
             hls_url,

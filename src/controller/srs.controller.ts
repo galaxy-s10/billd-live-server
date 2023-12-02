@@ -1,3 +1,4 @@
+import { MD5 } from 'crypto-js';
 import { ParameterizedContext } from 'koa';
 import { rimrafSync } from 'rimraf';
 
@@ -6,12 +7,13 @@ import successHandler from '@/app/handler/success-handle';
 import { SRS_CONFIG } from '@/config/secret';
 import { wsSocket } from '@/config/websocket';
 import { ALLOW_HTTP_CODE, LOCALHOST_URL } from '@/constant';
-import { ISrsRTC } from '@/interface';
+import { ISrsRTC, LiveRoomPullIsShouldAuthEnum } from '@/interface';
 import { IApiV1Clients, IApiV1Streams } from '@/interface-srs';
 import { WsMsgTypeEnum } from '@/interface-ws';
 import { CustomError } from '@/model/customError.model';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
+import userService from '@/service/user.service';
 import { resolveApp } from '@/utils';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 import { myaxios } from '@/utils/request';
@@ -103,8 +105,69 @@ class SRSController {
   async onPlay(ctx: ParameterizedContext, next) {
     // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
     // code等于数字0表示成功，其他错误码代表失败。
-    ctx.body = { code: 0, msg: 'room is living' };
-    await next();
+    const { body } = ctx.request;
+    console.log(chalkWARN(`on_play参数`), body);
+
+    const reg = /^roomId___(\d+)\.m3u8/g;
+    const roomId = reg.exec(body.stream)?.[1];
+    if (!roomId) {
+      console.log(chalkERROR(`[on_play] 房间id不存在！`));
+      ctx.body = { code: 1, msg: '[on_play] fail, roomId is not exist' };
+      await next();
+      return;
+    }
+    const [liveRoomInfo] = await Promise.all([
+      liveRoomService.find(Number(roomId)),
+    ]);
+    if (!liveRoomInfo) {
+      console.log(chalkERROR('[on_play] liveRoomInfo为空'));
+      ctx.body = { code: 1, msg: '[on_play] fail, liveRoomInfo is not exist' };
+      await next();
+      return;
+    }
+    if (liveRoomInfo.pull_is_should_auth === LiveRoomPullIsShouldAuthEnum.yes) {
+      const params = new URLSearchParams(body.param);
+      const paramsUserToken = params.get('usertoken');
+      const paramsUserid = params.get('userid');
+      if (!paramsUserToken || !paramsUserid) {
+        console.log(
+          chalkERROR(
+            `[on_play] 该直播需要拉流token，当前用户没有拉流token，不允许拉流`
+          )
+        );
+        ctx.body = { code: 1, msg: '[on_play] fail, no token' };
+        await next();
+        return;
+      }
+      const userInfo = await userService.findAndToken(Number(paramsUserid));
+      if (!userInfo) {
+        console.log(chalkERROR(`[on_play] 用户不存在，不允许拉流`));
+        ctx.body = {
+          code: 1,
+          msg: '[on_play] fail, userInfo is not exist',
+        };
+        await next();
+        return;
+      }
+      const token = MD5(userInfo.token!).toString();
+      if (token !== paramsUserToken) {
+        console.log(chalkERROR(`[on_play] 鉴权失败，不允许拉流`));
+        ctx.body = { code: 1, msg: '[on_play] fail, token fail' };
+        await next();
+        return;
+      }
+
+      console.log(params, 'paramsparams');
+      console.log(
+        chalkSUCCESS(`[on_play] 房间id：${roomId}，所有验证通过，允许拉流`)
+      );
+      ctx.body = { code: 0, msg: '[on_play] all success, pass' };
+      await next();
+    } else {
+      console.log(chalkSUCCESS(`[on_play] 房间id：${roomId}，不需要拉流鉴权`));
+      ctx.body = { code: 0, msg: '[on_play] all success, pass' };
+      await next();
+    }
   }
 
   onPublish = async (ctx: ParameterizedContext, next) => {
@@ -117,7 +180,7 @@ class SRSController {
     const roomId = reg.exec(body.stream)?.[1];
     if (!roomId) {
       console.log(chalkERROR(`[on_publish] 房间id不存在！`));
-      ctx.body = { code: 1, msg: 'no roomId' };
+      ctx.body = { code: 1, msg: '[on_publish] fail, roomId is not exist' };
       await next();
     } else {
       const params = new URLSearchParams(body.param);
@@ -125,7 +188,7 @@ class SRSController {
       const paramsType = params.get('type');
       if (!paramsToken) {
         console.log(chalkERROR(`[on_publish] 没有推流token`));
-        ctx.body = { code: 1, msg: '[on_publish] no token, return' };
+        ctx.body = { code: 1, msg: '[on_publish] fail, no token' };
         await next();
         return;
       }
@@ -133,7 +196,7 @@ class SRSController {
       const rtmptoken = result?.key;
       if (rtmptoken !== paramsToken) {
         console.log(chalkERROR(`[on_publish] 房间id：${roomId}，鉴权失败`));
-        ctx.body = { code: 1, msg: '[on_publish] auth fail, return' };
+        ctx.body = { code: 1, msg: '[on_publish] fail, auth fail' };
         await next();
         return;
       }
@@ -150,43 +213,47 @@ class SRSController {
             `[on_publish] 房间id：${roomId}，鉴权成功，但是正在直播，不允许推流`
           )
         );
-        ctx.body = { code: 1, msg: '[on_publish] room is living, return' };
+        ctx.body = { code: 1, msg: '[on_publish] fail, room is living' };
         await next();
-      } else {
-        console.log(
-          chalkSUCCESS(`[on_publish] 房间id：${roomId}，鉴权成功，允许推流`)
-        );
-        const [liveRoomInfo] = await Promise.all([
-          liveRoomService.find(Number(roomId)),
-        ]);
-        if (!liveRoomInfo) {
-          console.log(chalkERROR('[on_publish] liveRoomInfo为空'));
-          return;
-        }
-
-        ctx.body = { code: 0, msg: '[on_publish] auth success, pass' };
-        await liveService.create({
-          live_room_id: Number(roomId),
-          user_id: liveRoomInfo?.user_live_room?.user?.id,
-          socket_id: '-1',
-          track_audio: 1,
-          track_video: 1,
-          srs_action: body.action,
-          srs_app: body.app,
-          srs_client_id: body.client_id,
-          srs_ip: body.ip,
-          srs_param: body.param,
-          srs_server_id: body.server_id,
-          srs_service_id: body.service_id,
-          srs_stream: body.stream,
-          srs_stream_id: body.stream_id,
-          srs_stream_url: body.stream_url,
-          srs_tcUrl: body.tcUrl,
-          srs_vhost: body.vhost,
-        });
-        wsSocket.io?.to(roomId).emit(WsMsgTypeEnum.roomLiving, { data: {} });
-        await next();
+        return;
       }
+      const [liveRoomInfo] = await Promise.all([
+        liveRoomService.find(Number(roomId)),
+      ]);
+      if (!liveRoomInfo) {
+        console.log(chalkERROR('[on_publish] liveRoomInfo为空，不允许推流'));
+        ctx.body = {
+          code: 1,
+          msg: '[on_publish] fail, liveRoomInfo is not exist',
+        };
+        await next();
+        return;
+      }
+      console.log(
+        chalkSUCCESS(`[on_publish] 房间id：${roomId}，所有验证通过，允许推流`)
+      );
+      ctx.body = { code: 0, msg: '[on_publish] all success, pass' };
+      await liveService.create({
+        live_room_id: Number(roomId),
+        user_id: liveRoomInfo?.user_live_room?.user?.id,
+        socket_id: '-1',
+        track_audio: 1,
+        track_video: 1,
+        srs_action: body.action,
+        srs_app: body.app,
+        srs_client_id: body.client_id,
+        srs_ip: body.ip,
+        srs_param: body.param,
+        srs_server_id: body.server_id,
+        srs_service_id: body.service_id,
+        srs_stream: body.stream,
+        srs_stream_id: body.stream_id,
+        srs_stream_url: body.stream_url,
+        srs_tcUrl: body.tcUrl,
+        srs_vhost: body.vhost,
+      });
+      wsSocket.io?.to(roomId).emit(WsMsgTypeEnum.roomLiving, { data: {} });
+      await next();
     }
   };
 
@@ -199,8 +266,8 @@ class SRSController {
     const roomId = reg.exec(body.stream)?.[1];
 
     if (!roomId) {
-      console.log(chalkERROR('[on_unpublish] roomId为空'));
-      ctx.body = { code: 1, msg: '[on_unpublish] fail, no roomId' };
+      console.log(chalkERROR('[on_unpublish] 房间id不存在！'));
+      ctx.body = { code: 1, msg: '[on_unpublish] fail, roomId is not exist' };
     } else {
       console.log(chalkSUCCESS(`[on_unpublish] 房间id：${roomId}，成功`));
       ctx.body = { code: 0, msg: '[on_unpublish] success' };
@@ -218,8 +285,6 @@ class SRSController {
     // code等于数字0表示成功，其他错误码代表失败。
     const { body } = ctx.request;
     console.log(chalkWARN(`on_dvr参数`), body);
-    const reg = /^roomId___(.+)/g;
-    const roomId = reg.exec(body.stream)?.[1];
     ctx.body = { code: 0, msg: '[on_dvr] success' };
     await next();
   }

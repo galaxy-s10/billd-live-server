@@ -17,4 +17,11 @@ userRouter.get('/get_user_info', userController.getUserInfo);
 // 查找用户
 userRouter.get('/find/:id', userController.find);
 
+// 更新用户角色
+userRouter.put(
+  '/update_user_role/:id',
+  verifyProp,
+  userController.updateUserRole
+);
+
 export default userRouter;

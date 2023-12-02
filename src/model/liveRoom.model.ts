@@ -34,6 +34,9 @@ const model = sequelize.define<LiveRoomModel>(
     type: {
       type: DataTypes.INTEGER,
     },
+    pull_is_should_auth: {
+      type: DataTypes.INTEGER,
+    },
     cdn: {
       type: DataTypes.INTEGER,
     },

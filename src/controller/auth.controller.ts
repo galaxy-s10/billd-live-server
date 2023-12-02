@@ -1,15 +1,33 @@
 import { arrayUnique, getArrayDifference } from 'billd-utils';
 import { ParameterizedContext } from 'koa';
 
+import { authJwt } from '@/app/auth/authJwt';
 import { verifyUserAuth } from '@/app/auth/verifyUserAuth';
 import successHandler from '@/app/handler/success-handle';
 import { ALLOW_HTTP_CODE, PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import { IAuth, IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import authService from '@/service/auth.service';
+import roleService from '@/service/role.service';
 import { arrayToTree } from '@/utils';
 
 class AuthController {
+  common = {
+    getUserAuth: async (userId: number) => {
+      const myAllRole = await roleService.getMyRole(userId);
+      const queue: Promise<any>[] = [];
+      myAllRole.forEach((item) => {
+        queue.push(roleService.getRoleAuth(item.id));
+      });
+      const queueRes = await Promise.all(queue);
+      const res: any[] = [];
+      queueRes.forEach((item) => {
+        res.push(...item);
+      });
+      return res;
+    },
+  };
+
   async commonGetAllChildAuth(id) {
     const allAuth: any = [];
     const queue: any = [];
@@ -26,6 +44,26 @@ class AuthController {
     await Promise.all(queue);
     return allAuth;
   }
+
+  /** 获取我的权限 */
+  getMyAuth = async (ctx: ParameterizedContext, next) => {
+    const { code, userInfo, message } = await authJwt(ctx);
+    if (code !== ALLOW_HTTP_CODE.ok) {
+      console.log(message);
+      throw new CustomError(message, code, code);
+    }
+    const res = await this.common.getUserAuth(userInfo!.id!);
+    successHandler({ ctx, data: res });
+    await next();
+  };
+
+  /** 获取某个用户的权限 */
+  getUserAuth = async (ctx: ParameterizedContext, next) => {
+    const id = +ctx.params.id;
+    const res = await this.common.getUserAuth(id);
+    successHandler({ ctx, data: res });
+    await next();
+  };
 
   // 权限列表（分页）
   async getList(ctx: ParameterizedContext, next) {

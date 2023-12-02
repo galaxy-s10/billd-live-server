@@ -193,7 +193,6 @@ class RoleController {
     // const roleResFlat = roleRes.reduce((a, b) => a.concat(b), []);
     const roleResFlat = roleRes.flat();
     successHandler({ ctx, data: [...result, ...roleResFlat] });
-
     await next();
   };
 
