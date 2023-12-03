@@ -162,6 +162,8 @@ class SRSController {
   async onPlay(ctx: ParameterizedContext, next) {
     // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
     // code等于数字0表示成功，其他错误码代表失败。
+    const startTime = performance.now();
+    let duration = -1;
     const { body } = ctx.request;
     console.log(chalkWARN(`on_play参数`), body);
 
@@ -170,8 +172,12 @@ class SRSController {
     const roomId = reg.exec(roomIdStr)?.[1];
 
     if (!roomId) {
-      console.log(chalkERROR(`[on_play] 房间id不存在！`));
-      ctx.body = { code: 1, msg: '[on_play] fail, roomId is not exist' };
+      duration = Math.floor(performance.now() - startTime);
+      console.log(chalkERROR(`[on_play] 耗时：${duration}，房间id不存在！`));
+      ctx.body = {
+        code: 1,
+        msg: `[on_play] fail, duration: ${duration} , roomId is not exist`,
+      };
       await next();
       return;
     }
@@ -179,8 +185,12 @@ class SRSController {
       liveRoomService.find(Number(roomId)),
     ]);
     if (!liveRoomInfo) {
-      console.log(chalkERROR('[on_play] liveRoomInfo为空'));
-      ctx.body = { code: 1, msg: '[on_play] fail, liveRoomInfo is not exist' };
+      duration = Math.floor(performance.now() - startTime);
+      console.log(chalkERROR(`[on_play] 耗时：${duration}，liveRoomInfo为空`));
+      ctx.body = {
+        code: 1,
+        msg: `[on_play] fail, duration: ${duration} , liveRoomInfo is not exist`,
+      };
       await next();
       return;
     }
@@ -190,29 +200,42 @@ class SRSController {
     const paramsRandomid = params.get('randomid');
     if (liveRoomInfo.pull_is_should_auth === LiveRoomPullIsShouldAuthEnum.yes) {
       if (!paramsUserToken || !paramsUserid) {
+        duration = Math.floor(performance.now() - startTime);
         console.log(
           chalkERROR(
-            `[on_play] 该直播需要拉流token，当前用户没有拉流token，不允许拉流`
+            `[on_play] 耗时：${duration}，该直播需要拉流token，当前用户没有拉流token，不允许拉流`
           )
         );
-        ctx.body = { code: 1, msg: '[on_play] fail, no token' };
+        ctx.body = {
+          code: 1,
+          msg: `[on_play] fail, duration: ${duration} , no token`,
+        };
         await next();
         return;
       }
       const userInfo = await userService.findAndToken(Number(paramsUserid));
       if (!userInfo) {
-        console.log(chalkERROR(`[on_play] 用户不存在，不允许拉流`));
+        duration = Math.floor(performance.now() - startTime);
+        console.log(
+          chalkERROR(`[on_play] 耗时：${duration}，用户不存在，不允许拉流`)
+        );
         ctx.body = {
           code: 1,
-          msg: '[on_play] fail, userInfo is not exist',
+          msg: `[on_play] fail, duration: ${duration} , userInfo is not exist`,
         };
         await next();
         return;
       }
       const token = MD5(userInfo.token!).toString();
       if (token !== paramsUserToken) {
-        console.log(chalkERROR(`[on_play] 鉴权失败，不允许拉流`));
-        ctx.body = { code: 1, msg: '[on_play] fail, token fail' };
+        duration = Math.floor(performance.now() - startTime);
+        console.log(
+          chalkERROR(`[on_play] 耗时：${duration}，鉴权失败，不允许拉流`)
+        );
+        ctx.body = {
+          code: 1,
+          msg: `[on_play] fail, duration: ${duration}, token fail`,
+        };
         await next();
         return;
       }
@@ -233,10 +256,16 @@ class SRSController {
         srs_tcUrl: body.tcUrl,
         srs_vhost: body.vhost,
       });
+      duration = Math.floor(performance.now() - startTime);
       console.log(
-        chalkSUCCESS(`[on_play] 房间id：${roomId}，所有验证通过，允许拉流`)
+        chalkSUCCESS(
+          `[on_play] 耗时：${duration}，房间id：${roomId}，所有验证通过，允许拉流`
+        )
       );
-      ctx.body = { code: 0, msg: '[on_play] all success, pass' };
+      ctx.body = {
+        code: 0,
+        msg: `[on_play] duration: ${duration}, all success, pass`,
+      };
       await next();
     } else {
       await livePlayService.create({
@@ -256,8 +285,16 @@ class SRSController {
         srs_tcUrl: body.tcUrl,
         srs_vhost: body.vhost,
       });
-      console.log(chalkSUCCESS(`[on_play] 房间id：${roomId}，不需要拉流鉴权`));
-      ctx.body = { code: 0, msg: '[on_play] all success, pass' };
+      duration = Math.floor(performance.now() - startTime);
+      console.log(
+        chalkSUCCESS(
+          `[on_play] 耗时：${duration}，房间id：${roomId}，不需要拉流鉴权`
+        )
+      );
+      ctx.body = {
+        code: 0,
+        msg: `[on_play] duration: ${duration}, all success, pass`,
+      };
       await next();
     }
   }

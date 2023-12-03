@@ -4,7 +4,7 @@ import { SERVER_LIVE } from '@/config/secret';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import srsController from '@/controller/srs.controller';
 import { initUser } from '@/init/initUser';
-import { LiveRoomTypeEnum } from '@/interface';
+import { LiveRoomPullIsShouldAuthEnum, LiveRoomTypeEnum } from '@/interface';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
@@ -24,6 +24,7 @@ async function addLive({
   user_id,
   localFile,
   cover_img,
+  pull_is_should_auth,
   cdn,
   devFFmpeg,
   prodFFmpeg,
@@ -33,6 +34,7 @@ async function addLive({
   user_id: number;
   localFile: string;
   cover_img: string;
+  pull_is_should_auth: LiveRoomPullIsShouldAuthEnum;
   cdn: number; // 1:使用cdn;2:不使用cdn
   devFFmpeg: boolean;
   prodFFmpeg: boolean;
@@ -92,6 +94,7 @@ async function addLive({
       id: live_room_id,
       cover_img,
       type: LiveRoomTypeEnum.system,
+      pull_is_should_auth,
       cdn,
       weight,
       rtmp_url,
@@ -179,6 +182,7 @@ export const initFFmpeg = async (init = true) => {
           user_id: initUser[item].id,
           localFile: initUser[item].live_room.localFile,
           cover_img: initUser[item].live_room.cover_img,
+          pull_is_should_auth: initUser[item].live_room.pull_is_should_auth,
           cdn: initUser[item].live_room.cdn,
           devFFmpeg: initUser[item].live_room.devFFmpeg,
           prodFFmpeg: initUser[item].live_room.prodFFmpeg,

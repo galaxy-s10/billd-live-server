@@ -96,7 +96,7 @@ export const SRS_CONFIG = {
     // docker启动srs时的容器名字（可随便填）
     container: 'billd-live-srs',
     // docker镜像名，https://ossrs.net/lts/zh-cn/docs/v5/doc/getting-started
-    image: 'registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5.0.170',
+    image: 'registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5.0.200',
     port: {
       1935: 1935,
       8080: 5001,
