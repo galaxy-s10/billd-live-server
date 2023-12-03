@@ -75,11 +75,11 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 3,
       name: '房东的猫-和宇宙的温柔关联',
-      weight: 2,
+      weight: 10,
       cdn: 2, // 1:使用cdn;2:不使用cdn
-      pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
+      pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.yes,
       area: [1],
-      devFFmpeg: false, // 初始化ffmpeg
+      devFFmpeg: true, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
       cover_img: fddmHyzdwmglBase64,
       localFile:
@@ -121,7 +121,7 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 5,
       name: '房东的猫-你是我为数不多的骄傲',
-      weight: 10,
+      weight: 3,
       cdn: 2, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.yes,
       area: [1],
