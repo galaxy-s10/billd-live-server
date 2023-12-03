@@ -75,7 +75,7 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 3,
       name: '房东的猫-和宇宙的温柔关联',
-      weight: 10,
+      weight: 3,
       cdn: 2, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.yes,
       area: [1],
@@ -98,11 +98,11 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 4,
       name: '房东的猫-所念皆星河',
-      weight: 2,
+      weight: 5,
       cdn: 2, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],
-      devFFmpeg: false, // 初始化ffmpeg
+      devFFmpeg: true, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
       cover_img: fddmSnjxhBase64,
       localFile:
@@ -121,11 +121,11 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 5,
       name: '房东的猫-你是我为数不多的骄傲',
-      weight: 3,
+      weight: 2,
       cdn: 2, // 1:使用cdn;2:不使用cdn
-      pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.yes,
+      pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],
-      devFFmpeg: true, // 初始化ffmpeg
+      devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
       cover_img: fddmNswwsbddjaBase64,
       localFile:
@@ -166,7 +166,7 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 7,
       name: '周杰伦-不能说的秘密',
-      weight: 9,
+      weight: 2,
       cdn: 2, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],
@@ -280,7 +280,7 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 100,
       name: '周杰伦-一路向北',
-      weight: 3,
+      weight: 2,
       cdn: 2, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],

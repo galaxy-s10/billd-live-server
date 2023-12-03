@@ -133,7 +133,7 @@ class SRSController {
     const paramsUserid = params.get('userid');
     const userInfo = await userService.findAndToken(Number(paramsUserid));
     if (!userInfo) {
-      console.log(chalkERROR(`[on_stop] 用户不存在，不允许拉流`));
+      console.log(chalkERROR(`[on_stop] 用户不存在，不允许stop`));
       ctx.body = {
         code: 1,
         msg: '[on_stop] fail, userInfo is not exist',
