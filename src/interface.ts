@@ -311,6 +311,22 @@ export interface ILive extends ISrsPublishStream {
   deleted_at?: string;
 }
 
+export interface ILivePlay extends ISrsPublishStream {
+  id?: number;
+  /** 用户信息 */
+  user?: IUser;
+  /** 直播间信息 */
+  live_room?: ILiveRoom;
+
+  random_id?: string;
+  user_id?: number;
+  live_room_id?: number;
+
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
 export interface IBlacklist {
   id?: number;
   ip?: string;

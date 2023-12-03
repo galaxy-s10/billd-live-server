@@ -12,6 +12,7 @@ import { IApiV1Clients, IApiV1Streams } from '@/interface-srs';
 import { WsMsgTypeEnum } from '@/interface-ws';
 import { CustomError } from '@/model/customError.model';
 import liveService from '@/service/live.service';
+import livePlayService from '@/service/livePlay.service';
 import liveRoomService from '@/service/liveRoom.service';
 import userService from '@/service/user.service';
 import { resolveApp } from '@/utils';
@@ -102,14 +103,72 @@ class SRSController {
     await next();
   };
 
+  async onStop(ctx: ParameterizedContext, next) {
+    // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
+    // code等于数字0表示成功，其他错误码代表失败。
+    const { body } = ctx.request;
+    console.log(chalkWARN(`on_stop参数`), body);
+
+    const roomIdStr = body.stream.replace(/\.m3u8$/g, '');
+    const reg = /^roomId___(\d+)$/g;
+    const roomId = reg.exec(roomIdStr)?.[1];
+
+    if (!roomId) {
+      console.log(chalkERROR(`[on_stop] 房间id不存在！`));
+      ctx.body = { code: 1, msg: '[on_stop] fail, roomId is not exist' };
+      await next();
+      return;
+    }
+    const [liveRoomInfo] = await Promise.all([
+      liveRoomService.find(Number(roomId)),
+    ]);
+    if (!liveRoomInfo) {
+      console.log(chalkERROR('[on_stop] liveRoomInfo为空'));
+      ctx.body = { code: 1, msg: '[on_stop] fail, liveRoomInfo is not exist' };
+      await next();
+      return;
+    }
+    const params = new URLSearchParams(body.param);
+    const paramsUserToken = params.get('usertoken');
+    const paramsUserid = params.get('userid');
+    const userInfo = await userService.findAndToken(Number(paramsUserid));
+    if (!userInfo) {
+      console.log(chalkERROR(`[on_stop] 用户不存在，不允许拉流`));
+      ctx.body = {
+        code: 1,
+        msg: '[on_stop] fail, userInfo is not exist',
+      };
+      await next();
+      return;
+    }
+    const token = MD5(userInfo.token!).toString();
+    if (token !== paramsUserToken) {
+      console.log(chalkERROR(`[on_stop] 鉴权失败，不允许stop`));
+      ctx.body = { code: 1, msg: '[on_stop] fail, token fail' };
+      await next();
+      return;
+    }
+    await livePlayService.deleteByLiveRoomIdAndUserId({
+      live_room_id: Number(roomId),
+      user_id: userInfo.id!,
+    });
+    console.log(
+      chalkSUCCESS(`[on_stop] 房间id：${roomId}，所有验证通过，允许stop`)
+    );
+    ctx.body = { code: 0, msg: '[on_stop] all success, pass' };
+    await next();
+  }
+
   async onPlay(ctx: ParameterizedContext, next) {
     // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
     // code等于数字0表示成功，其他错误码代表失败。
     const { body } = ctx.request;
     console.log(chalkWARN(`on_play参数`), body);
 
-    const reg = /^roomId___(\d+)\.m3u8/g;
-    const roomId = reg.exec(body.stream)?.[1];
+    const roomIdStr = body.stream.replace(/\.m3u8$/g, '');
+    const reg = /^roomId___(\d+)$/g;
+    const roomId = reg.exec(roomIdStr)?.[1];
+
     if (!roomId) {
       console.log(chalkERROR(`[on_play] 房间id不存在！`));
       ctx.body = { code: 1, msg: '[on_play] fail, roomId is not exist' };
@@ -125,10 +184,11 @@ class SRSController {
       await next();
       return;
     }
+    const params = new URLSearchParams(body.param);
+    const paramsUserToken = params.get('usertoken');
+    const paramsUserid = params.get('userid');
+    const paramsRandomid = params.get('randomid');
     if (liveRoomInfo.pull_is_should_auth === LiveRoomPullIsShouldAuthEnum.yes) {
-      const params = new URLSearchParams(body.param);
-      const paramsUserToken = params.get('usertoken');
-      const paramsUserid = params.get('userid');
       if (!paramsUserToken || !paramsUserid) {
         console.log(
           chalkERROR(
@@ -156,14 +216,46 @@ class SRSController {
         await next();
         return;
       }
-
-      console.log(params, 'paramsparams');
+      await livePlayService.create({
+        live_room_id: Number(roomId),
+        user_id: userInfo.id,
+        random_id: paramsRandomid || '-1',
+        srs_action: body.action,
+        srs_app: body.app,
+        srs_client_id: body.client_id,
+        srs_ip: body.ip,
+        srs_param: body.param,
+        srs_server_id: body.server_id,
+        srs_service_id: body.service_id,
+        srs_stream: body.stream,
+        srs_stream_id: body.stream_id,
+        srs_stream_url: body.stream_url,
+        srs_tcUrl: body.tcUrl,
+        srs_vhost: body.vhost,
+      });
       console.log(
         chalkSUCCESS(`[on_play] 房间id：${roomId}，所有验证通过，允许拉流`)
       );
       ctx.body = { code: 0, msg: '[on_play] all success, pass' };
       await next();
     } else {
+      await livePlayService.create({
+        live_room_id: Number(roomId),
+        user_id: -1,
+        random_id: paramsRandomid || '-1',
+        srs_action: body.action,
+        srs_app: body.app,
+        srs_client_id: body.client_id,
+        srs_ip: body.ip,
+        srs_param: body.param,
+        srs_server_id: body.server_id,
+        srs_service_id: body.service_id,
+        srs_stream: body.stream,
+        srs_stream_id: body.stream_id,
+        srs_stream_url: body.stream_url,
+        srs_tcUrl: body.tcUrl,
+        srs_vhost: body.vhost,
+      });
       console.log(chalkSUCCESS(`[on_play] 房间id：${roomId}，不需要拉流鉴权`));
       ctx.body = { code: 0, msg: '[on_play] all success, pass' };
       await next();
@@ -176,8 +268,10 @@ class SRSController {
     const { body } = ctx.request;
     console.log(chalkWARN(`on_publish参数`), body);
 
-    const reg = /^roomId___(.+)/g;
-    const roomId = reg.exec(body.stream)?.[1];
+    const roomIdStr = body.stream.replace(/\.m3u8$/g, '');
+    const reg = /^roomId___(\d+)$/g;
+    const roomId = reg.exec(roomIdStr)?.[1];
+
     if (!roomId) {
       console.log(chalkERROR(`[on_publish] 房间id不存在！`));
       ctx.body = { code: 1, msg: '[on_publish] fail, roomId is not exist' };
@@ -262,8 +356,10 @@ class SRSController {
     // code等于数字0表示成功，其他错误码代表失败。
     const { body } = ctx.request;
     console.log(chalkWARN(`on_unpublish参数`), body);
-    const reg = /^roomId___(.+)/g;
-    const roomId = reg.exec(body.stream)?.[1];
+
+    const roomIdStr = body.stream.replace(/\.m3u8$/g, '');
+    const reg = /^roomId___(\d+)$/g;
+    const roomId = reg.exec(roomIdStr)?.[1];
 
     if (!roomId) {
       console.log(chalkERROR('[on_unpublish] 房间id不存在！'));

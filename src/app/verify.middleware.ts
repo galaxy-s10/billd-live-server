@@ -29,6 +29,7 @@ const frontendWhiteList = [
 
   '/srs/on_publish',
   '/srs/on_play',
+  '/srs/on_stop',
   '/srs/on_unpublish',
   '/srs/on_dvr',
 ];

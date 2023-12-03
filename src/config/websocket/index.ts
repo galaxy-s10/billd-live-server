@@ -456,7 +456,7 @@ export const connectWebSocket = (server) => {
           rtmp_url: data.data.rtmp_url,
         });
         if (data.data.track) {
-          liveService.updateByLoomId({
+          liveService.updateByRoomId({
             live_room_id: data.data.live_room_id,
             track_audio: data.data.track.audio,
             track_video: data.data.track.video,

@@ -1,4 +1,4 @@
-import { deleteUseLessObjectKey } from 'billd-utils';
+import { deleteUseLessObjectKey, isPureNumber } from 'billd-utils';
 import Sequelize from 'sequelize';
 
 import { IList, ILiveRoom } from '@/interface';
@@ -28,6 +28,9 @@ class LiveRoomService {
   async getList({
     id,
     name,
+    type,
+    cdn,
+    pull_is_should_auth,
     rtmp_url,
     flv_url,
     hls_url,
@@ -53,6 +56,18 @@ class LiveRoomService {
       flv_url,
       hls_url,
     });
+    if (type !== undefined && isPureNumber(`${type}`)) {
+      allWhere.type = type;
+    }
+    if (cdn !== undefined && isPureNumber(`${cdn}`)) {
+      allWhere.cdn = cdn;
+    }
+    if (
+      pull_is_should_auth !== undefined &&
+      isPureNumber(`${pull_is_should_auth}`)
+    ) {
+      allWhere.pull_is_should_auth = pull_is_should_auth;
+    }
     if (keyWord) {
       const keyWordWhere = [
         {

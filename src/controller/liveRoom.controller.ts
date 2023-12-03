@@ -22,6 +22,9 @@ class LiveRoomController {
     const {
       id,
       name,
+      type,
+      cdn,
+      pull_is_should_auth,
       rtmp_url,
       flv_url,
       hls_url,
@@ -37,6 +40,9 @@ class LiveRoomController {
     const result = await liveRoomService.getList({
       id,
       name,
+      type,
+      cdn,
+      pull_is_should_auth,
       rtmp_url,
       flv_url,
       hls_url,
@@ -106,6 +112,33 @@ class LiveRoomController {
     await this.common.create({
       name,
       key: cryptojs.MD5(`${+new Date()}___${getRandomString(6)}`).toString(),
+      type,
+      pull_is_should_auth,
+      weight,
+      cdn,
+      rtmp_url,
+      flv_url,
+      hls_url,
+    });
+    successHandler({ ctx });
+    await next();
+  }
+
+  async update(ctx: ParameterizedContext, next) {
+    const id = +ctx.params.id;
+    const {
+      name,
+      type,
+      pull_is_should_auth,
+      weight,
+      rtmp_url,
+      cdn,
+      flv_url,
+      hls_url,
+    }: ILiveRoom = ctx.request.body;
+    await this.common.update({
+      id,
+      name,
       type,
       pull_is_should_auth,
       weight,

@@ -10,4 +10,6 @@ liveRoomRouter.get('/find/:id', liveRoomController.find);
 
 liveRoomRouter.put('/update_key', liveRoomController.updateKey);
 
+liveRoomRouter.put('/update/:id', liveRoomController.update);
+
 export default liveRoomRouter;
