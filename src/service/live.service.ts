@@ -1,5 +1,5 @@
 import { isPureNumber } from 'billd-utils';
-import Sequelize from 'sequelize';
+import { Op, literal } from 'sequelize';
 
 import { IList, ILive } from '@/interface';
 import areaModel from '@/model/area.model';
@@ -7,8 +7,6 @@ import liveModel from '@/model/live.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
 import { handlePaging } from '@/utils';
-
-const { Op, col } = Sequelize;
 
 class LiveService {
   /** 直播是否存在 */
@@ -100,8 +98,20 @@ class LiveService {
       ],
       attributes: {
         exclude: ['key'],
+        include: [
+          [
+            literal(
+              `(select weight from ${liveRoomModel.tableName}
+                where ${liveRoomModel.tableName}.id = ${liveModel.tableName}.live_room_id)`
+            ),
+            'live_room_weight',
+          ],
+        ],
       },
-      order: [[orderName, orderBy]],
+      order: [
+        [literal('live_room_weight'), 'desc'],
+        [orderName, orderBy],
+      ],
       limit,
       offset,
       where: {
