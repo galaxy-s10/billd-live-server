@@ -1,6 +1,6 @@
 import { getRandomString } from 'billd-utils';
 
-import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import { DEFAULT_ROLE_INFO, PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import { fddmHyzdwmglBase64 } from '@/init/base64/fddm_hyzdwmgl';
 import { fddmMhswBase64 } from '@/init/base64/fddm_mhsw';
 import { fddmNswwsbddjaBase64 } from '@/init/base64/fddm_nswwsbddja';
@@ -25,7 +25,7 @@ export const initUser: Record<string, IInitUser> = {
     password: getRandomString(6),
     avatar:
       'https://resource.hsslive.cn/billd-live/image/def9f85caeb1bf7602ae1bc37f00b03d.webp',
-    user_roles: [3, 7],
+    user_roles: [DEFAULT_ROLE_INFO.SUPER_ADMIN.id],
     live_room: {
       id: 1,
       name: '房东的猫-美好事物',
@@ -46,7 +46,7 @@ export const initUser: Record<string, IInitUser> = {
     id: 2,
     username: 'CoCo',
     password: getRandomString(6),
-    user_roles: [5],
+    user_roles: [DEFAULT_ROLE_INFO.LIVE_ADMIN.id],
     avatar:
       'https://resource.hsslive.cn/billd-live/image/15a116a978cadb34e9fbf0061a4145bc.webp',
     live_room: {
@@ -71,7 +71,7 @@ export const initUser: Record<string, IInitUser> = {
     password: getRandomString(6),
     avatar:
       'https://resource.hsslive.cn/billd-live/image/752a40d44811c99278961410da656464.webp',
-    user_roles: [5],
+    user_roles: [DEFAULT_ROLE_INFO.SVIP_USER.id],
     live_room: {
       id: 3,
       name: '房东的猫-和宇宙的温柔关联',
@@ -94,7 +94,7 @@ export const initUser: Record<string, IInitUser> = {
     password: getRandomString(6),
     avatar:
       'https://resource.hsslive.cn/billd-live/image/2b045c7f02febd23893244e923115535.webp',
-    user_roles: [5],
+    user_roles: [DEFAULT_ROLE_INFO.VIP_USER.id],
     live_room: {
       id: 4,
       name: '房东的猫-所念皆星河',
@@ -117,7 +117,7 @@ export const initUser: Record<string, IInitUser> = {
     password: getRandomString(6),
     avatar:
       'https://resource.hsslive.cn/billd-live/image/2142b19fe33e1fd7ed848104f64c4fd4.webp',
-    user_roles: [5],
+    user_roles: [DEFAULT_ROLE_INFO.VIP_USER.id],
     live_room: {
       id: 5,
       name: '房东的猫-你是我为数不多的骄傲',
@@ -140,7 +140,7 @@ export const initUser: Record<string, IInitUser> = {
     password: getRandomString(6),
     avatar:
       'https://resource.hsslive.cn/billd-live/image/7e048083bb5dccde76018625b644c84b.webp',
-    user_roles: [5],
+    user_roles: [DEFAULT_ROLE_INFO.VIP_USER.id],
     live_room: {
       id: 6,
       name: '房东的猫-下一站茶山刘',
@@ -162,7 +162,7 @@ export const initUser: Record<string, IInitUser> = {
     username: 'user-7',
     password: getRandomString(6),
     avatar: '',
-    user_roles: [5],
+    user_roles: [DEFAULT_ROLE_INFO.VIP_USER.id],
     live_room: {
       id: 7,
       name: '周杰伦-不能说的秘密',
@@ -181,7 +181,7 @@ export const initUser: Record<string, IInitUser> = {
     username: 'user-8',
     password: getRandomString(6),
     avatar: '',
-    user_roles: [5],
+    user_roles: [DEFAULT_ROLE_INFO.VIP_USER.id],
     live_room: {
       id: 8,
       name: '周杰伦-晴天',
@@ -200,7 +200,7 @@ export const initUser: Record<string, IInitUser> = {
     username: 'user-9',
     password: getRandomString(6),
     avatar: '',
-    user_roles: [5],
+    user_roles: [DEFAULT_ROLE_INFO.VIP_USER.id],
     live_room: {
       id: 9,
       name: '房东的猫-一次就好',
@@ -219,7 +219,7 @@ export const initUser: Record<string, IInitUser> = {
     username: 'user-10',
     password: getRandomString(6),
     avatar: '',
-    user_roles: [5],
+    user_roles: [DEFAULT_ROLE_INFO.VIP_USER.id],
     live_room: {
       id: 10,
       name: '七龙珠-渐渐被你吸引',
@@ -238,7 +238,7 @@ export const initUser: Record<string, IInitUser> = {
     username: 'user-11',
     password: getRandomString(6),
     avatar: '',
-    user_roles: [5],
+    user_roles: [DEFAULT_ROLE_INFO.VIP_USER.id],
     live_room: {
       id: 11,
       name: '周杰伦-搁浅',
@@ -257,7 +257,7 @@ export const initUser: Record<string, IInitUser> = {
     username: 'user-12',
     password: getRandomString(6),
     avatar: '',
-    user_roles: [5],
+    user_roles: [DEFAULT_ROLE_INFO.VIP_USER.id],
     live_room: {
       id: 12,
       name: 'billd-live付费课',
@@ -276,7 +276,7 @@ export const initUser: Record<string, IInitUser> = {
     username: 'user-100',
     password: getRandomString(6),
     avatar: '',
-    user_roles: [5],
+    user_roles: [DEFAULT_ROLE_INFO.VIP_USER.id],
     live_room: {
       id: 100,
       name: '周杰伦-一路向北',

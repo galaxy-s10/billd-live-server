@@ -6,7 +6,8 @@ import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import { SRS_CONFIG } from '@/config/secret';
 import { wsSocket } from '@/config/websocket';
-import { ALLOW_HTTP_CODE, LOCALHOST_URL } from '@/constant';
+import { ALLOW_HTTP_CODE, DEFAULT_AUTH_INFO, LOCALHOST_URL } from '@/constant';
+import authController from '@/controller/auth.controller';
 import { ISrsRTC, LiveRoomPullIsShouldAuthEnum } from '@/interface';
 import { IApiV1Clients, IApiV1Streams } from '@/interface-srs';
 import { WsMsgTypeEnum } from '@/interface-ws';
@@ -235,6 +236,23 @@ class SRSController {
         ctx.body = {
           code: 1,
           msg: `[on_play] fail, duration: ${duration}, token fail`,
+        };
+        await next();
+        return;
+      }
+      const authArr = await authController.common.getUserAuth(userInfo.id!);
+      if (
+        !authArr.find((item) => item.id === DEFAULT_AUTH_INFO.LIVE_PULL_SVIP.id)
+      ) {
+        duration = Math.floor(performance.now() - startTime);
+        console.log(
+          chalkERROR(
+            `[on_play] 耗时：${duration}，鉴权失败，缺少权限，不允许拉流`
+          )
+        );
+        ctx.body = {
+          code: 1,
+          msg: `[on_play] fail, duration: ${duration}, auth fail`,
         };
         await next();
         return;

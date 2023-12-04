@@ -87,36 +87,40 @@ class LiveRoomService {
     // @ts-ignore
     const result = await liveRoomModel.findAndCountAll({
       include: [
+        // {
+        //   model: userLiveRoomModel,
+        //   include: [
+        //     {
+        //       model: userModel,
+        //       attributes: {
+        //         exclude: ['password', 'token'],
+        //       },
+        //     },
+        //   ],
+        //   required: true,
+        //   // attributes: [],
+        // },
         {
-          model: userLiveRoomModel,
-          include: [
-            {
-              model: userModel,
-              attributes: {
-                exclude: ['password', 'token'],
-              },
-            },
-          ],
-          required: true,
-          attributes: [],
+          model: userModel,
+          attributes: {
+            exclude: ['password', 'token'],
+          },
         },
         {
           model: liveModel,
         },
         {
           model: areaModel,
-          through: {
-            attributes: [],
-          },
         },
       ],
       attributes: {
         exclude: ['key'],
-        include: [
-          [col('user_live_room.user.id'), 'user_id'],
-          [col('user_live_room.user.username'), 'user_username'],
-          [col('user_live_room.user.avatar'), 'user_avatar'],
-        ],
+        // include: [
+        //   [col('user_live_room.id'), 'idd'],
+        //   [col('user_live_room.user.id'), 'user_id'],
+        //   [col('user_live_room.user.username'), 'user_username'],
+        //   [col('user_live_room.user.avatar'), 'user_avatar'],
+        // ],
       },
       distinct: true,
       order: [[orderName, orderBy]],

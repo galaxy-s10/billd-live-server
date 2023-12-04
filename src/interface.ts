@@ -1,12 +1,3 @@
-export enum AUTH_ENUM {
-  ALL_AUTH = 'ALL_AUTH',
-  USER_MANAGE = 'USER_MANAGE',
-  ROLE_MANAGE = 'ROLE_MANAGE',
-  AUTH_MANAGE = 'AUTH_MANAGE',
-  LIVE_MANAGE = 'LIVE_MANAGE',
-  LIVE_PULL = 'LIVE_PULL',
-}
-
 export interface IInitUser {
   id: number;
   username: string;

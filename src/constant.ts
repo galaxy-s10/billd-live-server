@@ -111,3 +111,81 @@ export const THIRD_PLATFORM = {
   website: 1, // 站内（user表里面的用户就是这个类型，但是不记录在third_user表里）
   qq: 2, // qq
 };
+
+export const DEFAULT_AUTH_INFO = {
+  ALL_AUTH: {
+    id: 1,
+    auth_value: 'ALL_AUTH',
+  },
+  USER_MANAGE: {
+    id: 2,
+    auth_value: 'USER_MANAGE',
+  },
+  ROLE_MANAGE: {
+    id: 3,
+    auth_value: 'ROLE_MANAGE',
+  },
+  AUTH_MANAGE: {
+    id: 4,
+    auth_value: 'AUTH_MANAGE',
+  },
+  COMMONENT_MANAGE: {
+    id: 5,
+    auth_value: 'COMMONENT_MANAGE',
+  },
+  LOG_MANAGE: {
+    id: 6,
+    auth_value: 'LOG_MANAGE',
+  },
+  LIVE_MANAGE: {
+    id: 7,
+    auth_value: 'LIVE_MANAGE',
+  },
+  LIVE_PUSH: {
+    id: 8,
+    auth_value: 'LIVE_PUSH',
+  },
+  LIVE_PULL: {
+    id: 9,
+    auth_value: 'LIVE_PULL',
+  },
+  LIVE_PULL_SVIP: {
+    id: 10,
+    auth_value: 'LIVE_PULL_SVIP',
+  },
+};
+
+export const DEFAULT_ROLE_INFO = {
+  ALL_ROLE: {
+    id: 1,
+    role_value: 'ALL_ROLE',
+  },
+  ADMIN: {
+    id: 2,
+    role_value: 'ADMIN',
+  },
+  SUPER_ADMIN: {
+    id: 3,
+    role_value: 'SUPER_ADMIN',
+  },
+  LIVE_ADMIN: {
+    id: 4,
+    role_value: 'LIVE_ADMIN',
+  },
+  USER: {
+    id: 5,
+    role_value: 'USER',
+  },
+  VIP_USER: {
+    id: 6,
+    role_value: 'VIP_USER',
+  },
+  SVIP_USER: {
+    id: 7,
+    role_value: 'SVIP_USER',
+  },
+  TOURIST_USER: {
+    id: 8,
+    role_value: 'TOURIST_USER',
+  },
+};

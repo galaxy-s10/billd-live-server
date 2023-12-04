@@ -20,7 +20,7 @@ class AuthController {
         queue.push(roleService.getRoleAuth(item.id));
       });
       const queueRes = await Promise.all(queue);
-      const res: any[] = [];
+      const res: IAuth[] = [];
       queueRes.forEach((item) => {
         res.push(...item);
       });

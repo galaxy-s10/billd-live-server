@@ -1,11 +1,5 @@
-import {
-  AUTH_ENUM,
-  GoodsTypeEnum,
-  IArea,
-  IAuth,
-  IGoods,
-  IRole,
-} from '@/interface';
+import { DEFAULT_AUTH_INFO, DEFAULT_ROLE_INFO } from '@/constant';
+import { GoodsTypeEnum, IArea, IAuth, IGoods, IRole } from '@/interface';
 
 export const bulkCreateArea: IArea[] = [
   {
@@ -37,52 +31,84 @@ export const bulkCreateArea: IArea[] = [
 const initAuth = () => {
   const deafultAuth: IAuth[] = [
     {
-      id: 1,
+      id: DEFAULT_AUTH_INFO.ALL_AUTH.id,
       auth_name: '全部权限',
-      auth_value: AUTH_ENUM.ALL_AUTH,
+      auth_value: DEFAULT_AUTH_INFO.ALL_AUTH.auth_value,
       type: 1,
       priority: 99,
       p_id: 0,
     },
     {
-      id: 2,
+      id: DEFAULT_AUTH_INFO.USER_MANAGE.id,
       auth_name: '用户管理',
-      auth_value: AUTH_ENUM.USER_MANAGE,
+      auth_value: DEFAULT_AUTH_INFO.USER_MANAGE.auth_value,
       type: 1,
       priority: 99,
-      p_id: 1,
+      p_id: DEFAULT_AUTH_INFO.ALL_AUTH.id,
     },
     {
-      id: 3,
+      id: DEFAULT_AUTH_INFO.ROLE_MANAGE.id,
       auth_name: '角色管理',
-      auth_value: AUTH_ENUM.ROLE_MANAGE,
+      auth_value: DEFAULT_AUTH_INFO.ROLE_MANAGE.auth_value,
       type: 1,
       priority: 99,
-      p_id: 1,
+      p_id: DEFAULT_AUTH_INFO.ALL_AUTH.id,
     },
     {
-      id: 4,
+      id: DEFAULT_AUTH_INFO.AUTH_MANAGE.id,
       auth_name: '权限管理',
-      auth_value: AUTH_ENUM.AUTH_MANAGE,
+      auth_value: DEFAULT_AUTH_INFO.AUTH_MANAGE.auth_value,
       type: 1,
       priority: 99,
-      p_id: 1,
+      p_id: DEFAULT_AUTH_INFO.ALL_AUTH.id,
     },
     {
-      id: 5,
+      id: DEFAULT_AUTH_INFO.COMMONENT_MANAGE.id,
+      auth_name: '评论管理',
+      auth_value: DEFAULT_AUTH_INFO.COMMONENT_MANAGE.auth_value,
+      type: 1,
+      priority: 99,
+      p_id: DEFAULT_AUTH_INFO.ALL_AUTH.id,
+    },
+    {
+      id: DEFAULT_AUTH_INFO.LOG_MANAGE.id,
+      auth_name: '日志管理',
+      auth_value: DEFAULT_AUTH_INFO.LOG_MANAGE.auth_value,
+      type: 1,
+      priority: 99,
+      p_id: DEFAULT_AUTH_INFO.ALL_AUTH.id,
+    },
+    {
+      id: DEFAULT_AUTH_INFO.LIVE_MANAGE.id,
       auth_name: '直播管理',
-      auth_value: AUTH_ENUM.LIVE_MANAGE,
+      auth_value: DEFAULT_AUTH_INFO.LIVE_MANAGE.auth_value,
       type: 1,
       priority: 99,
-      p_id: 1,
+      p_id: DEFAULT_AUTH_INFO.ALL_AUTH.id,
     },
     {
-      id: 6,
-      auth_name: '直播拉流',
-      auth_value: AUTH_ENUM.LIVE_PULL,
+      id: DEFAULT_AUTH_INFO.LIVE_PUSH.id,
+      auth_name: '直播推流',
+      auth_value: DEFAULT_AUTH_INFO.LIVE_PUSH.auth_value,
       type: 1,
       priority: 99,
-      p_id: 5,
+      p_id: DEFAULT_AUTH_INFO.LIVE_MANAGE.id,
+    },
+    {
+      id: DEFAULT_AUTH_INFO.LIVE_PULL.id,
+      auth_name: '直播拉流',
+      auth_value: DEFAULT_AUTH_INFO.LIVE_PULL.auth_value,
+      type: 1,
+      priority: 99,
+      p_id: DEFAULT_AUTH_INFO.LIVE_MANAGE.id,
+    },
+    {
+      id: DEFAULT_AUTH_INFO.LIVE_PULL_SVIP.id,
+      auth_name: '直播拉流（svip）',
+      auth_value: DEFAULT_AUTH_INFO.LIVE_PULL_SVIP.auth_value,
+      type: 1,
+      priority: 99,
+      p_id: DEFAULT_AUTH_INFO.LIVE_MANAGE.id,
     },
   ];
 
@@ -92,52 +118,68 @@ const initAuth = () => {
 const initRole = () => {
   const defaultRole: IRole[] = [
     {
-      id: 1,
+      id: DEFAULT_ROLE_INFO.ALL_ROLE.id,
       role_name: '全部角色',
-      role_value: 'ALL_ROLE',
+      role_value: DEFAULT_ROLE_INFO.ALL_ROLE.role_value,
       type: 1,
       priority: 99,
       p_id: 0,
     },
     {
-      id: 2,
+      id: DEFAULT_ROLE_INFO.ADMIN.id,
       role_name: '管理员',
-      role_value: 'ADMIN',
+      role_value: DEFAULT_ROLE_INFO.ADMIN.role_value,
       type: 1,
       priority: 99,
-      p_id: 1,
+      p_id: DEFAULT_ROLE_INFO.ALL_ROLE.id,
     },
     {
-      id: 3,
+      id: DEFAULT_ROLE_INFO.SUPER_ADMIN.id,
       role_name: '超级管理员',
-      role_value: 'SUPER_ADMIN',
+      role_value: DEFAULT_ROLE_INFO.SUPER_ADMIN.role_value,
       type: 1,
       priority: 99,
-      p_id: 2,
+      p_id: DEFAULT_ROLE_INFO.ADMIN.id,
     },
     {
-      id: 4,
+      id: DEFAULT_ROLE_INFO.LIVE_ADMIN.id,
+      role_name: '直播超管',
+      role_value: DEFAULT_ROLE_INFO.LIVE_ADMIN.role_value,
+      type: 1,
+      priority: 99,
+      p_id: DEFAULT_ROLE_INFO.ADMIN.id,
+    },
+    {
+      id: DEFAULT_ROLE_INFO.USER.id,
       role_name: '用户',
-      role_value: 'USER',
+      role_value: DEFAULT_ROLE_INFO.USER.role_value,
       type: 1,
       priority: 99,
-      p_id: 1,
+      p_id: DEFAULT_ROLE_INFO.ALL_ROLE.id,
     },
     {
-      id: 5,
+      id: DEFAULT_ROLE_INFO.VIP_USER.id,
       role_name: 'VIP用户',
-      role_value: 'VIP_USER',
+      role_value: DEFAULT_ROLE_INFO.VIP_USER.role_value,
       type: 1,
       priority: 99,
-      p_id: 4,
+      p_id: DEFAULT_ROLE_INFO.USER.id,
     },
     {
-      id: 6,
-      role_name: '游客',
-      role_value: 'TOURIST_USER',
+      id: DEFAULT_ROLE_INFO.SVIP_USER.id,
+      role_name: 'SVIP用户',
+      role_value: DEFAULT_ROLE_INFO.SVIP_USER.role_value,
       type: 1,
       priority: 99,
-      p_id: 4,
+      p_id: DEFAULT_ROLE_INFO.USER.id,
+    },
+    {
+      id: DEFAULT_ROLE_INFO.TOURIST_USER.id,
+      role_name: '游客',
+      role_value: DEFAULT_ROLE_INFO.TOURIST_USER.role_value,
+      type: 1,
+      priority: 99,
+      p_id: DEFAULT_ROLE_INFO.USER.id,
     },
   ];
   return defaultRole;
@@ -155,6 +197,66 @@ const initRoleAuth = () => {
       auth_id: v.id,
     });
   });
+  [
+    DEFAULT_AUTH_INFO.AUTH_MANAGE,
+    DEFAULT_AUTH_INFO.ROLE_MANAGE,
+    DEFAULT_AUTH_INFO.USER_MANAGE,
+    DEFAULT_AUTH_INFO.COMMONENT_MANAGE,
+    DEFAULT_AUTH_INFO.LIVE_MANAGE,
+    DEFAULT_AUTH_INFO.LIVE_PUSH,
+    DEFAULT_AUTH_INFO.LIVE_PULL,
+    DEFAULT_AUTH_INFO.LIVE_PULL_SVIP,
+  ].forEach((item) => {
+    id += 1;
+    roleAuth.push({
+      id,
+      role_id: DEFAULT_ROLE_INFO.SUPER_ADMIN.id,
+      auth_id: item.id,
+    });
+  });
+
+  [
+    DEFAULT_AUTH_INFO.USER_MANAGE,
+    DEFAULT_AUTH_INFO.COMMONENT_MANAGE,
+    DEFAULT_AUTH_INFO.LIVE_MANAGE,
+    DEFAULT_AUTH_INFO.LIVE_PUSH,
+    DEFAULT_AUTH_INFO.LIVE_PULL,
+    DEFAULT_AUTH_INFO.LIVE_PULL_SVIP,
+  ].forEach((item) => {
+    id += 1;
+    roleAuth.push({
+      id,
+      role_id: DEFAULT_ROLE_INFO.LIVE_ADMIN.id,
+      auth_id: item.id,
+    });
+  });
+  [
+    DEFAULT_AUTH_INFO.COMMONENT_MANAGE,
+    DEFAULT_AUTH_INFO.LIVE_PUSH,
+    DEFAULT_AUTH_INFO.LIVE_PULL,
+    DEFAULT_AUTH_INFO.LIVE_PULL_SVIP,
+  ].forEach((item) => {
+    id += 1;
+    roleAuth.push({
+      id,
+      role_id: DEFAULT_ROLE_INFO.SVIP_USER.id,
+      auth_id: item.id,
+    });
+  });
+
+  [
+    DEFAULT_AUTH_INFO.COMMONENT_MANAGE,
+    DEFAULT_AUTH_INFO.LIVE_PUSH,
+    DEFAULT_AUTH_INFO.LIVE_PULL,
+  ].forEach((item) => {
+    id += 1;
+    roleAuth.push({
+      id,
+      role_id: DEFAULT_ROLE_INFO.VIP_USER.id,
+      auth_id: item.id,
+    });
+  });
+
   return roleAuth;
 };
 
