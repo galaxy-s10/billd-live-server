@@ -8,7 +8,7 @@ import { SRS_CONFIG } from '@/config/secret';
 import { wsSocket } from '@/config/websocket';
 import { ALLOW_HTTP_CODE, DEFAULT_AUTH_INFO, LOCALHOST_URL } from '@/constant';
 import authController from '@/controller/auth.controller';
-import { ISrsRTC, LiveRoomPullIsShouldAuthEnum } from '@/interface';
+import { ISrsCb, ISrsRTC, LiveRoomPullIsShouldAuthEnum } from '@/interface';
 import { IApiV1Clients, IApiV1Streams } from '@/interface-srs';
 import { WsMsgTypeEnum } from '@/interface-ws';
 import { CustomError } from '@/model/customError.model';
@@ -86,6 +86,29 @@ class SRSController {
     await next();
   };
 
+  deleteAudience = async (ctx: ParameterizedContext, next) => {
+    const { userInfo } = await authJwt(ctx);
+    if (userInfo?.id !== 1) {
+      throw new CustomError(
+        `权限不足！`,
+        ALLOW_HTTP_CODE.forbidden,
+        ALLOW_HTTP_CODE.forbidden
+      );
+    }
+    const id = +ctx.params.id;
+    const livePlayInfo = await livePlayService.find(id);
+    let res;
+    if (livePlayInfo) {
+      res = await this.common.deleteApiV1Clients(livePlayInfo.srs_client_id!);
+    }
+    await livePlayService.delete(id);
+    successHandler({
+      ctx,
+      data: res,
+    });
+    await next();
+  };
+
   deleteApiV1Clients = async (ctx: ParameterizedContext, next) => {
     const { userInfo } = await authJwt(ctx);
     if (userInfo?.id !== 1) {
@@ -96,6 +119,20 @@ class SRSController {
       );
     }
     const { clientId }: { clientId: string } = ctx.params;
+    const res1 = await this.common.getApiV1ClientDetail(clientId);
+    if (res1.code === 0) {
+      if (res1.client.type === 'hls-play' || res1.client.type === 'flv-play') {
+        const roomIdStr = res1.client.name.replace(/\.m3u8$/g, '');
+        const reg = /^roomId___(\d+)$/g;
+        const roomId = reg.exec(roomIdStr)?.[1];
+        await livePlayService.deleteByLiveRoomIdAndUserId({
+          live_room_id: Number(roomId),
+          user_id: userInfo.id,
+          srs_client_id: res1.client.id,
+          srs_ip: res1.client.ip,
+        });
+      }
+    }
     const res = await this.common.deleteApiV1Clients(clientId);
     successHandler({
       ctx,
@@ -107,7 +144,8 @@ class SRSController {
   async onStop(ctx: ParameterizedContext, next) {
     // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
     // code等于数字0表示成功，其他错误码代表失败。
-    const { body } = ctx.request;
+    // @ts-ignore
+    const { body }: { body: ISrsCb } = ctx.request;
     console.log(chalkWARN(`on_stop参数`), body);
 
     const roomIdStr = body.stream.replace(/\.m3u8$/g, '');
@@ -116,7 +154,7 @@ class SRSController {
 
     if (!roomId) {
       console.log(chalkERROR(`[on_stop] 房间id不存在！`));
-      ctx.body = { code: 1, msg: '[on_stop] fail, roomId is not exist' };
+      ctx.body = { code: 0, msg: '[on_stop] fail, roomId is not exist' };
       await next();
       return;
     }
@@ -125,34 +163,45 @@ class SRSController {
     ]);
     if (!liveRoomInfo) {
       console.log(chalkERROR('[on_stop] liveRoomInfo为空'));
-      ctx.body = { code: 1, msg: '[on_stop] fail, liveRoomInfo is not exist' };
+      ctx.body = { code: 0, msg: '[on_stop] fail, liveRoomInfo is not exist' };
       await next();
       return;
     }
     const params = new URLSearchParams(body.param);
     const paramsUserToken = params.get('usertoken');
     const paramsUserid = params.get('userid');
+    const paramsRandomid = params.get('randomid');
     const userInfo = await userService.findAndToken(Number(paramsUserid));
     if (!userInfo) {
+      if (paramsRandomid) {
+        await livePlayService.deleteByLiveRoomIdAndRandomId({
+          live_room_id: Number(roomId),
+          random_id: paramsRandomid,
+          srs_client_id: body.client_id,
+          srs_ip: body.ip,
+        });
+      }
       console.log(chalkERROR(`[on_stop] 用户不存在，不允许stop`));
       ctx.body = {
-        code: 1,
+        code: 0,
         msg: '[on_stop] fail, userInfo is not exist',
       };
-      await next();
-      return;
-    }
-    const token = MD5(userInfo.token!).toString();
-    if (token !== paramsUserToken) {
-      console.log(chalkERROR(`[on_stop] 鉴权失败，不允许stop`));
-      ctx.body = { code: 1, msg: '[on_stop] fail, token fail' };
       await next();
       return;
     }
     await livePlayService.deleteByLiveRoomIdAndUserId({
       live_room_id: Number(roomId),
       user_id: userInfo.id!,
+      srs_client_id: body.client_id,
+      srs_ip: body.ip,
     });
+    const token = MD5(userInfo.token!).toString();
+    if (token !== paramsUserToken) {
+      console.log(chalkERROR(`[on_stop] 鉴权失败，不允许stop`));
+      ctx.body = { code: 0, msg: '[on_stop] fail, token fail' };
+      await next();
+      return;
+    }
     console.log(
       chalkSUCCESS(`[on_stop] 房间id：${roomId}，所有验证通过，允许stop`)
     );
@@ -165,7 +214,8 @@ class SRSController {
     // code等于数字0表示成功，其他错误码代表失败。
     const startTime = performance.now();
     let duration = -1;
-    const { body } = ctx.request;
+    // @ts-ignore
+    const { body }: { body: ISrsCb } = ctx.request;
     console.log(chalkWARN(`on_play参数`), body);
 
     const roomIdStr = body.stream.replace(/\.m3u8$/g, '');
@@ -257,23 +307,32 @@ class SRSController {
         await next();
         return;
       }
-      await livePlayService.create({
+      const isExist = await livePlayService.findAll({
         live_room_id: Number(roomId),
         user_id: userInfo.id,
         random_id: paramsRandomid || '-1',
-        srs_action: body.action,
-        srs_app: body.app,
-        srs_client_id: body.client_id,
-        srs_ip: body.ip,
-        srs_param: body.param,
-        srs_server_id: body.server_id,
-        srs_service_id: body.service_id,
-        srs_stream: body.stream,
-        srs_stream_id: body.stream_id,
-        srs_stream_url: body.stream_url,
-        srs_tcUrl: body.tcUrl,
-        srs_vhost: body.vhost,
+        rangTimeStart: +new Date() - 1000 * 3,
+        rangTimeEnd: +new Date() + 1000 * 3,
       });
+      if (!isExist.length) {
+        await livePlayService.create({
+          live_room_id: Number(roomId),
+          user_id: userInfo.id,
+          random_id: paramsRandomid || '-1',
+          srs_action: body.action,
+          srs_app: body.app,
+          srs_client_id: body.client_id,
+          srs_ip: body.ip,
+          srs_param: body.param,
+          srs_server_id: body.server_id,
+          srs_service_id: body.service_id,
+          srs_stream: body.stream,
+          srs_stream_id: body.stream_id,
+          srs_stream_url: body.stream_url,
+          srs_tcUrl: body.tcUrl,
+          srs_vhost: body.vhost,
+        });
+      }
       duration = Math.floor(performance.now() - startTime);
       console.log(
         chalkSUCCESS(
@@ -286,23 +345,33 @@ class SRSController {
       };
       await next();
     } else {
-      await livePlayService.create({
+      const isExist = await livePlayService.findAll({
         live_room_id: Number(roomId),
         user_id: -1,
         random_id: paramsRandomid || '-1',
-        srs_action: body.action,
-        srs_app: body.app,
-        srs_client_id: body.client_id,
-        srs_ip: body.ip,
-        srs_param: body.param,
-        srs_server_id: body.server_id,
-        srs_service_id: body.service_id,
-        srs_stream: body.stream,
-        srs_stream_id: body.stream_id,
-        srs_stream_url: body.stream_url,
-        srs_tcUrl: body.tcUrl,
-        srs_vhost: body.vhost,
+        rangTimeStart: +new Date() - 1000 * 3,
+        rangTimeEnd: +new Date() + 1000 * 3,
       });
+      if (!isExist.length) {
+        await livePlayService.create({
+          live_room_id: Number(roomId),
+          user_id: -1,
+          random_id: paramsRandomid || '-1',
+          srs_action: body.action,
+          srs_app: body.app,
+          srs_client_id: body.client_id,
+          srs_ip: body.ip,
+          srs_param: body.param,
+          srs_server_id: body.server_id,
+          srs_service_id: body.service_id,
+          srs_stream: body.stream,
+          srs_stream_id: body.stream_id,
+          srs_stream_url: body.stream_url,
+          srs_tcUrl: body.tcUrl,
+          srs_vhost: body.vhost,
+        });
+      }
+
       duration = Math.floor(performance.now() - startTime);
       console.log(
         chalkSUCCESS(
@@ -320,7 +389,8 @@ class SRSController {
   onPublish = async (ctx: ParameterizedContext, next) => {
     // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
     // code等于数字0表示成功，其他错误码代表失败。
-    const { body } = ctx.request;
+    // @ts-ignore
+    const { body }: { body: ISrsCb } = ctx.request;
     console.log(chalkWARN(`on_publish参数`), body);
 
     const roomIdStr = body.stream.replace(/\.m3u8$/g, '');

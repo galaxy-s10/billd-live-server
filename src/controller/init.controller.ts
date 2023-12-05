@@ -157,7 +157,6 @@ class InitController {
           const userInfo = {
             id: user.id,
             username: user.username,
-            password: user.password,
             avatar: user.avatar,
           };
           const exp = 24; // token过期时间：24小时

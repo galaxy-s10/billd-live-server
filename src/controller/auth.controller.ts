@@ -14,7 +14,7 @@ import { arrayToTree } from '@/utils';
 class AuthController {
   common = {
     getUserAuth: async (userId: number) => {
-      const myAllRole = await roleService.getMyRole(userId);
+      const myAllRole = await roleService.getUserRole(userId);
       const queue: Promise<any>[] = [];
       myAllRole.forEach((item) => {
         queue.push(roleService.getRoleAuth(item.id));

@@ -1,10 +1,8 @@
-import Sequelize from 'sequelize';
+import { Op } from 'sequelize';
 
 import { IList, IQqUser } from '@/interface';
 import qqUserModel from '@/model/qqUser.model';
 import { handlePaging } from '@/utils';
-
-const { Op } = Sequelize;
 
 class QQUserService {
   /** 所有应用里面是否存在qq用户 */

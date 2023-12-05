@@ -5,6 +5,7 @@ import { authJwt, signJwt } from '@/app/auth/authJwt';
 import { verifyUserAuth } from '@/app/auth/verifyUserAuth';
 import successHandler from '@/app/handler/success-handle';
 import { ALLOW_HTTP_CODE, PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import authController from '@/controller/auth.controller';
 import { IList, IUser } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import roleService from '@/service/role.service';
@@ -17,7 +18,7 @@ class UserController {
 
   login = async (ctx: ParameterizedContext, next) => {
     const { id, password, exp = 24 } = ctx.request.body;
-    const userInfo: any = await userService.login({ id, password });
+    const userInfo = await userService.login({ id, password });
     if (!userInfo) {
       throw new CustomError(
         '账号或密码错误！',
@@ -79,9 +80,13 @@ class UserController {
 
   async getUserInfo(ctx: ParameterizedContext, next) {
     const { code, userInfo, message } = await authJwt(ctx);
-    if (code === ALLOW_HTTP_CODE.ok) {
-      const result = await userService.getUserInfo(userInfo!.id!);
-      successHandler({ ctx, data: result });
+    if (code === ALLOW_HTTP_CODE.ok && userInfo) {
+      const [auths, result] = await Promise.all([
+        authController.common.getUserAuth(userInfo.id!),
+        userService.getUserInfo(userInfo.id!),
+      ]);
+      // 获取纯净的对象，避免循环引用
+      successHandler({ ctx, data: { ...result?.get({ plain: true }), auths } });
       await next();
     } else {
       throw new CustomError(message, code, code);
@@ -154,7 +159,7 @@ class UserController {
         ALLOW_HTTP_CODE.paramsError
       );
     }
-    const isExistSameName: any = await userService.isSameName(username);
+    const isExistSameName = await userService.isSameName(username);
     if (isExistSameName && isExistSameName.id !== id) {
       throw new CustomError(
         `已存在用户名为${username}的用户！`,

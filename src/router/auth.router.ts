@@ -5,10 +5,10 @@ import { verifyProp } from '@/middleware/auth.middleware';
 
 const authRouter = new Router({ prefix: '/auth' });
 
-// DONE 获取我的权限
+// DONE 获取我的权限（递归查找所有）
 authRouter.get('/get_my_auth', authController.getMyAuth);
 
-// DONE 获取某个用户的权限
+// DONE 获取某个用户的权限（递归查找所有）
 authRouter.get('/get_user_auth/:id', authController.getUserAuth);
 
 // DONE 权限列表（分页）

@@ -10,6 +10,7 @@ import {
 } from '@/config/secret';
 import {
   ALLOW_HTTP_CODE,
+  DEFAULT_ROLE_INFO,
   PROJECT_ENV,
   PROJECT_ENV_ENUM,
   THIRD_PLATFORM,
@@ -183,29 +184,32 @@ class QqUserController {
     const isExist = await qqUserService.isExistUnionid(OauthInfo.unionid);
     if (!isExist) {
       console.log('不存在qq账号');
-      const qqUser: any = await qqUserService.create(qqUserInfo);
-      const userInfo: any = await userService.create({
+      const qqUser = await qqUserService.create(qqUserInfo);
+      const userInfo = await userService.create({
         username: qqUserInfo.nickname,
         password: getRandomString(8),
         avatar: qqUserInfo.figureurl_2,
       });
       if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
-        // 生产环境注册用户权限就是SVIP用户
-        await userInfo.setRoles([5]);
+        // 生产环境注册用户权限就是VIP用户
+        // @ts-ignore
+        await userInfo.setRoles([DEFAULT_ROLE_INFO.VIP_USER.id]);
       } else {
         // 非生产环境注册用户权限就是SUPER_ADMIN管理员
-        await userInfo.setRoles([2, 3]);
+        // @ts-ignore
+        await userInfo.setRoles([DEFAULT_ROLE_INFO.SUPER_ADMIN.id]);
       }
-      await walletService.create({ user_id: userInfo?.id, balance: '0.00' });
+      await walletService.create({ user_id: userInfo.id, balance: '0.00' });
       await thirdUserModel.create({
-        user_id: userInfo?.id,
+        user_id: userInfo.id,
         third_user_id: qqUser.id,
         third_platform: THIRD_PLATFORM.qq,
       });
       const token = signJwt({
         userInfo: {
-          ...JSON.parse(JSON.stringify(userInfo)),
-          qq_users: undefined,
+          id: userInfo.id,
+          username: userInfo.username,
+          avatar: userInfo.avatar,
         },
         exp,
       });
@@ -261,23 +265,43 @@ class QqUserController {
     } else {
       console.log('已存在qq账号');
       await qqUserService.update(qqUserInfo);
-      const oldQqUser: any = await qqUserService.findByUnionid(
-        OauthInfo.unionid
-      );
-      const thirdUserInfo: any = await thirdUserService.findUser({
+      const oldQqUser = await qqUserService.findByUnionid(OauthInfo.unionid);
+      if (!oldQqUser) {
+        throw new CustomError(
+          `qq登录oldQqUser错误`,
+          ALLOW_HTTP_CODE.paramsError,
+          ALLOW_HTTP_CODE.paramsError
+        );
+      }
+      const thirdUserInfo = await thirdUserService.findUser({
         third_platform: THIRD_PLATFORM.qq,
         third_user_id: oldQqUser.id,
       });
-      const userInfo: any = await userService.find(thirdUserInfo.user_id);
+      if (!thirdUserInfo) {
+        throw new CustomError(
+          `qq登录thirdUserInfo错误`,
+          ALLOW_HTTP_CODE.paramsError,
+          ALLOW_HTTP_CODE.paramsError
+        );
+      }
+      const userInfo = await userService.find(thirdUserInfo.user_id!);
+      if (!userInfo) {
+        throw new CustomError(
+          `qq登录userInfo错误`,
+          ALLOW_HTTP_CODE.paramsError,
+          ALLOW_HTTP_CODE.paramsError
+        );
+      }
       const token = signJwt({
         userInfo: {
-          ...JSON.parse(JSON.stringify(userInfo)),
-          qq_users: undefined,
+          id: userInfo.id,
+          username: userInfo.username,
+          avatar: userInfo.avatar,
         },
         exp,
       });
       await userService.update({
-        id: userInfo?.id,
+        id: userInfo.id,
         token,
       });
       if (ctx.header.origin?.indexOf('localhost') !== -1) {
@@ -336,7 +360,6 @@ class QqUserController {
   };
 
   async list(ctx: ParameterizedContext, next) {
-    // @ts-ignore
     const {
       id,
       orderBy = 'asc',

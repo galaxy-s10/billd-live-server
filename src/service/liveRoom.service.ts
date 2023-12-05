@@ -1,5 +1,5 @@
 import { deleteUseLessObjectKey, isPureNumber } from 'billd-utils';
-import Sequelize from 'sequelize';
+import { Op } from 'sequelize';
 
 import { IList, ILiveRoom } from '@/interface';
 import areaModel from '@/model/area.model';
@@ -8,8 +8,6 @@ import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
 import userLiveRoomModel from '@/model/userLiveRoom.model';
 import { handlePaging } from '@/utils';
-
-const { Op, col } = Sequelize;
 
 class LiveRoomService {
   /** 直播间是否存在 */
@@ -105,12 +103,14 @@ class LiveRoomService {
           attributes: {
             exclude: ['password', 'token'],
           },
+          through: { attributes: [] },
         },
         {
           model: liveModel,
         },
         {
           model: areaModel,
+          through: { attributes: [] },
         },
       ],
       attributes: {

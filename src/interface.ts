@@ -48,6 +48,21 @@ export enum DanmuMsgTypeEnum {
   userLeaved,
 }
 
+export interface ISrsCb {
+  server_id: string;
+  service_id: string;
+  action: string;
+  client_id: string;
+  ip: string;
+  vhost: string;
+  app: string;
+  tcUrl: string;
+  stream: string;
+  param: string;
+  stream_url: string;
+  stream_id: string;
+}
+
 export interface ISrsRTC {
   api: string;
   clientip: any;

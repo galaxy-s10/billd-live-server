@@ -49,11 +49,17 @@ roleRouter.get('/get_child_role/:id', roleController.getChildRole);
 // DONE 获取该角色的子角色（递归查找所有）
 roleRouter.get('/get_all_child_role/:id', roleController.getAllChildRole);
 
-// DONE 获取某个用户的角色
+// DONE 获取用户的角色
 roleRouter.get('/get_user_role/:user_id', roleController.getUserRole);
+
+// DONE 获取用户的角色（递归找所有）
+roleRouter.get('/get_user_all_role/:user_id', roleController.getUserAllRole);
 
 // DONE 获取我的角色
 roleRouter.get('/get_my_role', roleController.getMyRole);
+
+// DONE 获取我的角色（递归找所有）
+roleRouter.get('/get_my_all_role', roleController.getMyAllRole);
 
 // DONE 获取某个角色的权限
 roleRouter.get('/get_role_auth/:id', roleController.getRoleAuth);

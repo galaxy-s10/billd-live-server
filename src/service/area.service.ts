@@ -1,5 +1,5 @@
 import { deleteUseLessObjectKey } from 'billd-utils';
-import Sequelize from 'sequelize';
+import { Op, literal } from 'sequelize';
 
 import { IArea, IList } from '@/interface';
 import areaModel from '@/model/area.model';
@@ -8,8 +8,6 @@ import liveModel from '@/model/live.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
 import { handlePaging } from '@/utils';
-
-const { Op, col, literal } = Sequelize;
 
 class AreaService {
   /** 分区是否存在 */

@@ -17,6 +17,9 @@ userRouter.get('/get_user_info', userController.getUserInfo);
 // 查找用户
 userRouter.get('/find/:id', userController.find);
 
+// 修改密码
+userRouter.put('/update_pwd', userController.updatePwd);
+
 // 更新用户角色
 userRouter.put(
   '/update_user_role/:id',

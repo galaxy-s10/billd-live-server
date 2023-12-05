@@ -1,12 +1,10 @@
 import { deleteUseLessObjectKey } from 'billd-utils';
-import Sequelize from 'sequelize';
+import { Op, cast, col } from 'sequelize';
 
 import { IList, IWallet } from '@/interface';
 import userModel from '@/model/user.model';
 import walletModel from '@/model/wallet.model';
 import { handlePaging } from '@/utils';
-
-const { Op, col, cast } = Sequelize;
 
 class WalletService {
   /** 钱包是否存在 */

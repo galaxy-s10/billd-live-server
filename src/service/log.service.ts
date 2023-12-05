@@ -1,10 +1,8 @@
-import Sequelize from 'sequelize';
+import { Op } from 'sequelize';
 
 import { IList, ILog } from '@/interface';
 import logModel from '@/model/log.model';
 import { handlePaging } from '@/utils';
-
-const { Op } = Sequelize;
 
 class LogService {
   /** 日志是否存在 */

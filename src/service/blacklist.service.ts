@@ -1,10 +1,8 @@
-import Sequelize from 'sequelize';
+import { Op } from 'sequelize';
 
 import { IBlacklist, IList } from '@/interface';
 import blacklistModel from '@/model/blacklist.model';
 import { handlePaging } from '@/utils';
-
-const { Op } = Sequelize;
 
 class BlackListService {
   /** 黑名单是否存在 */

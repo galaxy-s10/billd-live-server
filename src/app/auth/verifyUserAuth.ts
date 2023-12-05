@@ -1,18 +1,17 @@
 import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
-import { ALLOW_HTTP_CODE } from '@/constant';
+import { ALLOW_HTTP_CODE, DEFAULT_ROLE_INFO } from '@/constant';
 import roleService from '@/service/role.service';
 
 export const verifyUserAuth = async (ctx: ParameterizedContext) => {
-  const { code, userInfo, message } = await authJwt(ctx);
+  const { code, userInfo } = await authJwt(ctx);
   if (code !== ALLOW_HTTP_CODE.ok) {
-    console.log(message);
     return false;
   }
-  const result: any = await roleService.getMyRole(userInfo!.id!);
+  const result = await roleService.getUserRole(userInfo!.id!);
   const roles = result.map((v) => v.role_value);
-  if (roles.includes('SUPER_ADMIN')) {
+  if (roles.includes(DEFAULT_ROLE_INFO.SUPER_ADMIN.role_value)) {
     return userInfo!;
   }
   return false;

@@ -1,11 +1,9 @@
-import Sequelize from 'sequelize';
+import { Op } from 'sequelize';
 
 import { IList, IRole } from '@/interface';
 import roleModel from '@/model/role.model';
 import userModel from '@/model/user.model';
 import { handlePaging } from '@/utils';
-
-const { Op } = Sequelize;
 
 class RoleService {
   /** 角色是否存在 */
@@ -178,8 +176,9 @@ class RoleService {
 
   /** 根据角色id查找对应的权限 */
   async getRoleAuth(roleId: number) {
-    const role: any = await roleModel.findByPk(roleId);
-    const auths = await role.getAuths();
+    const role = await roleModel.findByPk(roleId);
+    // @ts-ignore
+    const auths: any = await role?.getAuths();
     const result: any = [];
     auths.forEach((v) => {
       const obj = v.get();
@@ -189,14 +188,14 @@ class RoleService {
     return result;
   }
 
-  /** 获取我的角色 */
-  async getMyRole(id: number) {
-    // const user = await userModel.findOne({ where: { id } });
-    const user: any = await userModel.findByPk(id);
+  /** 获取某个用户的角色 */
+  async getUserRole(id: number) {
+    const user = await userModel.findByPk(id);
     if (!user) {
       throw new Error(`不存在id为${id}的用户！`);
     }
-    const roles: any[] = await user.getRoles();
+    // @ts-ignore
+    const roles: any[] = await user?.getRoles();
     const result: any[] = [];
     roles.forEach((v) => {
       const obj = v.get();
@@ -304,8 +303,9 @@ class RoleService {
     user_id: number;
     role_ids: number[];
   }) {
-    const user: any = await userModel.findByPk(user_id);
-    const result = await user.setRoles(role_ids);
+    const user = await userModel.findByPk(user_id);
+    // @ts-ignore
+    const result = await user?.setRoles(role_ids);
     return result;
   }
 

@@ -1,5 +1,5 @@
 import { deleteUseLessObjectKey } from 'billd-utils';
-import Sequelize from 'sequelize';
+import { Op } from 'sequelize';
 
 import { IList, IUserLiveRoom } from '@/interface';
 import areaModel from '@/model/area.model';
@@ -7,8 +7,6 @@ import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
 import userLiveRoomModel from '@/model/userLiveRoom.model';
 import { handlePaging } from '@/utils';
-
-const { Op } = Sequelize;
 
 class UserLiveRoomService {
   /** 用户直播间是否存在 */

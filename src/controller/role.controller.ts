@@ -12,6 +12,58 @@ import roleService from '@/service/role.service';
 import { arrayToTree } from '@/utils';
 
 class RoleController {
+  common = {
+    async commonGetAllChildRole(id) {
+      const allRole: any[] = [];
+      const queue: any[] = [];
+      const result: any[] = [id];
+      const tmp: any[] = [];
+      const getChildRole = async (_id: number): Promise<any[]> => {
+        const c: any = await roleService.findAllChildren(_id);
+        tmp.push(_id);
+        if (c.length > 0) allRole.push(...c);
+        for (let i = 0; i < c.length; i += 1) {
+          const item = c[i];
+          queue.push(getChildRole(item.id));
+        }
+        return c;
+      };
+      const one = await getChildRole(id);
+      one.forEach((v) => {
+        result.push(v.id);
+      });
+      const res = await Promise.all(queue);
+      res.forEach((v) => {
+        v[0] && result.push(v[0].id);
+      });
+      const diff: any[] = getArrayDifference(result, tmp);
+      const diffQueqe: any[] = [];
+      if (diff.length) {
+        for (let i = 0; i < diff.length; i += 1) {
+          const v = [diff][i];
+          // const x = await this.commonGetAllChildRole(v);
+          // allRole.push(x);
+          diffQueqe.push(this.commonGetAllChildRole(v));
+        }
+      }
+      await Promise.all(diffQueqe);
+      return allRole;
+    },
+    getUserAllRole: async (userId: number) => {
+      const result = await roleService.getUserRole(userId);
+      const role: any = [];
+      result.forEach((v) => {
+        role.push(this.common.commonGetAllChildRole(v.id));
+      });
+      // 这是个二维数组
+      const roleRes = await Promise.all(role);
+      // 将二维数组拍平
+      // const roleResFlat = roleRes.reduce((a, b) => a.concat(b), []);
+      const roleResFlat = roleRes.flat();
+      return [...result, ...roleResFlat];
+    },
+  };
+
   async getAllList(ctx: ParameterizedContext, next) {
     const {
       id,
@@ -132,14 +184,6 @@ class RoleController {
     await next();
   }
 
-  // 获取某个用户的角色
-  async getUserRole(ctx: ParameterizedContext, next) {
-    const user_id = +ctx.params.user_id;
-    const result = await roleService.getMyRole(user_id);
-    successHandler({ ctx, data: { total: result.length, result } });
-    await next();
-  }
-
   // 获取某个角色的权限
   async getRoleAuth(ctx: ParameterizedContext, next) {
     const id = +ctx.params.id;
@@ -164,15 +208,22 @@ class RoleController {
     await next();
   }
 
+  // 获取某个用户的角色
+  async getUserRole(ctx: ParameterizedContext, next) {
+    const userId = +ctx.params.user_id;
+    const result = await roleService.getUserRole(userId);
+    successHandler({ ctx, data: { total: result.length, result } });
+    await next();
+  }
+
   // 获取我的角色
   getMyRole = async (ctx: ParameterizedContext, next) => {
     const { code, userInfo, message } = await authJwt(ctx);
     if (code !== ALLOW_HTTP_CODE.ok) {
       throw new CustomError(message, code, code);
     }
-    const result = await roleService.getMyRole(userInfo!.id!);
+    const result = await roleService.getUserRole(userInfo!.id!);
     successHandler({ ctx, data: { total: result.length, result } });
-
     await next();
   };
 
@@ -182,56 +233,18 @@ class RoleController {
     if (code !== ALLOW_HTTP_CODE.ok) {
       throw new CustomError(message, code, code);
     }
-    const result = await roleService.getMyRole(userInfo!.id!);
-    const role: any = [];
-    result.forEach((v) => {
-      role.push(this.commonGetAllChildRole(v.id));
-    });
-    // 这是个二维数组
-    const roleRes = await Promise.all(role);
-    // 将二维数组拍平
-    // const roleResFlat = roleRes.reduce((a, b) => a.concat(b), []);
-    const roleResFlat = roleRes.flat();
-    successHandler({ ctx, data: [...result, ...roleResFlat] });
+    const result = await this.common.getUserAllRole(userInfo!.id!);
+    successHandler({ ctx, data: result });
     await next();
   };
 
-  async commonGetAllChildRole(id) {
-    const allRole: any[] = [];
-    const queue: any[] = [];
-    const result: any[] = [id];
-    const tmp: any[] = [];
-    const getChildRole = async (_id: number): Promise<any[]> => {
-      const c: any = await roleService.findAllChildren(_id);
-      tmp.push(_id);
-      if (c.length > 0) allRole.push(...c);
-      for (let i = 0; i < c.length; i += 1) {
-        const item = c[i];
-        queue.push(getChildRole(item.id));
-      }
-      return c;
-    };
-    const one = await getChildRole(id);
-    one.forEach((v) => {
-      result.push(v.id);
-    });
-    const res = await Promise.all(queue);
-    res.forEach((v) => {
-      v[0] && result.push(v[0].id);
-    });
-    const diff: any[] = getArrayDifference(result, tmp);
-    const diffQueqe: any[] = [];
-    if (diff.length) {
-      for (let i = 0; i < diff.length; i += 1) {
-        const v = [diff][i];
-        // const x = await this.commonGetAllChildRole(v);
-        // allRole.push(x);
-        diffQueqe.push(this.commonGetAllChildRole(v));
-      }
-    }
-    await Promise.all(diffQueqe);
-    return allRole;
-  }
+  // 获取某个用户的角色（递归找所有）
+  getUserAllRole = async (ctx: ParameterizedContext, next) => {
+    const userId = +ctx.params.user_id;
+    const result = await this.common.getUserAllRole(userId);
+    successHandler({ ctx, data: result });
+    await next();
+  };
 
   // 获取该角色的子角色（递归查找所有）
   getAllChildRole = async (ctx: ParameterizedContext, next) => {
@@ -244,7 +257,7 @@ class RoleController {
         ALLOW_HTTP_CODE.paramsError
       );
     }
-    const result = await this.commonGetAllChildRole(id);
+    const result = await this.common.commonGetAllChildRole(id);
     successHandler({ ctx, data: { total: result.length, result } });
 
     await next();
@@ -502,7 +515,7 @@ class RoleController {
     }
     const queue: any = [];
     c_roles.forEach((v) => {
-      queue.push(this.commonGetAllChildRole(v));
+      queue.push(this.common.commonGetAllChildRole(v));
     });
     // 这是个二维数组
     const roleRes = await Promise.all(queue);
@@ -627,7 +640,7 @@ class RoleController {
     }
     const auths = await role.getAuths();
     await role.removeAuths(auths); // 删除该角色的权限
-    const result = await this.commonGetAllChildRole(id);
+    const result = await this.common.commonGetAllChildRole(id);
     await roleService.delete([id, ...result.map((v) => v.id)]);
     successHandler({
       ctx,

@@ -126,6 +126,28 @@ class LivePlayService {
     return result;
   }
 
+  /** 查找直播 */
+  async findAll({
+    live_room_id,
+    user_id,
+    random_id,
+    rangTimeStart,
+    rangTimeEnd,
+  }) {
+    const result = await livePlayModel.findAll({
+      where: {
+        live_room_id,
+        user_id,
+        random_id,
+        created_at: {
+          [Op.gt]: new Date(+rangTimeStart),
+          [Op.lt]: new Date(+rangTimeEnd),
+        },
+      },
+    });
+    return result;
+  }
+
   /** 修改直播 */
   async update({
     id,
@@ -219,9 +241,34 @@ class LivePlayService {
   deleteByLiveRoomIdAndUserId = async (data: {
     live_room_id: number;
     user_id: number;
+    srs_client_id: string;
+    srs_ip: string;
   }) => {
     const res = await livePlayModel.destroy({
-      where: { live_room_id: data.live_room_id, user_id: data.user_id },
+      where: {
+        live_room_id: data.live_room_id,
+        user_id: data.user_id,
+        srs_client_id: data.srs_client_id,
+        srs_ip: data.srs_ip,
+      },
+    });
+    return res;
+  };
+
+  /** 删除直播 */
+  deleteByLiveRoomIdAndRandomId = async (data: {
+    live_room_id: number;
+    random_id: string;
+    srs_client_id: string;
+    srs_ip: string;
+  }) => {
+    const res = await livePlayModel.destroy({
+      where: {
+        live_room_id: data.live_room_id,
+        random_id: data.random_id,
+        srs_client_id: data.srs_client_id,
+        srs_ip: data.srs_ip,
+      },
     });
     return res;
   };

@@ -14,6 +14,8 @@ srsRouter.get('/apiV1Clients', srsController.getApiV1Clients);
 
 srsRouter.delete('/apiV1Clients/:clientId', srsController.deleteApiV1Clients);
 
+srsRouter.delete('/audience/:id', srsController.deleteAudience);
+
 // SRS http回调
 srsRouter.post('/on_publish', srsController.onPublish);
 

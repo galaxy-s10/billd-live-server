@@ -1,4 +1,4 @@
-import Sequelize from 'sequelize';
+import { Op, literal, where } from 'sequelize';
 
 import { THIRD_PLATFORM } from '@/constant';
 import { IList, IUser } from '@/interface';
@@ -9,8 +9,6 @@ import roleModel from '@/model/role.model';
 import userModel from '@/model/user.model';
 import walletModel from '@/model/wallet.model';
 import { handlePaging } from '@/utils';
-
-const { Op, where, literal } = Sequelize;
 
 class UserService {
   /** 用户是否存在 */
@@ -175,7 +173,7 @@ class UserService {
 
   /** 获取用户信息 */
   async getUserInfo(id: number) {
-    const userInfo: any = await userModel.findOne({
+    const result = await userModel.findOne({
       include: [
         {
           model: qqUserModel,
@@ -199,6 +197,7 @@ class UserService {
         },
         {
           model: roleModel,
+          through: { attributes: [] },
         },
         {
           model: walletModel,
@@ -221,7 +220,6 @@ class UserService {
       },
       where: { id },
     });
-    const result = userInfo.get();
     return result;
   }
 
@@ -236,7 +234,7 @@ class UserService {
         username: where(literal(`BINARY username`), username),
       },
     });
-    return result || false;
+    return result;
   }
 
   /** 根据id修改用户 */
@@ -250,8 +248,7 @@ class UserService {
 
   /** 创建用户 */
   async create(props: IUser) {
-    // @ts-ignore
-    const result: any = await userModel.create(props);
+    const result = await userModel.create(props);
     return result;
   }
 

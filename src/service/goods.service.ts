@@ -1,11 +1,9 @@
 import { deleteUseLessObjectKey } from 'billd-utils';
-import Sequelize from 'sequelize';
+import { Op } from 'sequelize';
 
 import { GoodsTypeEnum, IGoods, IList } from '@/interface';
 import goodsModel from '@/model/goods.model';
 import { handlePaging } from '@/utils';
-
-const { Op } = Sequelize;
 
 class GoodsService {
   /** 商品是否存在 */

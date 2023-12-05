@@ -1,10 +1,8 @@
-import Sequelize from 'sequelize';
+import { Op } from 'sequelize';
 
 import { IList, IThirdUser } from '@/interface';
 import thirdUserModel from '@/model/thirdUser.model';
 import { handlePaging } from '@/utils';
-
-const { Op } = Sequelize;
 
 class ThirdUserService {
   /** 第三方用户记录是否存在 */
