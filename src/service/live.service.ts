@@ -24,8 +24,8 @@ class LiveService {
   /** 获取直播列表 */
   async getList({
     id,
-    user_id,
     live_room_id,
+    user_id,
     orderBy,
     orderName,
     nowPage,
@@ -42,24 +42,29 @@ class LiveService {
       limit = +pageSize;
     }
     const allWhere: any = {};
-    if (id) {
-      allWhere.id = +id;
-    }
-    if (user_id !== undefined && isPureNumber(`${user_id}`)) {
-      allWhere.user_id = user_id;
+    if (id !== undefined && isPureNumber(`${id}`)) {
+      allWhere.id = id;
     }
     if (live_room_id !== undefined && isPureNumber(`${live_room_id}`)) {
       allWhere.live_room_id = live_room_id;
     }
+    if (user_id !== undefined && isPureNumber(`${user_id}`)) {
+      allWhere.user_id = user_id;
+    }
     if (keyWord) {
       const keyWordWhere = [
         {
-          socketId: {
+          srs_client_id: {
             [Op.like]: `%${keyWord}%`,
           },
         },
         {
-          roomId: {
+          srs_stream: {
+            [Op.like]: `%${keyWord}%`,
+          },
+        },
+        {
+          srs_stream_url: {
             [Op.like]: `%${keyWord}%`,
           },
         },
@@ -140,7 +145,7 @@ class LiveService {
   };
 
   /** 查找直播（禁止对外。） */
-  findByRoomId = async (live_room_id: number) => {
+  findByLiveRoomId = async (live_room_id: number) => {
     const res = await liveModel.findOne({
       include: [
         {

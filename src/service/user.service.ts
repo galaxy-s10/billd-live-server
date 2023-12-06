@@ -1,3 +1,4 @@
+import { isPureNumber } from 'billd-utils';
 import { Op, literal, where } from 'sequelize';
 
 import { THIRD_PLATFORM } from '@/constant';
@@ -55,8 +56,8 @@ class UserService {
       limit = +pageSize;
     }
     const allWhere: any = {};
-    if (id) {
-      allWhere.id = +id;
+    if (id !== undefined && isPureNumber(`${id}`)) {
+      allWhere.id = id;
     }
     if (keyWord) {
       const keyWordWhere = [

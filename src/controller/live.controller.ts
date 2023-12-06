@@ -15,6 +15,8 @@ class LiveController {
   common = {
     getList: async ({
       id,
+      live_room_id,
+      user_id,
       orderBy = 'asc',
       orderName = 'id',
       nowPage,
@@ -26,6 +28,8 @@ class LiveController {
     }: IList<ILive>) => {
       const result = await liveService.getList({
         id,
+        live_room_id,
+        user_id,
         nowPage,
         pageSize,
         orderBy,
@@ -52,15 +56,25 @@ class LiveController {
         await liveService.delete(id);
       }
     },
+
     deleteByLiveRoomId: async (liveRoomId: number) => {
       await liveService.deleteByLiveRoomId(liveRoomId);
+    },
+
+    findByLiveRoomId: async (liveRoomId: number) => {
+      const res = await liveService.findByLiveRoomId(liveRoomId);
+      return res;
+    },
+
+    create: async (data: ILive) => {
+      const res = await liveService.create(data);
+      return res;
     },
   };
 
   getList = async (ctx: ParameterizedContext, next) => {
     const result = await this.common.getList(ctx.request.query);
     successHandler({ ctx, data: result });
-
     await next();
   };
 

@@ -1,3 +1,4 @@
+import { isPureNumber } from 'billd-utils';
 import { Op } from 'sequelize';
 
 import { IList, IQqUser } from '@/interface';
@@ -56,8 +57,8 @@ class QQUserService {
       limit = +pageSize;
     }
     const allWhere: any = {};
-    if (id) {
-      allWhere.id = +id;
+    if (id !== undefined && isPureNumber(`${id}`)) {
+      allWhere.id = id;
     }
     if (rangTimeType) {
       allWhere[rangTimeType] = {

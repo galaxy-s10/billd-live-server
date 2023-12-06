@@ -43,7 +43,7 @@ class LivePlayService {
       limit = +pageSize;
     }
     const allWhere: any = {};
-    if (user_id !== undefined && isPureNumber(`${user_id}`)) {
+    if (id !== undefined && isPureNumber(`${id}`)) {
       allWhere.id = id;
     }
     if (random_id !== undefined) {
@@ -58,7 +58,17 @@ class LivePlayService {
     if (keyWord) {
       const keyWordWhere = [
         {
-          roomId: {
+          srs_client_id: {
+            [Op.like]: `%${keyWord}%`,
+          },
+        },
+        {
+          srs_stream: {
+            [Op.like]: `%${keyWord}%`,
+          },
+        },
+        {
+          srs_stream_url: {
             [Op.like]: `%${keyWord}%`,
           },
         },

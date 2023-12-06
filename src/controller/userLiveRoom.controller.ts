@@ -16,7 +16,9 @@ import userLiveRoomService from '@/service/userLiveRoom.service';
 class UserLiveRoomController {
   common = {
     create: (data: IUserLiveRoom) => userLiveRoomService.create(data),
-    findByUserId: (userId) => userLiveRoomService.findByUserId(userId),
+    findByUserId: (userId: number) => userLiveRoomService.findByUserId(userId),
+    findByLiveRoomId: (liveRoomId: number) =>
+      userLiveRoomService.findByLiveRoomId(liveRoomId),
   };
 
   async getList(ctx: ParameterizedContext, next) {

@@ -319,6 +319,7 @@ export interface ILive extends ISrsPublishStream {
 
 export interface ILivePlay extends ISrsPublishStream {
   id?: number;
+
   /** 用户信息 */
   user?: IUser;
   /** 直播间信息 */
@@ -327,6 +328,31 @@ export interface ILivePlay extends ISrsPublishStream {
   random_id?: string;
   user_id?: number;
   live_room_id?: number;
+
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
+export interface ILiveRecord {
+  id?: number;
+
+  /** 用户信息 */
+  user?: IUser;
+  /** 直播间信息 */
+  live_room?: ILiveRoom;
+
+  client_id?: string;
+  user_id?: number;
+  live_room_id?: number;
+  /** 直播时长 */
+  duration?: number;
+  /** 弹幕数 */
+  danmu?: number;
+  /** 观看数 */
+  view?: number;
+  /** 直播结束时间 */
+  end_time?: string;
 
   created_at?: string;
   updated_at?: string;

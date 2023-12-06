@@ -47,12 +47,7 @@ class OrderService {
     if (keyWord) {
       const keyWordWhere = [
         {
-          socketId: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          roomId: {
+          billd_live_order_subject: {
             [Op.like]: `%${keyWord}%`,
           },
         },

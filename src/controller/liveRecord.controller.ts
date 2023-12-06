@@ -2,38 +2,32 @@ import { ParameterizedContext } from 'koa';
 
 import successHandler from '@/app/handler/success-handle';
 import { ALLOW_HTTP_CODE } from '@/constant';
-import { IList, ILivePlay } from '@/interface';
+import { IList, ILiveRecord } from '@/interface';
 import { CustomError } from '@/model/customError.model';
-import livePlayService from '@/service/livePlay.service';
+import liveRecordService from '@/service/liveRecord.service';
 
-class LivePlayController {
+class LiveRecordController {
   common = {
     find: async (id: number) => {
-      const res = await livePlayService.find(id);
+      const res = await liveRecordService.find(id);
       return res;
     },
 
-    findAll: async (data: {
-      live_room_id;
-      user_id;
-      random_id;
-      rangTimeStart;
-      rangTimeEnd;
-    }) => {
-      const res = await livePlayService.findAll(data);
+    create: async (data: ILiveRecord) => {
+      const res = await liveRecordService.create(data);
       return res;
     },
 
-    create: async (data: ILivePlay) => {
-      const res = await livePlayService.create(data);
+    updateByLiveRoomIdAndUserId: async (data: ILiveRecord) => {
+      const res = await liveRecordService.updateByLiveRoomIdAndUserId(data);
       return res;
     },
 
     getList: async ({
       id,
+      client_id,
       live_room_id,
       user_id,
-      random_id,
       orderBy = 'asc',
       orderName = 'id',
       nowPage,
@@ -42,12 +36,12 @@ class LivePlayController {
       rangTimeType,
       rangTimeStart,
       rangTimeEnd,
-    }: IList<ILivePlay>) => {
-      const result = await livePlayService.getList({
+    }: IList<ILiveRecord>) => {
+      const result = await liveRecordService.getList({
         id,
+        client_id,
         live_room_id,
         user_id,
-        random_id,
         nowPage,
         pageSize,
         orderBy,
@@ -61,34 +55,23 @@ class LivePlayController {
     },
 
     delete: async (id: number) => {
-      const isExist = await livePlayService.isExist([id]);
+      const isExist = await liveRecordService.isExist([id]);
       if (!isExist) {
         throw new CustomError(
-          `不存在id为${id}的直播！`,
+          `不存在id为${id}的直播记录！`,
           ALLOW_HTTP_CODE.paramsError,
           ALLOW_HTTP_CODE.paramsError
         );
       }
-      await livePlayService.delete(id);
+      await liveRecordService.delete(id);
     },
 
     deleteByLiveRoomIdAndUserId: async (data: {
+      client_id: number;
       live_room_id: number;
       user_id: number;
-      srs_client_id: string;
-      srs_ip: string;
     }) => {
-      const res = await livePlayService.deleteByLiveRoomIdAndUserId(data);
-      return res;
-    },
-
-    deleteByLiveRoomIdAndRandomId: async (data: {
-      live_room_id: number;
-      random_id: string;
-      srs_client_id: string;
-      srs_ip: string;
-    }) => {
-      const res = await livePlayService.deleteByLiveRoomIdAndRandomId(data);
+      const res = await liveRecordService.deleteByLiveRoomIdAndUserId(data);
       return res;
     },
   };
@@ -101,4 +84,4 @@ class LivePlayController {
   };
 }
 
-export default new LivePlayController();
+export default new LiveRecordController();

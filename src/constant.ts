@@ -189,3 +189,11 @@ export const DEFAULT_ROLE_INFO = {
     role_value: 'TOURIST_USER',
   },
 };
+
+export const SRS_CB_URL_PARAMS = {
+  publishKey: 'pushkey',
+  publishType: 'pushtype',
+  userToken: 'usertoken',
+  userId: 'userid',
+  randomId: 'randomid',
+};

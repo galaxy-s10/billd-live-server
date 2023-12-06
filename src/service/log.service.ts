@@ -1,3 +1,4 @@
+import { isPureNumber } from 'billd-utils';
 import { Op } from 'sequelize';
 
 import { IList, ILog } from '@/interface';
@@ -36,8 +37,8 @@ class LogService {
       limit = +pageSize;
     }
     const allWhere: any = {};
-    if (id) {
-      allWhere.id = +id;
+    if (id !== undefined && isPureNumber(`${id}`)) {
+      allWhere.id = id;
     }
     if (keyWord) {
       const keyWordWhere = [

@@ -4,6 +4,7 @@ import AreaLiveRoom from '@/model/areaLiveRoom.model';
 import Auth from '@/model/auth.model';
 import Live from '@/model/live.model';
 import LivePlay from '@/model/livePlay.model';
+import LiveRecord from '@/model/liveRecord.model';
 import LiveRoom from '@/model/liveRoom.model';
 import Log from '@/model/log.model';
 import Order from '@/model/order.model';
@@ -88,12 +89,21 @@ LivePlay.belongsTo(User, {
   constraints: false,
 });
 
+LiveRecord.belongsTo(User, {
+  foreignKey: 'user_id',
+  constraints: false,
+});
+
 Live.belongsTo(LiveRoom, {
   foreignKey: 'live_room_id',
   constraints: false,
 });
 
 LivePlay.belongsTo(LiveRoom, {
+  foreignKey: 'live_room_id',
+  constraints: false,
+});
+LiveRecord.belongsTo(LiveRoom, {
   foreignKey: 'live_room_id',
   constraints: false,
 });
@@ -104,6 +114,10 @@ LiveRoom.hasOne(Live, {
 });
 
 LiveRoom.hasOne(LivePlay, {
+  foreignKey: 'live_room_id',
+  constraints: false,
+});
+LiveRoom.hasOne(LiveRecord, {
   foreignKey: 'live_room_id',
   constraints: false,
 });

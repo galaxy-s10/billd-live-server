@@ -196,7 +196,7 @@ export const connectWebSocket = (server) => {
       }
       const [liveRoomInfo, liveInfo] = await Promise.all([
         liveRoomService.find(roomId),
-        liveService.findByRoomId(roomId),
+        liveService.findByLiveRoomId(roomId),
       ]);
       if (!liveRoomInfo) {
         console.log(chalkERROR('liveRoomInfo为空'));

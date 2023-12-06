@@ -1,7 +1,7 @@
 import { exec, spawnSync } from 'child_process';
 
 import { SERVER_LIVE } from '@/config/secret';
-import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import { PROJECT_ENV, PROJECT_ENV_ENUM, SRS_CB_URL_PARAMS } from '@/constant';
 import srsController from '@/controller/srs.controller';
 import { initUser } from '@/init/initUser';
 import { LiveRoomPullIsShouldAuthEnum, LiveRoomTypeEnum } from '@/interface';
@@ -72,7 +72,7 @@ async function addLive({
       // const { pid } = ffmpegCmd;
       // console.log(chalkWARN('ffmpeg进程pid'), pid);
       const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec copy -acodec copy -f flv '${rtmp_url}${
-        cdn === 2 ? `?token=${token}` : ''
+        cdn === 2 ? `?${SRS_CB_URL_PARAMS.publishKey}=${token}` : ''
       }'`;
       const ffmpegSyncCmd = `${ffmpegCmd} 1>/dev/null 2>&1 &`;
       try {
