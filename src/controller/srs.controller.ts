@@ -322,22 +322,29 @@ class SRSController {
         rangTimeEnd: +new Date() + 1000 * 2,
       });
       if (!isExist.length) {
-        await livePlayController.common.create({
+        await Promise.all([
+          livePlayController.common.create({
+            live_room_id: Number(roomId),
+            user_id: userInfo.id,
+            random_id: paramsRandomid || '-1',
+            srs_action: body.action,
+            srs_app: body.app,
+            srs_client_id: body.client_id,
+            srs_ip: body.ip,
+            srs_param: body.param,
+            srs_server_id: body.server_id,
+            srs_service_id: body.service_id,
+            srs_stream: body.stream,
+            srs_stream_id: body.stream_id,
+            srs_stream_url: body.stream_url,
+            srs_tcUrl: body.tcUrl,
+            srs_vhost: body.vhost,
+          }),
+        ]);
+      } else {
+        liveRecordController.common.updateView({
+          client_id: body.client_id,
           live_room_id: Number(roomId),
-          user_id: userInfo.id,
-          random_id: paramsRandomid || '-1',
-          srs_action: body.action,
-          srs_app: body.app,
-          srs_client_id: body.client_id,
-          srs_ip: body.ip,
-          srs_param: body.param,
-          srs_server_id: body.server_id,
-          srs_service_id: body.service_id,
-          srs_stream: body.stream,
-          srs_stream_id: body.stream_id,
-          srs_stream_url: body.stream_url,
-          srs_tcUrl: body.tcUrl,
-          srs_vhost: body.vhost,
         });
       }
       duration = Math.floor(performance.now() - startTime);
@@ -360,25 +367,31 @@ class SRSController {
         rangTimeEnd: +new Date() + 1000 * 2,
       });
       if (!isExist.length) {
-        await livePlayController.common.create({
+        await Promise.all([
+          livePlayController.common.create({
+            live_room_id: Number(roomId),
+            user_id: -1,
+            random_id: paramsRandomid || '-1',
+            srs_action: body.action,
+            srs_app: body.app,
+            srs_client_id: body.client_id,
+            srs_ip: body.ip,
+            srs_param: body.param,
+            srs_server_id: body.server_id,
+            srs_service_id: body.service_id,
+            srs_stream: body.stream,
+            srs_stream_id: body.stream_id,
+            srs_stream_url: body.stream_url,
+            srs_tcUrl: body.tcUrl,
+            srs_vhost: body.vhost,
+          }),
+        ]);
+      } else {
+        liveRecordController.common.updateView({
+          client_id: body.client_id,
           live_room_id: Number(roomId),
-          user_id: -1,
-          random_id: paramsRandomid || '-1',
-          srs_action: body.action,
-          srs_app: body.app,
-          srs_client_id: body.client_id,
-          srs_ip: body.ip,
-          srs_param: body.param,
-          srs_server_id: body.server_id,
-          srs_service_id: body.service_id,
-          srs_stream: body.stream,
-          srs_stream_id: body.stream_id,
-          srs_stream_url: body.stream_url,
-          srs_tcUrl: body.tcUrl,
-          srs_vhost: body.vhost,
         });
       }
-
       duration = Math.floor(performance.now() - startTime);
       console.log(
         chalkSUCCESS(

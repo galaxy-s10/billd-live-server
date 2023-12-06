@@ -23,6 +23,11 @@ class LiveRecordController {
       return res;
     },
 
+    updateView: async (data: ILiveRecord) => {
+      const res = await liveRecordService.updateView(data);
+      return res;
+    },
+
     getList: async ({
       id,
       client_id,
