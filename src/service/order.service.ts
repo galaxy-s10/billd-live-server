@@ -112,6 +112,7 @@ class OrderService {
   /** 支付成功 */
   async updatePayOk({
     id,
+    client_ip,
     billd_live_user_id,
     billd_live_goods_id,
     billd_live_live_room_id,
@@ -133,6 +134,7 @@ class OrderService {
   }: IOrder) {
     const result = await orderModel.update(
       {
+        client_ip,
         billd_live_user_id,
         billd_live_goods_id,
         billd_live_live_room_id,
@@ -160,6 +162,7 @@ class OrderService {
   /** 修改订单 */
   async update({
     id,
+    client_ip,
     billd_live_user_id,
     billd_live_goods_id,
     billd_live_live_room_id,
@@ -181,6 +184,7 @@ class OrderService {
   }: IOrder) {
     const result = await orderModel.update(
       {
+        client_ip,
         billd_live_user_id,
         billd_live_goods_id,
         billd_live_live_room_id,
@@ -207,6 +211,7 @@ class OrderService {
 
   /** 创建订单 */
   async create({
+    client_ip,
     billd_live_user_id,
     billd_live_goods_id,
     billd_live_live_room_id,
@@ -227,6 +232,7 @@ class OrderService {
     trade_status,
   }: IOrder) {
     const result = await orderModel.create({
+      client_ip,
       billd_live_user_id,
       billd_live_goods_id,
       billd_live_live_room_id,

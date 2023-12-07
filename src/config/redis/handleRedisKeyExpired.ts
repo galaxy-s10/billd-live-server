@@ -14,7 +14,7 @@ export const handleRedisKeyExpired = () => {
       if (redisKey.indexOf(REDIS_PREFIX.order) === 0) {
         const out_trade_no = redisKey.replace(`${REDIS_PREFIX.order}`, '');
         console.log('订单过期', out_trade_no);
-        orderController.commonGetPayStatus(out_trade_no, true);
+        orderController.common.getPayStatus(out_trade_no, true);
       }
 
       // 房间不直播了

@@ -34,11 +34,14 @@ const model = sequelize.define<OrderModel>(
     billd_live_live_room_id: {
       type: DataTypes.INTEGER,
     },
-    billd_live_order_version: {
-      type: DataTypes.INTEGER,
+    client_ip: {
+      type: DataTypes.STRING(100),
     },
     billd_live_order_subject: {
       type: DataTypes.STRING(100),
+    },
+    billd_live_order_version: {
+      type: DataTypes.INTEGER,
     },
     product_code: {
       type: DataTypes.STRING(100),
@@ -76,7 +79,7 @@ const model = sequelize.define<OrderModel>(
     },
     trade_status: {
       type: DataTypes.STRING(100),
-      defaultValue: PayStatusEnum.error,
+      defaultValue: PayStatusEnum.wait,
     },
     send_pay_date: {
       type: DataTypes.STRING(100),
