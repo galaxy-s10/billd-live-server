@@ -1,6 +1,5 @@
 import { ParameterizedContext } from 'koa';
 
-import { verifyUserAuth } from '@/app/auth/verifyUserAuth';
 import successHandler from '@/app/handler/success-handle';
 import { ALLOW_HTTP_CODE } from '@/constant';
 import { IArea, IList } from '@/interface';
@@ -123,14 +122,6 @@ class AreaController {
   }
 
   async create(ctx: ParameterizedContext, next) {
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        `权限不足！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
     const { name, remark, weight }: IArea = ctx.request.body;
     await areaService.create({
       name,
@@ -143,14 +134,6 @@ class AreaController {
   }
 
   delete = async (ctx: ParameterizedContext, next) => {
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        `权限不足！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
     const id = +ctx.params.id;
     await this.common.delete(id, true);
     successHandler({ ctx });

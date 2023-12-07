@@ -2,9 +2,8 @@ import { arrayUnique } from 'billd-utils';
 import { ParameterizedContext } from 'koa';
 
 import { authJwt, signJwt } from '@/app/auth/authJwt';
-import { verifyUserAuth } from '@/app/auth/verifyUserAuth';
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE, PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import { ALLOW_HTTP_CODE } from '@/constant';
 import authController from '@/controller/auth.controller';
 import { IList, IUser } from '@/interface';
 import { CustomError } from '@/model/customError.model';
@@ -80,27 +79,22 @@ class UserController {
 
   async getUserInfo(ctx: ParameterizedContext, next) {
     const { code, userInfo, message } = await authJwt(ctx);
-    if (code === ALLOW_HTTP_CODE.ok && userInfo) {
-      const [auths, result] = await Promise.all([
-        authController.common.getUserAuth(userInfo.id!),
-        userService.getUserInfo(userInfo.id!),
-      ]);
-      // 获取纯净的对象，避免循环引用
-      successHandler({ ctx, data: { ...result?.get({ plain: true }), auths } });
-      await next();
-    } else {
+    if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
       throw new CustomError(message, code, code);
     }
+    const [auths, result] = await Promise.all([
+      authController.common.getUserAuth(userInfo.id!),
+      userService.getUserInfo(userInfo.id!),
+    ]);
+    // 获取纯净的对象，避免循环引用
+    successHandler({ ctx, data: { ...result?.get({ plain: true }), auths } });
+    await next();
   }
 
   async updatePwd(ctx: ParameterizedContext, next) {
-    const { userInfo } = await authJwt(ctx);
-    if (!userInfo) {
-      throw new CustomError(
-        `请登录！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
+    const { code, userInfo, message } = await authJwt(ctx);
+    if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
+      throw new CustomError(message, code, code);
     }
     const { oldpwd, newpwd } = ctx.request.body;
     if (!oldpwd || !newpwd) {
@@ -136,21 +130,6 @@ class UserController {
         ALLOW_HTTP_CODE.paramsError
       );
     }
-    if (PROJECT_ENV === PROJECT_ENV_ENUM.beta) {
-      throw new CustomError(
-        `权限不足！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        `权限不足！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
     const isExist = await userService.isExist([id]);
     if (!isExist) {
       throw new CustomError(
@@ -180,21 +159,6 @@ class UserController {
   }
 
   async updateUserRole(ctx: ParameterizedContext, next) {
-    if (PROJECT_ENV === PROJECT_ENV_ENUM.beta) {
-      throw new CustomError(
-        `权限不足！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        `权限不足！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
     const user_id = +ctx.params.id;
     const { user_roles }: IUser = ctx.request.body;
 

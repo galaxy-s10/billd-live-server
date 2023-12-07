@@ -1,3 +1,4 @@
+import { getArrayDifference } from 'billd-utils';
 import chalk from 'chalk';
 import { ParameterizedContext } from 'koa';
 
@@ -9,6 +10,7 @@ import {
   COMMON_ERR_MSG,
   ERROR_HTTP_CODE,
 } from '@/constant';
+import authController from '@/controller/auth.controller';
 import blacklistController from '@/controller/blacklist.controller';
 import logController from '@/controller/log.controller';
 import { CustomError } from '@/model/customError.model';
@@ -175,4 +177,25 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
    */
   await next();
   consoleEnd();
+};
+
+export const apiVerifyAuth = (shouldAuthArr: string[]) => {
+  return async (ctx: ParameterizedContext, next) => {
+    const { code, userInfo, message } = await authJwt(ctx);
+    if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
+      throw new CustomError(message, code, code);
+    }
+    const myAllAuths = await authController.common.getUserAuth(userInfo.id!);
+    const myAllAuthsArr = myAllAuths.map((v) => v.auth_value!);
+    const diffArr = getArrayDifference(shouldAuthArr, myAllAuthsArr);
+    if (diffArr.length > 0) {
+      throw new CustomError(
+        `缺少${diffArr.join()}权限！`,
+        ALLOW_HTTP_CODE.forbidden,
+        ALLOW_HTTP_CODE.forbidden
+      );
+    } else {
+      await next();
+    }
+  };
 };

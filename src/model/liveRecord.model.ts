@@ -25,14 +25,14 @@ const model = sequelize.define<LiveRecordModel>(
       allowNull: false,
       autoIncrement: true,
     },
-    client_id: {
-      type: DataTypes.STRING,
-    },
     live_room_id: {
       type: DataTypes.INTEGER,
     },
     user_id: {
       type: DataTypes.INTEGER,
+    },
+    client_id: {
+      type: DataTypes.STRING,
     },
     duration: {
       type: DataTypes.INTEGER,

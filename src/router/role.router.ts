@@ -1,5 +1,7 @@
 import Router from 'koa-router';
 
+import { apiVerifyAuth } from '@/app/verify.middleware';
+import { DEFAULT_AUTH_INFO } from '@/constant';
 import roleController from '@/controller/role.controller';
 import { verifyProp } from '@/middleware/role.middleware';
 
@@ -21,6 +23,7 @@ roleRouter.get('/get_tree_child_role', roleController.getTreeChildRole);
 roleRouter.post(
   '/batch_delete_child_roles',
   verifyProp,
+  apiVerifyAuth([DEFAULT_AUTH_INFO.ROLE_MANAGE.auth_value]),
   roleController.batchDeleteChildRoles
 );
 
@@ -28,20 +31,35 @@ roleRouter.post(
 roleRouter.put(
   '/batch_add_child_roles',
   verifyProp,
+  apiVerifyAuth([DEFAULT_AUTH_INFO.ROLE_MANAGE.auth_value]),
   roleController.batchAddChildRoles
 );
 
 // DONE 创建角色
-roleRouter.post('/create', verifyProp, roleController.create);
+roleRouter.post(
+  '/create',
+  verifyProp,
+  apiVerifyAuth([DEFAULT_AUTH_INFO.ROLE_MANAGE.auth_value]),
+  roleController.create
+);
 
 // DONE 更新角色
-roleRouter.put('/update/:id', verifyProp, roleController.update);
+roleRouter.put(
+  '/update/:id',
+  verifyProp,
+  apiVerifyAuth([DEFAULT_AUTH_INFO.ROLE_MANAGE.auth_value]),
+  roleController.update
+);
 
 // DONE 查找角色
 roleRouter.get('/find/:id', roleController.find);
 
 // DONE 删除角色（会删除底下关联的所有子角色）
-roleRouter.delete('/delete/:id', roleController.delete);
+roleRouter.delete(
+  '/delete/:id',
+  apiVerifyAuth([DEFAULT_AUTH_INFO.ROLE_MANAGE.auth_value]),
+  roleController.delete
+);
 
 // DONE 获取该角色的子角色（只找一层）
 roleRouter.get('/get_child_role/:id', roleController.getChildRole);
@@ -65,6 +83,10 @@ roleRouter.get('/get_my_all_role', roleController.getMyAllRole);
 roleRouter.get('/get_role_auth/:id', roleController.getRoleAuth);
 
 // 修改某个角色的权限
-roleRouter.put('/update_role_auth/:id', roleController.updateRoleAuth);
+roleRouter.put(
+  '/update_role_auth/:id',
+  apiVerifyAuth([DEFAULT_AUTH_INFO.ROLE_MANAGE.auth_value]),
+  roleController.updateRoleAuth
+);
 
 export default roleRouter;

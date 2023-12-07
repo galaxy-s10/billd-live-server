@@ -140,26 +140,42 @@ class LivePlayService {
 
   /** 修改直播记录 */
   async updateView({ live_room_id }: ILiveRecord) {
-    const result = await liveRecordModel.update(
-      { view: literal('`view` +1') },
-      {
-        where: { live_room_id, end_time: { [Op.not]: true } },
-        silent: true, // silent如果为true，则不会更新updateAt时间戳。
-      }
-    );
-    return result;
+    const lastData = await liveRecordModel.findOne({
+      order: [['created_at', 'desc']],
+      where: { live_room_id, end_time: { [Op.not]: true } },
+    });
+    let flag = true;
+    if (lastData) {
+      await liveRecordModel.update(
+        { view: literal('`view` +1') },
+        {
+          where: { id: lastData.id },
+        }
+      );
+    } else {
+      flag = false;
+    }
+    return flag;
   }
 
   /** 修改直播记录 */
   async updateDanmu({ live_room_id }: ILiveRecord) {
-    const result = await liveRecordModel.update(
-      { danmu: literal('`danmu` +1') },
-      {
-        where: { live_room_id, end_time: { [Op.not]: true } },
-        silent: true, // silent如果为true，则不会更新updateAt时间戳。
-      }
-    );
-    return result;
+    const lastData = await liveRecordModel.findOne({
+      order: [['created_at', 'desc']],
+      where: { live_room_id, end_time: { [Op.not]: true } },
+    });
+    let flag = true;
+    if (lastData) {
+      await liveRecordModel.update(
+        { view: literal('`danmu` +1') },
+        {
+          where: { id: lastData.id },
+        }
+      );
+    } else {
+      flag = false;
+    }
+    return flag;
   }
 
   /** 修改直播记录 */

@@ -328,6 +328,7 @@ export interface ILivePlay extends ISrsPublishStream {
   random_id?: string;
   user_id?: number;
   live_room_id?: number;
+  end_time?: string;
 
   created_at?: string;
   updated_at?: string;

@@ -195,14 +195,17 @@ class RoleService {
       throw new Error(`不存在id为${id}的用户！`);
     }
     // @ts-ignore
-    const roles: any[] = await user?.getRoles();
-    const result: any[] = [];
-    roles.forEach((v) => {
-      const obj = v.get();
-      delete obj.user_role;
-      result.push(obj);
+    const roles: IRole[] = await user?.getRoles({
+      /**
+       * 对于 belongsToMany 关系, 默认情况下, getBars() 将返回连接表中的所有字段.
+       * 请注意, 任何 include 参数都将应用于目标 Bar 对象,
+       * 因此无法像使用 find 方法进行预加载时那样尝试为连接表设置参数. 要选择要包含的连接表的哪些属性,
+       * getBars() 支持一个 joinTableAttributes 选项, 其使用类似于在 include 中设置 through.attributes.
+       * 例如, 设定 Foo belongsToMany Bar, 以下都将输出没有连接表字段的结果
+       */
+      joinTableAttributes: [],
     });
-    return result;
+    return roles;
   }
 
   /** 修改角色 */

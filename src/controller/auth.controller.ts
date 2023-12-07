@@ -2,7 +2,6 @@ import { arrayUnique, getArrayDifference } from 'billd-utils';
 import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
-import { verifyUserAuth } from '@/app/auth/verifyUserAuth';
 import successHandler from '@/app/handler/success-handle';
 import { ALLOW_HTTP_CODE, PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import { IAuth, IList } from '@/interface';
@@ -17,7 +16,7 @@ class AuthController {
       const myAllRole = await roleService.getUserRole(userId);
       const queue: Promise<any>[] = [];
       myAllRole.forEach((item) => {
-        queue.push(roleService.getRoleAuth(item.id));
+        queue.push(roleService.getRoleAuth(item.id!));
       });
       const queueRes = await Promise.all(queue);
       const res: IAuth[] = [];
@@ -49,7 +48,6 @@ class AuthController {
   getMyAuth = async (ctx: ParameterizedContext, next) => {
     const { code, userInfo, message } = await authJwt(ctx);
     if (code !== ALLOW_HTTP_CODE.ok) {
-      console.log(message);
       throw new CustomError(message, code, code);
     }
     const res = await this.common.getUserAuth(userInfo!.id!);
@@ -179,14 +177,6 @@ class AuthController {
 
   // 创建权限
   async create(ctx: ParameterizedContext, next) {
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        '权限不足！',
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
     const {
       p_id,
       auth_name,
@@ -232,14 +222,6 @@ class AuthController {
           ALLOW_HTTP_CODE.forbidden
         );
       }
-    }
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        '权限不足！',
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
     }
 
     const { p_id, auth_name, auth_value, type, priority }: IAuth =
@@ -318,14 +300,6 @@ class AuthController {
         );
       }
     }
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        '权限不足！',
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
     if (id === 1) {
       throw new Error(`不能删除根权限哦！`);
     }
@@ -361,14 +335,6 @@ class AuthController {
           ALLOW_HTTP_CODE.forbidden
         );
       }
-    }
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        '权限不足！',
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
     }
     if (id === undefined) {
       throw new Error(`请传入id！`);
@@ -413,14 +379,6 @@ class AuthController {
           ALLOW_HTTP_CODE.forbidden
         );
       }
-    }
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        `权限不足！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
     }
     if (id === undefined) {
       throw new CustomError(

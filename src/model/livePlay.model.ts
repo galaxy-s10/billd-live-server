@@ -34,6 +34,9 @@ const model = sequelize.define<LivePlayModel>(
     random_id: {
       type: DataTypes.STRING,
     },
+    end_time: {
+      type: DataTypes.STRING,
+    },
     srs_server_id: {
       type: DataTypes.STRING,
     },

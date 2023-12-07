@@ -1,6 +1,5 @@
 import { ParameterizedContext } from 'koa';
 
-import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import { ALLOW_HTTP_CODE } from '@/constant';
 import { IList, ILog } from '@/interface';
@@ -27,14 +26,6 @@ class LogController {
       rangTimeStart,
       rangTimeEnd,
     }: IList<ILog> = ctx.request.query;
-    const { userInfo } = await authJwt(ctx);
-    if (userInfo?.id !== 1) {
-      throw new CustomError(
-        `权限不足！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
     const result = await logService.getList({
       id,
       nowPage,

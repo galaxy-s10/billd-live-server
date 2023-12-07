@@ -1,5 +1,7 @@
 import Router from 'koa-router';
 
+import { apiVerifyAuth } from '@/app/verify.middleware';
+import { DEFAULT_AUTH_INFO } from '@/constant';
 import srsController from '@/controller/srs.controller';
 
 const srsRouter = new Router({ prefix: '/srs' });
@@ -12,9 +14,17 @@ srsRouter.get('/apiV1Streams', srsController.getApiV1Streams);
 
 srsRouter.get('/apiV1Clients', srsController.getApiV1Clients);
 
-srsRouter.delete('/apiV1Clients/:clientId', srsController.deleteApiV1Clients);
+srsRouter.delete(
+  '/apiV1Clients/:clientId',
+  apiVerifyAuth([DEFAULT_AUTH_INFO.LIVE_MANAGE.auth_value]),
+  srsController.deleteApiV1Clients
+);
 
-srsRouter.delete('/audience/:id', srsController.deleteAudience);
+srsRouter.delete(
+  '/audience/:id',
+  apiVerifyAuth([DEFAULT_AUTH_INFO.LIVE_MANAGE.auth_value]),
+  srsController.deleteAudience
+);
 
 // SRS http回调
 srsRouter.post('/on_publish', srsController.onPublish);

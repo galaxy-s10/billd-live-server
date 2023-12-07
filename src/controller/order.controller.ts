@@ -188,6 +188,9 @@ class OrderController {
   async getList(ctx: ParameterizedContext, next) {
     const {
       id,
+      billd_live_goods_id,
+      billd_live_live_room_id,
+      billd_live_user_id,
       trade_status,
       orderBy = 'asc',
       orderName = 'id',
@@ -201,6 +204,9 @@ class OrderController {
 
     const res = await orderService.getList({
       id,
+      billd_live_goods_id,
+      billd_live_live_room_id,
+      billd_live_user_id,
       trade_status,
       orderBy,
       orderName,

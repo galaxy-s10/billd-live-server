@@ -1,4 +1,4 @@
-import { isPureNumber } from 'billd-utils';
+import { deleteUseLessObjectKey, isPureNumber } from 'billd-utils';
 import { Op, literal } from 'sequelize';
 
 import { IList, ILivePlay } from '@/interface';
@@ -247,40 +247,41 @@ class LivePlayService {
     return result;
   }
 
-  /** 删除直播 */
-  deleteByLiveRoomIdAndUserId = async (data: {
+  /** 更新结束时间 */
+  updateEndTime = async (data: {
     live_room_id: number;
-    user_id: number;
+    user_id?: number;
+    random_id?: string;
     srs_client_id: string;
     srs_ip: string;
+    end_time: string;
   }) => {
-    const res = await livePlayModel.destroy({
-      where: {
+    const lastData = await livePlayModel.findOne({
+      order: [['created_at', 'desc']],
+      where: deleteUseLessObjectKey({
         live_room_id: data.live_room_id,
         user_id: data.user_id,
-        srs_client_id: data.srs_client_id,
-        srs_ip: data.srs_ip,
-      },
-    });
-    return res;
-  };
-
-  /** 删除直播 */
-  deleteByLiveRoomIdAndRandomId = async (data: {
-    live_room_id: number;
-    random_id: string;
-    srs_client_id: string;
-    srs_ip: string;
-  }) => {
-    const res = await livePlayModel.destroy({
-      where: {
-        live_room_id: data.live_room_id,
         random_id: data.random_id,
         srs_client_id: data.srs_client_id,
         srs_ip: data.srs_ip,
-      },
+      }),
     });
-    return res;
+    let flag = true;
+    if (lastData) {
+      await livePlayModel.update(
+        {
+          end_time: data.end_time,
+        },
+        {
+          where: {
+            id: lastData.id,
+          },
+        }
+      );
+    } else {
+      flag = false;
+    }
+    return flag;
   };
 }
 

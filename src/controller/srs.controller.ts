@@ -2,7 +2,6 @@ import { MD5 } from 'crypto-js';
 import { ParameterizedContext } from 'koa';
 import { rimrafSync } from 'rimraf';
 
-import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import { SRS_CONFIG } from '@/config/secret';
 import { wsSocket } from '@/config/websocket';
@@ -94,21 +93,27 @@ class SRSController {
   };
 
   deleteAudience = async (ctx: ParameterizedContext, next) => {
-    const { userInfo } = await authJwt(ctx);
-    if (userInfo?.id !== 1) {
-      throw new CustomError(
-        `权限不足！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
     const id = +ctx.params.id;
     const livePlayInfo = await livePlayController.common.find(id);
     let res;
     if (livePlayInfo) {
+      if (livePlayInfo.end_time) {
+        throw new CustomError(
+          `已观看结束，不能踢了`,
+          ALLOW_HTTP_CODE.paramsError,
+          ALLOW_HTTP_CODE.paramsError
+        );
+      }
       res = await this.common.deleteApiV1Clients(livePlayInfo.srs_client_id!);
+      await livePlayController.common.updateEndTime({
+        live_room_id: livePlayInfo.live_room_id!,
+        user_id: livePlayInfo.user_id!,
+        random_id: livePlayInfo.random_id!,
+        srs_client_id: livePlayInfo.srs_client_id!,
+        srs_ip: livePlayInfo.srs_ip!,
+        end_time: `${+new Date()}`,
+      });
     }
-    await livePlayController.common.delete(id);
     successHandler({
       ctx,
       data: res,
@@ -117,26 +122,22 @@ class SRSController {
   };
 
   deleteApiV1Clients = async (ctx: ParameterizedContext, next) => {
-    const { userInfo } = await authJwt(ctx);
-    if (userInfo?.id !== 1) {
-      throw new CustomError(
-        `权限不足！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
     const { clientId }: { clientId: string } = ctx.params;
     const res1 = await this.common.getApiV1ClientDetail(clientId);
     if (res1.code === 0) {
-      if (res1.client.type === 'hls-play' || res1.client.type === 'flv-play') {
+      if (
+        res1.client.type === 'hls-play' ||
+        res1.client.type === 'flv-play' ||
+        res1.client.type === 'rtmp-play'
+      ) {
         const roomIdStr = res1.client.name.replace(/\.m3u8$/g, '');
         const reg = /^roomId___(\d+)$/g;
         const roomId = reg.exec(roomIdStr)?.[1];
-        await livePlayController.common.deleteByLiveRoomIdAndUserId({
+        await livePlayController.common.updateEndTime({
           live_room_id: Number(roomId),
-          user_id: userInfo.id,
           srs_client_id: res1.client.id,
           srs_ip: res1.client.ip,
+          end_time: `${+new Date()}`,
         });
       }
     }
@@ -176,16 +177,17 @@ class SRSController {
     }
     const params = new URLSearchParams(body.param);
     const paramsUserToken = params.get(SRS_CB_URL_PARAMS.userToken);
-    const paramsUserid = params.get(SRS_CB_URL_PARAMS.userId);
-    const paramsRandomid = params.get(SRS_CB_URL_PARAMS.randomId);
-    const userInfo = await userService.findAndToken(Number(paramsUserid));
+    const paramsUserId = params.get(SRS_CB_URL_PARAMS.userId);
+    const paramsRandomId = params.get(SRS_CB_URL_PARAMS.randomId);
+    const userInfo = await userService.findAndToken(Number(paramsUserId));
     if (!userInfo) {
-      if (paramsRandomid) {
-        await livePlayController.common.deleteByLiveRoomIdAndRandomId({
+      if (paramsRandomId) {
+        await livePlayController.common.updateEndTime({
           live_room_id: Number(roomId),
-          random_id: paramsRandomid,
+          random_id: paramsRandomId,
           srs_client_id: body.client_id,
           srs_ip: body.ip,
+          end_time: `${+new Date()}`,
         });
       }
       console.log(chalkERROR(`[on_stop] 用户不存在，不允许stop`));
@@ -196,11 +198,12 @@ class SRSController {
       await next();
       return;
     }
-    await livePlayController.common.deleteByLiveRoomIdAndUserId({
+    await livePlayController.common.updateEndTime({
       live_room_id: Number(roomId),
       user_id: userInfo.id!,
       srs_client_id: body.client_id,
       srs_ip: body.ip,
+      end_time: `${+new Date()}`,
     });
     const token = MD5(userInfo.token!).toString();
     if (token !== paramsUserToken) {
@@ -254,10 +257,10 @@ class SRSController {
     }
     const params = new URLSearchParams(body.param);
     const paramsUserToken = params.get(SRS_CB_URL_PARAMS.userToken);
-    const paramsUserid = params.get(SRS_CB_URL_PARAMS.userId);
-    const paramsRandomid = params.get(SRS_CB_URL_PARAMS.randomId);
+    const paramsUserId = params.get(SRS_CB_URL_PARAMS.userId);
+    const paramsRandomId = params.get(SRS_CB_URL_PARAMS.randomId);
     if (liveRoomInfo.pull_is_should_auth === LiveRoomPullIsShouldAuthEnum.yes) {
-      if (!paramsUserToken || !paramsUserid) {
+      if (!paramsUserToken || !paramsUserId) {
         duration = Math.floor(performance.now() - startTime);
         console.log(
           chalkERROR(
@@ -271,7 +274,7 @@ class SRSController {
         await next();
         return;
       }
-      const userInfo = await userService.findAndToken(Number(paramsUserid));
+      const userInfo = await userService.findAndToken(Number(paramsUserId));
       if (!userInfo) {
         duration = Math.floor(performance.now() - startTime);
         console.log(
@@ -317,7 +320,7 @@ class SRSController {
       const isExist = await livePlayController.common.findAll({
         live_room_id: Number(roomId),
         user_id: userInfo.id,
-        random_id: paramsRandomid || '-1',
+        random_id: paramsRandomId || '-1',
         rangTimeStart: +new Date() - 1000 * 2,
         rangTimeEnd: +new Date() + 1000 * 2,
       });
@@ -326,7 +329,7 @@ class SRSController {
           livePlayController.common.create({
             live_room_id: Number(roomId),
             user_id: userInfo.id,
-            random_id: paramsRandomid || '-1',
+            random_id: paramsRandomId || '-1',
             srs_action: body.action,
             srs_app: body.app,
             srs_client_id: body.client_id,
@@ -361,8 +364,8 @@ class SRSController {
     } else {
       const isExist = await livePlayController.common.findAll({
         live_room_id: Number(roomId),
-        user_id: -1,
-        random_id: paramsRandomid || '-1',
+        user_id: Number(paramsUserId) || -1,
+        random_id: paramsRandomId || '-1',
         rangTimeStart: +new Date() - 1000 * 2,
         rangTimeEnd: +new Date() + 1000 * 2,
       });
@@ -370,8 +373,8 @@ class SRSController {
         await Promise.all([
           livePlayController.common.create({
             live_room_id: Number(roomId),
-            user_id: -1,
-            random_id: paramsRandomid || '-1',
+            user_id: Number(paramsUserId) || -1,
+            random_id: paramsRandomId || '-1',
             srs_action: body.action,
             srs_app: body.app,
             srs_client_id: body.client_id,

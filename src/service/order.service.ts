@@ -24,6 +24,9 @@ class OrderService {
   /** 获取订单列表 */
   async getList({
     id,
+    billd_live_goods_id,
+    billd_live_live_room_id,
+    billd_live_user_id,
     trade_status,
     orderBy,
     orderName,
@@ -42,12 +45,24 @@ class OrderService {
     }
     const allWhere: any = deleteUseLessObjectKey({
       id,
+      billd_live_goods_id,
+      billd_live_live_room_id,
+      billd_live_user_id,
       trade_status,
     });
     if (keyWord) {
       const keyWordWhere = [
         {
           billd_live_order_subject: {
+            [Op.like]: `%${keyWord}%`,
+          },
+          trade_no: {
+            [Op.like]: `%${keyWord}%`,
+          },
+          out_trade_no: {
+            [Op.like]: `%${keyWord}%`,
+          },
+          buyer_logon_id: {
             [Op.like]: `%${keyWord}%`,
           },
         },

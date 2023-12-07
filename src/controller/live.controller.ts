@@ -1,7 +1,6 @@
 import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
-import { verifyUserAuth } from '@/app/auth/verifyUserAuth';
 import successHandler from '@/app/handler/success-handle';
 import { ALLOW_HTTP_CODE } from '@/constant';
 import { IList, ILive } from '@/interface';
@@ -80,43 +79,39 @@ class LiveController {
 
   closeLive = async (ctx: ParameterizedContext, next) => {
     const { code, userInfo, message } = await authJwt(ctx);
-    if (code === ALLOW_HTTP_CODE.ok) {
-      const userLiveRoomInfo = await userLiveRoomService.findByUserId(
-        userInfo!.id!
-      );
-      if (!userLiveRoomInfo) {
-        throw new CustomError('userLiveRoomInfo为空', 400, 400);
-      }
-      const roomId = userLiveRoomInfo.live_room_id!;
-      const res1 = await liveService.findAllLiveByRoomId(roomId);
-      res1.forEach((item) => {
-        srsController.common.deleteApiV1Clients(item.srs_client_id!);
-      });
-      await liveService.deleteByLiveRoomId(roomId);
-      successHandler({ ctx, data: userLiveRoomInfo });
-    } else {
+    if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
       throw new CustomError(message, code, code);
     }
-
+    const userLiveRoomInfo = await userLiveRoomService.findByUserId(
+      userInfo.id!
+    );
+    if (!userLiveRoomInfo) {
+      throw new CustomError('userLiveRoomInfo为空', 400, 400);
+    }
+    const roomId = userLiveRoomInfo.live_room_id!;
+    const res1 = await liveService.findAllLiveByRoomId(roomId);
+    res1.forEach((item) => {
+      srsController.common.deleteApiV1Clients(item.srs_client_id!);
+    });
+    await liveService.deleteByLiveRoomId(roomId);
+    successHandler({ ctx, data: userLiveRoomInfo });
     await next();
   };
 
   async isLive(ctx: ParameterizedContext, next) {
     const { code, userInfo, message } = await authJwt(ctx);
-    if (code === ALLOW_HTTP_CODE.ok) {
-      const userLiveRoomInfo = await userLiveRoomService.findByUserId(
-        userInfo!.id!
-      );
-      if (!userLiveRoomInfo) {
-        throw new CustomError('userLiveRoomInfo为空', 400, 400);
-      }
-      const roomId = userLiveRoomInfo.live_room_id!;
-      const res = await liveService.findAllLiveByRoomId(roomId);
-      successHandler({ ctx, data: res });
-    } else {
+    if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
       throw new CustomError(message, code, code);
     }
-
+    const userLiveRoomInfo = await userLiveRoomService.findByUserId(
+      userInfo.id!
+    );
+    if (!userLiveRoomInfo) {
+      throw new CustomError('userLiveRoomInfo为空', 400, 400);
+    }
+    const roomId = userLiveRoomInfo.live_room_id!;
+    const res = await liveService.findAllLiveByRoomId(roomId);
+    successHandler({ ctx, data: res });
     await next();
   }
 
@@ -129,14 +124,6 @@ class LiveController {
   }
 
   delete = async (ctx: ParameterizedContext, next) => {
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        `权限不足！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
     const id = +ctx.params.id;
     await this.common.delete(id, true);
     successHandler({ ctx });

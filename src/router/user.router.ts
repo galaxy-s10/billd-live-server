@@ -1,5 +1,7 @@
 import Router from 'koa-router';
 
+import { apiVerifyAuth } from '@/app/verify.middleware';
+import { DEFAULT_AUTH_INFO } from '@/constant';
 import userController from '@/controller/user.controller';
 import { verifyProp } from '@/middleware/user.middleware';
 
@@ -24,6 +26,7 @@ userRouter.put('/update_pwd', userController.updatePwd);
 userRouter.put(
   '/update_user_role/:id',
   verifyProp,
+  apiVerifyAuth([DEFAULT_AUTH_INFO.USER_MANAGE.auth_value]),
   userController.updateUserRole
 );
 

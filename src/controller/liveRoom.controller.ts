@@ -3,7 +3,6 @@ import cryptojs from 'crypto-js';
 import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
-import { verifyUserAuth } from '@/app/auth/verifyUserAuth';
 import successHandler from '@/app/handler/success-handle';
 import { SERVER_LIVE } from '@/config/secret';
 import { ALLOW_HTTP_CODE } from '@/constant';
@@ -68,32 +67,29 @@ class LiveRoomController {
 
   updateKey = async (ctx: ParameterizedContext, next) => {
     const { code, userInfo, message } = await authJwt(ctx);
-    if (userInfo) {
-      const liveRoom = await userLiveRoomService.findByUserId(
-        userInfo.id || -1
-      );
-      if (!liveRoom) {
-        throw new CustomError(
-          `你还没有开通直播间！`,
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
-        );
-      } else {
-        const key = cryptojs
-          .MD5(`${+new Date()}___${getRandomString(6)}`)
-          .toString();
-        const rtmp_url = `${SERVER_LIVE.PushDomain}/${
-          SERVER_LIVE.AppName
-        }/roomId___${liveRoom.live_room!.id!}`;
-        await this.common.update({
-          id: liveRoom.live_room!.id!,
-          key,
-          rtmp_url,
-        });
-        successHandler({ ctx, data: { rtmp_url, key } });
-      }
-    } else {
+    if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
       throw new CustomError(message, code, code);
+    }
+    const liveRoom = await userLiveRoomService.findByUserId(userInfo.id || -1);
+    if (!liveRoom) {
+      throw new CustomError(
+        `你还没有开通直播间！`,
+        ALLOW_HTTP_CODE.paramsError,
+        ALLOW_HTTP_CODE.paramsError
+      );
+    } else {
+      const key = cryptojs
+        .MD5(`${+new Date()}___${getRandomString(6)}`)
+        .toString();
+      const rtmp_url = `${SERVER_LIVE.PushDomain}/${
+        SERVER_LIVE.AppName
+      }/roomId___${liveRoom.live_room!.id!}`;
+      await this.common.update({
+        id: liveRoom.live_room!.id!,
+        key,
+        rtmp_url,
+      });
+      successHandler({ ctx, data: { rtmp_url, key } });
     }
     await next();
   };
@@ -152,14 +148,6 @@ class LiveRoomController {
   }
 
   async delete(ctx: ParameterizedContext, next) {
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        '权限不足！',
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
     const id = +ctx.params.id;
     const isExist = await liveRoomService.isExist([id]);
     if (!isExist) {

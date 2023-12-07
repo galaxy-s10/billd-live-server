@@ -1,6 +1,5 @@
 import { ParameterizedContext } from 'koa';
 
-import { verifyUserAuth } from '@/app/auth/verifyUserAuth';
 import successHandler from '@/app/handler/success-handle';
 import { ALLOW_HTTP_CODE } from '@/constant';
 import { IList, IWallet } from '@/interface';
@@ -51,14 +50,6 @@ class LiveRoomController {
   }
 
   async update(ctx: ParameterizedContext, next) {
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        '权限不足！',
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
     const id = +ctx.params.id;
     const { user_id, balance }: IWallet = ctx.request.body;
     const isExist = await walletService.isExist([id]);
@@ -89,14 +80,6 @@ class LiveRoomController {
   }
 
   async delete(ctx: ParameterizedContext, next) {
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        '权限不足！',
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
     const id = +ctx.params.id;
     const isExist = await walletService.isExist([id]);
     if (!isExist) {

@@ -72,23 +72,15 @@ class LivePlayController {
       await livePlayService.delete(id);
     },
 
-    deleteByLiveRoomIdAndUserId: async (data: {
+    updateEndTime: async (data: {
       live_room_id: number;
-      user_id: number;
+      user_id?: number;
+      random_id?: string;
       srs_client_id: string;
       srs_ip: string;
+      end_time: string;
     }) => {
-      const res = await livePlayService.deleteByLiveRoomIdAndUserId(data);
-      return res;
-    },
-
-    deleteByLiveRoomIdAndRandomId: async (data: {
-      live_room_id: number;
-      random_id: string;
-      srs_client_id: string;
-      srs_ip: string;
-    }) => {
-      const res = await livePlayService.deleteByLiveRoomIdAndRandomId(data);
+      const res = await livePlayService.updateEndTime(data);
       return res;
     },
   };

@@ -1,5 +1,7 @@
 import Router from 'koa-router';
 
+import { apiVerifyAuth } from '@/app/verify.middleware';
+import { DEFAULT_AUTH_INFO } from '@/constant';
 import authController from '@/controller/auth.controller';
 import { verifyProp } from '@/middleware/auth.middleware';
 
@@ -33,18 +35,33 @@ authRouter.get('/get_child_auth/:id', authController.getChildAuth);
 authRouter.get('/get_all_child_auth/:id', authController.getAllChildAuth);
 
 // 创建权限
-authRouter.post('/create', verifyProp, authController.create);
+authRouter.post(
+  '/create',
+  verifyProp,
+  apiVerifyAuth([DEFAULT_AUTH_INFO.AUTH_MANAGE.auth_value]),
+  authController.create
+);
 
 // 更新权限
-authRouter.put('/update/:id', verifyProp, authController.update);
+authRouter.put(
+  '/update/:id',
+  verifyProp,
+  apiVerifyAuth([DEFAULT_AUTH_INFO.AUTH_MANAGE.auth_value]),
+  authController.update
+);
 
 // 删除权限
-authRouter.delete('/delete/:id', authController.delete);
+authRouter.delete(
+  '/delete/:id',
+  apiVerifyAuth([DEFAULT_AUTH_INFO.AUTH_MANAGE.auth_value]),
+  authController.delete
+);
 
 // 批量新增子权限
 authRouter.put(
   '/batch_add_child_auths',
   verifyProp,
+  apiVerifyAuth([DEFAULT_AUTH_INFO.AUTH_MANAGE.auth_value]),
   authController.batchAddChildAuths
 );
 
@@ -52,6 +69,7 @@ authRouter.put(
 authRouter.delete(
   '/batch_delete_child_auths',
   verifyProp,
+  apiVerifyAuth([DEFAULT_AUTH_INFO.AUTH_MANAGE.auth_value]),
   authController.batchDeleteChildAuths
 );
 

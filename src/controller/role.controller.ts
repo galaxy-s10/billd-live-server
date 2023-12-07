@@ -2,9 +2,8 @@ import { arrayUnique, getArrayDifference } from 'billd-utils';
 import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
-import { verifyUserAuth } from '@/app/auth/verifyUserAuth';
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE, PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import { ALLOW_HTTP_CODE } from '@/constant';
 import { IList, IRole } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import authService from '@/service/auth.service';
@@ -13,47 +12,34 @@ import { arrayToTree } from '@/utils';
 
 class RoleController {
   common = {
-    async commonGetAllChildRole(id) {
-      const allRole: any[] = [];
-      const queue: any[] = [];
-      const result: any[] = [id];
-      const tmp: any[] = [];
-      const getChildRole = async (_id: number): Promise<any[]> => {
-        const c: any = await roleService.findAllChildren(_id);
-        tmp.push(_id);
-        if (c.length > 0) allRole.push(...c);
-        for (let i = 0; i < c.length; i += 1) {
-          const item = c[i];
-          queue.push(getChildRole(item.id));
+    async getAllChildRole(id: number) {
+      const queue: Array<Promise<IRole[]>> = [];
+      const result: IRole[] = [];
+      const getChildRole = async (_id: number): Promise<IRole[]> => {
+        const res: IRole[] = await roleService.findAllChildren(_id);
+        for (let i = 0; i < res.length; i += 1) {
+          const item = res[i];
+          queue.push(getChildRole(item.id!));
         }
-        return c;
+        return res;
       };
-      const one = await getChildRole(id);
-      one.forEach((v) => {
-        result.push(v.id);
+      const wrap = await getChildRole(id);
+      wrap.forEach((v) => {
+        result.push(v);
       });
       const res = await Promise.all(queue);
-      res.forEach((v) => {
-        v[0] && result.push(v[0].id);
+      res.forEach((item) => {
+        item.forEach((iten) => {
+          result.push(iten);
+        });
       });
-      const diff: any[] = getArrayDifference(result, tmp);
-      const diffQueqe: any[] = [];
-      if (diff.length) {
-        for (let i = 0; i < diff.length; i += 1) {
-          const v = [diff][i];
-          // const x = await this.commonGetAllChildRole(v);
-          // allRole.push(x);
-          diffQueqe.push(this.commonGetAllChildRole(v));
-        }
-      }
-      await Promise.all(diffQueqe);
-      return allRole;
+      return result;
     },
     getUserAllRole: async (userId: number) => {
       const result = await roleService.getUserRole(userId);
-      const role: any = [];
+      const role: Array<Promise<IRole[]>> = [];
       result.forEach((v) => {
-        role.push(this.common.commonGetAllChildRole(v.id));
+        role.push(this.common.getAllChildRole(v.id!));
       });
       // 这是个二维数组
       const roleRes = await Promise.all(role);
@@ -257,7 +243,7 @@ class RoleController {
         ALLOW_HTTP_CODE.paramsError
       );
     }
-    const result = await this.common.commonGetAllChildRole(id);
+    const result = await this.common.getAllChildRole(id);
     successHandler({ ctx, data: { total: result.length, result } });
 
     await next();
@@ -289,24 +275,6 @@ class RoleController {
         `role_auths不能为空`,
         ALLOW_HTTP_CODE.paramsError,
         ALLOW_HTTP_CODE.paramsError
-      );
-    }
-    if (PROJECT_ENV === PROJECT_ENV_ENUM.beta) {
-      const role: any = await roleService.find(id);
-      if (role.type === 1) {
-        throw new CustomError(
-          `权限不足！`,
-          ALLOW_HTTP_CODE.forbidden,
-          ALLOW_HTTP_CODE.forbidden
-        );
-      }
-    }
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        `权限不足！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
       );
     }
     const isExistRole = await roleService.isExist([id]);
@@ -358,24 +326,6 @@ class RoleController {
         ALLOW_HTTP_CODE.paramsError
       );
     }
-    if (PROJECT_ENV === PROJECT_ENV_ENUM.beta) {
-      const role: any = await roleService.find(id);
-      if (role.type === 1) {
-        throw new CustomError(
-          `权限不足！`,
-          ALLOW_HTTP_CODE.forbidden,
-          ALLOW_HTTP_CODE.forbidden
-        );
-      }
-    }
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        `权限不足！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
     if (id === 1) {
       await roleService.update({
         id,
@@ -425,14 +375,6 @@ class RoleController {
       type = 2,
       priority = 1,
     }: IRole = ctx.request.body;
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        `权限不足！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
     const isExist = p_id === 0 ? false : await roleService.isExist([p_id!]);
     if (!isExist) {
       throw new CustomError(
@@ -461,24 +403,6 @@ class RoleController {
         `id不能为空！`,
         ALLOW_HTTP_CODE.paramsError,
         ALLOW_HTTP_CODE.paramsError
-      );
-    }
-    if (PROJECT_ENV === PROJECT_ENV_ENUM.beta) {
-      const role: any = await roleService.find(id);
-      if (role.type === 1) {
-        throw new CustomError(
-          `权限不足！`,
-          ALLOW_HTTP_CODE.forbidden,
-          ALLOW_HTTP_CODE.forbidden
-        );
-      }
-    }
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        `权限不足！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
       );
     }
     if (id === undefined) {
@@ -515,7 +439,7 @@ class RoleController {
     }
     const queue: any = [];
     c_roles.forEach((v) => {
-      queue.push(this.common.commonGetAllChildRole(v));
+      queue.push(this.common.getAllChildRole(v));
     });
     // 这是个二维数组
     const roleRes = await Promise.all(queue);
@@ -538,24 +462,6 @@ class RoleController {
         `id不能为空！`,
         ALLOW_HTTP_CODE.paramsError,
         ALLOW_HTTP_CODE.paramsError
-      );
-    }
-    if (PROJECT_ENV === PROJECT_ENV_ENUM.beta) {
-      const role: any = await roleService.find(id);
-      if (role.type === 1) {
-        throw new CustomError(
-          `权限不足！`,
-          ALLOW_HTTP_CODE.forbidden,
-          ALLOW_HTTP_CODE.forbidden
-        );
-      }
-    }
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        `权限不足！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
       );
     }
     if (id === undefined) {
@@ -605,24 +511,6 @@ class RoleController {
 
   delete = async (ctx: ParameterizedContext, next) => {
     const id = +ctx.params.id;
-    if (PROJECT_ENV === PROJECT_ENV_ENUM.beta) {
-      const role: any = await roleService.find(id);
-      if (role.type === 1) {
-        throw new CustomError(
-          `权限不足！`,
-          ALLOW_HTTP_CODE.forbidden,
-          ALLOW_HTTP_CODE.forbidden
-        );
-      }
-    }
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        `权限不足！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
     if (id === 1) {
       throw new CustomError(
         `不能删除根角色！`,
@@ -640,8 +528,8 @@ class RoleController {
     }
     const auths = await role.getAuths();
     await role.removeAuths(auths); // 删除该角色的权限
-    const result = await this.common.commonGetAllChildRole(id);
-    await roleService.delete([id, ...result.map((v) => v.id)]);
+    const result = await this.common.getAllChildRole(id);
+    await roleService.delete([id, ...result.map((v) => v.id!)]);
     successHandler({
       ctx,
       message: `删除成功，且删除了${result.length}个关联角色`,

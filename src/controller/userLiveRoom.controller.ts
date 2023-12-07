@@ -3,7 +3,6 @@ import cryptojs from 'crypto-js';
 import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
-import { verifyUserAuth } from '@/app/auth/verifyUserAuth';
 import successHandler from '@/app/handler/success-handle';
 import { SERVER_LIVE } from '@/config/secret';
 import { ALLOW_HTTP_CODE } from '@/constant';
@@ -67,14 +66,6 @@ class UserLiveRoomController {
   };
 
   async update(ctx: ParameterizedContext, next) {
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        '权限不足！',
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
     const id = +ctx.params.id;
     const { user_id, live_room_id }: IUserLiveRoom = ctx.request.body;
     const isExist = await userLiveRoomService.isExist([id]);
@@ -95,15 +86,11 @@ class UserLiveRoomController {
   }
 
   create = async (ctx: ParameterizedContext, next) => {
-    const { userInfo } = await authJwt(ctx);
-    if (!userInfo) {
-      throw new CustomError(
-        `请登录！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
+    const { code, userInfo, message } = await authJwt(ctx);
+    if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
+      throw new CustomError(message, code, code);
     }
-    const isExist = await this.common.findByUserId(userInfo.id);
+    const isExist = await this.common.findByUserId(userInfo.id!);
     if (isExist) {
       throw new CustomError(
         `你已开通直播间！`,
@@ -153,14 +140,6 @@ class UserLiveRoomController {
   };
 
   async delete(ctx: ParameterizedContext, next) {
-    const hasAuth = await verifyUserAuth(ctx);
-    if (!hasAuth) {
-      throw new CustomError(
-        '权限不足！',
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
-      );
-    }
     const id = +ctx.params.id;
     const isExist = await userLiveRoomService.isExist([id]);
     if (!isExist) {
