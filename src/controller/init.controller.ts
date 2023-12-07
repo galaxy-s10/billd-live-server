@@ -84,7 +84,7 @@ class InitController {
           this.common.initArea(),
         ]);
       } catch (error) {
-        // console.log();
+        console.log('已初始化数据库，不能在初始化了');
       }
     },
     initArea: async () => {
@@ -163,6 +163,7 @@ class InitController {
           const token = signJwt({ userInfo, exp });
           userRes = await userService.create({
             ...userInfo,
+            password: getRandomString(8),
             token,
           });
           // @ts-ignore

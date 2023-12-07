@@ -1,7 +1,6 @@
 export interface IInitUser {
   id: number;
   username: string;
-  password: string;
   avatar: string;
   user_roles: number[];
   live_room: {

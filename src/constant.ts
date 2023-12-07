@@ -41,6 +41,7 @@ export const QQ_MAIL_CONFIG = {
 
 export const maxBitrate = 1000 * 3;
 
+export const SERVER_VIDEO_DIR = '/node/video/'; // 服务器video目录
 export const LOCALHOST_URL = 'localhost'; // 本地地址，一般是localhost或者127.0.0.1，但也可以是其他本地地址，如192.168.x.x
 
 export const ERROR_HTTP_CODE = {
