@@ -25,6 +25,9 @@ const frontendWhiteList = [
 
   '/user/login', // 登录，这个接口是post的
   '/qq_user/login', // 登录，这个接口是post的
+  '/qiniu_data/upload',
+  '/qiniu_data/upload_chunk',
+  '/qiniu_data/merge_chunk',
 
   '/order/pay',
   '/wallet/init',

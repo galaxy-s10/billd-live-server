@@ -1,32 +1,12 @@
 import { DEFAULT_AUTH_INFO, DEFAULT_ROLE_INFO } from '@/constant';
-import { GoodsTypeEnum, IArea, IAuth, IGoods, IRole } from '@/interface';
-
-export const bulkCreateArea: IArea[] = [
-  {
-    id: 1,
-    name: '音乐',
-    remark: '音乐分区',
-    weight: 10,
-  },
-  {
-    id: 2,
-    name: '知识',
-    remark: '知识分区',
-    weight: 9,
-  },
-  {
-    id: 3,
-    name: '手游',
-    remark: '和平精英、王者荣耀',
-    weight: 9,
-  },
-  {
-    id: 4,
-    name: '网游',
-    remark: '英雄联盟、CS:GO、DOTA2',
-    weight: 9,
-  },
-];
+import {
+  GoodsTypeEnum,
+  IArea,
+  IAuth,
+  IGoods,
+  ILiveConfig,
+  IRole,
+} from '@/interface';
 
 const initAuth = () => {
   const deafultAuth: IAuth[] = [
@@ -259,6 +239,43 @@ const initRoleAuth = () => {
 
   return roleAuth;
 };
+
+export const bulkCreateLiveConfig: ILiveConfig[] = [
+  {
+    id: 1,
+    key: 'frontend_live_home_bg',
+    value: 'https://resource.hsslive.cn/image/1578937683585vueblog.webp',
+    desc: '直播间前台首页的背景图',
+    type: 'upload',
+  },
+];
+
+export const bulkCreateArea: IArea[] = [
+  {
+    id: 1,
+    name: '音乐',
+    remark: '音乐分区',
+    weight: 10,
+  },
+  {
+    id: 2,
+    name: '知识',
+    remark: '知识分区',
+    weight: 9,
+  },
+  {
+    id: 3,
+    name: '手游',
+    remark: '和平精英、王者荣耀',
+    weight: 9,
+  },
+  {
+    id: 4,
+    name: '网游',
+    remark: '英雄联盟、CS:GO、DOTA2',
+    weight: 9,
+  },
+];
 
 export const bulkCreateGoods: IGoods[] = [
   {

@@ -21,6 +21,7 @@ class LiveRoomController {
     const {
       id,
       name,
+      desc,
       type,
       cdn,
       pull_is_should_auth,
@@ -39,6 +40,7 @@ class LiveRoomController {
     const result = await liveRoomService.getList({
       id,
       name,
+      desc,
       type,
       cdn,
       pull_is_should_auth,
@@ -97,6 +99,7 @@ class LiveRoomController {
   async create(ctx: ParameterizedContext, next) {
     const {
       name,
+      desc,
       type,
       pull_is_should_auth,
       weight,
@@ -107,6 +110,7 @@ class LiveRoomController {
     }: ILiveRoom = ctx.request.body;
     await this.common.create({
       name,
+      desc,
       key: cryptojs.MD5(`${+new Date()}___${getRandomString(6)}`).toString(),
       type,
       pull_is_should_auth,
@@ -124,6 +128,7 @@ class LiveRoomController {
     const id = +ctx.params.id;
     const {
       name,
+      desc,
       type,
       pull_is_should_auth,
       weight,
@@ -135,6 +140,7 @@ class LiveRoomController {
     await this.common.update({
       id,
       name,
+      desc,
       type,
       pull_is_should_auth,
       weight,

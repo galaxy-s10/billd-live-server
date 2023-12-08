@@ -28,6 +28,9 @@ const model = sequelize.define<LiveRoomModel>(
     name: {
       type: DataTypes.STRING(100),
     },
+    desc: {
+      type: DataTypes.STRING(500),
+    },
     key: {
       type: DataTypes.STRING(100),
     },

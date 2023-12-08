@@ -26,6 +26,7 @@ class LiveRoomService {
   async getList({
     id,
     name,
+    desc,
     type,
     cdn,
     pull_is_should_auth,
@@ -50,6 +51,7 @@ class LiveRoomService {
     const allWhere: any = deleteUseLessObjectKey({
       id,
       name,
+      desc,
       rtmp_url,
       flv_url,
       hls_url,
@@ -69,6 +71,9 @@ class LiveRoomService {
     if (keyWord) {
       const keyWordWhere = [
         {
+          desc: {
+            [Op.like]: `%${keyWord}%`,
+          },
           name: {
             [Op.like]: `%${keyWord}%`,
           },
@@ -194,6 +199,7 @@ class LiveRoomService {
   async update({
     id,
     name,
+    desc,
     key,
     type,
     pull_is_should_auth,
@@ -207,6 +213,7 @@ class LiveRoomService {
     const result = await liveRoomModel.update(
       {
         name,
+        desc,
         key,
         type,
         pull_is_should_auth,
@@ -225,6 +232,7 @@ class LiveRoomService {
   /** 创建直播间 */
   async create({
     name,
+    desc,
     key,
     type,
     pull_is_should_auth,
@@ -237,6 +245,7 @@ class LiveRoomService {
   }: ILiveRoom) {
     const result = await liveRoomModel.create({
       name,
+      desc,
       key,
       type,
       pull_is_should_auth,

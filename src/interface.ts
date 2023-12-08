@@ -1,19 +1,28 @@
-export interface IInitUser {
-  id: number;
-  username: string;
-  avatar: string;
+export interface IQiniuData {
+  id?: number;
+  user_id?: number;
+  prefix?: string;
+  bucket?: string;
+  qiniu_key?: string;
+  qiniu_hash?: string;
+  qiniu_fsize?: number;
+  qiniu_mimeType?: string;
+  qiniu_putTime?: string;
+  qiniu_type?: number;
+  qiniu_status?: number;
+  qiniu_md5?: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
+export interface IInitUser extends IUser {
   user_roles: number[];
-  live_room: {
+  live_room: ILiveRoom & {
     devFFmpeg: boolean;
     prodFFmpeg: boolean;
-    cdn: number;
-    id: number;
     area: number[];
-    name: string;
     localFile: string;
-    cover_img: string;
-    weight: number;
-    pull_is_should_auth: LiveRoomPullIsShouldAuthEnum;
   };
 }
 
@@ -158,6 +167,7 @@ export interface ILiveRoom {
   live?: ILive;
   user_live_room?: IUserLiveRoom & { user: IUser };
   name?: string;
+  desc?: string;
   /** 1:使用cdn;2:不使用cdn */
   cdn?: number;
   /** 权重 */
@@ -217,6 +227,31 @@ export interface IUserLiveRoom {
   user?: IUser;
   /** 直播间信息 */
   live_room?: ILiveRoom;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
+export enum FormTypeEnum {
+  'input' = 'input',
+  'password' = 'password',
+  'number' = 'number',
+  'select' = 'select',
+  'radio' = 'radio',
+  'checkbox' = 'checkbox',
+  'markdown' = 'markdown',
+  'switch' = 'switch',
+  'upload' = 'upload',
+  'treeSelect' = 'treeSelect',
+  'datePicker' = 'datePicker',
+}
+
+export interface ILiveConfig {
+  id?: number;
+  key?: string;
+  value?: string;
+  desc?: string;
+  type?: FormTypeEnum;
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;

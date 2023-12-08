@@ -31,6 +31,7 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 1,
       name: '房东的猫-美好事物',
+      desc: '房东的猫livehouse合集',
       weight: 2,
       cdn: 2, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
@@ -53,6 +54,7 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 2,
       name: '房东的猫-云烟成雨',
+      desc: '房东的猫livehouse合集',
       weight: 10,
       cdn: 1, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
@@ -75,6 +77,7 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 3,
       name: '房东的猫-和宇宙的温柔关联',
+      desc: '房东的猫livehouse合集',
       weight: 3,
       cdn: 2, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.yes,
@@ -97,6 +100,7 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 4,
       name: '房东的猫-所念皆星河',
+      desc: '房东的猫livehouse合集',
       weight: 5,
       cdn: 2, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
@@ -119,6 +123,7 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 5,
       name: '房东的猫-你是我为数不多的骄傲',
+      desc: '房东的猫livehouse合集',
       weight: 2,
       cdn: 2, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
@@ -141,6 +146,7 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 6,
       name: '房东的猫-下一站茶山刘',
+      desc: '房东的猫livehouse合集',
       weight: 2,
       cdn: 2, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
@@ -162,6 +168,7 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 7,
       name: '周杰伦-不能说的秘密',
+      desc: '房东的猫livehouse合集',
       weight: 2,
       cdn: 2, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
@@ -180,6 +187,7 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 8,
       name: '周杰伦-晴天',
+      desc: '周杰伦演唱会合集',
       weight: 2,
       cdn: 2, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
@@ -198,6 +206,7 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 9,
       name: '房东的猫-一次就好',
+      desc: '房东的猫livehouse合集',
       weight: 2,
       cdn: 2, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
@@ -216,6 +225,7 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 10,
       name: '七龙珠-渐渐被你吸引',
+      desc: '龙珠系列合集',
       weight: 2,
       cdn: 2, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
@@ -234,6 +244,7 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 11,
       name: '周杰伦-搁浅',
+      desc: '周杰伦演唱会合集',
       weight: 2,
       cdn: 2, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
@@ -252,6 +263,7 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 12,
       name: 'billd-live付费课',
+      desc: '从零搭建一个开源直播间系列',
       weight: 20,
       cdn: 2, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
@@ -270,6 +282,7 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 100,
       name: '周杰伦-一路向北',
+      desc: '周杰伦演唱会合集',
       weight: 2,
       cdn: 2, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,

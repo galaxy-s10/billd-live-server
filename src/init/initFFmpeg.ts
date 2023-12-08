@@ -22,23 +22,27 @@ function ffmpegIsInstalled() {
 async function addLive({
   live_room_id,
   user_id,
-  localFile,
-  cover_img,
-  pull_is_should_auth,
+  name,
+  desc,
   cdn,
+  weight,
+  pull_is_should_auth,
+  cover_img,
+  localFile,
   devFFmpeg,
   prodFFmpeg,
-  weight,
 }: {
   live_room_id: number;
   user_id: number;
-  localFile: string;
-  cover_img: string;
-  pull_is_should_auth: LiveRoomPullIsShouldAuthEnum;
+  name: string;
+  desc: string;
   cdn: number; // 1:使用cdn;2:不使用cdn
+  weight: number;
+  pull_is_should_auth: LiveRoomPullIsShouldAuthEnum;
+  cover_img: string;
+  localFile: string;
   devFFmpeg: boolean;
   prodFFmpeg: boolean;
-  weight: number;
 }) {
   let flv_url = '';
   let hls_url = '';
@@ -74,7 +78,7 @@ async function addLive({
       const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec copy -acodec copy -f flv '${rtmp_url}${
         cdn === 2 ? `?${SRS_CB_URL_PARAMS.publishKey}=${token}` : ''
       }'`;
-      const ffmpegSyncCmd = `${ffmpegCmd} 1>/dev/null 2>&1 &`;
+      // const ffmpegSyncCmd = `${ffmpegCmd} 1>/dev/null 2>&1 &`;
       try {
         // WARN 使用execSync的话，命令最后需要添加：1>/dev/null 2>&1 &，否则会自动退出进程；
         // 但是本地开发环境的时候，因为nodemon的缘故，每次热更新后，在ffmpeg推完流后，触发on_unpublish钩子，删除了live表里的直播记录
@@ -92,11 +96,13 @@ async function addLive({
     }
     await liveRoomService.update({
       id: live_room_id,
+      name,
+      desc,
+      cdn,
+      weight,
       cover_img,
       type: LiveRoomTypeEnum.system,
       pull_is_should_auth,
-      cdn,
-      weight,
       rtmp_url,
       flv_url,
       hls_url,
@@ -178,15 +184,17 @@ export const initFFmpeg = async (init = true) => {
     Object.keys(initUser).forEach((item) => {
       queue.push(
         addLive({
-          live_room_id: initUser[item].live_room.id,
-          user_id: initUser[item].id,
+          live_room_id: initUser[item].live_room.id!,
+          user_id: initUser[item].id!,
+          name: initUser[item].live_room.name!,
+          desc: initUser[item].live_room.desc!,
+          cdn: initUser[item].live_room.cdn!,
+          weight: initUser[item].live_room.weight!,
+          pull_is_should_auth: initUser[item].live_room.pull_is_should_auth!,
+          cover_img: initUser[item].live_room.cover_img!,
           localFile: initUser[item].live_room.localFile,
-          cover_img: initUser[item].live_room.cover_img,
-          pull_is_should_auth: initUser[item].live_room.pull_is_should_auth,
-          cdn: initUser[item].live_room.cdn,
           devFFmpeg: initUser[item].live_room.devFFmpeg,
           prodFFmpeg: initUser[item].live_room.prodFFmpeg,
-          weight: initUser[item].live_room.weight,
         })
       );
     });

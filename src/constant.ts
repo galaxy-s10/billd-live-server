@@ -14,6 +14,30 @@ export const PROJECT_ENV = process.env
 export const PROJECT_PORT = process.env.NODE_APP_RELEASE_PROJECT_PORT as string;
 export const PROJECT_NODE_ENV = process.env.NODE_ENV as string;
 
+// 七牛云文件上传进度类型
+export enum QINIU_UPLOAD_PROGRESS_TYPE {
+  fileProgress = 1,
+  chunkFileProgress = 2,
+}
+
+export const QINIU_BACKUP = {
+  domain: 'backup.hsslive.cn',
+  url: 'http://backup.hsslive.cn/',
+  bucket: 'hss-backup',
+  prefix: {
+    'mysql/': 'mysql/',
+  },
+};
+
+export const QINIU_BLOG = {
+  domain: 'resource.hsslive.cn',
+  url: 'https://resource.hsslive.cn/',
+  bucket: 'hssblog',
+  prefix: {
+    'image/': 'image/',
+  },
+};
+
 export const STATIC_DIR =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
     ? resolveApp('/dist/public/')
@@ -105,7 +129,10 @@ export const REDIS_PREFIX = {
   joined: `${PROJECT_NAME}-${PROJECT_ENV}-joined___`, // 用户加入了房间
   roomIsLiveing: `${PROJECT_NAME}-${PROJECT_ENV}-roomIsLiveing___`, // 主播正在直播
   order: `${PROJECT_NAME}-${PROJECT_ENV}-order___`, // 订单
+  fileProgress: `${PROJECT_NAME}-${PROJECT_ENV}-fileProgress___`, // 订单
 };
+
+export const IS_UPLOAD_SERVER = false; // 是否上传到服务器
 
 // 平台类型
 export const THIRD_PLATFORM = {

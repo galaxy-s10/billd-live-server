@@ -16,6 +16,7 @@ import {
   bulkCreateArea,
   bulkCreateAuth,
   bulkCreateGoods,
+  bulkCreateLiveConfig,
   bulkCreateRole,
   bulkCreateRoleAuth,
 } from '@/init/initData';
@@ -28,6 +29,7 @@ import { CustomError } from '@/model/customError.model';
 import dayDataModel from '@/model/dayData.model';
 import goodsModel from '@/model/goods.model';
 import liveModel from '@/model/live.model';
+import liveConfigModel from '@/model/liveConfig.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import orderModel from '@/model/order.model';
 import qqUserModel from '@/model/qqUser.model';
@@ -75,6 +77,7 @@ class InitController {
       try {
         await this.common.initUser();
         await Promise.all([
+          this.common.initLiveConfig(),
           this.common.initRole(),
           this.common.initAuth(),
           this.common.initRoleAuth(),
@@ -94,6 +97,18 @@ class InitController {
       } else {
         throw new CustomError(
           '已经初始化过分区，不能再初始化了！',
+          ALLOW_HTTP_CODE.paramsError,
+          ALLOW_HTTP_CODE.paramsError
+        );
+      }
+    },
+    initLiveConfig: async () => {
+      const count = await liveConfigModel.count();
+      if (count === 0) {
+        await liveConfigModel.bulkCreate(bulkCreateLiveConfig);
+      } else {
+        throw new CustomError(
+          '已经初始化过直播配置，不能再初始化了！',
           ALLOW_HTTP_CODE.paramsError,
           ALLOW_HTTP_CODE.paramsError
         );

@@ -1,9 +1,10 @@
 node_modules
 .DS_Store
-dist
-src/config/secret.ts
-src/upload/**/*
-src/webm/**/*
-!src/upload/README.md
-!src/webm/README.md
-!src/video/README.md
+/dist
+/src/config/secret.ts
+/src/public/**/*
+/src/upload/**/*
+/src/webm/**/*
+!/src/public/README.md
+!/src/upload/README.md
+!/src/webm/README.md
