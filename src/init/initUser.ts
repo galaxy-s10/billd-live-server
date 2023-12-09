@@ -167,7 +167,7 @@ export const initUser: Record<string, IInitUser> = {
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
       cover_img: zjlBnsdmmBase64,
-      localFile: `${SERVER_VIDEO_DIR}zjl_bnsdmm.mp4'`,
+      localFile: `${SERVER_VIDEO_DIR}zjl_bnsdmm.mp4`,
     },
   },
   systemUser7: {
@@ -186,7 +186,7 @@ export const initUser: Record<string, IInitUser> = {
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: false, // 初始化ffmpeg
       cover_img: zjlQtBase64,
-      localFile: `${SERVER_VIDEO_DIR}zjl_qt.mp4'`,
+      localFile: `${SERVER_VIDEO_DIR}zjl_qt.mp4`,
     },
   },
   systemUser8: {
@@ -205,7 +205,7 @@ export const initUser: Record<string, IInitUser> = {
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
       cover_img: fddmYcjhBase64,
-      localFile: `${SERVER_VIDEO_DIR}fddm_ycjh.mp4'`,
+      localFile: `${SERVER_VIDEO_DIR}fddm_ycjh.mp4`,
     },
   },
   systemUser9: {
@@ -224,7 +224,7 @@ export const initUser: Record<string, IInitUser> = {
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
       cover_img: qlzJjbnxyBase64,
-      localFile: `${SERVER_VIDEO_DIR}qlz_jjbnxy.mp4'`,
+      localFile: `${SERVER_VIDEO_DIR}qlz_jjbnxy.mp4`,
     },
   },
   systemUser10: {
@@ -243,7 +243,7 @@ export const initUser: Record<string, IInitUser> = {
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: false, // 初始化ffmpeg
       cover_img: zjlGqBase64,
-      localFile: `${SERVER_VIDEO_DIR}zjl_gq.mp4'`,
+      localFile: `${SERVER_VIDEO_DIR}zjl_gq.mp4`,
     },
   },
   systemUser11: {
@@ -262,7 +262,7 @@ export const initUser: Record<string, IInitUser> = {
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
       cover_img: hss_20230707_1_30Base64,
-      localFile: `${SERVER_VIDEO_DIR}hss_20230707_1_30.mp4'`,
+      localFile: `${SERVER_VIDEO_DIR}hss_20230707_1_30.mp4`,
     },
   },
   systemUser100: {
@@ -281,7 +281,7 @@ export const initUser: Record<string, IInitUser> = {
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
       cover_img: zjlYlxbBase64,
-      localFile: `${SERVER_VIDEO_DIR}zjl_ylxb.mp4'`,
+      localFile: `${SERVER_VIDEO_DIR}zjl_ylxb.mp4`,
     },
   },
 };
