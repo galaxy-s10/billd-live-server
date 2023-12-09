@@ -98,6 +98,8 @@ class LiveRoomController {
 
   async create(ctx: ParameterizedContext, next) {
     const {
+      cover_img,
+      bg_img,
       name,
       desc,
       type,
@@ -109,6 +111,8 @@ class LiveRoomController {
       hls_url,
     }: ILiveRoom = ctx.request.body;
     await this.common.create({
+      cover_img,
+      bg_img,
       name,
       desc,
       key: cryptojs.MD5(`${+new Date()}___${getRandomString(6)}`).toString(),
@@ -127,6 +131,8 @@ class LiveRoomController {
   async update(ctx: ParameterizedContext, next) {
     const id = +ctx.params.id;
     const {
+      cover_img,
+      bg_img,
       name,
       desc,
       type,
@@ -139,6 +145,8 @@ class LiveRoomController {
     }: ILiveRoom = ctx.request.body;
     await this.common.update({
       id,
+      cover_img,
+      bg_img,
       name,
       desc,
       type,

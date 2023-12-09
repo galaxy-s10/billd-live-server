@@ -29,12 +29,13 @@ export const QINIU_BACKUP = {
   },
 };
 
-export const QINIU_BLOG = {
+export const QINIU_LIVE = {
   domain: 'resource.hsslive.cn',
   url: 'https://resource.hsslive.cn/',
   bucket: 'hssblog',
   prefix: {
-    'image/': 'image/',
+    'billd-live/image/': 'billd-live/image/',
+    'billd-live/msg-image/': 'billd-live/msg-image/',
   },
 };
 

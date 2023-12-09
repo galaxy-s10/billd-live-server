@@ -163,6 +163,8 @@ export interface ILiveRoom {
   users?: IUser[];
   /** 分区信息 */
   area?: IArea;
+  /** 分区信息 */
+  areas?: IArea[];
   /** 直播信息 */
   live?: ILive;
   user_live_room?: IUserLiveRoom & { user: IUser };
@@ -179,6 +181,7 @@ export interface ILiveRoom {
   /** 拉流是否需要鉴权 */
   pull_is_should_auth?: LiveRoomPullIsShouldAuthEnum;
   cover_img?: string;
+  bg_img?: string;
   rtmp_url?: string;
   flv_url?: string;
   hls_url?: string;

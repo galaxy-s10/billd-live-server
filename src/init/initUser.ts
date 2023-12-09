@@ -7,7 +7,7 @@ import {
 import { fddmHyzdwmglBase64 } from '@/init/base64/fddm_hyzdwmgl';
 import { fddmMhswBase64 } from '@/init/base64/fddm_mhsw';
 import { fddmNswwsbddjaBase64 } from '@/init/base64/fddm_nswwsbddja';
-import { fddmSnjxhBase64 } from '@/init/base64/fddm_snjxh';
+import { fddmSnjsBase64 } from '@/init/base64/fddm_snjs';
 import { fddmXyzcslBase64 } from '@/init/base64/fddm_xyzcsl';
 import { fddmYcjhBase64 } from '@/init/base64/fddm_ycjh';
 import { fddmYycyBase64 } from '@/init/base64/fddm_yycy';
@@ -39,10 +39,7 @@ export const initUser: Record<string, IInitUser> = {
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: false, // 初始化ffmpeg
       cover_img: fddmMhswBase64,
-      localFile:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? `${SERVER_VIDEO_DIR}fddm_mhsw.mp4`
-          : resolveApp('/src/video/fddm_mhsw.mp4'),
+      localFile: `${SERVER_VIDEO_DIR}fddm_mhsw.mp4`,
     },
   },
   systemUser1: {
@@ -62,10 +59,7 @@ export const initUser: Record<string, IInitUser> = {
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
       cover_img: fddmYycyBase64,
-      localFile:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? `${SERVER_VIDEO_DIR}fddm_yycy.mp4`
-          : resolveApp('/src/video/fddm_yycy.mp4'),
+      localFile: `${SERVER_VIDEO_DIR}fddm_yycy.mp4`,
     },
   },
   systemUser2: {
@@ -99,19 +93,19 @@ export const initUser: Record<string, IInitUser> = {
     user_roles: [DEFAULT_ROLE_INFO.VIP_USER.id],
     live_room: {
       id: 4,
-      name: '房东的猫-所念皆星河',
+      name: '房东的猫-少年锦时',
       desc: '房东的猫livehouse合集',
-      weight: 5,
+      weight: 20,
       cdn: 2, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],
       devFFmpeg: true, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
-      cover_img: fddmSnjxhBase64,
+      cover_img: fddmSnjsBase64,
       localFile:
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? `${SERVER_VIDEO_DIR}fddm_snjxh.mp4`
-          : resolveApp('/src/video/fddm_snjxh.mp4'),
+          ? `${SERVER_VIDEO_DIR}fddm_snjs.mp4`
+          : resolveApp('/src/video/fddm_snjs.mp4'),
     },
   },
   systemUser4: {
@@ -131,10 +125,7 @@ export const initUser: Record<string, IInitUser> = {
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
       cover_img: fddmNswwsbddjaBase64,
-      localFile:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? `${SERVER_VIDEO_DIR}fddm_nswwsbddja.mp4`
-          : resolveApp('/src/video/fddm_nswwsbddja.mp4'),
+      localFile: `${SERVER_VIDEO_DIR}fddm_nswwsbddja.mp4`,
     },
   },
   systemUser5: {
@@ -264,7 +255,7 @@ export const initUser: Record<string, IInitUser> = {
       id: 12,
       name: 'billd-live付费课',
       desc: '从零搭建一个开源直播间系列',
-      weight: 20,
+      weight: 10,
       cdn: 2, // 1:使用cdn;2:不使用cdn
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],

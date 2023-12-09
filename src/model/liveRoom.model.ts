@@ -49,6 +49,9 @@ const model = sequelize.define<LiveRoomModel>(
     cover_img: {
       type: DataTypes.TEXT,
     },
+    bg_img: {
+      type: DataTypes.STRING(500),
+    },
     rtmp_url: {
       type: DataTypes.STRING(500),
     },

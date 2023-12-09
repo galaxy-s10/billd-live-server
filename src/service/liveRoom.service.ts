@@ -198,13 +198,14 @@ class LiveRoomService {
   /** 修改直播间 */
   async update({
     id,
+    cover_img,
+    bg_img,
     name,
     desc,
     key,
     type,
     pull_is_should_auth,
     weight,
-    cover_img,
     cdn,
     rtmp_url,
     flv_url,
@@ -212,13 +213,14 @@ class LiveRoomService {
   }: ILiveRoom) {
     const result = await liveRoomModel.update(
       {
+        cover_img,
+        bg_img,
         name,
         desc,
         key,
         type,
         pull_is_should_auth,
         weight,
-        cover_img,
         cdn,
         rtmp_url,
         flv_url,
@@ -231,26 +233,28 @@ class LiveRoomService {
 
   /** 创建直播间 */
   async create({
+    cover_img,
+    bg_img,
     name,
     desc,
     key,
     type,
     pull_is_should_auth,
     weight,
-    cover_img,
     cdn,
     rtmp_url,
     flv_url,
     hls_url,
   }: ILiveRoom) {
     const result = await liveRoomModel.create({
+      cover_img,
+      bg_img,
       name,
       desc,
       key,
       type,
       pull_is_should_auth,
       weight,
-      cover_img,
       cdn,
       rtmp_url,
       flv_url,

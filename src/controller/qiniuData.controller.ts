@@ -21,7 +21,7 @@ import {
   LOCALHOST_URL,
   PROJECT_PORT,
   QINIU_BACKUP,
-  QINIU_BLOG,
+  QINIU_LIVE,
   QINIU_UPLOAD_PROGRESS_TYPE,
   REDIS_PREFIX,
   STATIC_DIR,
@@ -85,7 +85,7 @@ class QiniuController {
     const prefetch: string[][] = [];
     const list = qiniuOfficialRes.map((item) => {
       // eslint-disable-next-line
-      return `${QINIU_BLOG.url}${item.key}`;
+      return `${QINIU_LIVE.url}${item.key}`;
     });
     for (let i = 0; i < list.length; i += 60) {
       prefetch.push(list.slice(i, i + 60));
@@ -143,7 +143,7 @@ class QiniuController {
     } = ctx.request.body;
     const key = `${prefix + hash}.${ext}`;
     if (!IS_UPLOAD_SERVER) {
-      const { flag } = await QiniuUtils.getQiniuStat(QINIU_BLOG.bucket, key);
+      const { flag } = await QiniuUtils.getQiniuStat(QINIU_LIVE.bucket, key);
       if (flag) {
         successHandler({
           code: 3,
@@ -229,7 +229,7 @@ class QiniuController {
   // 合并chunk
   mergeChunk = async (ctx: ParameterizedContext, next) => {
     const { hash, ext, prefix }: IQiniuKey = ctx.request.body;
-    if (!QINIU_BLOG.prefix[prefix]) {
+    if (!QINIU_LIVE.prefix[prefix]) {
       throw new CustomError(
         `prefix错误！`,
         ALLOW_HTTP_CODE.paramsError,
@@ -277,14 +277,14 @@ class QiniuController {
   upload = async (ctx: ParameterizedContext, next) => {
     const { userInfo } = await authJwt(ctx);
     const { hash, ext, prefix }: IQiniuKey = ctx.request.body;
-    if (!QINIU_BLOG.prefix[prefix]) {
+    if (!QINIU_LIVE.prefix[prefix]) {
       throw new CustomError(
         `prefix错误！`,
         ALLOW_HTTP_CODE.paramsError,
         ALLOW_HTTP_CODE.paramsError
       );
     }
-    if (IS_UPLOAD_SERVER) {
+    if (!IS_UPLOAD_SERVER) {
       const result = await QiniuUtils.upload({
         ext,
         prefix,
@@ -391,7 +391,7 @@ class QiniuController {
     // @ts-ignore
     const { prefix, hash, ext }: IQiniuKey = ctx.request.query;
     const key = `${prefix + hash}.${ext}`;
-    const { flag } = await QiniuUtils.getQiniuStat(QINIU_BLOG.bucket, key);
+    const { flag } = await QiniuUtils.getQiniuStat(QINIU_LIVE.bucket, key);
     if (flag) {
       successHandler({
         code: 3,
@@ -447,7 +447,7 @@ class QiniuController {
       result.qiniu_key,
       result.bucket
     );
-    const cdnUrl = QINIU_BLOG.url + result.qiniu_key!;
+    const cdnUrl = QINIU_LIVE.url + result.qiniu_key!;
     successHandler({
       ctx,
       data: `${
@@ -470,10 +470,10 @@ class QiniuController {
     };
     const qiniuOfficialRes = await QiniuUtils.delete(
       qiniu_key,
-      QINIU_BLOG.bucket
+      QINIU_LIVE.bucket
     );
     const result = await qiniuDataService.findByQiniuKey(qiniu_key);
-    const cdnUrl = QINIU_BLOG.url + qiniu_key;
+    const cdnUrl = QINIU_LIVE.url + qiniu_key;
 
     if (!result) {
       successHandler({
@@ -530,7 +530,7 @@ class QiniuController {
   // 对比差异
   getDiff = async (ctx: ParameterizedContext, next) => {
     const { prefix }: any = ctx.request.query;
-    if (!QINIU_BACKUP.prefix[prefix] && !QINIU_BLOG.prefix[prefix]) {
+    if (!QINIU_BACKUP.prefix[prefix] && !QINIU_LIVE.prefix[prefix]) {
       throw new CustomError(
         '错误的prefix',
         ALLOW_HTTP_CODE.paramsError,
@@ -572,7 +572,7 @@ class QiniuController {
 
   async update(ctx: ParameterizedContext, next) {
     const { bucket, prefix, qiniu_key }: any = ctx.request.body;
-    if (!QINIU_BACKUP.prefix[prefix] && !QINIU_BLOG.prefix[prefix]) {
+    if (!QINIU_BACKUP.prefix[prefix] && !QINIU_LIVE.prefix[prefix]) {
       throw new CustomError(
         '错误的prefix',
         ALLOW_HTTP_CODE.paramsError,
@@ -593,7 +593,7 @@ class QiniuController {
       await QiniuUtils.updateQiniuFile(
         bucket,
         file.qiniu_key,
-        QINIU_BLOG.bucket,
+        QINIU_LIVE.bucket,
         qiniu_key
       );
     if (flag) {
@@ -626,7 +626,7 @@ class QiniuController {
   monitCDN() {
     const cdnManager = QiniuUtils.getQiniuCdnManager();
     // 域名列表
-    const domains = [QINIU_BLOG.domain, QINIU_BACKUP.domain];
+    const domains = [QINIU_LIVE.domain, QINIU_BACKUP.domain];
     const { startDate, endDate } = getLastestWeek();
     const granularity = 'day'; // 粒度，取值：5min ／ hour ／day
     return new Promise((resolve, reject) => {
