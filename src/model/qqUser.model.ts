@@ -27,7 +27,7 @@ const model = sequelize.define<QqUserModel>(
     },
     client_id: {
       // 其实就是appid
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
     },
     openid: {
       type: DataTypes.STRING,

@@ -1,13 +1,11 @@
 {
-  "server_id": "vid-20w60r2",
-  "service_id": "32rw84n3",
-  "action": "on_stop",
-  "client_id": "in941pq8",
-  "ip": "172.17.0.1",
-  "vhost": "__defaultVhost__",
-  "app": "livestream",
-  "tcUrl": "http://localhost/livestream",
-  "stream": "roomId___4.m3u8",
-  "param": "?hls_ctx=in941pq8&randomid=1hsQEI4D",
-  "stream_url": "/livestream/roomId___4"
+  "openid": "OPENID",
+  "nickname": "NICKNAME",
+  "sex": 1,
+  "province": "PROVINCE",
+  "city": "CITY",
+  "country": "COUNTRY",
+  "headimgurl": "https://thirdwx.qlogo.cn/mmopen/g3MonUZtNHkdmzicIlibx6iaFqAc56vxLSUfpb6n5WKSYVY0ChQKkiaJSgQ1dZuTOgvLLrhJbERQQ4eMsv84eavHiaiceqxibJxCfHe/46",
+  "privilege": ["PRIVILEGE1", "PRIVILEGE2"],
+  "unionid": "o6_bmasdasdsad6_2sgVt7hMZOPfL"
 }

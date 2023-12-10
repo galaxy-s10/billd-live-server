@@ -1,10 +1,11 @@
-import { arrayUnique } from 'billd-utils';
+import { arrayUnique, getRandomString } from 'billd-utils';
 import { ParameterizedContext } from 'koa';
 
 import { authJwt, signJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE } from '@/constant';
+import { ALLOW_HTTP_CODE, REDIS_PREFIX, THIRD_PLATFORM } from '@/constant';
 import authController from '@/controller/auth.controller';
+import redisController from '@/controller/redis.controller';
 import { IList, IUser } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import roleService from '@/service/role.service';
@@ -13,6 +14,62 @@ import userService from '@/service/user.service';
 class UserController {
   common = {
     list: (data) => userService.getList(data),
+  };
+
+  qrCodeLoginStatus = async (ctx: ParameterizedContext, next) => {
+    const { platform, login_id }: { platform: string; login_id: string } =
+      ctx.request.body;
+    if (!THIRD_PLATFORM[platform]) {
+      throw new CustomError(
+        'platform错误！',
+        ALLOW_HTTP_CODE.paramsError,
+        ALLOW_HTTP_CODE.paramsError
+      );
+    }
+    const res = await redisController.getVal({
+      prefix: REDIS_PREFIX.qrCodeLogin,
+      key: `${platform}___${login_id}`,
+    });
+    if (!res) {
+      successHandler({ ctx, data: { isLogin: false } });
+    } else {
+      successHandler({ ctx, data: JSON.parse(res) });
+    }
+    await next();
+  };
+
+  qrCodeLogin = async (ctx: ParameterizedContext, next) => {
+    const { platform }: { platform: string } = ctx.request.body;
+    if (!THIRD_PLATFORM[platform]) {
+      throw new CustomError(
+        'platform错误！',
+        ALLOW_HTTP_CODE.paramsError,
+        ALLOW_HTTP_CODE.paramsError
+      );
+    }
+    let { exp } = ctx.request.body;
+    const maxExp = 24 * 7; // token过期时间：7天
+    if (exp > maxExp) {
+      exp = maxExp;
+    } else if (!exp) {
+      exp = 24;
+    }
+    const createDate = {
+      login_id: getRandomString(8),
+      exp,
+      platform,
+      isLogin: false,
+      token: '',
+    };
+    const redisExp = 60 * 5;
+    await redisController.setExVal({
+      prefix: REDIS_PREFIX.qrCodeLogin,
+      key: `${platform}___${createDate.login_id}`,
+      exp: redisExp,
+      value: createDate,
+    });
+    successHandler({ ctx, data: createDate });
+    await next();
   };
 
   login = async (ctx: ParameterizedContext, next) => {

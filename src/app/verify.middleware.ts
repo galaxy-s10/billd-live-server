@@ -23,6 +23,7 @@ const frontendWhiteList = [
   '/init/roleAuth',
   '/init/dayData',
 
+  '/user/qrcode_login', // 登录，这个接口是post的
   '/user/login', // 登录，这个接口是post的
   '/qq_user/login', // 登录，这个接口是post的
   '/qiniu_data/upload',

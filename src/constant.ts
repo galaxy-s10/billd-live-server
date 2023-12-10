@@ -69,6 +69,10 @@ export const maxBitrate = 1000 * 3;
 export const SERVER_VIDEO_DIR = '/node/video/'; // 服务器video目录
 export const LOCALHOST_URL = 'localhost'; // 本地地址，一般是localhost或者127.0.0.1，但也可以是其他本地地址，如192.168.x.x
 
+// .hsslive.cn
+// .hfgmupw.cn
+export const COOKIE_DOMAIN = '.hsslive.cn';
+
 export const ERROR_HTTP_CODE = {
   serverError: 10000, // 服务器错误
   banIp: 1000,
@@ -131,6 +135,7 @@ export const REDIS_PREFIX = {
   roomIsLiveing: `${PROJECT_NAME}-${PROJECT_ENV}-roomIsLiveing___`, // 主播正在直播
   order: `${PROJECT_NAME}-${PROJECT_ENV}-order___`, // 订单
   fileProgress: `${PROJECT_NAME}-${PROJECT_ENV}-fileProgress___`, // 订单
+  qrCodeLogin: `${PROJECT_NAME}-${PROJECT_ENV}-qrCodeLogin___`, // 订单
 };
 
 export const IS_UPLOAD_SERVER = false; // 是否上传到服务器
@@ -139,6 +144,7 @@ export const IS_UPLOAD_SERVER = false; // 是否上传到服务器
 export const THIRD_PLATFORM = {
   website: 1, // 站内（user表里面的用户就是这个类型，但是不记录在third_user表里）
   qq: 2, // qq
+  wechat: 3, // wechat
 };
 
 export const DEFAULT_AUTH_INFO = {

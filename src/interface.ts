@@ -110,6 +110,23 @@ export interface IQqUser {
   deleted_at?: string;
 }
 
+export interface IWechatUser {
+  id?: number;
+  appid?: string;
+  openid?: string;
+  nickname?: string;
+  sex?: number;
+  province?: string;
+  city?: string;
+  country?: string;
+  headimgurl?: string;
+  privilege?: string;
+  unionid?: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
 export interface IThirdUser {
   id?: number;
   user_id?: number;
