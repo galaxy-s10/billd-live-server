@@ -1,5 +1,6 @@
 import { DEFAULT_AUTH_INFO, DEFAULT_ROLE_INFO } from '@/constant';
 import {
+  FormTypeEnum,
   GoodsTypeEnum,
   IArea,
   IAuth,
@@ -246,7 +247,14 @@ export const bulkCreateLiveConfig: ILiveConfig[] = [
     key: 'frontend_live_home_bg',
     value: 'https://resource.hsslive.cn/image/1578937683585vueblog.webp',
     desc: '直播间前台首页的背景图',
-    type: 'upload',
+    type: FormTypeEnum.upload,
+  },
+  {
+    id: 2,
+    key: 'frontend_wechat_qrcode',
+    value: 'https://resource.hsslive.cn/image/1578937683585vueblog.webp',
+    desc: 'h5页面的客服二维码',
+    type: FormTypeEnum.upload,
   },
 ];
 
