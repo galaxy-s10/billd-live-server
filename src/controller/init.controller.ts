@@ -21,7 +21,12 @@ import {
   bulkCreateRoleAuth,
 } from '@/init/initData';
 import { initUser } from '@/init/initUser';
-import { IInitUser, IUser, LiveRoomTypeEnum } from '@/interface';
+import {
+  IInitUser,
+  IUser,
+  LiveRoomTypeEnum,
+  LiveRoomUseCDNEnum,
+} from '@/interface';
 import areaModel from '@/model/area.model';
 import areaLiveRoomModel from '@/model/areaLiveRoom.model';
 import authModel from '@/model/auth.model';
@@ -197,14 +202,14 @@ class InitController {
           const rtmptoken = cryptojs
             .MD5(`${+new Date()}___${getRandomString(6)}`)
             .toString();
-          if (user.live_room.cdn === 2) {
+          if (user.live_room.cdn === LiveRoomUseCDNEnum.no) {
             liveUrl = (live_room_id: number) => ({
               rtmp_url: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}`,
               flv_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.flv`,
               hls_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.m3u8`,
             });
             // @ts-ignore
-          } else if (user.live_room.cdn === 1) {
+          } else if (user.live_room.cdn === LiveRoomUseCDNEnum.yes) {
             liveUrl = (live_room_id: number) => {
               const res = tencentcloudUtils.getPullUrl({
                 roomId: live_room_id,

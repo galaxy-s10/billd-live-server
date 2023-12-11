@@ -16,7 +16,11 @@ import { zjlBnsdmmBase64 } from '@/init/base64/zjl_bnsdmm';
 import { zjlGqBase64 } from '@/init/base64/zjl_gq';
 import { zjlQtBase64 } from '@/init/base64/zjl_qt';
 import { zjlYlxbBase64 } from '@/init/base64/zjl_ylxb';
-import { IInitUser, LiveRoomPullIsShouldAuthEnum } from '@/interface';
+import {
+  IInitUser,
+  LiveRoomPullIsShouldAuthEnum,
+  LiveRoomUseCDNEnum,
+} from '@/interface';
 import { resolveApp } from '@/utils';
 
 import { hss_20230707_1_30Base64 } from './base64/hss_20230707_1_30';
@@ -33,7 +37,7 @@ export const initUser: Record<string, IInitUser> = {
       name: '房东的猫-美好事物',
       desc: '房东的猫livehouse合集',
       weight: 2,
-      cdn: 2, // 1:使用cdn;2:不使用cdn
+      cdn: LiveRoomUseCDNEnum.no,
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
@@ -53,7 +57,7 @@ export const initUser: Record<string, IInitUser> = {
       name: '房东的猫-云烟成雨',
       desc: '房东的猫livehouse合集',
       weight: 10,
-      cdn: 1, // 1:使用cdn;2:不使用cdn
+      cdn: LiveRoomUseCDNEnum.yes,
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
@@ -73,7 +77,7 @@ export const initUser: Record<string, IInitUser> = {
       name: '房东的猫-和宇宙的温柔关联',
       desc: '房东的猫livehouse合集',
       weight: 3,
-      cdn: 2, // 1:使用cdn;2:不使用cdn
+      cdn: LiveRoomUseCDNEnum.no,
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.yes,
       area: [1],
       devFFmpeg: true, // 初始化ffmpeg
@@ -96,7 +100,7 @@ export const initUser: Record<string, IInitUser> = {
       name: '房东的猫-少年锦时',
       desc: '房东的猫livehouse合集',
       weight: 20,
-      cdn: 2, // 1:使用cdn;2:不使用cdn
+      cdn: LiveRoomUseCDNEnum.no,
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],
       devFFmpeg: true, // 初始化ffmpeg
@@ -119,7 +123,7 @@ export const initUser: Record<string, IInitUser> = {
       name: '房东的猫-你是我为数不多的骄傲',
       desc: '房东的猫livehouse合集',
       weight: 2,
-      cdn: 2, // 1:使用cdn;2:不使用cdn
+      cdn: LiveRoomUseCDNEnum.no,
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
@@ -139,7 +143,7 @@ export const initUser: Record<string, IInitUser> = {
       name: '房东的猫-下一站茶山刘',
       desc: '房东的猫livehouse合集',
       weight: 2,
-      cdn: 2, // 1:使用cdn;2:不使用cdn
+      cdn: LiveRoomUseCDNEnum.no,
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],
       devFFmpeg: true, // 初始化ffmpeg
@@ -161,7 +165,7 @@ export const initUser: Record<string, IInitUser> = {
       name: '周杰伦-不能说的秘密',
       desc: '房东的猫livehouse合集',
       weight: 2,
-      cdn: 2, // 1:使用cdn;2:不使用cdn
+      cdn: LiveRoomUseCDNEnum.no,
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
@@ -180,7 +184,7 @@ export const initUser: Record<string, IInitUser> = {
       name: '周杰伦-晴天',
       desc: '周杰伦演唱会合集',
       weight: 2,
-      cdn: 2, // 1:使用cdn;2:不使用cdn
+      cdn: LiveRoomUseCDNEnum.no,
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
@@ -199,7 +203,7 @@ export const initUser: Record<string, IInitUser> = {
       name: '房东的猫-一次就好',
       desc: '房东的猫livehouse合集',
       weight: 2,
-      cdn: 2, // 1:使用cdn;2:不使用cdn
+      cdn: LiveRoomUseCDNEnum.no,
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
@@ -218,7 +222,7 @@ export const initUser: Record<string, IInitUser> = {
       name: '七龙珠-渐渐被你吸引',
       desc: '龙珠系列合集',
       weight: 2,
-      cdn: 2, // 1:使用cdn;2:不使用cdn
+      cdn: LiveRoomUseCDNEnum.no,
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
@@ -237,7 +241,7 @@ export const initUser: Record<string, IInitUser> = {
       name: '周杰伦-搁浅',
       desc: '周杰伦演唱会合集',
       weight: 2,
-      cdn: 2, // 1:使用cdn;2:不使用cdn
+      cdn: LiveRoomUseCDNEnum.no,
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
@@ -256,7 +260,7 @@ export const initUser: Record<string, IInitUser> = {
       name: 'billd-live付费课',
       desc: '从零搭建一个开源直播间系列',
       weight: 10,
-      cdn: 2, // 1:使用cdn;2:不使用cdn
+      cdn: LiveRoomUseCDNEnum.no,
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
@@ -275,7 +279,7 @@ export const initUser: Record<string, IInitUser> = {
       name: '周杰伦-一路向北',
       desc: '周杰伦演唱会合集',
       weight: 2,
-      cdn: 2, // 1:使用cdn;2:不使用cdn
+      cdn: LiveRoomUseCDNEnum.no,
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg

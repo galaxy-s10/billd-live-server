@@ -11,7 +11,7 @@ const userRouter = new Router({ prefix: '/user' });
 userRouter.post('/qrcode_login', userController.qrCodeLogin);
 
 // 二维码登录状态
-userRouter.post('/qrcode_login_status', userController.qrCodeLoginStatus);
+userRouter.get('/qrcode_login_status', userController.qrCodeLoginStatus);
 
 // 账号密码登录
 userRouter.post('/login', verifyProp, userController.login);

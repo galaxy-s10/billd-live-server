@@ -4,7 +4,11 @@ import { SERVER_LIVE } from '@/config/secret';
 import { PROJECT_ENV, PROJECT_ENV_ENUM, SRS_CB_URL_PARAMS } from '@/constant';
 import srsController from '@/controller/srs.controller';
 import { initUser } from '@/init/initUser';
-import { LiveRoomPullIsShouldAuthEnum, LiveRoomTypeEnum } from '@/interface';
+import {
+  LiveRoomPullIsShouldAuthEnum,
+  LiveRoomTypeEnum,
+  LiveRoomUseCDNEnum,
+} from '@/interface';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
@@ -36,7 +40,7 @@ async function addLive({
   user_id: number;
   name: string;
   desc: string;
-  cdn: number; // 1:使用cdn;2:不使用cdn
+  cdn: LiveRoomUseCDNEnum;
   weight: number;
   pull_is_should_auth: LiveRoomPullIsShouldAuthEnum;
   cover_img: string;
@@ -76,7 +80,9 @@ async function addLive({
       // const { pid } = ffmpegCmd;
       // console.log(chalkWARN('ffmpeg进程pid'), pid);
       const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec copy -acodec copy -f flv '${rtmp_url}${
-        cdn === 2 ? `?${SRS_CB_URL_PARAMS.publishKey}=${token}` : ''
+        cdn === LiveRoomUseCDNEnum.no
+          ? `?${SRS_CB_URL_PARAMS.publishKey}=${token}`
+          : ''
       }'`;
       // const ffmpegSyncCmd = `${ffmpegCmd} 1>/dev/null 2>&1 &`;
       try {
@@ -109,7 +115,11 @@ async function addLive({
     });
   }
 
-  if (cdn === 1 && PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
+  if (
+    PROJECT_ENV === PROJECT_ENV_ENUM.prod &&
+    prodFFmpeg &&
+    cdn === LiveRoomUseCDNEnum.yes
+  ) {
     await tencentcloudUtils.dropLiveStream({
       roomId: live_room_id,
     });
@@ -138,7 +148,7 @@ async function addLive({
     }
   }
 
-  if (cdn === 2) {
+  if (cdn === LiveRoomUseCDNEnum.no) {
     const liveRoomInfo = await liveRoomService.findKey(live_room_id);
     token = liveRoomInfo!.key!;
     rtmp_url = `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}`;

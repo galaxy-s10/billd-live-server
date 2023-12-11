@@ -17,8 +17,10 @@ class UserController {
   };
 
   qrCodeLoginStatus = async (ctx: ParameterizedContext, next) => {
-    const { platform, login_id }: { platform: string; login_id: string } =
-      ctx.request.body;
+    const { platform, login_id } = ctx.request.query as {
+      platform: string;
+      login_id: string;
+    };
     if (!THIRD_PLATFORM[platform]) {
       throw new CustomError(
         'platform错误！',
@@ -33,7 +35,8 @@ class UserController {
     if (!res) {
       successHandler({ ctx, data: { isLogin: false } });
     } else {
-      successHandler({ ctx, data: JSON.parse(res) });
+      const origin = JSON.parse(res);
+      successHandler({ ctx, data: origin.value });
     }
     await next();
   };
