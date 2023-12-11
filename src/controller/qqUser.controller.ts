@@ -148,7 +148,13 @@ class QqUserController {
 
   login = async (ctx: ParameterizedContext, next) => {
     const { code } = ctx.request.body; // 注意此code会在10分钟内过期。
-    const exp = 24; // token过期时间：24小时
+    let { exp } = ctx.request.body;
+    const maxExp = 24 * 7; // token过期时间：7天
+    if (!exp) {
+      exp = 24;
+    } else if (exp > maxExp) {
+      exp = maxExp;
+    }
     const accessToken = await this.getAccessToken(code);
     if (accessToken.error) {
       throw new CustomError(

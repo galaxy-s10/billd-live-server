@@ -3,7 +3,6 @@ import chalk from 'chalk';
 import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
-import { IP_WHITE_LIST } from '@/config/secret';
 import {
   ALLOW_HTTP_CODE,
   BLACKLIST_TYPE,
@@ -12,7 +11,6 @@ import {
 } from '@/constant';
 import authController from '@/controller/auth.controller';
 import blacklistController from '@/controller/blacklist.controller';
-import logController from '@/controller/log.controller';
 import { CustomError } from '@/model/customError.model';
 import { chalkINFO, chalkWARN } from '@/utils/chalkTip';
 
@@ -26,6 +24,7 @@ const frontendWhiteList = [
   '/user/qrcode_login', // 登录，这个接口是post的
   '/user/login', // 登录，这个接口是post的
   '/qq_user/login', // 登录，这个接口是post的
+  '/wechat_user/login', // 登录，这个接口是post的
   '/qiniu_data/upload',
   '/qiniu_data/upload_chunk',
   '/qiniu_data/merge_chunk',
@@ -40,41 +39,11 @@ const frontendWhiteList = [
   '/srs/on_dvr',
 ];
 
-// 后台的所有接口都需要判断token，除了白名单内的不需要token
-const backendWhiteList = [];
-
 // 全局白名单
 const globalWhiteList = ['/init/'];
 
 // 允许频繁请求的路径白名单
 const frequentlyWhiteList = [];
-
-async function isPass(ip: string) {
-  const nowDate = +new Date();
-  let flag = true;
-  if (IP_WHITE_LIST.includes(ip)) return flag;
-  const [oneMinuteApiNum, oneHourApiNum, oneDayApiNum] = await Promise.all([
-    logController.common.getCount({
-      startTime: new Date(nowDate - 1000 * 60), // 一分钟内访问的次数
-      endTime: new Date(nowDate),
-      api_real_ip: ip,
-    }),
-    logController.common.getCount({
-      startTime: new Date(nowDate - 1000 * 60 * 60), // 一小时内访问的次数
-      endTime: new Date(nowDate),
-      api_real_ip: ip,
-    }),
-    logController.common.getCount({
-      startTime: new Date(nowDate - 1000 * 60 * 60 * 24), // 一天内访问的次数
-      endTime: new Date(nowDate),
-      api_real_ip: ip,
-    }),
-  ]);
-  oneMinuteApiNum > 100 && (flag = false);
-  oneHourApiNum > 2000 && (flag = false);
-  oneDayApiNum > 5000 && (flag = false);
-  return flag;
-}
 
 export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
   console.log(chalkINFO('apiBeforeVerify中间件开始'));
@@ -129,6 +98,7 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
   }
 
   // 验证是否频繁请求
+  // @ts-ignore
   if (frequentlyWhiteList.indexOf(url) === -1) {
     const res = true;
     // const res = await isPass(ip);

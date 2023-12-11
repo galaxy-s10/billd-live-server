@@ -6,7 +6,6 @@ import successHandler from '@/app/handler/success-handle';
 import { WECHAT_APPID, WECHAT_SECRET } from '@/config/secret';
 import {
   ALLOW_HTTP_CODE,
-  COOKIE_DOMAIN,
   DEFAULT_ROLE_INFO,
   PROJECT_ENV,
   PROJECT_ENV_ENUM,
@@ -161,12 +160,12 @@ class WechatUserController {
         ALLOW_HTTP_CODE.paramsError
       );
     }
-    let { exp } = loginBody;
+    let { exp } = ctx.request.body;
     const maxExp = 24 * 7; // token过期时间：7天
-    if (exp > maxExp) {
-      exp = maxExp;
-    } else if (!exp) {
+    if (!exp) {
       exp = 24;
+    } else if (exp > maxExp) {
+      exp = maxExp;
     }
     const accessToken = await this.getAccessToken(code);
     if (accessToken.errcode) {
@@ -177,6 +176,7 @@ class WechatUserController {
       );
     }
     console.log('getAccessToken成功');
+    console.log(accessToken);
     const wxUserInfo = await this.getUserInfo({
       access_token: accessToken.access_token,
       openid: accessToken.openid,
@@ -189,6 +189,7 @@ class WechatUserController {
       );
     }
     console.log('wechat登录getUserInfo成功');
+    console.log(wxUserInfo);
     const wechatUserInfo = {
       appid: WECHAT_APPID,
       city: wxUserInfo.city,
@@ -196,13 +197,13 @@ class WechatUserController {
       headimgurl: wxUserInfo.headimgurl,
       nickname: wxUserInfo.nickname,
       openid: wxUserInfo.openid,
-      privilege: wxUserInfo.privilege,
+      privilege: JSON.stringify(wxUserInfo.privilege),
       province: wxUserInfo.province,
       sex: wxUserInfo.sex,
       unionid: wxUserInfo.unionid,
     };
-    const isExist = await wechatUserService.isExistUnionid(
-      wechatUserInfo.unionid
+    const isExist = await wechatUserService.isExistOpenid(
+      wechatUserInfo.openid
     );
     if (!isExist) {
       console.log('不存在wechat账号');
@@ -241,47 +242,8 @@ class WechatUserController {
       });
       if (ctx.header.origin?.indexOf('localhost') !== -1) {
         console.log('不存在wechat账号，localhost设置cookie', token);
-        ctx.cookies.set('token', token, {
-          httpOnly: false, // 设置httpOnly为true后，document.cookie就拿不到key为token的cookie了，因此设置false
-          /**
-           * secure
-           * 一个布尔值，指示是否仅发送 cookie 通过 HTTPS（对于 HTTP，默认为 false，对于 HTTPS 默认为 true）。
-           * 这里判断如果是本地开发，就设置false，因为本地是http://localhost，不是https，如果是线上，就设置
-           * true，因为线上是https://admin.hsslive.cn
-           */
-          secure: false,
-          /**
-           * domain
-           * 设置域名为hsslive.cn，因为接口服务部署在api.hsslive.cn，在admin.hsslive.cn请求api.hsslive.cn，默认api.hsslive.cn的Set-Cookie
-           * 设置的domain是api.hsslive.cn，不会设置到admin.hsslive.cn站点下，因此手动设置domain为hsslive.cn
-           */
-          domain:
-            ctx.header.origin?.indexOf('localhost') !== -1
-              ? 'localhost'
-              : COOKIE_DOMAIN,
-        });
       } else {
         console.log('不存在wechat账号，非localhost设置cookie', token);
-        ctx.cookies.set('token', token, {
-          httpOnly: false, // 设置httpOnly为true后，document.cookie就拿不到key为token的cookie了，因此设置false
-          sameSite: 'none', // 跨站点cookie需要设置sameSite: 'none'，设置sameSite: 'none'后，secure也要跟着设置true！
-          /**
-           * secure
-           * 一个布尔值，指示是否仅发送 cookie 通过 HTTPS（对于 HTTP，默认为 false，对于 HTTPS 默认为 true）。
-           * 这里判断如果是本地开发，就设置false，因为本地是http://localhost，不是https，如果是线上，就设置
-           * true，因为线上是https://admin.hsslive.cn
-           */
-          secure: true,
-          /**
-           * domain
-           * 设置域名为hsslive.cn，因为接口服务部署在api.hsslive.cn，在admin.hsslive.cn请求api.hsslive.cn，默认api.hsslive.cn的Set-Cookie
-           * 设置的domain是api.hsslive.cn，不会设置到admin.hsslive.cn站点下，因此手动设置domain为hsslive.cn
-           */
-          domain:
-            ctx.header.origin?.indexOf('localhost') !== -1
-              ? 'localhost'
-              : COOKIE_DOMAIN,
-        });
       }
 
       const createDate = {
@@ -291,7 +253,7 @@ class WechatUserController {
         isLogin: true,
         token,
       };
-      const redisExp = 60 * 5;
+      const redisExp = 10;
       await redisController.setExVal({
         prefix: REDIS_PREFIX.qrCodeLogin,
         key: `${platform}___${login_id}`,
@@ -302,8 +264,8 @@ class WechatUserController {
     } else {
       console.log('已存在wechat账号');
       await wechatUserService.update(wechatUserInfo);
-      const oldWechatUser = await wechatUserService.findByUnionid(
-        wechatUserInfo.unionid
+      const oldWechatUser = await wechatUserService.findByOpenid(
+        wechatUserInfo.openid
       );
       if (!oldWechatUser) {
         throw new CustomError(
@@ -345,47 +307,8 @@ class WechatUserController {
       });
       if (ctx.header.origin?.indexOf('localhost') !== -1) {
         console.log('已存在wechat账号，localhost设置cookie', token);
-        ctx.cookies.set('token', token, {
-          httpOnly: false, // 设置httpOnly为true后，document.cookie就拿不到key为token的cookie了，因此设置false
-          /**
-           * secure
-           * 一个布尔值，指示是否仅发送 cookie 通过 HTTPS（对于 HTTP，默认为 false，对于 HTTPS 默认为 true）。
-           * 这里判断如果是本地开发，就设置false，因为本地是http://localhost，不是https，如果是线上，就设置
-           * true，因为线上是https://admin.hsslive.cn
-           */
-          secure: false,
-          /**
-           * domain
-           * 设置域名为hsslive.cn，因为接口服务部署在api.hsslive.cn，在admin.hsslive.cn请求api.hsslive.cn，默认api.hsslive.cn的Set-Cookie
-           * 设置的domain是api.hsslive.cn，不会设置到admin.hsslive.cn站点下，因此手动设置domain为hsslive.cn
-           */
-          domain:
-            ctx.header.origin?.indexOf('localhost') !== -1
-              ? 'localhost'
-              : COOKIE_DOMAIN,
-        });
       } else {
         console.log('已存在wechat账号，非localhost设置cookie', token);
-        ctx.cookies.set('token', token, {
-          httpOnly: false, // 设置httpOnly为true后，document.cookie就拿不到key为token的cookie了，因此设置false
-          sameSite: 'none', // 跨站点cookie需要设置sameSite: 'none'，设置sameSite: 'none'后，secure也要跟着设置true！
-          /**
-           * secure
-           * 一个布尔值，指示是否仅发送 cookie 通过 HTTPS（对于 HTTP，默认为 false，对于 HTTPS 默认为 true）。
-           * 这里判断如果是本地开发，就设置false，因为本地是http://localhost，不是https，如果是线上，就设置
-           * true，因为线上是https://admin.hsslive.cn
-           */
-          secure: true,
-          /**
-           * domain
-           * 设置域名为hsslive.cn，因为接口服务部署在api.hsslive.cn，在admin.hsslive.cn请求api.hsslive.cn，默认api.hsslive.cn的Set-Cookie
-           * 设置的domain是api.hsslive.cn，不会设置到admin.hsslive.cn站点下，因此手动设置domain为hsslive.cn
-           */
-          domain:
-            ctx.header.origin?.indexOf('localhost') !== -1
-              ? 'localhost'
-              : COOKIE_DOMAIN,
-        });
       }
       const createDate = {
         login_id,
@@ -394,7 +317,7 @@ class WechatUserController {
         isLogin: true,
         token,
       };
-      const redisExp = 60 * 5;
+      const redisExp = 10;
       await redisController.setExVal({
         prefix: REDIS_PREFIX.qrCodeLogin,
         key: `${platform}___${login_id}`,

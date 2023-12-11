@@ -7,21 +7,21 @@ import { handlePaging } from '@/utils';
 
 class WechatUserService {
   /** 所有应用里面是否存在wechat用户 */
-  async isExistUnionid(unionid: any) {
+  async isExistOpenid(openid: any) {
     const res = await wechatUserModel.count({
       where: {
-        unionid,
+        openid,
       },
     });
     return res === 1;
   }
 
   /** 同一个应用里面是否存在wechat用户 */
-  async isExistClientIdUnionid(appid: any, unionid: any) {
+  async isExistClientIdOpenid(appid: any, openid: any) {
     const res = await wechatUserModel.count({
       where: {
         appid,
-        unionid,
+        openid,
       },
     });
     return res === 1;
@@ -108,9 +108,9 @@ class WechatUserService {
   }
 
   /** 根据unionid查找wechat用户 */
-  async findByUnionid(unionid) {
+  async findByOpenid(openid) {
     const result = await wechatUserModel.findOne({
-      where: { unionid },
+      where: { openid },
     });
     return result;
   }
@@ -131,7 +131,6 @@ class WechatUserService {
     const result = await wechatUserModel.update(
       {
         appid,
-        openid,
         nickname,
         sex,
         province,
@@ -139,8 +138,9 @@ class WechatUserService {
         country,
         headimgurl,
         privilege,
+        unionid,
       },
-      { where: { unionid } }
+      { where: { openid } }
     );
     return result;
   }

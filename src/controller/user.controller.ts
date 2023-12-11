@@ -49,10 +49,10 @@ class UserController {
     }
     let { exp } = ctx.request.body;
     const maxExp = 24 * 7; // token过期时间：7天
-    if (exp > maxExp) {
-      exp = maxExp;
-    } else if (!exp) {
+    if (!exp) {
       exp = 24;
+    } else if (exp > maxExp) {
+      exp = maxExp;
     }
     const createDate = {
       login_id: getRandomString(8),
@@ -73,7 +73,14 @@ class UserController {
   };
 
   login = async (ctx: ParameterizedContext, next) => {
-    const { id, password, exp = 24 } = ctx.request.body;
+    const { id, password } = ctx.request.body;
+    let { exp } = ctx.request.body;
+    const maxExp = 24 * 7; // token过期时间：7天
+    if (!exp) {
+      exp = 24;
+    } else if (exp > maxExp) {
+      exp = maxExp;
+    }
     const userInfo = await userService.login({ id, password });
     if (!userInfo) {
       throw new CustomError(
