@@ -1,7 +1,12 @@
 import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
-import { ALLOW_HTTP_CODE, ERROR_HTTP_CODE, PROJECT_ENV } from '@/constant';
+import {
+  ALLOW_HTTP_CODE,
+  CORS_ALLOW_ORIGIN,
+  ERROR_HTTP_CODE,
+  PROJECT_ENV,
+} from '@/constant';
 import logController from '@/controller/log.controller';
 import { CustomError } from '@/model/customError.model';
 import { chalkINFO, chalkWARN } from '@/utils/chalkTip';
@@ -172,14 +177,7 @@ export const corsMiddle = async (ctx: ParameterizedContext, next) => {
     ctx.set('Access-Control-Allow-Credentials', 'true'); // 允许携带cookie，Access-Control-Allow-Origin为*的时候不能设置Access-Control-Allow-Credentials:true！
     ctx.set('Access-Control-Allow-Origin', ctx.header.origin!); // 允许的源
   } else {
-    const allowOrigin = [
-      'https://www.hsslive.cn',
-      'https://admin.hsslive.cn',
-      'https://live.hsslive.cn',
-      'https://live-admin.hsslive.cn',
-      'https://live-api.hsslive.cn',
-      'https://nuxt2.hsslive.cn',
-    ];
+    const allowOrigin = CORS_ALLOW_ORIGIN;
     // @ts-ignore
     if (allowOrigin === '*') {
       ctx.set('Access-Control-Allow-Origin', '*'); // 允许所有源

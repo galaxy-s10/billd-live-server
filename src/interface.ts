@@ -159,14 +159,6 @@ export enum LiveRoomPullIsShouldAuthEnum {
   no,
 }
 
-/** 是否使用cdn */
-export enum LiveRoomUseCDNEnum {
-  /** 使用cdn */
-  yes = 1,
-  /** 不使用cdn */
-  no = 2,
-}
-
 export interface IArea {
   id?: number;
   name?: string;
@@ -178,6 +170,14 @@ export interface IArea {
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
+}
+
+/** 是否使用cdn */
+export enum LiveRoomUseCDNEnum {
+  /** 使用cdn */
+  yes = 1,
+  /** 不使用cdn */
+  no = 2,
 }
 
 export interface ILiveRoom {

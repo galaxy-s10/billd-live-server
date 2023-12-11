@@ -8,10 +8,10 @@ export const QQ_CLIENT_ID = '**********'; // qq登录APP ID
 export const QQ_CLIENT_SECRET = '**********'; // qq登录APP Key
 export const QQ_REDIRECT_URI = '**********'; // qq登录回调地址
 
-// WARN 七牛云属实拉胯，不用它了，QINIU_LIVE里面的值可以随便填（但一定要有值），反正用不到。
+// WARN 七牛云属实拉胯，不用它了，QINIU_PILI_LIVE里面的值可以随便填（但一定要有值），反正用不到。
 export const QINIU_ACCESSKEY = '**********'; // 七牛云秘钥
 export const QINIU_SECRETKEY = '**********'; // 七牛云秘钥
-export const QINIU_LIVE = {
+export const QINIU_PILI_LIVE = {
   // 推流鉴权方式：静态鉴权(static)，https://developer.qiniu.com/pili/6678/push-the-current-authentication
   // 推流地址格式：rtmp://<RTMPPublishDomain>/<Hub>/<streamTitle>?key=<PublishKey>
   RTMPPublishDomain: '**********', // 推流域名

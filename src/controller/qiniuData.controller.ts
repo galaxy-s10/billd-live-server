@@ -189,9 +189,12 @@ class QiniuController {
       if (existsSync(destHashChunk)) {
         // 删除临时文件
         remove(chunkInfo.filepath);
+        const num = readdirSync(destHashDir).length;
+        const percentage = ((num / +chunkTotal) * 100) / 2;
         successHandler({
           ctx,
           code: 2,
+          data: { percentage },
           message: `${hash}/${chunkName}已存在！`,
         });
       } else {
@@ -391,7 +394,15 @@ class QiniuController {
     // @ts-ignore
     const { prefix, hash, ext }: IQiniuKey = ctx.request.query;
     const key = `${prefix + hash}.${ext}`;
-    const { flag } = await QiniuUtils.getQiniuStat(QINIU_LIVE.bucket, key);
+    let flag = false;
+    if (!IS_UPLOAD_SERVER) {
+      const res = await QiniuUtils.getQiniuStat(QINIU_LIVE.bucket, key);
+      flag = res.flag;
+    } else {
+      const filename = `${hash}.${ext}`;
+      const url = `${STATIC_DIR}${prefix}${filename}`;
+      flag = existsSync(url);
+    }
     if (flag) {
       successHandler({
         code: 3,

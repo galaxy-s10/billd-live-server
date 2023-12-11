@@ -39,6 +39,15 @@ export const QINIU_LIVE = {
   },
 };
 
+export const CORS_ALLOW_ORIGIN = [
+  'https://www.hsslive.cn',
+  'https://admin.hsslive.cn',
+  'https://live.hsslive.cn',
+  'https://live-admin.hsslive.cn',
+  'https://live-api.hsslive.cn',
+  'https://nuxt2.hsslive.cn',
+];
+
 export const STATIC_DIR =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
     ? resolveApp('/dist/public/')
