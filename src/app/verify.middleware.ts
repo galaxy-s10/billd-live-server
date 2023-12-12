@@ -159,7 +159,10 @@ export const apiVerifyAuth = (shouldAuthArr: string[]) => {
     if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
       throw new CustomError(message, code, code);
     }
+    console.log('dddddd111');
     const myAllAuths = await authController.common.getUserAuth(userInfo.id!);
+    console.log('dddddd222');
+
     const myAllAuthsArr = myAllAuths.map((v) => v.auth_value!);
     const diffArr = getArrayDifference(shouldAuthArr, myAllAuthsArr);
     if (diffArr.length > 0) {
@@ -169,6 +172,7 @@ export const apiVerifyAuth = (shouldAuthArr: string[]) => {
         ALLOW_HTTP_CODE.forbidden
       );
     } else {
+      console.log('-099999');
       await next();
     }
   };

@@ -25,14 +25,9 @@ class LiveRoomService {
   /** 获取直播间列表 */
   async getList({
     id,
-    name,
-    desc,
     type,
     cdn,
     pull_is_should_auth,
-    rtmp_url,
-    flv_url,
-    hls_url,
     orderBy,
     orderName,
     nowPage,
@@ -50,11 +45,6 @@ class LiveRoomService {
     }
     const allWhere: any = deleteUseLessObjectKey({
       id,
-      name,
-      desc,
-      rtmp_url,
-      flv_url,
-      hls_url,
     });
     if (type !== undefined && isPureNumber(`${type}`)) {
       allWhere.type = type;
@@ -71,10 +61,12 @@ class LiveRoomService {
     if (keyWord) {
       const keyWordWhere = [
         {
-          desc: {
+          name: {
             [Op.like]: `%${keyWord}%`,
           },
-          name: {
+        },
+        {
+          desc: {
             [Op.like]: `%${keyWord}%`,
           },
         },

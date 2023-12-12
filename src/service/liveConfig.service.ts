@@ -55,9 +55,13 @@ class LiveConfigService {
           key: {
             [Op.like]: `%${keyWord}%`,
           },
+        },
+        {
           value: {
             [Op.like]: `%${keyWord}%`,
           },
+        },
+        {
           desc: {
             [Op.like]: `%${keyWord}%`,
           },

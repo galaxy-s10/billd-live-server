@@ -56,12 +56,18 @@ class OrderService {
           billd_live_order_subject: {
             [Op.like]: `%${keyWord}%`,
           },
+        },
+        {
           trade_no: {
             [Op.like]: `%${keyWord}%`,
           },
+        },
+        {
           out_trade_no: {
             [Op.like]: `%${keyWord}%`,
           },
+        },
+        {
           buyer_logon_id: {
             [Op.like]: `%${keyWord}%`,
           },

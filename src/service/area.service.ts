@@ -55,6 +55,8 @@ class AreaService {
           name: {
             [Op.like]: `%${keyWord}%`,
           },
+        },
+        {
           remark: {
             [Op.like]: `%${keyWord}%`,
           },
@@ -153,6 +155,8 @@ class AreaService {
           name: {
             [Op.like]: `%${keyWord}%`,
           },
+        },
+        {
           remark: {
             [Op.like]: `%${keyWord}%`,
           },

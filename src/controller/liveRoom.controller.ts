@@ -17,7 +17,7 @@ class LiveRoomController {
     update: (data: ILiveRoom) => liveRoomService.update(data),
   };
 
-  async getList(ctx: ParameterizedContext, next) {
+  getList = async (ctx: ParameterizedContext, next) => {
     const {
       id,
       name,
@@ -58,7 +58,7 @@ class LiveRoomController {
     });
     successHandler({ ctx, data: result });
     await next();
-  }
+  };
 
   async find(ctx: ParameterizedContext, next) {
     const id = +ctx.params.id;
@@ -96,7 +96,7 @@ class LiveRoomController {
     await next();
   };
 
-  async create(ctx: ParameterizedContext, next) {
+  create = async (ctx: ParameterizedContext, next) => {
     const {
       cover_img,
       bg_img,
@@ -126,9 +126,9 @@ class LiveRoomController {
     });
     successHandler({ ctx });
     await next();
-  }
+  };
 
-  async update(ctx: ParameterizedContext, next) {
+  update = async (ctx: ParameterizedContext, next) => {
     const id = +ctx.params.id;
     const {
       cover_img,
@@ -143,6 +143,7 @@ class LiveRoomController {
       flv_url,
       hls_url,
     }: ILiveRoom = ctx.request.body;
+    console.log(this, '-----');
     await this.common.update({
       id,
       cover_img,
@@ -159,7 +160,7 @@ class LiveRoomController {
     });
     successHandler({ ctx });
     await next();
-  }
+  };
 
   async delete(ctx: ParameterizedContext, next) {
     const id = +ctx.params.id;
