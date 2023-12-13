@@ -235,7 +235,7 @@ export const initUser: Record<string, IInitUser> = {
     id: 11,
     username: 'user-11',
     avatar: '',
-    user_roles: [DEFAULT_ROLE_INFO.VIP_USER.id],
+    user_roles: [DEFAULT_ROLE_INFO.TOURIST_USER.id],
     live_room: {
       id: 11,
       name: '周杰伦-搁浅',

@@ -187,7 +187,7 @@ class UserController {
     await next();
   }
 
-  async update(ctx: ParameterizedContext, next) {
+  update = async (ctx: ParameterizedContext, next) => {
     const id = +ctx.params.id;
     const { username, desc, status, avatar }: IUser = ctx.request.body;
     if (!username) {
@@ -223,7 +223,7 @@ class UserController {
     successHandler({ ctx });
 
     await next();
-  }
+  };
 
   async updateUserRole(ctx: ParameterizedContext, next) {
     const user_id = +ctx.params.id;

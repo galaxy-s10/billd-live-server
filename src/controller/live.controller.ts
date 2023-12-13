@@ -15,6 +15,8 @@ class LiveController {
     getList: async ({
       id,
       live_room_id,
+      live_room_is_show,
+      live_room_status,
       user_id,
       orderBy = 'asc',
       orderName = 'id',
@@ -28,6 +30,8 @@ class LiveController {
       const result = await liveService.getList({
         id,
         live_room_id,
+        live_room_is_show,
+        live_room_status,
         user_id,
         nowPage,
         pageSize,

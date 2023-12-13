@@ -16,6 +16,7 @@ import User from '@/model/user.model';
 import UserLiveRoom from '@/model/userLiveRoom.model';
 import UserRole from '@/model/userRole.model';
 import Wallet from '@/model/wallet.model';
+import wechatUser from '@/model/wechatUser.model';
 
 loadAllModel();
 
@@ -216,6 +217,28 @@ QqUser.belongsToMany(User, {
 });
 
 User.belongsToMany(QqUser, {
+  foreignKey: 'user_id',
+  otherKey: 'third_user_id',
+  targetKey: 'id',
+  constraints: false,
+  through: {
+    model: ThirdUser,
+    unique: false, // 不生成唯一索引
+  },
+});
+
+wechatUser.belongsToMany(User, {
+  foreignKey: 'third_user_id',
+  otherKey: 'user_id',
+  sourceKey: 'id',
+  constraints: false,
+  through: {
+    model: ThirdUser,
+    unique: false, // 不生成唯一索引
+  },
+});
+
+User.belongsToMany(wechatUser, {
   foreignKey: 'user_id',
   otherKey: 'third_user_id',
   targetKey: 'id',

@@ -25,6 +25,8 @@ class LiveRoomService {
   /** 获取直播间列表 */
   async getList({
     id,
+    status,
+    is_show,
     type,
     cdn,
     pull_is_should_auth,
@@ -45,6 +47,8 @@ class LiveRoomService {
     }
     const allWhere: any = deleteUseLessObjectKey({
       id,
+      status,
+      is_show,
     });
     if (type !== undefined && isPureNumber(`${type}`)) {
       allWhere.type = type;
@@ -67,6 +71,11 @@ class LiveRoomService {
         },
         {
           desc: {
+            [Op.like]: `%${keyWord}%`,
+          },
+        },
+        {
+          remark: {
             [Op.like]: `%${keyWord}%`,
           },
         },
@@ -190,6 +199,9 @@ class LiveRoomService {
   /** 修改直播间 */
   async update({
     id,
+    status,
+    is_show,
+    remark,
     cover_img,
     bg_img,
     name,
@@ -205,6 +217,9 @@ class LiveRoomService {
   }: ILiveRoom) {
     const result = await liveRoomModel.update(
       {
+        status,
+        is_show,
+        remark,
         cover_img,
         bg_img,
         name,
@@ -225,6 +240,9 @@ class LiveRoomService {
 
   /** 创建直播间 */
   async create({
+    status,
+    is_show,
+    remark,
     cover_img,
     bg_img,
     name,
@@ -239,6 +257,9 @@ class LiveRoomService {
     hls_url,
   }: ILiveRoom) {
     const result = await liveRoomModel.create({
+      status,
+      is_show,
+      remark,
       cover_img,
       bg_img,
       name,

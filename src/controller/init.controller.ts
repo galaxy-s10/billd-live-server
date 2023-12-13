@@ -24,6 +24,8 @@ import { initUser } from '@/init/initUser';
 import {
   IInitUser,
   IUser,
+  LiveRoomIsShowEnum,
+  LiveRoomStatusEnum,
   LiveRoomTypeEnum,
   LiveRoomUseCDNEnum,
 } from '@/interface';
@@ -226,6 +228,7 @@ class InitController {
           const liveRoom = await liveRoomModel.create({
             id: user.live_room?.id,
             name: user.live_room?.name,
+            desc: user.live_room?.desc,
             key: rtmptoken,
             type: LiveRoomTypeEnum.system,
             weight: user.live_room?.weight,
@@ -235,6 +238,8 @@ class InitController {
             rtmp_url,
             flv_url,
             hls_url,
+            status: LiveRoomStatusEnum.normal,
+            is_show: LiveRoomIsShowEnum.yes,
           });
           // @ts-ignore
           await liveRoom.setAreas(user.live_room?.area);

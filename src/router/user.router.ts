@@ -25,6 +25,14 @@ userRouter.get('/get_user_info', userController.getUserInfo);
 // 查找用户
 userRouter.get('/find/:id', userController.find);
 
+// 更新用户
+userRouter.put(
+  '/update/:id',
+  verifyProp,
+  apiVerifyAuth([DEFAULT_AUTH_INFO.USER_MANAGE.auth_value]),
+  userController.update
+);
+
 // 修改密码
 userRouter.put('/update_pwd', userController.updatePwd);
 

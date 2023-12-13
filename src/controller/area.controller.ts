@@ -42,6 +42,8 @@ class AreaController {
     getAreaLiveRoomList: async (data) => {
       const {
         id,
+        live_room_status,
+        live_room_is_show,
         name,
         remark,
         weight,
@@ -56,6 +58,8 @@ class AreaController {
       }: IList<IArea> = data;
       const result = await areaService.getAreaLiveRoomList({
         id,
+        live_room_status,
+        live_room_is_show,
         name,
         remark,
         weight,
@@ -95,9 +99,17 @@ class AreaController {
   };
 
   getLiveRoomList = async (ctx: ParameterizedContext, next) => {
-    const { id, nowPage, pageSize }: IList<IArea> = ctx.request.query;
+    const {
+      id,
+      live_room_is_show,
+      live_room_status,
+      nowPage,
+      pageSize,
+    }: IList<IArea> = ctx.request.query;
     const result = await areaService.getLiveRoomList({
       area_id: id,
+      live_room_is_show,
+      live_room_status,
       nowPage,
       pageSize,
     });

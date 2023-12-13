@@ -84,7 +84,13 @@ class AreaService {
   }
 
   /** 获取分区直播间列表 */
-  async getLiveRoomList({ area_id, nowPage, pageSize }) {
+  async getLiveRoomList({
+    area_id,
+    live_room_is_show,
+    live_room_status,
+    nowPage,
+    pageSize,
+  }) {
     let offset;
     let limit;
     if (nowPage && pageSize) {
@@ -94,6 +100,10 @@ class AreaService {
     const inst = await areaModel.findOne({ where: { id: area_id } });
     // @ts-ignore
     const count = (await inst?.countLive_rooms()) || 0;
+    const subWhere = deleteUseLessObjectKey({
+      is_show: live_room_is_show,
+      status: live_room_status,
+    });
     // @ts-ignore
     const result = await inst.getLive_rooms({
       limit,
@@ -118,6 +128,7 @@ class AreaService {
           },
         },
       ],
+      where: { ...subWhere },
     });
     return handlePaging({ rows: result, count }, nowPage, pageSize);
   }
@@ -125,6 +136,8 @@ class AreaService {
   /** 获取分区列表 */
   async getAreaLiveRoomList({
     id,
+    live_room_status,
+    live_room_is_show,
     name,
     remark,
     weight,
@@ -170,6 +183,10 @@ class AreaService {
         [Op.lt]: new Date(+rangTimeEnd!),
       };
     }
+    const subWhere = deleteUseLessObjectKey({
+      is_show: live_room_is_show,
+      status: live_room_status,
+    });
     // @ts-ignore
     const result = await areaModel.findAndCountAll({
       include: [
@@ -196,6 +213,7 @@ class AreaService {
                   },
                 },
               ],
+              where: { ...subWhere },
             },
           ],
           // https://www.sequelize.cn/other-topics/sub-queries#%E4%BD%BF%E7%94%A8%E5%AD%90%E6%9F%A5%E8%AF%A2%E8%BF%9B%E8%A1%8C%E5%A4%8D%E6%9D%82%E6%8E%92%E5%BA%8F

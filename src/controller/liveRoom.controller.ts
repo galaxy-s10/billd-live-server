@@ -20,6 +20,8 @@ class LiveRoomController {
   getList = async (ctx: ParameterizedContext, next) => {
     const {
       id,
+      status,
+      is_show,
       name,
       desc,
       type,
@@ -39,6 +41,8 @@ class LiveRoomController {
     }: IList<ILiveRoom> = ctx.request.query;
     const result = await liveRoomService.getList({
       id,
+      status,
+      is_show,
       name,
       desc,
       type,
@@ -98,6 +102,9 @@ class LiveRoomController {
 
   create = async (ctx: ParameterizedContext, next) => {
     const {
+      status,
+      is_show,
+      remark,
       cover_img,
       bg_img,
       name,
@@ -111,6 +118,9 @@ class LiveRoomController {
       hls_url,
     }: ILiveRoom = ctx.request.body;
     await this.common.create({
+      status,
+      is_show,
+      remark,
       cover_img,
       bg_img,
       name,
@@ -131,6 +141,9 @@ class LiveRoomController {
   update = async (ctx: ParameterizedContext, next) => {
     const id = +ctx.params.id;
     const {
+      status,
+      is_show,
+      remark,
       cover_img,
       bg_img,
       name,
@@ -143,9 +156,11 @@ class LiveRoomController {
       flv_url,
       hls_url,
     }: ILiveRoom = ctx.request.body;
-    console.log(this, '-----');
     await this.common.update({
       id,
+      status,
+      is_show,
+      remark,
       cover_img,
       bg_img,
       name,

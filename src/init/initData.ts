@@ -178,6 +178,7 @@ const initRoleAuth = () => {
       auth_id: v.id,
     });
   });
+
   [
     DEFAULT_AUTH_INFO.AUTH_MANAGE,
     DEFAULT_AUTH_INFO.ROLE_MANAGE,
@@ -211,6 +212,7 @@ const initRoleAuth = () => {
       auth_id: item.id,
     });
   });
+
   [
     DEFAULT_AUTH_INFO.COMMONENT_MANAGE,
     DEFAULT_AUTH_INFO.LIVE_PUSH,
@@ -234,6 +236,15 @@ const initRoleAuth = () => {
     roleAuth.push({
       id,
       role_id: DEFAULT_ROLE_INFO.VIP_USER.id,
+      auth_id: item.id,
+    });
+  });
+
+  [DEFAULT_AUTH_INFO.LIVE_PUSH, DEFAULT_AUTH_INFO.LIVE_PULL].forEach((item) => {
+    id += 1;
+    roleAuth.push({
+      id,
+      role_id: DEFAULT_ROLE_INFO.TOURIST_USER.id,
       auth_id: item.id,
     });
   });

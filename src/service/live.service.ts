@@ -1,4 +1,4 @@
-import { isPureNumber } from 'billd-utils';
+import { deleteUseLessObjectKey, isPureNumber } from 'billd-utils';
 import { Op, literal } from 'sequelize';
 
 import { IList, ILive } from '@/interface';
@@ -26,6 +26,8 @@ class LiveService {
     id,
     live_room_id,
     user_id,
+    live_room_is_show,
+    live_room_status,
     orderBy,
     orderName,
     nowPage,
@@ -77,6 +79,10 @@ class LiveService {
         [Op.lt]: new Date(+rangTimeEnd!),
       };
     }
+    const subWhere = deleteUseLessObjectKey({
+      is_show: live_room_is_show,
+      status: live_room_status,
+    });
     // @ts-ignore
     const result = await liveModel.findAndCountAll({
       include: [
@@ -99,6 +105,9 @@ class LiveService {
               },
             },
           ],
+          where: {
+            ...subWhere,
+          },
         },
       ],
       attributes: {

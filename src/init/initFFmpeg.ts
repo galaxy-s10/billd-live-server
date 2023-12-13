@@ -105,13 +105,15 @@ async function addLive({
       name,
       desc,
       cdn,
+      pull_is_should_auth,
       weight,
       cover_img,
-      type: LiveRoomTypeEnum.system,
-      pull_is_should_auth,
       rtmp_url,
       flv_url,
       hls_url,
+      type: LiveRoomTypeEnum.system,
+      // status: LiveRoomStatusEnum.normal,
+      // is_show: LiveRoomIsShowEnum.yes,
     });
   }
 

@@ -9,6 +9,7 @@ import qqUserModel from '@/model/qqUser.model';
 import roleModel from '@/model/role.model';
 import userModel from '@/model/user.model';
 import walletModel from '@/model/wallet.model';
+import wechatUserModel from '@/model/wechatUser.model';
 import { handlePaging } from '@/utils';
 
 class UserService {
@@ -182,6 +183,15 @@ class UserService {
             attributes: ['third_platform'],
             where: {
               third_platform: THIRD_PLATFORM.qq,
+            },
+          },
+        },
+        {
+          model: wechatUserModel,
+          through: {
+            attributes: ['third_platform'],
+            where: {
+              third_platform: THIRD_PLATFORM.wechat,
             },
           },
         },

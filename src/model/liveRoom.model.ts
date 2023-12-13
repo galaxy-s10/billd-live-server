@@ -29,6 +29,15 @@ const model = sequelize.define<LiveRoomModel>(
       type: DataTypes.STRING(100),
     },
     desc: {
+      type: DataTypes.STRING(300),
+    },
+    status: {
+      type: DataTypes.INTEGER,
+    },
+    is_show: {
+      type: DataTypes.INTEGER,
+    },
+    remark: {
       type: DataTypes.STRING(500),
     },
     key: {
