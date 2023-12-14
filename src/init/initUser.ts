@@ -120,26 +120,6 @@ export const initUser: Record<string, IInitUser> = {
     user_roles: [DEFAULT_ROLE_INFO.VIP_USER.id],
     live_room: {
       id: 5,
-      name: '房东的猫-你是我为数不多的骄傲',
-      desc: '房东的猫livehouse合集',
-      weight: 2,
-      cdn: LiveRoomUseCDNEnum.no,
-      pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
-      area: [1],
-      devFFmpeg: false, // 初始化ffmpeg
-      prodFFmpeg: true, // 初始化ffmpeg
-      cover_img: fddmNswwsbddjaBase64,
-      localFile: `${SERVER_VIDEO_DIR}fddm_nswwsbddja.mp4`,
-    },
-  },
-  systemUser5: {
-    id: 6,
-    username: 'Ojin',
-    avatar:
-      'https://resource.hsslive.cn/billd-live/image/7e048083bb5dccde76018625b644c84b.webp',
-    user_roles: [DEFAULT_ROLE_INFO.VIP_USER.id],
-    live_room: {
-      id: 6,
       name: '房东的猫-下一站茶山刘',
       desc: '房东的猫livehouse合集',
       weight: 2,
@@ -153,6 +133,26 @@ export const initUser: Record<string, IInitUser> = {
         PROJECT_ENV === PROJECT_ENV_ENUM.prod
           ? `${SERVER_VIDEO_DIR}fddm_xyzcsl.mp4`
           : resolveApp('/src/video/fddm_xyzcsl.mp4'),
+    },
+  },
+  systemUser5: {
+    id: 6,
+    username: 'Ojin',
+    avatar:
+      'https://resource.hsslive.cn/billd-live/image/7e048083bb5dccde76018625b644c84b.webp',
+    user_roles: [DEFAULT_ROLE_INFO.VIP_USER.id],
+    live_room: {
+      id: 6,
+      name: '房东的猫-你是我为数不多的骄傲',
+      desc: '房东的猫livehouse合集',
+      weight: 2,
+      cdn: LiveRoomUseCDNEnum.no,
+      pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
+      area: [1],
+      devFFmpeg: false, // 初始化ffmpeg
+      prodFFmpeg: true, // 初始化ffmpeg
+      cover_img: fddmNswwsbddjaBase64,
+      localFile: `${SERVER_VIDEO_DIR}fddm_nswwsbddja.mp4`,
     },
   },
   systemUser6: {
