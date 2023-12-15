@@ -147,7 +147,7 @@ export const REDIS_PREFIX = {
   qrCodeLogin: `${PROJECT_NAME}-${PROJECT_ENV}-qrCodeLogin___`, // 订单
 };
 
-export const IS_UPLOAD_SERVER = true; // 是否上传到服务器
+export const IS_UPLOAD_SERVER = false; // 是否上传到服务器
 
 // 平台类型
 export const THIRD_PLATFORM = {
