@@ -4,14 +4,17 @@ import fs from 'fs';
 import { rimrafSync } from 'rimraf';
 import { Server, Socket } from 'socket.io';
 
+import { jwtVerify } from '@/app/auth/authJwt';
 import liveRedisController from '@/config/websocket/live-redis.controller';
-import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import { DEFAULT_AUTH_INFO, PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import AuthController from '@/controller/auth.controller';
 import { LiveRoomTypeEnum } from '@/interface';
 import {
   WSGetRoomAllUserType,
   WsAnswerType,
   WsCandidateType,
   WsConnectStatusEnum,
+  WsDisableSpeakingType,
   WsGetLiveUserType,
   WsHeartbeatType,
   WsJoinType,
@@ -413,18 +416,35 @@ export const connectWebSocket = (server) => {
     });
 
     // 收到用户发送消息
-    socket.on(WsMsgTypeEnum.message, (data: WsMessageType) => {
+    socket.on(WsMsgTypeEnum.message, async (data: WsMessageType) => {
       prettierInfoLog({
         msg: '收到用户发送消息',
         socketId: socket.id,
         roomId: data.data.live_room_id,
       });
-      socketEmit<any>({
-        socket,
-        roomId: data.data.live_room_id,
-        msgType: WsMsgTypeEnum.message,
-        data,
+      const res = await liveRedisController.getDisableSpeaking({
+        liveRoomId: data.data.live_room_id,
+        userId: data.user_info?.id || -1,
       });
+      if (!res) {
+        socketEmit<any>({
+          socket,
+          roomId: data.data.live_room_id,
+          msgType: WsMsgTypeEnum.message,
+          data,
+        });
+      } else {
+        ioEmit<any>({
+          roomId: data.data.live_room_id,
+          msgType: WsMsgTypeEnum.disableSpeaking,
+          data: {
+            ...data.data,
+            request_id: data.request_id,
+            disable_created_at: res.created_at,
+            disable_expired_at: res.expired_at,
+          },
+        });
+      }
     });
 
     // 收到心跳
@@ -438,6 +458,46 @@ export const connectWebSocket = (server) => {
         client_ip: socket.handshake.address,
       });
     });
+
+    // 收到主播禁言用户
+    socket.on(
+      WsMsgTypeEnum.disableSpeaking,
+      async (data: WsDisableSpeakingType) => {
+        prettierInfoLog({
+          msg: '收到主播禁言用户',
+          socketId: socket.id,
+        });
+        try {
+          if (!data.user_token) {
+            return;
+          }
+          const { userInfo } = await jwtVerify(data.user_token);
+          if (!userInfo?.id) {
+            return;
+          }
+          const auths = await AuthController.common.getUserAuth(userInfo.id);
+          const hasAuth = auths.find(
+            (v) => v.auth_value === DEFAULT_AUTH_INFO.MESSAGE_DISABLE.auth_value
+          );
+          if (hasAuth) {
+            await liveRedisController.setDisableSpeaking({
+              userId: data.data.user_id,
+              liveRoomId: data.data.live_room_id,
+              exp: data.data.duration || 60 * 5,
+              client_ip: socket.handshake.address,
+            });
+            socketEmit<WsDisableSpeakingType['data']>({
+              socket,
+              msgType: WsMsgTypeEnum.disableSpeaking,
+              data: data.data,
+            });
+          }
+        } catch (error) {
+          console.log(error);
+          console.log(chalkERROR('disableSpeaking错误'));
+        }
+      }
+    );
 
     // 收到更新加入信息
     socket.on(

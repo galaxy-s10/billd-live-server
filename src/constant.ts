@@ -73,7 +73,7 @@ export const QQ_MAIL_CONFIG = {
   to: '2274751790@qq.com', // list of receivers
 };
 
-export const maxBitrate = 1000 * 3;
+export const maxBitrate = 1000 * 3; // 最大码率，3m
 
 export const SERVER_VIDEO_DIR = '/node/video/'; // 服务器video目录
 export const LOCALHOST_URL = 'localhost'; // 本地地址，一般是localhost或者127.0.0.1，但也可以是其他本地地址，如192.168.x.x
@@ -136,18 +136,20 @@ export const COMMON_ERR_MSG = {
 
 // redis前缀
 export const REDIS_PREFIX = {
-  emailLogin: `${PROJECT_NAME}-${PROJECT_ENV}-emailLogin___`, // 登录不区分前后台
-  emailRegister: `${PROJECT_NAME}-${PROJECT_ENV}-emailRegister___`, // 注册不区分前后台
+  emailLogin: `${PROJECT_NAME}-${PROJECT_ENV}-emailLogin___`, // 邮箱登录
+  emailRegister: `${PROJECT_NAME}-${PROJECT_ENV}-emailRegister___`, // 邮箱注册
   userBindEmail: `${PROJECT_NAME}-${PROJECT_ENV}-userBindEmail___`, // 用户绑定邮箱
   userCancelBindEmail: `${PROJECT_NAME}-${PROJECT_ENV}-userCancelBindEmail___`, // 用户取消绑定邮箱
   joined: `${PROJECT_NAME}-${PROJECT_ENV}-joined___`, // 用户加入了房间
   roomIsLiveing: `${PROJECT_NAME}-${PROJECT_ENV}-roomIsLiveing___`, // 主播正在直播
   order: `${PROJECT_NAME}-${PROJECT_ENV}-order___`, // 订单
-  fileProgress: `${PROJECT_NAME}-${PROJECT_ENV}-fileProgress___`, // 订单
-  qrCodeLogin: `${PROJECT_NAME}-${PROJECT_ENV}-qrCodeLogin___`, // 订单
+  fileProgress: `${PROJECT_NAME}-${PROJECT_ENV}-fileProgress___`, // 文件上传进度
+  qrCodeLogin: `${PROJECT_NAME}-${PROJECT_ENV}-qrCodeLogin___`, // 二维码登录
+  disableSpeaking: `${PROJECT_NAME}-${PROJECT_ENV}-disableSpeaking___`, // 禁言用户
+  kick: `${PROJECT_NAME}-${PROJECT_ENV}-kick___`, // 踢掉用户
 };
 
-export const IS_UPLOAD_SERVER = false; // 是否上传到服务器
+export const IS_UPLOAD_SERVER = !(PROJECT_ENV === PROJECT_ENV_ENUM.prod); // 是否上传到服务器
 
 // 平台类型
 export const THIRD_PLATFORM = {
@@ -173,28 +175,36 @@ export const DEFAULT_AUTH_INFO = {
     id: 4,
     auth_value: 'AUTH_MANAGE',
   },
-  COMMONENT_MANAGE: {
+  MESSAGE_MANAGE: {
     id: 5,
-    auth_value: 'COMMONENT_MANAGE',
+    auth_value: 'MESSAGE_MANAGE',
+  },
+  MESSAGE_SEND: {
+    id: 6,
+    auth_value: 'MESSAGE_SEND',
+  },
+  MESSAGE_DISABLE: {
+    id: 7,
+    auth_value: 'MESSAGE_DISABLE',
   },
   LOG_MANAGE: {
-    id: 6,
+    id: 8,
     auth_value: 'LOG_MANAGE',
   },
   LIVE_MANAGE: {
-    id: 7,
+    id: 9,
     auth_value: 'LIVE_MANAGE',
   },
   LIVE_PUSH: {
-    id: 8,
+    id: 10,
     auth_value: 'LIVE_PUSH',
   },
   LIVE_PULL: {
-    id: 9,
+    id: 11,
     auth_value: 'LIVE_PULL',
   },
   LIVE_PULL_SVIP: {
-    id: 10,
+    id: 12,
     auth_value: 'LIVE_PULL_SVIP',
   },
 };

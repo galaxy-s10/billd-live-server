@@ -45,7 +45,7 @@ async function verifyBitrateIsOver(info: IApiV1Streams['streams'][0]) {
         )
       );
       if (bitrate > maxBitrate) {
-        // 码率超过4m，踢掉
+        // 码率超过阈值，踢掉
         srsController.common.deleteApiV1Clients(info.publish.cid);
       }
     }
@@ -54,7 +54,7 @@ async function verifyBitrateIsOver(info: IApiV1Streams['streams'][0]) {
 
 const initLiveRoomId: number[] = [];
 Object.keys(initUser).forEach((iten) => {
-  initLiveRoomId.push(initUser[iten].live_room.id);
+  initLiveRoomId.push(initUser[iten].live_room.id!);
 });
 
 export const handleVerifyStream = async () => {

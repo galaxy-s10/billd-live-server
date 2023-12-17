@@ -44,12 +44,28 @@ const initAuth = () => {
       p_id: DEFAULT_AUTH_INFO.ALL_AUTH.id,
     },
     {
-      id: DEFAULT_AUTH_INFO.COMMONENT_MANAGE.id,
-      auth_name: '评论管理',
-      auth_value: DEFAULT_AUTH_INFO.COMMONENT_MANAGE.auth_value,
+      id: DEFAULT_AUTH_INFO.MESSAGE_MANAGE.id,
+      auth_name: '消息管理',
+      auth_value: DEFAULT_AUTH_INFO.MESSAGE_MANAGE.auth_value,
       type: 1,
       priority: 99,
       p_id: DEFAULT_AUTH_INFO.ALL_AUTH.id,
+    },
+    {
+      id: DEFAULT_AUTH_INFO.MESSAGE_SEND.id,
+      auth_name: '消息发送',
+      auth_value: DEFAULT_AUTH_INFO.MESSAGE_SEND.auth_value,
+      type: 1,
+      priority: 99,
+      p_id: DEFAULT_AUTH_INFO.MESSAGE_MANAGE.id,
+    },
+    {
+      id: DEFAULT_AUTH_INFO.MESSAGE_DISABLE.id,
+      auth_name: '消息禁用',
+      auth_value: DEFAULT_AUTH_INFO.MESSAGE_DISABLE.auth_value,
+      type: 1,
+      priority: 99,
+      p_id: DEFAULT_AUTH_INFO.MESSAGE_MANAGE.id,
     },
     {
       id: DEFAULT_AUTH_INFO.LOG_MANAGE.id,
@@ -183,7 +199,9 @@ const initRoleAuth = () => {
     DEFAULT_AUTH_INFO.AUTH_MANAGE,
     DEFAULT_AUTH_INFO.ROLE_MANAGE,
     DEFAULT_AUTH_INFO.USER_MANAGE,
-    DEFAULT_AUTH_INFO.COMMONENT_MANAGE,
+    DEFAULT_AUTH_INFO.MESSAGE_MANAGE,
+    DEFAULT_AUTH_INFO.MESSAGE_SEND,
+    DEFAULT_AUTH_INFO.MESSAGE_DISABLE,
     DEFAULT_AUTH_INFO.LIVE_MANAGE,
     DEFAULT_AUTH_INFO.LIVE_PUSH,
     DEFAULT_AUTH_INFO.LIVE_PULL,
@@ -199,7 +217,9 @@ const initRoleAuth = () => {
 
   [
     DEFAULT_AUTH_INFO.USER_MANAGE,
-    DEFAULT_AUTH_INFO.COMMONENT_MANAGE,
+    DEFAULT_AUTH_INFO.MESSAGE_MANAGE,
+    DEFAULT_AUTH_INFO.MESSAGE_SEND,
+    DEFAULT_AUTH_INFO.MESSAGE_DISABLE,
     DEFAULT_AUTH_INFO.LIVE_MANAGE,
     DEFAULT_AUTH_INFO.LIVE_PUSH,
     DEFAULT_AUTH_INFO.LIVE_PULL,
@@ -214,7 +234,7 @@ const initRoleAuth = () => {
   });
 
   [
-    DEFAULT_AUTH_INFO.COMMONENT_MANAGE,
+    DEFAULT_AUTH_INFO.MESSAGE_SEND,
     DEFAULT_AUTH_INFO.LIVE_PUSH,
     DEFAULT_AUTH_INFO.LIVE_PULL,
     DEFAULT_AUTH_INFO.LIVE_PULL_SVIP,
@@ -228,7 +248,7 @@ const initRoleAuth = () => {
   });
 
   [
-    DEFAULT_AUTH_INFO.COMMONENT_MANAGE,
+    DEFAULT_AUTH_INFO.MESSAGE_SEND,
     DEFAULT_AUTH_INFO.LIVE_PUSH,
     DEFAULT_AUTH_INFO.LIVE_PULL,
   ].forEach((item) => {

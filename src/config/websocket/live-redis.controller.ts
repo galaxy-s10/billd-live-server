@@ -103,6 +103,48 @@ class WSController {
     });
     return res ? JSON.parse(res) : null;
   };
+
+  /** 设置主播禁言用户*/
+  setDisableSpeaking = async (data: {
+    liveRoomId: number;
+    userId: number;
+    exp: number;
+    created_at?: number;
+    expired_at?: number;
+    client_ip?: string;
+  }) => {
+    const res = await redisController.setExVal({
+      prefix: `${REDIS_PREFIX.disableSpeaking}`,
+      key: `${data.liveRoomId}-${data.userId}`,
+      value: filterObj(data, ['created_at', 'expired_at', 'client_ip']),
+      exp: data.exp,
+      created_at: data.created_at,
+      expired_at: data.expired_at,
+      client_ip: data.client_ip,
+    });
+    return res;
+  };
+
+  /** 获取主播禁言用户*/
+  getDisableSpeaking = async (data: {
+    liveRoomId: number;
+    userId: number;
+  }): Promise<{
+    value: {
+      userId: number;
+      liveRoomId: number;
+      exp: number;
+    };
+    created_at: number;
+    expired_at: number;
+    client_ip: string;
+  }> => {
+    const res = await redisController.getVal({
+      prefix: `${REDIS_PREFIX.disableSpeaking}`,
+      key: `${data.liveRoomId}-${data.userId}`,
+    });
+    return res ? JSON.parse(res) : null;
+  };
 }
 
 export default new WSController();
