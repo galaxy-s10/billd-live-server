@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 import { JWT_SECRET } from '@/config/secret';
 import { ALLOW_HTTP_CODE, COMMON_ERR_MSG } from '@/constant';
-import { IUser } from '@/interface';
+import { IUser, UserStatusEnum } from '@/interface';
 import userService from '@/service/user.service';
 
 /**
@@ -45,7 +45,7 @@ export const jwtVerify = (token: string) => {
               });
               return;
             }
-            if (userResult.status === 2) {
+            if (userResult.status === UserStatusEnum.disable) {
               // 账号被禁用了
               resolve({
                 code: ALLOW_HTTP_CODE.unauthorized,

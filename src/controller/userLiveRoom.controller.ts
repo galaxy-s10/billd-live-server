@@ -10,7 +10,9 @@ import liveRoomController from '@/controller/liveRoom.controller';
 import {
   IList,
   IUserLiveRoom,
+  LiveRoomIsShowEnum,
   LiveRoomPullIsShouldAuthEnum,
+  LiveRoomStatusEnum,
   LiveRoomTypeEnum,
   LiveRoomUseCDNEnum,
 } from '@/interface';
@@ -115,6 +117,8 @@ class UserLiveRoomController {
       weight: 21,
       cdn: LiveRoomUseCDNEnum.no,
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
+      is_show: LiveRoomIsShowEnum.yes,
+      status: LiveRoomStatusEnum.normal,
     });
     // @ts-ignore
     await liveRoom.setAreas([1]);

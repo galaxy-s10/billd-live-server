@@ -9,7 +9,7 @@ import {
 import sequelize from '@/config/mysql';
 // import userService from '@/service/user.service';
 import { initTable } from '@/init/initDb';
-import { IUser } from '@/interface';
+import { IUser, UserStatusEnum } from '@/interface';
 // const MD5 = require('crypto-js/md5');
 
 interface UserModel
@@ -72,7 +72,7 @@ const model = sequelize.define<UserModel>(
     },
     status: {
       type: DataTypes.INTEGER,
-      defaultValue: 1, // 1:正常 2:禁用
+      defaultValue: UserStatusEnum.normal,
     },
     avatar: {
       type: DataTypes.STRING(150),

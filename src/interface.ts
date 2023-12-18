@@ -246,11 +246,19 @@ export interface ILiveRoom {
   deleted_at?: string;
 }
 
+/** 用户状态 */
+export enum UserStatusEnum {
+  /** 正常 */
+  normal,
+  /** 禁用 */
+  disable,
+}
+
 export interface IUser {
   id?: number;
   username?: string;
   password?: string;
-  status?: number;
+  status?: UserStatusEnum;
   avatar?: string;
   desc?: string;
   token?: string;

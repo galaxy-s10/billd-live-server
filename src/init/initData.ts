@@ -260,7 +260,7 @@ const initRoleAuth = () => {
     });
   });
 
-  [DEFAULT_AUTH_INFO.LIVE_PUSH, DEFAULT_AUTH_INFO.LIVE_PULL].forEach((item) => {
+  [DEFAULT_AUTH_INFO.LIVE_PULL].forEach((item) => {
     id += 1;
     roleAuth.push({
       id,
