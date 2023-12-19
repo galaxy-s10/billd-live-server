@@ -115,24 +115,6 @@ export const wsSocket: { io?: Server } = {
   io: undefined,
 };
 
-function socketEmit<T>({
-  socket,
-  roomId,
-  msgType,
-  data,
-}: {
-  socket: Socket;
-  roomId?: number;
-  msgType: WsMsgTypeEnum;
-  data?: T;
-}) {
-  if (roomId) {
-    socket.to(`${roomId}`).emit(msgType, data);
-  } else {
-    socket.emit(msgType, data);
-  }
-}
-
 export const connectWebSocket = (server) => {
   if (PROJECT_ENV === PROJECT_ENV_ENUM.beta) {
     console.log(chalkWARN('当前是beta环境，不初始化websocket'));
@@ -144,6 +126,25 @@ export const connectWebSocket = (server) => {
     maxHttpBufferSize: oneK * 1000 * 100,
   });
 
+  function socketEmit<T>({
+    socket,
+    roomId,
+    msgType,
+    data,
+  }: {
+    socket: Socket;
+    roomId?: number;
+    msgType: WsMsgTypeEnum;
+    data?: T;
+  }) {
+    // console.log('===socketEmit===', roomId, socket.id, msgType);
+    if (roomId) {
+      socket.to(`${roomId}`).emit(msgType, data);
+    } else {
+      socket.emit(msgType, data);
+    }
+  }
+
   function ioEmit<T>({
     roomId,
     msgType,
@@ -153,6 +154,7 @@ export const connectWebSocket = (server) => {
     msgType: WsMsgTypeEnum;
     data?: T;
   }) {
+    // console.log('===ioEmit===', roomId, msgType);
     if (roomId) {
       io.to(`${roomId}`).emit(msgType, data);
     } else {
@@ -434,15 +436,19 @@ export const connectWebSocket = (server) => {
           data,
         });
       } else {
-        ioEmit<any>({
-          roomId: data.data.live_room_id,
-          msgType: WsMsgTypeEnum.disableSpeaking,
-          data: {
-            ...data.data,
-            request_id: data.request_id,
-            disable_created_at: res.created_at,
-            disable_expired_at: res.expired_at,
-          },
+        io.sockets.sockets.forEach((socketItem) => {
+          if (socketItem.id === data.socket_id) {
+            socketEmit<any>({
+              socket: socketItem,
+              msgType: WsMsgTypeEnum.disableSpeaking,
+              data: {
+                ...data.data,
+                request_id: data.request_id,
+                disable_expired_at: res.expired_at,
+                is_disable_speaking: true,
+              },
+            });
+          }
         });
       }
     });
@@ -480,17 +486,82 @@ export const connectWebSocket = (server) => {
             (v) => v.auth_value === DEFAULT_AUTH_INFO.MESSAGE_DISABLE.auth_value
           );
           if (hasAuth) {
-            await liveRedisController.setDisableSpeaking({
-              userId: data.data.user_id,
-              liveRoomId: data.data.live_room_id,
-              exp: data.data.duration || 60 * 5,
-              client_ip: socket.handshake.address,
-            });
-            socketEmit<WsDisableSpeakingType['data']>({
-              socket,
-              msgType: WsMsgTypeEnum.disableSpeaking,
-              data: data.data,
-            });
+            if (data.data.restore) {
+              await liveRedisController.clearDisableSpeaking({
+                userId: data.data.user_id,
+                liveRoomId: data.data.live_room_id,
+              });
+              ioEmit<WsDisableSpeakingType['data']>({
+                msgType: WsMsgTypeEnum.disableSpeaking,
+                data: {
+                  ...data.data,
+                  restore_disable_ok: true,
+                  request_id: data.request_id,
+                },
+              });
+              // socketEmit<WsDisableSpeakingType['data']>({
+              //   socket,
+              //   msgType: WsMsgTypeEnum.disableSpeaking,
+              //   data: {
+              //     ...data.data,
+              //     restore_disable_ok: true,
+              //     request_id: data.request_id,
+              //   },
+              // });
+
+              // io.sockets.sockets.forEach((socketItem) => {
+              //   if (socketItem.id === data.data.socket_id) {
+              //     socketEmit<WsDisableSpeakingType['data']>({
+              //       socket: socketItem,
+              //       msgType: WsMsgTypeEnum.disableSpeaking,
+              //       data: {
+              //         ...data.data,
+              //         restore_disable_ok: true,
+              //         request_id: data.request_id,
+              //       },
+              //     });
+              //   }
+              // });
+            } else {
+              const exp = data.data.duration || 60 * 5;
+              await liveRedisController.setDisableSpeaking({
+                userId: data.data.user_id,
+                liveRoomId: data.data.live_room_id,
+                exp,
+                client_ip: socket.handshake.address,
+              });
+              socketEmit<WsDisableSpeakingType['data']>({
+                socket,
+                msgType: WsMsgTypeEnum.disableSpeaking,
+                data: {
+                  ...data.data,
+                  disable_ok: true,
+                  request_id: data.request_id,
+                },
+              });
+              ioEmit<WsDisableSpeakingType['data']>({
+                msgType: WsMsgTypeEnum.disableSpeaking,
+                data: {
+                  ...data.data,
+                  disable_expired_at: +new Date() + exp * 1000,
+                  request_id: data.request_id,
+                },
+              });
+              // io.sockets.sockets.forEach((socketItem) => {
+              //   if (socketItem.id === data.data.socket_id) {
+              //     socketEmit<WsDisableSpeakingType['data']>({
+              //       socket: socketItem,
+              //       msgType: WsMsgTypeEnum.disableSpeaking,
+              //       data: {
+              //         ...data.data,
+              //         disable_ok: true,
+              //         disable_expired_at: +new Date() + exp * 1000,
+              //         request_id: data.request_id,
+              //       },
+              //     });
+              //   }
+              // });
+            }
           }
         } catch (error) {
           console.log(error);

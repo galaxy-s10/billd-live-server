@@ -145,6 +145,17 @@ class WSController {
     });
     return res ? JSON.parse(res) : null;
   };
+
+  clearDisableSpeaking = async (data: {
+    liveRoomId: number;
+    userId: number;
+  }) => {
+    const res = await redisController.del({
+      prefix: `${REDIS_PREFIX.disableSpeaking}`,
+      key: `${data.liveRoomId}-${data.userId}`,
+    });
+    return res;
+  };
 }
 
 export default new WSController();
