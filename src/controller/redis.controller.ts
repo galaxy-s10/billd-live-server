@@ -6,50 +6,37 @@ class RedisController {
    * @param {*} param1
    * @return {*}
    */
-  getTTL = async ({ prefix, key }: { prefix: string; key: string }) => {
-    const res = await redisClient.ttl(`${prefix}${key}`);
+  getTTL = async (data: { prefix: string; key: string }) => {
+    const res = await redisClient.ttl(`${data.prefix}${data.key}`);
     return res;
   };
 
-  del = async ({ prefix, key }: { prefix: string; key: string }) => {
-    const res = await redisClient.del(`${prefix}${key}`);
+  del = async (data: { prefix: string; key: string }) => {
+    const res = await redisClient.del(`${data.prefix}${data.key}`);
     return res;
   };
 
-  getVal = async ({ prefix, key }: { prefix: string; key: string }) => {
-    const res = await redisClient.get(`${prefix}${key}`);
+  getVal = async (data: { prefix: string; key: string }) => {
+    const res = await redisClient.get(`${data.prefix}${data.key}`);
     return res;
   };
 
-  setVal = async ({
-    prefix,
-    key,
-    value,
-    created_at,
-  }: {
+  setVal = async (data: {
     prefix: string;
     key: string;
     value: Record<string, any>;
     created_at?: number;
   }) => {
     await redisClient.set(
-      `${prefix}${key}`,
+      `${data.prefix}${data.key}`,
       JSON.stringify({
-        value,
-        created_at: created_at || +new Date(),
+        value: data.value,
+        created_at: data.created_at || +new Date(),
       })
     );
   };
 
-  setExVal = async ({
-    prefix,
-    key,
-    value,
-    exp,
-    created_at,
-    expired_at,
-    client_ip,
-  }: {
+  setExVal = async (data: {
     prefix: string;
     key: string;
     value: Record<string, any>;
@@ -60,40 +47,40 @@ class RedisController {
     client_ip?: string;
   }) => {
     await redisClient.setEx(
-      `${prefix}${key}`,
-      exp,
+      `${data.prefix}${data.key}`,
+      data.exp,
       JSON.stringify({
-        value,
-        created_at: created_at || +new Date(),
-        expired_at: expired_at || +new Date() + exp * 1000,
-        client_ip: client_ip || '',
+        value: data.value,
+        created_at: data.created_at || +new Date(),
+        expired_at: data.expired_at || +new Date() + data.exp * 1000,
+        client_ip: data.client_ip || '',
       })
     );
   };
 
-  setHashVal = async (
-    key: string,
-    field: string,
-    value: Record<string, any>
-  ) => {
+  setHashVal = async (data: {
+    key: string;
+    field: string;
+    value: Record<string, any>;
+  }) => {
     const res = await redisClient.hSetNX(
-      key,
-      field,
+      data.key,
+      data.field,
       JSON.stringify({
-        value,
+        value: data.value,
         created_at: +new Date(),
       })
     );
     return res;
   };
 
-  delHashVal = async (key: string, field: string) => {
-    const res = await redisClient.hDel(key, field);
+  delHashVal = async (data: { key: string; field: string }) => {
+    const res = await redisClient.hDel(data.key, data.field);
     return res;
   };
 
-  getHashVal = async (key: string, field: string) => {
-    const res = await redisClient.hGet(key, field);
+  getHashVal = async (data: { key: string; field: string }) => {
+    const res = await redisClient.hGet(data.key, data.field);
     return res;
   };
 
@@ -107,11 +94,11 @@ class RedisController {
     return res;
   };
 
-  setSetVal = async (key: string, value: Record<string, any>) => {
+  setSetVal = async (data: { key: string; value: Record<string, any> }) => {
     const res = await redisClient.sAdd(
-      key,
+      data.key,
       JSON.stringify({
-        value,
+        value: data.value,
         created_at: +new Date(),
       })
     );
@@ -123,11 +110,11 @@ class RedisController {
     return res;
   };
 
-  setListVal = async (key: string, value: Record<string, any>) => {
+  setListVal = async (data: { key: string; value: Record<string, any> }) => {
     const res = await redisClient.lPush(
-      key,
+      data.key,
       JSON.stringify({
-        value,
+        value: data.value,
         created_at: +new Date(),
       })
     );

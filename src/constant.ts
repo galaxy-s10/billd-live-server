@@ -39,7 +39,7 @@ export const QINIU_LIVE = {
   },
 };
 
-export const CORS_ALLOW_ORIGIN = [
+export const CORS_ALLOW_ORIGIN: string | string[] = [
   'https://www.hsslive.cn',
   'https://admin.hsslive.cn',
   'https://live.hsslive.cn',
@@ -147,6 +147,7 @@ export const REDIS_PREFIX = {
   qrCodeLogin: `${PROJECT_NAME}-${PROJECT_ENV}-qrCodeLogin___`, // 二维码登录
   disableSpeaking: `${PROJECT_NAME}-${PROJECT_ENV}-disableSpeaking___`, // 禁言用户
   kick: `${PROJECT_NAME}-${PROJECT_ENV}-kick___`, // 踢掉用户
+  liveRoomOnlineUser: `${PROJECT_NAME}-${PROJECT_ENV}-liveRoomOnlineLisUser`, // 直播间在线用户
 };
 
 export const IS_UPLOAD_SERVER = !(PROJECT_ENV === PROJECT_ENV_ENUM.prod); // 是否上传到服务器

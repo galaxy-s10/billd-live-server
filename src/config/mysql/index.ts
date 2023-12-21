@@ -42,7 +42,7 @@ const msg = (flag: boolean) =>
 
 const sequelize = newSequelize(dbName);
 
-async function handleInit() {
+async function handleMysqlInit() {
   const initSequelize = newSequelize();
   try {
     await initSequelize.query(`USE ${dbName}`, { logging: false });
@@ -76,7 +76,7 @@ export const connectMysql = async () => {
       `开始连接${MYSQL_CONFIG.host}:${MYSQL_CONFIG.port}服务器的${dbName}数据库...`
     )
   );
-  await handleInit();
+  await handleMysqlInit();
   await sequelize.authenticate({ logging: false });
   await initDb('load', sequelize);
   console.log(chalkSUCCESS(msg(true)));

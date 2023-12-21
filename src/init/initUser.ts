@@ -163,7 +163,7 @@ export const initUser: Record<string, IInitUser> = {
     live_room: {
       id: 7,
       name: '周杰伦-不能说的秘密',
-      desc: '房东的猫livehouse合集',
+      desc: '周杰伦演唱会合集',
       weight: 2,
       cdn: LiveRoomUseCDNEnum.no,
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,

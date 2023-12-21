@@ -366,7 +366,10 @@ export const connectWebSocket = (server) => {
         socketId: socket.id,
         roomId: data.data.live_room_id,
       });
-      const liveUser = await getRoomAllUser(io, data.data.live_room_id);
+      const liveUser = await liveRedisController.getLiveRoomOnlineUser(
+        data.data.live_room_id
+      );
+      // const liveUser = await getRoomAllUser(io, data.data.live_room_id);
       socketEmit<WSGetRoomAllUserType['data']>({
         socket,
         msgType: WsMsgTypeEnum.liveUser,
@@ -544,6 +547,7 @@ export const connectWebSocket = (server) => {
                 data: {
                   ...data.data,
                   disable_expired_at: +new Date() + exp * 1000,
+                  is_disable_speaking: true,
                   request_id: data.request_id,
                 },
               });

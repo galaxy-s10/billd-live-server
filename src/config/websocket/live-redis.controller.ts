@@ -42,6 +42,20 @@ class WSController {
       expired_at: data.expired_at,
       client_ip: data.client_ip,
     });
+    if (data.userInfo) {
+      await redisController.setHashVal({
+        key: `${REDIS_PREFIX.liveRoomOnlineUser}-${data.joinRoomId}`,
+        field: `${data.userInfo.id!}`,
+        value: filterObj(data, ['created_at', 'expired_at', 'client_ip']),
+      });
+    } else {
+      await redisController.setHashVal({
+        key: `${REDIS_PREFIX.liveRoomOnlineUser}-${data.joinRoomId}`,
+        field: data.socketId,
+        value: filterObj(data, ['created_at', 'expired_at', 'client_ip']),
+      });
+    }
+
     return res;
   };
 
@@ -155,6 +169,13 @@ class WSController {
       key: `${data.liveRoomId}-${data.userId}`,
     });
     return res;
+  };
+
+  getLiveRoomOnlineUser = async (liveRoomId: number) => {
+    const res = await redisController.getAllHashVal(
+      `${REDIS_PREFIX.liveRoomOnlineUser}-${liveRoomId}`
+    );
+    return res.map((v) => JSON.parse(v));
   };
 }
 

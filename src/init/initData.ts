@@ -326,7 +326,6 @@ export const bulkCreateGoods: IGoods[] = [
     original_price: '0.00',
     badge: 'free',
     badge_bg: 'pink',
-    remark: '',
     nums: 1,
     cover:
       'https://resource.hsslive.cn/billd-live/image/c5258ebf3a79c7d67ef8ae95062c8fe4.webp',
@@ -340,7 +339,6 @@ export const bulkCreateGoods: IGoods[] = [
     original_price: '2.00',
     badge: '新品',
     badge_bg: '#e60c0d',
-    remark: '',
     nums: 1,
     cover:
       'https://resource.hsslive.cn/billd-live/image/3f56506ae5f536864dbc92b52c355bfe.webp',
@@ -354,7 +352,6 @@ export const bulkCreateGoods: IGoods[] = [
     original_price: '5.00',
     badge: '',
     badge_bg: '',
-    remark: '',
     nums: 1,
     cover:
       'https://resource.hsslive.cn/billd-live/image/3f4e7debdc978741f90515ace48aee22.webp',
@@ -368,7 +365,6 @@ export const bulkCreateGoods: IGoods[] = [
     original_price: '10.00',
     badge: '肝！',
     badge_bg: '#cda8a1',
-    remark: '',
     nums: 1,
     cover:
       'https://resource.hsslive.cn/billd-live/image/d9770d31ac7350556103c0b1ed09e01d.webp',
@@ -382,7 +378,6 @@ export const bulkCreateGoods: IGoods[] = [
     original_price: '0.10',
     badge: '',
     badge_bg: '',
-    remark: '',
     nums: 1,
     cover:
       'https://resource.hsslive.cn/billd-live/image/7170e9bbf14b8dcda73e30ccff589132.webp',
@@ -396,7 +391,6 @@ export const bulkCreateGoods: IGoods[] = [
     original_price: '1.00',
     badge: '',
     badge_bg: '',
-    remark: '',
     nums: 1,
     cover:
       'https://resource.hsslive.cn/billd-live/image/ed2e20878ee3cd9d2f71a4c3714e82a9.webp',
@@ -410,7 +404,6 @@ export const bulkCreateGoods: IGoods[] = [
     original_price: '10.00',
     badge: '',
     badge_bg: '',
-    remark: '',
     nums: 1,
     cover:
       'https://resource.hsslive.cn/billd-live/image/7e9edac32a8d9e0b7ac0b9554eded85c.webp',
@@ -424,7 +417,6 @@ export const bulkCreateGoods: IGoods[] = [
     original_price: '25.00',
     badge: '',
     badge_bg: '',
-    remark: '',
     nums: 1,
     cover:
       'https://resource.hsslive.cn/billd-live/image/8d4ac68c84b6d0cad754e15151869d71.webp',
@@ -438,7 +430,6 @@ export const bulkCreateGoods: IGoods[] = [
     original_price: '50.00',
     badge: 'crazy',
     badge_bg: '#cda8a1',
-    remark: '',
     nums: 1,
     cover:
       'https://resource.hsslive.cn/billd-live/image/fd04506d5b3167cf210bd875e5a97c8b.webp',
@@ -452,7 +443,6 @@ export const bulkCreateGoods: IGoods[] = [
     original_price: '100.00',
     badge: '',
     badge_bg: '',
-    remark: '',
     nums: 1,
     cover:
       'https://resource.hsslive.cn/billd-live/image/3f71039d061fb5b2dc4a2d835a5c66ca.webp',
@@ -466,7 +456,6 @@ export const bulkCreateGoods: IGoods[] = [
     original_price: '25.00',
     badge: '新人优惠',
     badge_bg: '#8fcbee',
-    remark: '',
     nums: 1,
     cover:
       'https://resource.hsslive.cn/billd-live/image/b89fcf45fb773d5ea6f173c906ce6a07.webp',
@@ -480,7 +469,6 @@ export const bulkCreateGoods: IGoods[] = [
     original_price: '50.00',
     badge: '',
     badge_bg: '',
-    remark: '',
     nums: 1,
     cover:
       'https://resource.hsslive.cn/billd-live/image/b89fcf45fb773d5ea6f173c906ce6a07.webp',
@@ -494,7 +482,6 @@ export const bulkCreateGoods: IGoods[] = [
     original_price: '150.00',
     badge: '',
     badge_bg: '',
-    remark: '',
     nums: 1,
     cover:
       'https://resource.hsslive.cn/billd-live/image/b89fcf45fb773d5ea6f173c906ce6a07.webp',
@@ -506,9 +493,8 @@ export const bulkCreateGoods: IGoods[] = [
     short_desc: '从零搭建迷你版b站直播间',
     price: '249.00',
     original_price: '299.00',
-    badge: '',
-    badge_bg: '',
-    remark: 'hot',
+    badge: 'hot',
+    badge_bg: '#ea3323',
     nums: 1,
     cover:
       'https://resource.hsslive.cn/billd-live/image/b89fcf45fb773d5ea6f173c906ce6a07.webp',
@@ -522,7 +508,6 @@ export const bulkCreateGoods: IGoods[] = [
     original_price: '0.00',
     badge: '',
     badge_bg: '',
-    remark: '',
     nums: 1,
     cover: '',
   },

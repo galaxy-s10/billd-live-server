@@ -176,17 +176,13 @@ export const corsMiddle = async (ctx: ParameterizedContext, next) => {
   if (ctx.header.origin?.indexOf('http://localhost') !== -1) {
     ctx.set('Access-Control-Allow-Credentials', 'true'); // 允许携带cookie，Access-Control-Allow-Origin为*的时候不能设置Access-Control-Allow-Credentials:true！
     ctx.set('Access-Control-Allow-Origin', ctx.header.origin!); // 允许的源
+  } else if (CORS_ALLOW_ORIGIN === '*') {
+    ctx.set('Access-Control-Allow-Origin', '*'); // 允许所有源
+  } else if (CORS_ALLOW_ORIGIN.includes(ctx.header.origin)) {
+    ctx.set('Access-Control-Allow-Credentials', 'true'); // 允许携带cookie，Access-Control-Allow-Origin为*的时候不能设置Access-Control-Allow-Credentials:true！
+    ctx.set('Access-Control-Allow-Origin', ctx.header.origin); // 允许的源
   } else {
-    const allowOrigin = CORS_ALLOW_ORIGIN;
-    // @ts-ignore
-    if (allowOrigin === '*') {
-      ctx.set('Access-Control-Allow-Origin', '*'); // 允许所有源
-    } else if (allowOrigin.includes(ctx.header.origin)) {
-      ctx.set('Access-Control-Allow-Credentials', 'true'); // 允许携带cookie，Access-Control-Allow-Origin为*的时候不能设置Access-Control-Allow-Credentials:true！
-      ctx.set('Access-Control-Allow-Origin', ctx.header.origin); // 允许的源
-    } else {
-      console.log('非法源！');
-    }
+    console.log('非法源！');
   }
 
   if (ctx.method === 'OPTIONS') {
