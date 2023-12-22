@@ -246,6 +246,18 @@ export interface ILiveRoom {
   deleted_at?: string;
 }
 
+export interface ILiveUser {
+  // id: string;
+  // rooms?: string[];
+  // userInfo?: IUser;
+  created_at: string;
+  value: {
+    socketId: string;
+    joinRoomId: number;
+    userInfo?: IUser;
+  };
+}
+
 /** 用户状态 */
 export enum UserStatusEnum {
   /** 正常 */

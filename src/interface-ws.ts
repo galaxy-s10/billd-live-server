@@ -1,6 +1,7 @@
 import {
   DanmuMsgTypeEnum,
   ILiveRoom,
+  ILiveUser,
   IUser,
   LiveRoomTypeEnum,
 } from './interface';
@@ -82,7 +83,7 @@ export type WsUpdateJoinInfoType = IWsFormat<{
 
 /** 获取在线用户 */
 export type WSGetRoomAllUserType = IWsFormat<{
-  liveUser: { id: any; rooms: any[] }[];
+  liveUser: ILiveUser[];
 }>;
 
 /** 获取在线用户 */
@@ -106,6 +107,7 @@ export type WsMessageType = IWsFormat<{
   msgType: DanmuMsgTypeEnum;
   msgIsFile: boolean;
   msg: string;
+  sendMsgTime: number;
   live_room_id: number;
 }>;
 
