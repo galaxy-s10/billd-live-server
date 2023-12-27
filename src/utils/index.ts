@@ -3,6 +3,25 @@ import os from 'os';
 import path from 'path';
 
 /**
+ * 获取日期当天的开始时间到结束时间
+ */
+export function dateStartAndEnd(date: Date) {
+  const y = date.getFullYear();
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  const startTime = `${y}-${m}-${d} 00:00:00`;
+  const endTime = `${y}-${m}-${d} 23:59:59`;
+  return {
+    startTime,
+    endTime,
+  };
+}
+
+export function getStars(count: number) {
+  return '*'.repeat(count);
+}
+
+/**
  * 获取最近一周
  */
 export const getLastestWeek = () => {
