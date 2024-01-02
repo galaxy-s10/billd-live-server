@@ -584,7 +584,25 @@ export interface IUserRole {
 
 export interface IDayData {
   id?: number;
-  today: string;
+  day: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
+export interface IHourData {
+  id?: number;
+  hour: string;
+
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
+export interface IMinuteData {
+  id?: number;
+  minute: string;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
