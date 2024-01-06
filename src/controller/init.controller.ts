@@ -1,5 +1,6 @@
 import { getRandomString } from 'billd-utils';
 import cryptojs from 'crypto-js';
+import dayjs from 'dayjs';
 import { ParameterizedContext } from 'koa';
 
 import { signJwt } from '@/app/auth/authJwt';
@@ -38,6 +39,7 @@ import goodsModel from '@/model/goods.model';
 import liveModel from '@/model/live.model';
 import liveConfigModel from '@/model/liveConfig.model';
 import liveRoomModel from '@/model/liveRoom.model';
+import mockDayDataModel from '@/model/mockDayData.model';
 import orderModel from '@/model/order.model';
 import qqUserModel from '@/model/qqUser.model';
 import roleModel from '@/model/role.model';
@@ -273,6 +275,48 @@ class InitController {
         arr.push(handleWallet(item));
       });
       await Promise.all(arr);
+    },
+    initDayData: async (total = 365 * 10) => {
+      // const count = await mockDayDataModel.count();
+      // if (count === 0) {
+      const res = await mockDayDataModel.findOne({ order: [['day', 'desc']] });
+      const lastDate = dayjs(res?.day || '2023-10-01 00:00:00');
+      const nowDate = dayjs().format('YYYY-MM-DD HH:mm:ss');
+      // const total = 36;
+      // const groupChunk = 10;
+      const groupChunk = 1000;
+      const remainder = total % groupChunk;
+      const group: any[] = [];
+      for (let i = 1; i < total; i += groupChunk) {
+        group.push(i);
+      }
+      if (remainder) {
+        group.push(total);
+      }
+      let initIndex = 0;
+      const queue: any[] = [];
+      for (let x = 0; x < group.length; x += 1) {
+        const sql = `INSERT INTO ${mockDayDataModel.name} ( day, created_at, updated_at ) VALUES`;
+        let str = '';
+        if (group[x]) {
+          for (initIndex; initIndex < group[x]; initIndex += 1) {
+            const initStartDate = lastDate
+              .add(initIndex + 1, 'day')
+              .format('YYYY-MM-DD 00:00:00');
+            str += `('${initStartDate}','${nowDate}','${nowDate}'),`;
+          }
+          const fullSql = sql + str.slice(0, str.length - 1);
+          queue.push(sequelize.query(fullSql));
+        }
+      }
+      await Promise.all(queue);
+      // } else {
+      //   throw new CustomError(
+      //     `已经初始化过${mockDayDataModel.name}表了，不能再初始化了！`,
+      //     ALLOW_HTTP_CODE.paramsError,
+      //     ALLOW_HTTP_CODE.paramsError
+      //   );
+      // }
     },
   };
 
