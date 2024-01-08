@@ -34,12 +34,12 @@ import areaModel from '@/model/area.model';
 import areaLiveRoomModel from '@/model/areaLiveRoom.model';
 import authModel from '@/model/auth.model';
 import { CustomError } from '@/model/customError.model';
-import dayDataModel from '@/model/dayData.model';
 import goodsModel from '@/model/goods.model';
 import liveModel from '@/model/live.model';
 import liveConfigModel from '@/model/liveConfig.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import mockDayDataModel from '@/model/mockDayData.model';
+import mockHourDataModel from '@/model/mockHourData.model';
 import orderModel from '@/model/order.model';
 import qqUserModel from '@/model/qqUser.model';
 import roleModel from '@/model/role.model';
@@ -54,45 +54,21 @@ import userService from '@/service/user.service';
 import walletService from '@/service/wallet.service';
 import { tencentcloudUtils } from '@/utils/tencentcloud';
 
-const sql1 = `
-DROP PROCEDURE IF EXISTS insert_many_dates;
-`;
-
-const sql2 = `
-CREATE DEFINER = root @'%' PROCEDURE insert_many_dates ( number_to_insert INT ) BEGIN
-
-	SET @x = 0;
-
-	SET @date = '2022-01-01';
-	REPEAT
-
-			SET @x = @x + 1;
-		INSERT INTO day_data ( today, created_at, updated_at )
-		VALUES
-			( @date, NOW(), NOW() );
-
-		SET @date = DATE_ADD( @date, INTERVAL 1 DAY );
-		UNTIL @x >= number_to_insert
-	END REPEAT;
-
-END
-`;
-
-const sql3 = `call insert_many_dates(3650)`;
-
 class InitController {
   common = {
     initDefault: async () => {
       try {
         await this.common.initUser();
+        await this.common.initGoods(); // 如果商品表报错，就代表已经初始化过了
         await Promise.all([
+          this.common.initDayData(365 * 10),
+          this.common.initHourData(365 * 10 * 24),
           this.common.initLiveConfig(),
           this.common.initRole(),
           this.common.initAuth(),
           this.common.initRoleAuth(),
           // this.common.initUser(),
           this.common.initUserWallet(),
-          this.common.initGoods(),
           this.common.initArea(),
         ]);
       } catch (error) {
@@ -318,6 +294,50 @@ class InitController {
       //   );
       // }
     },
+    initHourData: async (total = 365 * 10 * 24) => {
+      // const count = await mockDayDataModel.count();
+      // if (count === 0) {
+      const res = await mockHourDataModel.findOne({
+        order: [['hour', 'desc']],
+      });
+      const lastDate = dayjs(res?.hour || '2023-10-01 00:00:00');
+      const nowDate = dayjs().format('YYYY-MM-DD HH:mm:ss');
+      // const total = 36;
+      // const groupChunk = 10;
+      const groupChunk = 1000;
+      const remainder = total % groupChunk;
+      const group: any[] = [];
+      for (let i = 1; i < total; i += groupChunk) {
+        group.push(i);
+      }
+      if (remainder) {
+        group.push(total);
+      }
+      let initIndex = 0;
+      const queue: any[] = [];
+      for (let x = 0; x < group.length; x += 1) {
+        const sql = `INSERT INTO ${mockHourDataModel.name} ( hour, created_at, updated_at ) VALUES`;
+        let str = '';
+        if (group[x]) {
+          for (initIndex; initIndex < group[x]; initIndex += 1) {
+            const initStartDate = lastDate
+              .add(initIndex + 1, 'hour')
+              .format('YYYY-MM-DD HH:00:00');
+            str += `('${initStartDate}','${nowDate}','${nowDate}'),`;
+          }
+          const fullSql = sql + str.slice(0, str.length - 1);
+          queue.push(sequelize.query(fullSql));
+        }
+      }
+      await Promise.all(queue);
+      // } else {
+      //   throw new CustomError(
+      //     `已经初始化过${mockDayDataModel.name}表了，不能再初始化了！`,
+      //     ALLOW_HTTP_CODE.paramsError,
+      //     ALLOW_HTTP_CODE.paramsError
+      //   );
+      // }
+    },
   };
 
   // initDefault = async (ctx: ParameterizedContext, next) => {
@@ -383,28 +403,26 @@ class InitController {
   };
 
   // 初始化时间表
-  async initDayData(ctx: ParameterizedContext, next) {
-    const count = await dayDataModel.count();
-    if (count === 0) {
-      await sequelize.query(sql1);
-      await sequelize.query(sql2);
-      await sequelize.query(sql3);
-    } else {
-      throw new CustomError(
-        '已经初始化过时间表了，不能再初始化了！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
-      );
-    }
-    successHandler({ ctx, data: '初始化时间表成功！' });
+  initDayData = async (ctx: ParameterizedContext, next) => {
+    await mockDayDataModel.sync({ alter: true });
+    await this.common.initDayData(365 * 10);
+    successHandler({ ctx, data: `初始化${mockDayDataModel.name}表成功！` });
     await next();
-  }
+  };
+
+  // 初始化时间表
+  initHourData = async (ctx: ParameterizedContext, next) => {
+    await mockHourDataModel.sync({ alter: true });
+    await this.common.initHourData(365 * 10 * 24);
+    successHandler({ ctx, data: `初始化${mockHourDataModel.name}表成功！` });
+    await next();
+  };
 
   // 重建表
   forceTable = async (ctx: ParameterizedContext, next) => {
     if (PROJECT_ENV !== PROJECT_ENV_ENUM.development) {
       throw new CustomError(
-        '非开发环境，不能截断表！',
+        '非开发环境，不能重建表！',
         ALLOW_HTTP_CODE.paramsError,
         ALLOW_HTTP_CODE.paramsError
       );

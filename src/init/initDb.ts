@@ -73,7 +73,7 @@ export const deleteAllIndexs = async (sequelize: Sequelize) => {
  * @param model
  * @param method
  */
-export const initTable = (data: {
+export const initTable = async (data: {
   model: ModelStatic<Model>;
   method?: 'force' | 'alter';
   sequelize: Sequelize;
@@ -96,10 +96,12 @@ export const initTable = (data: {
       console.log(chalkINFO(`加载数据库表: ${modelArg.tableName}`));
     }
   }
-  main(data.model, data.method).catch((err) => {
-    console.log(chalkERROR(`initTable失败`), err.message);
-    console.log(err);
-  });
+  try {
+    await main(data.model, data.method);
+  } catch (error: any) {
+    console.log(chalkERROR(`initTable失败`), error.message);
+    console.log(error);
+  }
 };
 
 /** 加载所有model */
