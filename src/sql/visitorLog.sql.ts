@@ -1,7 +1,9 @@
 import mockDayDataModel from '@/model/mockDayData.model';
 import mockHourDataModel from '@/model/mockHourData.model';
+import mockMinuteTenDataModel from '@/model/mockMinuteTenData.model';
+import visitorLogModel from '@/model/visitorLog.model';
 
-export const getAnalysisSql = (data: {
+export const getAnalysisByDaySql = (data: {
   rangTimeStart: string;
   rangTimeEnd: string;
   orderName: string;
@@ -23,11 +25,11 @@ FROM
 		user_id,
 		live_room_id,
 		duration,
-		DATE_FORMAT( visitor_log.created_at, '%Y-%m-%d 00:00:00' ) AS format_created_at
+		DATE_FORMAT( ${visitorLogModel.name}.created_at, '%Y-%m-%d 00:00:00' ) AS format_created_at
 	FROM
-		visitor_log AS visitor_log
+		${visitorLogModel.name} AS ${visitorLogModel.name}
 	WHERE
-	( visitor_log.deleted_at IS NULL AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}')) AS t2
+	( ${visitorLogModel.name}.deleted_at IS NULL AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}')) AS t2
 	RIGHT JOIN ${mockDayDataModel.name} AS t3 ON t2.format_created_at = t3.day
 WHERE
 	t3.day >= '${data.rangTimeStart}'
@@ -37,7 +39,7 @@ GROUP BY
 ORDER BY ${data.orderName} ${data.orderBy}
 `;
 
-export const getAnalysisHourSql = (data: {
+export const getAnalysisByHourSql = (data: {
   rangTimeStart: string;
   rangTimeEnd: string;
   orderName: string;
@@ -59,15 +61,51 @@ FROM
 		user_id,
 		live_room_id,
 		duration,
-		DATE_FORMAT( visitor_log.created_at, '%Y-%m-%d %H:00:00' ) AS format_created_at
+		DATE_FORMAT( ${visitorLogModel.name}.created_at, '%Y-%m-%d %H:00:00' ) AS format_created_at
 	FROM
-		visitor_log AS visitor_log
+		${visitorLogModel.name} AS ${visitorLogModel.name}
 	WHERE
-	( visitor_log.deleted_at IS NULL AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}')) AS t2
+	( ${visitorLogModel.name}.deleted_at IS NULL AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}')) AS t2
 	RIGHT JOIN ${mockHourDataModel.name} AS t3 ON t2.format_created_at = t3.hour
 WHERE
 	t3.hour >= '${data.rangTimeStart}'
 	AND t3.hour <= '${data.rangTimeEnd}'
+GROUP BY
+	format_date
+ORDER BY ${data.orderName} ${data.orderBy}
+`;
+
+export const getAnalysisByMinuteTenSql = (data: {
+  rangTimeStart: string;
+  rangTimeEnd: string;
+  orderName: string;
+  orderBy: string;
+}) => `
+SELECT
+  COALESCE ( sum( duration ), 0 ) AS sum_duration,
+  t3.minute AS format_date,
+  GROUP_CONCAT( DISTINCT ip SEPARATOR ', ' ) AS unique_ip_str,
+	GROUP_CONCAT( DISTINCT user_id SEPARATOR ', ' ) AS unique_user_id_str,
+	GROUP_CONCAT( ip SEPARATOR ', ' ) AS ip_str,
+	GROUP_CONCAT( user_id SEPARATOR ', ' ) AS user_id_str,
+	GROUP_CONCAT( duration SEPARATOR ', ' ) AS duration_str
+FROM
+	(
+	SELECT
+		id,
+		ip,
+		user_id,
+		live_room_id,
+		duration,
+		DATE_FORMAT( ${visitorLogModel.name}.created_at, '%Y-%m-%d %H:%M:00' ) AS format_created_at
+	FROM
+		${visitorLogModel.name} AS ${visitorLogModel.name}
+	WHERE
+	( ${visitorLogModel.name}.deleted_at IS NULL AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}')) AS t2
+	RIGHT JOIN ${mockMinuteTenDataModel.name} AS t3 ON t2.format_created_at = t3.minute
+WHERE
+	t3.minute >= '${data.rangTimeStart}'
+	AND t3.minute <= '${data.rangTimeEnd}'
 GROUP BY
 	format_date
 ORDER BY ${data.orderName} ${data.orderBy}
@@ -99,7 +137,7 @@ export const getUserVisitRecordSql = (data: {
     COALESCE ( GROUP_CONCAT( DISTINCT live_room_id SEPARATOR ', ' ), '' ) AS live_room_id_str,
     COALESCE ( GROUP_CONCAT( duration SEPARATOR ', ' ), '' ) AS duration_str
   FROM
-    ( SELECT user_id, duration, live_room_id, DATE_FORMAT( created_at, '%Y-%m-%d' ) AS format_date FROM visitor_log WHERE deleted_at IS NULL AND user_id = ${data.userId} AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}' ) AS subquery
+    ( SELECT user_id, duration, live_room_id, DATE_FORMAT( created_at, '%Y-%m-%d' ) AS format_date FROM ${visitorLogModel.name} WHERE deleted_at IS NULL AND user_id = ${data.userId} AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}' ) AS subquery
     RIGHT JOIN ${mockDayDataModel.name} AS t3 ON t3.day = subquery.format_date
     LEFT JOIN user AS t4 ON t4.id = ${data.userId}
     LEFT JOIN user_child AS t5 ON t5.child_user_id = ${data.userId}
@@ -135,7 +173,7 @@ export const getIpVisitRecordSql = (data: {
     COALESCE ( GROUP_CONCAT( DISTINCT live_room_id SEPARATOR ', ' ), '' ) AS live_room_id_str,
     COALESCE ( GROUP_CONCAT( duration SEPARATOR ', ' ), '' ) AS duration_str
   FROM
-    ( SELECT ip, duration, live_room_id, DATE_FORMAT( created_at, '%Y-%m-%d' ) AS format_date FROM visitor_log WHERE deleted_at IS NULL AND ip = '${data.ip}' AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}' ) AS subquery
+    ( SELECT ip, duration, live_room_id, DATE_FORMAT( created_at, '%Y-%m-%d' ) AS format_date FROM ${visitorLogModel.name} WHERE deleted_at IS NULL AND ip = '${data.ip}' AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}' ) AS subquery
     RIGHT JOIN ${mockDayDataModel.name} AS t3 ON t3.day = subquery.format_date
   WHERE
     t3.day >= '${data.rangTimeStart}'
