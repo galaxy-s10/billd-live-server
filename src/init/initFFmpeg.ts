@@ -94,7 +94,7 @@ async function addLive({
         exec(ffmpegCmd);
         console.log(
           chalkSUCCESS(`FFmpeg推流成功！roomId：${live_room_id}`),
-          ffmpegCmd
+          ffmpegCmd.replace(' -loglevel quiet', '')
         );
       } catch (error) {
         console.log(chalkERROR(`FFmpeg推流错误！`), error);

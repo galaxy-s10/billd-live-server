@@ -36,6 +36,7 @@ export function loadAllRoutes(app) {
   });
   if (err.length) {
     console.log(chalkERROR(`加载路由: ${err.toString()}出错！`));
+    throw new Error('');
   } else {
     console.log(chalkSUCCESS('加载所有路由成功！'));
   }

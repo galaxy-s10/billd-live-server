@@ -37,15 +37,28 @@ initRouter.post(
 // 初始化时间表
 initRouter.post(
   '/day_data',
-  apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
+  // apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
   initController.initDayData
 );
 
 // 初始化时间表
 initRouter.post(
   '/hour_data',
-  apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
+  // apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
   initController.initHourData
+);
+
+// 初始化时间表
+initRouter.post(
+  '/minute_ten_data',
+  // apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
+  initController.initMinuteTenData
+);
+// 初始化时间表
+initRouter.post(
+  '/minute_thirty_data',
+  // apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
+  initController.initMinuteThirtyData
 );
 
 // 初始化用户

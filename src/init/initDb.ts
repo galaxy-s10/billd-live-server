@@ -1,16 +1,71 @@
 import fs from 'fs';
 
+import dayjs from 'dayjs';
 import { Sequelize } from 'sequelize';
 import { Model, ModelStatic } from 'sequelize/types';
 
-// import sequelize from '@/config/mysql';
+import sequelize from '@/config/mysql';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 
+export async function mockTimeBatchInsert({
+  model,
+  field,
+  total,
+  unitNum,
+  unit,
+  format,
+}: {
+  model;
+  field;
+  total;
+  unitNum: number;
+  unit: dayjs.ManipulateType;
+  format;
+}) {
+  console.log(model, field, total, unitNum, unit, '===');
+  const res = await model.findOne({
+    order: [[field, 'desc']],
+  });
+  const lastDate = dayjs(
+    res?.[field] || dayjs().subtract(6, 'month').format('YYYY-MM-DD 00:00:00')
+  );
+  const nowDate = dayjs().format('YYYY-MM-DD HH:mm:ss');
+  // const total = 36;
+  // const groupChunk = 10;
+  const groupChunk = 1000;
+  const remainder = total % groupChunk;
+  const group: any[] = [];
+  for (let i = 1; i < total; i += groupChunk) {
+    group.push(i);
+  }
+  if (remainder) {
+    group.push(total);
+  }
+  let initIndex = 0;
+  const queue: any[] = [];
+  for (let x = 0; x < group.length; x += 1) {
+    // eslint-disable-next-line
+    const sql = `INSERT INTO ${model.name} ( ${field}, created_at, updated_at ) VALUES`;
+    let str = '';
+    if (group[x]) {
+      for (initIndex; initIndex < group[x]; initIndex += 1) {
+        const initStartDate = lastDate
+          .add((initIndex + 1) * unitNum, unit)
+          .format(format);
+        str += `('${initStartDate}','${nowDate}','${nowDate}'),`;
+      }
+      const fullSql = sql + str.slice(0, str.length - 1);
+      queue.push(sequelize.query(fullSql));
+    }
+  }
+  await Promise.all(queue);
+}
+
 /** 删除所有外键 */
-export const deleteAllForeignKeys = async (sequelize: Sequelize) => {
+export const deleteAllForeignKeys = async (sequelizeInst: Sequelize) => {
   try {
-    const queryInterface = sequelize.getQueryInterface();
+    const queryInterface = sequelizeInst.getQueryInterface();
     const allTables: string[] = await queryInterface.showAllTables();
     console.log(chalkINFO(`所有表:${allTables.toString()}`));
     const allConstraint: any = [];
@@ -37,9 +92,9 @@ export const deleteAllForeignKeys = async (sequelize: Sequelize) => {
 };
 
 /** 删除所有索引（除了PRIMARY） */
-export const deleteAllIndexs = async (sequelize: Sequelize) => {
+export const deleteAllIndexs = async (sequelizeInst: Sequelize) => {
   try {
-    const queryInterface = sequelize.getQueryInterface();
+    const queryInterface = sequelizeInst.getQueryInterface();
     const allTables = await queryInterface.showAllTables();
     console.log(chalkINFO(`所有表:${allTables.toString()}`));
     const allIndexs: any = [];
@@ -120,10 +175,10 @@ export const loadAllModel = () => {
 };
 
 /** 删除所有表 */
-export const deleteAllTable = async (sequelize: Sequelize) => {
+export const deleteAllTable = async (sequelizeInst: Sequelize) => {
   try {
     loadAllModel();
-    await sequelize.drop();
+    await sequelizeInst.drop();
     console.log(chalkSUCCESS('删除所有表成功！'));
   } catch (err) {
     console.log(chalkERROR('删除所有表失败！'));

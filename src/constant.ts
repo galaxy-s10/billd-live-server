@@ -80,7 +80,6 @@ export const LOCALHOST_URL = 'localhost'; // 本地地址，一般是localhost�
 export const DOMAIN_URL = 'localhost'; // 本地地址，一般是localhost或者127.0.0.1，但也可以是其他本地地址，如192.168.x.x
 
 // .hsslive.cn
-// .hfgmupw.cn
 export const COOKIE_DOMAIN = '.hsslive.cn';
 
 export const ERROR_HTTP_CODE = {

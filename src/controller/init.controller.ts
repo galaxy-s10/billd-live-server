@@ -1,11 +1,9 @@
 import { getRandomString } from 'billd-utils';
 import cryptojs from 'crypto-js';
-import dayjs from 'dayjs';
 import { ParameterizedContext } from 'koa';
 
 import { signJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import sequelize from '@/config/mysql';
 import { SERVER_LIVE } from '@/config/secret';
 import {
   ALLOW_HTTP_CODE,
@@ -21,6 +19,7 @@ import {
   bulkCreateRole,
   bulkCreateRoleAuth,
 } from '@/init/initData';
+import { mockTimeBatchInsert } from '@/init/initDb';
 import { initUser } from '@/init/initUser';
 import {
   IInitUser,
@@ -38,8 +37,11 @@ import goodsModel from '@/model/goods.model';
 import liveModel from '@/model/live.model';
 import liveConfigModel from '@/model/liveConfig.model';
 import liveRoomModel from '@/model/liveRoom.model';
+import logModel from '@/model/log.model';
 import mockDayDataModel from '@/model/mockDayData.model';
 import mockHourDataModel from '@/model/mockHourData.model';
+import mockMinuteTenDataModel from '@/model/mockMinuteTenData.model';
+import mockMinuteThirtyDataModel from '@/model/mockMinuteThirtyData.model';
 import orderModel from '@/model/order.model';
 import qqUserModel from '@/model/qqUser.model';
 import roleModel from '@/model/role.model';
@@ -61,8 +63,10 @@ class InitController {
         await this.common.initUser();
         await this.common.initGoods(); // 如果商品表报错，就代表已经初始化过了
         await Promise.all([
-          this.common.initDayData(365 * 10),
-          this.common.initHourData(365 * 10 * 24),
+          this.common.initDayData(365 * 3),
+          this.common.initHourData(365 * 3 * 24),
+          this.common.initMinuteTenData(365 * 3 * 24 * 6),
+          this.common.initMinuteThirtyData(365 * 3 * 24 * 2),
           this.common.initLiveConfig(),
           this.common.initRole(),
           this.common.initAuth(),
@@ -252,40 +256,17 @@ class InitController {
       });
       await Promise.all(arr);
     },
-    initDayData: async (total = 365 * 10) => {
+    initDayData: async (total = 365 * 3) => {
       // const count = await mockDayDataModel.count();
       // if (count === 0) {
-      const res = await mockDayDataModel.findOne({ order: [['day', 'desc']] });
-      const lastDate = dayjs(res?.day || '2023-10-01 00:00:00');
-      const nowDate = dayjs().format('YYYY-MM-DD HH:mm:ss');
-      // const total = 36;
-      // const groupChunk = 10;
-      const groupChunk = 1000;
-      const remainder = total % groupChunk;
-      const group: any[] = [];
-      for (let i = 1; i < total; i += groupChunk) {
-        group.push(i);
-      }
-      if (remainder) {
-        group.push(total);
-      }
-      let initIndex = 0;
-      const queue: any[] = [];
-      for (let x = 0; x < group.length; x += 1) {
-        const sql = `INSERT INTO ${mockDayDataModel.name} ( day, created_at, updated_at ) VALUES`;
-        let str = '';
-        if (group[x]) {
-          for (initIndex; initIndex < group[x]; initIndex += 1) {
-            const initStartDate = lastDate
-              .add(initIndex + 1, 'day')
-              .format('YYYY-MM-DD 00:00:00');
-            str += `('${initStartDate}','${nowDate}','${nowDate}'),`;
-          }
-          const fullSql = sql + str.slice(0, str.length - 1);
-          queue.push(sequelize.query(fullSql));
-        }
-      }
-      await Promise.all(queue);
+      await mockTimeBatchInsert({
+        model: mockDayDataModel,
+        unit: 'day',
+        unitNum: 1,
+        field: 'day',
+        total,
+        format: 'YYYY-MM-DD 00:00:00',
+      });
       // } else {
       //   throw new CustomError(
       //     `已经初始化过${mockDayDataModel.name}表了，不能再初始化了！`,
@@ -294,57 +275,37 @@ class InitController {
       //   );
       // }
     },
-    initHourData: async (total = 365 * 10 * 24) => {
-      // const count = await mockDayDataModel.count();
-      // if (count === 0) {
-      const res = await mockHourDataModel.findOne({
-        order: [['hour', 'desc']],
+    initHourData: async (total = 365 * 3 * 24) => {
+      await mockTimeBatchInsert({
+        model: mockHourDataModel,
+        unit: 'hour',
+        unitNum: 1,
+        field: 'hour',
+        total,
+        format: 'YYYY-MM-DD HH:00:00',
       });
-      const lastDate = dayjs(res?.hour || '2023-10-01 00:00:00');
-      const nowDate = dayjs().format('YYYY-MM-DD HH:mm:ss');
-      // const total = 36;
-      // const groupChunk = 10;
-      const groupChunk = 1000;
-      const remainder = total % groupChunk;
-      const group: any[] = [];
-      for (let i = 1; i < total; i += groupChunk) {
-        group.push(i);
-      }
-      if (remainder) {
-        group.push(total);
-      }
-      let initIndex = 0;
-      const queue: any[] = [];
-      for (let x = 0; x < group.length; x += 1) {
-        const sql = `INSERT INTO ${mockHourDataModel.name} ( hour, created_at, updated_at ) VALUES`;
-        let str = '';
-        if (group[x]) {
-          for (initIndex; initIndex < group[x]; initIndex += 1) {
-            const initStartDate = lastDate
-              .add(initIndex + 1, 'hour')
-              .format('YYYY-MM-DD HH:00:00');
-            str += `('${initStartDate}','${nowDate}','${nowDate}'),`;
-          }
-          const fullSql = sql + str.slice(0, str.length - 1);
-          queue.push(sequelize.query(fullSql));
-        }
-      }
-      await Promise.all(queue);
-      // } else {
-      //   throw new CustomError(
-      //     `已经初始化过${mockDayDataModel.name}表了，不能再初始化了！`,
-      //     ALLOW_HTTP_CODE.paramsError,
-      //     ALLOW_HTTP_CODE.paramsError
-      //   );
-      // }
+    },
+    initMinuteTenData: async (total = 365 * 3 * 24 * 6) => {
+      await mockTimeBatchInsert({
+        model: mockMinuteTenDataModel,
+        unit: 'minute',
+        unitNum: 10,
+        field: 'minute',
+        total,
+        format: 'YYYY-MM-DD HH:mm:00',
+      });
+    },
+    initMinuteThirtyData: async (total = 365 * 3 * 24 * 2) => {
+      await mockTimeBatchInsert({
+        model: mockMinuteThirtyDataModel,
+        unit: 'minute',
+        unitNum: 30,
+        field: 'minute',
+        total,
+        format: 'YYYY-MM-DD HH:mm:00',
+      });
     },
   };
-
-  // initDefault = async (ctx: ParameterizedContext, next) => {
-  //   await this.common.initDefault();
-  //   successHandler({ ctx, message: '初始化默认数据成功！' });
-  //   await next();
-  // };
 
   // 添加用户
   addUser = async (ctx: ParameterizedContext, next) => {
@@ -405,7 +366,7 @@ class InitController {
   // 初始化时间表
   initDayData = async (ctx: ParameterizedContext, next) => {
     await mockDayDataModel.sync({ alter: true });
-    await this.common.initDayData(365 * 10);
+    await this.common.initDayData(365 * 3);
     successHandler({ ctx, data: `初始化${mockDayDataModel.name}表成功！` });
     await next();
   };
@@ -413,8 +374,30 @@ class InitController {
   // 初始化时间表
   initHourData = async (ctx: ParameterizedContext, next) => {
     await mockHourDataModel.sync({ alter: true });
-    await this.common.initHourData(365 * 10 * 24);
+    await this.common.initHourData(365 * 3 * 24);
     successHandler({ ctx, data: `初始化${mockHourDataModel.name}表成功！` });
+    await next();
+  };
+
+  // 初始化时间表
+  initMinuteTenData = async (ctx: ParameterizedContext, next) => {
+    await mockMinuteTenDataModel.sync({ alter: true });
+    await this.common.initMinuteTenData(365 * 3 * 24 * 6);
+    successHandler({
+      ctx,
+      data: `初始化${mockMinuteTenDataModel.name}表成功！`,
+    });
+    await next();
+  };
+
+  // 初始化时间表
+  initMinuteThirtyData = async (ctx: ParameterizedContext, next) => {
+    await mockMinuteThirtyDataModel.sync({ alter: true });
+    await this.common.initMinuteThirtyData(365 * 3 * 24 * 2);
+    successHandler({
+      ctx,
+      data: `初始化${mockMinuteThirtyDataModel.name}表成功！`,
+    });
     await next();
   };
 
@@ -428,6 +411,7 @@ class InitController {
       );
     }
     await Promise.all([
+      logModel.sync({ force: true }),
       roleModel.sync({ force: true }),
       authModel.sync({ force: true }),
       roleAuthModel.sync({ force: true }),
