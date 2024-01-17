@@ -172,7 +172,6 @@ export const apiVerifyAuth = (shouldAuthArr: string[]) => {
         ALLOW_HTTP_CODE.forbidden
       );
     } else {
-      console.log('-099999');
       await next();
     }
   };

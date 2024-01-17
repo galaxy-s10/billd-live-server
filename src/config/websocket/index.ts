@@ -623,6 +623,21 @@ export const connectWebSocket = (server) => {
       });
     });
 
+    // 收到nativeWebRtcOffer
+    socket.on(WsMsgTypeEnum.nativeWebRtcOffer, (data: WsOfferType) => {
+      prettierInfoLog({
+        msg: '收到nativeWebRtcOffer',
+        socketId: socket.id,
+        roomId: data.data.live_room_id,
+      });
+      socketEmit<WsOfferType['data']>({
+        roomId: data.data.live_room_id,
+        socket,
+        msgType: WsMsgTypeEnum.nativeWebRtcOffer,
+        data: data.data,
+      });
+    });
+
     // 收到answer
     socket.on(WsMsgTypeEnum.answer, (data: WsAnswerType) => {
       prettierInfoLog({
@@ -638,6 +653,21 @@ export const connectWebSocket = (server) => {
       });
     });
 
+    // 收到nativeWebRtcAnswer
+    socket.on(WsMsgTypeEnum.nativeWebRtcAnswer, (data: WsAnswerType) => {
+      prettierInfoLog({
+        msg: '收到nativeWebRtcAnswer',
+        socketId: socket.id,
+        roomId: data.data.live_room_id,
+      });
+      socketEmit<WsAnswerType['data']>({
+        roomId: data.data.live_room_id,
+        socket,
+        msgType: WsMsgTypeEnum.nativeWebRtcAnswer,
+        data: data.data,
+      });
+    });
+
     // 收到candidate
     socket.on(WsMsgTypeEnum.candidate, (data: WsCandidateType) => {
       prettierInfoLog({
@@ -649,6 +679,21 @@ export const connectWebSocket = (server) => {
         socket,
         roomId: data.data.live_room_id,
         msgType: WsMsgTypeEnum.candidate,
+        data: data.data,
+      });
+    });
+
+    // 收到nativeWebRtcCandidate
+    socket.on(WsMsgTypeEnum.nativeWebRtcCandidate, (data: WsCandidateType) => {
+      prettierInfoLog({
+        msg: '收到nativeWebRtcCandidate',
+        socketId: socket.id,
+        roomId: data.data.live_room_id,
+      });
+      socketEmit<WsCandidateType['data']>({
+        socket,
+        roomId: data.data.live_room_id,
+        msgType: WsMsgTypeEnum.nativeWebRtcCandidate,
         data: data.data,
       });
     });

@@ -23,7 +23,6 @@ export async function mockTimeBatchInsert({
   unit: dayjs.ManipulateType;
   format;
 }) {
-  console.log(model, field, total, unitNum, unit, '===');
   const res = await model.findOne({
     order: [[field, 'desc']],
   });
