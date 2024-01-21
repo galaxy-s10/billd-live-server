@@ -4,13 +4,13 @@ import { SERVER_LIVE } from '@/config/secret';
 import { PROJECT_ENV, PROJECT_ENV_ENUM, SRS_CB_URL_PARAMS } from '@/constant';
 import srsController from '@/controller/srs.controller';
 import { initUser } from '@/init/initUser';
+import liveService from '@/service/live.service';
+import liveRoomService from '@/service/liveRoom.service';
 import {
   LiveRoomPullIsShouldAuthEnum,
   LiveRoomTypeEnum,
   LiveRoomUseCDNEnum,
-} from '@/interface';
-import liveService from '@/service/live.service';
-import liveRoomService from '@/service/liveRoom.service';
+} from '@/types/ILiveRoom';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 import { tencentcloudUtils } from '@/utils/tencentcloud';
 

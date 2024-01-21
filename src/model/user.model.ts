@@ -9,7 +9,8 @@ import {
 import sequelize from '@/config/mysql';
 // import userService from '@/service/user.service';
 import { initTable } from '@/init/initDb';
-import { IUser, UserStatusEnum } from '@/interface';
+import { IUser, UserStatusEnum } from '@/types/IUser';
+
 // const MD5 = require('crypto-js/md5');
 
 interface UserModel

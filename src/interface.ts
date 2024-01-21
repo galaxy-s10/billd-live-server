@@ -1,3 +1,50 @@
+import {
+  ILiveRoom,
+  LiveRoomIsShowEnum,
+  LiveRoomStatusEnum,
+} from '@/types/ILiveRoom';
+import { IUser } from '@/types/IUser';
+
+export interface IVisitorLog {
+  id?: number;
+  live_room_id?: number;
+  user_id?: number;
+  ip?: string;
+  user_agent?: string;
+  duration?: number;
+  /** 获取一段时间内，每个ip访问的次数的时候添加的 */
+  total?: number;
+  /** /visitor_log/create接口的时候添加的 */
+  tourist?: {
+    info: IUser;
+    token: string;
+    token_exp: number;
+  };
+
+  user?: IUser;
+
+  /** 统计字段 */
+  analysis_format_date?: string;
+  /** 统计字段 */
+  analysis_unique_ip_nums?: number;
+  /** 统计字段 */
+  analysis_ip_nums?: number;
+  /** 统计字段 */
+  analysis_unique_user_id_nums?: number;
+  /** 统计字段 */
+  analysis_user_id_nums?: number;
+  /** 统计字段 */
+  analysis_average_duration?: number;
+
+  group_user_id?: number;
+  parent_user_id?: number;
+  parent_user_username?: string;
+
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
 export interface IQiniuData {
   id?: number;
   user_id?: number;
@@ -55,6 +102,94 @@ export enum DanmuMsgTypeEnum {
   danmu,
   otherJoin,
   userLeaved,
+  system,
+  redbag,
+}
+
+export enum WsMessageMsgIsFileEnum {
+  yes,
+  no,
+}
+
+export enum WsMessageMsgIsShowEnum {
+  yes,
+  no,
+}
+
+export enum WsMessageMsgIsVerifyEnum {
+  yes,
+  no,
+}
+
+export interface IWsMessage {
+  id?: number;
+  username?: string;
+  origin_username?: string;
+  content?: string;
+  origin_content?: string;
+  redbag_send_id?: number;
+  live_room_id?: number;
+  user_id?: number;
+  ip?: string;
+  msg_is_file?: WsMessageMsgIsFileEnum;
+  msg_type?: DanmuMsgTypeEnum;
+  user_agent?: string;
+  send_msg_time?: number;
+  is_show?: WsMessageMsgIsShowEnum;
+  is_verify?: WsMessageMsgIsVerifyEnum;
+
+  user?: IUser;
+  redbag_send?: IRedbagSend;
+
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
+export interface IRedbagSend {
+  id?: number;
+
+  user_id?: number;
+  live_room_id?: number;
+
+  total_amount?: string;
+  remaining_amount?: string;
+  total_nums?: number;
+  remaining_nums?: number;
+  remark?: string;
+
+  /** 用户信息 */
+  user?: IUser;
+  /** 直播间信息 */
+  live_room?: IGoods;
+
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
+export enum RedbagIsGrantEnum {
+  yes,
+  no,
+}
+
+export interface IRedbagRecv {
+  id?: number;
+
+  user_id?: number;
+  redbag_send_id?: number;
+  amount?: string;
+  remark?: string;
+
+  /** 抢到红包了，是否已发放 */
+  is_grant?: RedbagIsGrantEnum;
+
+  /** 用户信息 */
+  user?: IUser;
+
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
 }
 
 export interface ISrsCb {
@@ -88,163 +223,6 @@ export interface IWallet {
   updated_at?: string;
   deleted_at?: string;
 }
-export interface IQqUser {
-  id?: number;
-  client_id?: number;
-  openid?: string;
-  unionid?: string;
-  nickname?: string;
-  figureurl?: string;
-  figureurl_1?: string;
-  figureurl_2?: string;
-  figureurl_qq_1?: string;
-  figureurl_qq_2?: string;
-  constellation?: string;
-  gender?: string;
-  city?: string;
-  province?: string;
-  year?: string;
-  ret?: number;
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
-}
-
-export interface IWechatUser {
-  id?: number;
-  appid?: string;
-  openid?: string;
-  nickname?: string;
-  sex?: number;
-  province?: string;
-  city?: string;
-  country?: string;
-  headimgurl?: string;
-  privilege?: string;
-  unionid?: string;
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
-}
-
-export interface IThirdUser {
-  id?: number;
-  user_id?: number;
-  third_user_id?: number;
-  third_platform?: number;
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
-}
-
-/** 直播间类型 */
-export enum LiveRoomTypeEnum {
-  /** 系统直播 */
-  system,
-  /** 主播使用webrtc直播 */
-  user_wertc,
-  /** 主播使用srs直播 */
-  user_srs,
-  /** 主播使用obs/ffmpeg直播 */
-  user_obs,
-  /** 主播使用msr直播 */
-  user_msr,
-}
-
-/** 拉流是否需要鉴权 */
-export enum LiveRoomPullIsShouldAuthEnum {
-  /** 需要鉴权 */
-  yes,
-  /** 不需要鉴权 */
-  no,
-}
-
-/** 直播间状态 */
-export enum LiveRoomStatusEnum {
-  /** 正常 */
-  normal,
-  /** 禁用 */
-  disable,
-}
-
-/** 直播间是否显示 */
-export enum LiveRoomIsShowEnum {
-  /** 显示 */
-  yes,
-  /** 不显示 */
-  no,
-}
-
-export interface IArea {
-  id?: number;
-  name?: string;
-  /** 备注 */
-  remark?: string;
-  /** 权重 */
-  weight?: number;
-  area_live_rooms?: IAreaLiveRoom[];
-  live_room_is_show?: LiveRoomIsShowEnum;
-  live_room_status?: LiveRoomStatusEnum;
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
-}
-
-/** 是否使用cdn */
-export enum LiveRoomUseCDNEnum {
-  /** 使用cdn */
-  yes,
-  /** 不使用cdn */
-  no,
-}
-
-export interface ILiveRoom {
-  id?: number;
-  /** 直播间名称 */
-  name?: string;
-  /** 直播间简介 */
-  desc?: string;
-  /** 直播间备注 */
-  remark?: string;
-  /** 是否使用cdn */
-  cdn?: LiveRoomUseCDNEnum;
-  /** 拉流是否需要鉴权 */
-  pull_is_should_auth?: LiveRoomPullIsShouldAuthEnum;
-  /** 权重 */
-  weight?: number;
-  /** 推流秘钥 */
-  key?: string;
-  /** 直播间类型 */
-  type?: LiveRoomTypeEnum;
-  /** 开播预览图 */
-  cover_img?: string;
-  /** 直播间背景图 */
-  bg_img?: string;
-  /** 直播间状态 */
-  status?: LiveRoomStatusEnum;
-  /** 直播间是否显示 */
-  is_show?: LiveRoomIsShowEnum;
-
-  /** 用户信息 */
-  user?: IUser;
-  /** 用户信息 */
-  users?: IUser[];
-  /** 分区信息 */
-  area?: IArea;
-  /** 分区信息 */
-  areas?: IArea[];
-  /** 直播信息 */
-  live?: ILive;
-  user_live_room?: IUserLiveRoom & { user: IUser };
-
-  rtmp_url?: string;
-  flv_url?: string;
-  hls_url?: string;
-
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
-}
 
 export interface ILiveUser {
   // id: string;
@@ -258,31 +236,16 @@ export interface ILiveUser {
   };
 }
 
-/** 用户状态 */
-export enum UserStatusEnum {
-  /** 正常 */
-  normal,
-  /** 禁用 */
-  disable,
-}
-
-export interface IUser {
+export interface IArea {
   id?: number;
-  username?: string;
-  password?: string;
-  status?: UserStatusEnum;
-  avatar?: string;
-  desc?: string;
-  token?: string;
-
-  qq_users?: IQqUser[];
-  wechat_users?: IQqUser[];
-
-  user_roles?: number[];
-  wallet?: IWallet;
-  live_room?: ILiveRoom;
-  live_rooms?: ILiveRoom[];
-
+  name?: string;
+  /** 备注 */
+  remark?: string;
+  /** 权重 */
+  weight?: number;
+  area_live_rooms?: IAreaLiveRoom[];
+  live_room_is_show?: LiveRoomIsShowEnum;
+  live_room_status?: LiveRoomStatusEnum;
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;

@@ -1,8 +1,9 @@
 import { isPureNumber } from 'billd-utils';
 import { Op } from 'sequelize';
 
-import { IList, IQqUser } from '@/interface';
+import { IList } from '@/interface';
 import qqUserModel from '@/model/qqUser.model';
+import { IQqUser } from '@/types/IUser';
 import { handlePaging } from '@/utils';
 
 class QQUserService {

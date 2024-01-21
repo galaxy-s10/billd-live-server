@@ -27,11 +27,14 @@ class RedisController {
     value: Record<string, any>;
     created_at?: number;
   }) => {
+    const nowTime = +new Date();
+    const createdAt = data.created_at || nowTime;
     await redisClient.set(
       `${data.prefix}${data.key}`,
       JSON.stringify({
+        created_at: createdAt,
+        format_created_at: new Date(createdAt).toLocaleString(),
         value: data.value,
-        created_at: data.created_at || +new Date(),
       })
     );
   };
@@ -46,14 +49,19 @@ class RedisController {
     expired_at?: number;
     client_ip?: string;
   }) => {
+    const nowTime = +new Date();
+    const createdAt = data.created_at || nowTime;
+    const expiredAt = data.expired_at || nowTime + data.exp * 1000;
     await redisClient.setEx(
       `${data.prefix}${data.key}`,
       data.exp,
       JSON.stringify({
-        value: data.value,
-        created_at: data.created_at || +new Date(),
-        expired_at: data.expired_at || +new Date() + data.exp * 1000,
+        created_at: createdAt,
+        expired_at: expiredAt,
+        format_created_at: new Date(createdAt).toLocaleString(),
+        format_expired_at: new Date(expiredAt).toLocaleString(),
         client_ip: data.client_ip || '',
+        value: data.value,
       })
     );
   };
@@ -63,12 +71,14 @@ class RedisController {
     field: string;
     value: Record<string, any>;
   }) => {
+    const createdAt = +new Date();
     const res = await redisClient.hSetNX(
       data.key,
       data.field,
       JSON.stringify({
+        created_at: createdAt,
+        format_created_at: new Date(createdAt).toLocaleString(),
         value: data.value,
-        created_at: +new Date(),
       })
     );
     return res;
@@ -95,11 +105,13 @@ class RedisController {
   };
 
   setSetVal = async (data: { key: string; value: Record<string, any> }) => {
+    const createdAt = +new Date();
     const res = await redisClient.sAdd(
       data.key,
       JSON.stringify({
+        created_at: createdAt,
+        format_created_at: new Date(createdAt).toLocaleString(),
         value: data.value,
-        created_at: +new Date(),
       })
     );
     return res;
@@ -111,11 +123,13 @@ class RedisController {
   };
 
   setListVal = async (data: { key: string; value: Record<string, any> }) => {
+    const createdAt = +new Date();
     const res = await redisClient.lPush(
       data.key,
       JSON.stringify({
+        created_at: createdAt,
+        format_created_at: new Date(createdAt).toLocaleString(),
         value: data.value,
-        created_at: +new Date(),
       })
     );
     return res;

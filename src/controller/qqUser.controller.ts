@@ -16,13 +16,14 @@ import {
   PROJECT_ENV_ENUM,
   THIRD_PLATFORM,
 } from '@/constant';
-import { IList, IQqUser } from '@/interface';
+import { IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import thirdUserModel from '@/model/thirdUser.model';
 import qqUserService from '@/service/qqUser.service';
 import thirdUserService from '@/service/thirdUser.service';
 import userService from '@/service/user.service';
 import walletService from '@/service/wallet.service';
+import { IQqUser } from '@/types/IUser';
 import { myaxios } from '@/utils/request';
 
 // WARN 有时候qq登录的回调会是这样的：https://admin.hsslive.cn/oauth/qq_login?error=100070&error_description=the+account+has+security+exception&state=99

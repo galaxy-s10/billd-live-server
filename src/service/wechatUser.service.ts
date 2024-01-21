@@ -1,8 +1,9 @@
 import { isPureNumber } from 'billd-utils';
 import { Op } from 'sequelize';
 
-import { IList, IWechatUser } from '@/interface';
+import { IList } from '@/interface';
 import wechatUserModel from '@/model/wechatUser.model';
+import { IWechatUser } from '@/types/IUser';
 import { handlePaging } from '@/utils';
 
 class WechatUserService {

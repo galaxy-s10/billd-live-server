@@ -6,15 +6,17 @@ import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import { SERVER_LIVE } from '@/config/secret';
 import { ALLOW_HTTP_CODE } from '@/constant';
-import { IList, ILiveRoom } from '@/interface';
+import { IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveRoomService from '@/service/liveRoom.service';
 import userLiveRoomService from '@/service/userLiveRoom.service';
+import { ILiveRoom } from '@/types/ILiveRoom';
 
 class LiveRoomController {
   common = {
     create: (data: ILiveRoom) => liveRoomService.create(data),
     update: (data: ILiveRoom) => liveRoomService.update(data),
+    find: (id: number) => liveRoomService.find(id),
   };
 
   getList = async (ctx: ParameterizedContext, next) => {
@@ -64,12 +66,12 @@ class LiveRoomController {
     await next();
   };
 
-  async find(ctx: ParameterizedContext, next) {
+  find = async (ctx: ParameterizedContext, next) => {
     const id = +ctx.params.id;
-    const result = await liveRoomService.find(id);
+    const result = await this.common.find(id);
     successHandler({ ctx, data: result });
     await next();
-  }
+  };
 
   updateKey = async (ctx: ParameterizedContext, next) => {
     const { code, userInfo, message } = await authJwt(ctx);

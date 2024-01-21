@@ -27,8 +27,8 @@ dependencies:
     specifier: ^0.0.8
     version: 0.0.8
   billd-utils:
-    specifier: ^0.0.20
-    version: 0.0.20(typescript@4.8.4)
+    specifier: ^0.0.22
+    version: 0.0.22(typescript@4.8.4)
   chalk:
     specifier: ^4.1.2
     version: 4.1.2
@@ -3304,8 +3304,8 @@ packages:
     requiresBuild: true
     dev: false
 
-  /billd-utils@0.0.20(typescript@4.8.4):
-    resolution: {integrity: sha512-/FfOnbEoVuHpqLRj4NMR3ZYDaZQWt/ajOD2BUhTtwk82bf1swwyqs39kVn02hnYQjlKcKGEeHpCIGEuqhG0nnw==}
+  /billd-utils@0.0.22(typescript@4.8.4):
+    resolution: {integrity: sha512-koOfFzbzSkw6gMYyOKNMzAJHYMhUWHr3swPW48rT7PwZMvBkAtH93bHEVuDCwariWrSwxCGIqozOzp5YaeePqQ==}
     requiresBuild: true
     dependencies:
       '@babel/core': 7.21.5

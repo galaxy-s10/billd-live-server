@@ -8,7 +8,7 @@ import { catchErrorMiddle, corsMiddle } from '@/app/app.middleware';
 import errorHandler from '@/app/handler/error-handle';
 import { apiBeforeVerify } from '@/app/verify.middleware';
 import { handleRedisKeyExpired } from '@/config/redis/handleRedisKeyExpired';
-import { startSchedule } from '@/config/schedule';
+import { initSchedule } from '@/config/schedule';
 import { connectWebSocket } from '@/config/websocket';
 import { STATIC_DIR, UPLOAD_DIR } from '@/constant';
 import { CustomError } from '@/model/customError.model';
@@ -65,7 +65,7 @@ export async function setupKoa({ port }) {
     connectWebSocket(httpServer); // 初始化websocket
   }); // http接口服务
   handleRedisKeyExpired();
-  startSchedule();
+  initSchedule();
   // 初始化FFmpeg推流
   initFFmpeg(true);
 }

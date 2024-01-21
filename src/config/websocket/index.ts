@@ -1,16 +1,35 @@
-import { exec } from 'child_process';
 import fs from 'fs';
+import path from 'path';
 
+import { getRandomString } from 'billd-utils';
+import nodeSchedule from 'node-schedule';
 import { rimrafSync } from 'rimraf';
 import { Server, Socket } from 'socket.io';
 
 import { jwtVerify } from '@/app/auth/authJwt';
+import { startBlobIsExistSchedule } from '@/config/schedule/blobIsExist';
 import liveRedisController from '@/config/websocket/live-redis.controller';
-import { DEFAULT_AUTH_INFO, PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import {
+  DEFAULT_AUTH_INFO,
+  MSG_MAX_LENGTH,
+  PROJECT_ENV,
+  PROJECT_ENV_ENUM,
+  REDIS_PREFIX,
+  SCHEDULE_TYPE,
+  WEBM_DIR,
+} from '@/constant';
 import AuthController from '@/controller/auth.controller';
-import { LiveRoomTypeEnum } from '@/interface';
+import liveRoomController from '@/controller/liveRoom.controller';
+import redisController from '@/controller/redis.controller';
+import wsMessageController from '@/controller/wsMessage.controller';
+import { WsMessageMsgIsVerifyEnum } from '@/interface';
+import liveService from '@/service/live.service';
+import liveRoomService from '@/service/liveRoom.service';
+import userLiveRoomService from '@/service/userLiveRoom.service';
+import { LiveRoomMsgVerifyEnum, LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import {
   WSGetRoomAllUserType,
+  WSLivePkKeyType,
   WsAnswerType,
   WsCandidateType,
   WsConnectStatusEnum,
@@ -28,11 +47,7 @@ import {
   WsRoomNoLiveType,
   WsStartLiveType,
   WsUpdateJoinInfoType,
-} from '@/interface-ws';
-import liveService from '@/service/live.service';
-import liveRoomService from '@/service/liveRoom.service';
-import userLiveRoomService from '@/service/userLiveRoom.service';
-import { resolveApp } from '@/utils';
+} from '@/types/websocket';
 import {
   chalkERROR,
   chalkINFO,
@@ -40,6 +55,14 @@ import {
   chalkWARN,
 } from '@/utils/chalkTip';
 import { mp4PushRtmp, webmToMp4 } from '@/utils/process';
+
+function getSocketRealIp(socket?: Socket) {
+  if (!socket) {
+    return '-1';
+  }
+  const realIp = socket.handshake.headers['x-real-ip'] as string;
+  return realIp || '-1';
+}
 
 // 获取所有连接的socket客户端
 async function getAllSockets(io) {
@@ -126,15 +149,19 @@ export const connectWebSocket = (server) => {
     maxHttpBufferSize: oneK * 1000 * 100,
   });
 
+  /**
+   * 有roomId，发送给roomId的出自己以外的其他人
+   * 没有roomId，发送给自己
+   */
   function socketEmit<T>({
     socket,
-    roomId,
     msgType,
+    roomId,
     data,
   }: {
     socket: Socket;
-    roomId?: number;
     msgType: WsMsgTypeEnum;
+    roomId?: number;
     data?: T;
   }) {
     // console.log('===socketEmit===', roomId, socket.id, msgType);
@@ -166,15 +193,14 @@ export const connectWebSocket = (server) => {
 
   function prettierInfoLog(data: {
     msg: string;
-    socketId?: string;
+    socket: Socket;
     roomId?: number;
-    ip?: string;
   }) {
     console.log(
       chalkINFO(
-        `${new Date().toLocaleString()},${
-          data.msg
-        },socketId:${data.socketId!},roomId:${data.roomId!},ip:${data.ip!}`
+        `${new Date().toLocaleString()},${data.msg},roomId:${
+          data.roomId || ''
+        },socketId:${data.socket.id},socketIp:${getSocketRealIp(data.socket)}`
       )
     );
   }
@@ -185,14 +211,14 @@ export const connectWebSocket = (server) => {
 
   // 每个客户端socket连接时都会触发 connection 事件
   io.on(WsConnectStatusEnum.connection, (socket: Socket) => {
-    prettierInfoLog({ msg: 'connection', ip: socket.handshake.address });
+    prettierInfoLog({ msg: 'connection', socket });
 
     // 收到用户进入房间
     socket.on(WsMsgTypeEnum.join, async (data: WsJoinType) => {
       const roomId = data.data.live_room.id;
       prettierInfoLog({
         msg: '收到用户进入房间',
-        socketId: socket.id,
+        socket,
         roomId,
       });
       if (!roomId) {
@@ -223,7 +249,7 @@ export const connectWebSocket = (server) => {
         socketId: data.socket_id,
         joinRoomId: data.data.live_room.id!,
         userInfo: data.user_info,
-        client_ip: socket.handshake.address,
+        client_ip: getSocketRealIp(socket),
       });
       const liveUser = await getRoomAllUser(io, roomId);
       socketEmit<WSGetRoomAllUserType['data']>({
@@ -231,6 +257,7 @@ export const connectWebSocket = (server) => {
         roomId,
         msgType: WsMsgTypeEnum.liveUser,
         data: {
+          // @ts-ignore
           liveUser,
         },
       });
@@ -247,17 +274,9 @@ export const connectWebSocket = (server) => {
           socketId: socket.id,
           joinRoomId: roomId,
           userInfo: data.user_info,
-          client_ip: socket.handshake.address,
+          client_ip: getSocketRealIp(socket),
         });
-      } else if (!liveInfo) {
-        socketEmit<WsRoomNoLiveType['data']>({
-          socket,
-          msgType: WsMsgTypeEnum.roomNoLive,
-          data: {
-            live_room: liveRoomInfo,
-          },
-        });
-      } else {
+      } else if (liveInfo && liveRoomInfo) {
         socketEmit<WsRoomLivingType['data']>({
           socket,
           msgType: WsMsgTypeEnum.roomLiving,
@@ -270,7 +289,7 @@ export const connectWebSocket = (server) => {
           socketId: socket.id,
           joinRoomId: roomId,
           userInfo: data.user_info,
-          client_ip: socket.handshake.address,
+          client_ip: getSocketRealIp(socket),
         });
       }
 
@@ -310,7 +329,7 @@ export const connectWebSocket = (server) => {
       });
       prettierInfoLog({
         msg: '收到主播开始直播',
-        socketId: socket.id,
+        socket,
         roomId,
       });
       if (data.data.type === LiveRoomTypeEnum.user_wertc) {
@@ -331,16 +350,54 @@ export const connectWebSocket = (server) => {
           },
         });
       } else if (data.data.type === LiveRoomTypeEnum.user_msr) {
-        const roomDir = resolveApp(`/src/webm/roomId_${roomId}`);
-        const txtFile = `${roomDir}/list.txt`;
+        /**
+         * 业务设计：
+         * 1，客户端开始msr直播，携带delay、max_delay参数
+         * 2，客户端每delay毫秒发送一次webm，携带blob_id、delay、max_delay参数。blob_id即当前发送的是第几个webm
+         * 3，服务端接收到webm就进行转码，转码成mp4，并且每max_delay毫秒进行一次合并mp4
+         * 4，实际的推流命令，里面的文件列表就是转码后的mp4文件列表
+         * 5，(max_delay * 2)毫秒后，执行推流命令
+         * 具体实现：
+         * 1，客户端开始msr直播，携带delay、max_delay参数，假设delay是1000；max_delay是5000
+         * 2，服务端收到客户端开始msr直播后，直接生成理论上24小时的推流文件（24小时内所有的mp4文件列表）
+         * 3，直接算出来理论上需要多少个webm文件，(1000*60*60*24) / 1000 = 86400，也就是需要86400个webm文件
+         * 3，直接算出来理论上需要多少个mp4文件，(1000*60*60*24) / 5000 = 17280，也就是需要17280个mp4文件
+         * 4，客户端每1000毫秒发送一次webm，服务端收到后，转码成mp4，存到mp4目录，存放位置为[roomId]/tmpMp4/[blob_id]
+         * 5，因为网络等因素影响，服务端不能依赖收到客户端发送的webm再进行业务处理，服务端收到msr直播命令了，就开始定时任务，
+         * 每5000毫秒合并一次tmpMp4目录里的所有mp4，生成在[roomId]/resMp4/目录，
+         * 服务端每n*4毫秒进行一次合并mp4，正常情况下，每n*4毫秒，能收到4个webm，转码后也就是4个mp4
+         * 但是如果各种因素（网络差，转码慢等等）导致每n*4毫秒的时候，
+         * 实际的推流文件是每n*4毫秒的mp4文件列表
+         */
+        const msrDelay = data.data.msrDelay || 1000;
+        const msrMaxDelay = data.data.msrMaxDelay || 5000; // 值越大，延迟越高，但抗网络抖动越强
+        if (msrDelay > 1000 * 5 || !Number.isInteger(msrDelay / 1000)) {
+          console.log(chalkERROR('msrDelay错误！'));
+          return;
+        }
+        // 假设每个webm是1秒钟，转码成mp4需要翻三倍时间，即3秒。因此msrMaxDelay不能小于这个翻倍间隔
+        if (
+          msrMaxDelay < msrDelay * 3 ||
+          !Number.isInteger(msrMaxDelay / 1000)
+        ) {
+          console.log(chalkERROR('msrMaxDelay错误！'));
+          return;
+        }
+        const roomDir = path.resolve(WEBM_DIR, `roomId_${roomId}`);
         const fileDir = `${roomDir}/file`;
-        console.log('删除roomDir111');
-        rimrafSync(roomDir);
+        const fileResDir = `${fileDir}/res`;
+        const txtFile = `${roomDir}/list.txt`;
+        console.log('收到主播开始msr直播，删除直播间的webm目录');
+        if (fs.existsSync(roomDir)) {
+          rimrafSync(roomDir);
+        }
         let str = '';
-        const allTime = 60 * 60 * 24; // 24小时对应的秒数
-        for (let i = 1; i < allTime / (data.data.chunkDelay / 1000); i += 1) {
-          str += `${i !== 1 ? '\n' : ''}file '${fileDir}/${i}.mp4'`;
-          // str += `${i !== 1 ? '\n' : ''}file 'file/${i}.mp4'`;
+        const allTime = 1000 * 60 * 60 * 24; // 24小时对应的毫秒数
+        for (let i = 1; i <= allTime / msrDelay; i += 1) {
+          str += `${i !== 1 ? '\n' : ''}file '${fileResDir}/${i}.mp4'`;
+        }
+        if (!fs.existsSync(WEBM_DIR)) {
+          fs.mkdirSync(WEBM_DIR);
         }
         if (!fs.existsSync(roomDir)) {
           fs.mkdirSync(roomDir);
@@ -348,14 +405,48 @@ export const connectWebSocket = (server) => {
         if (!fs.existsSync(fileDir)) {
           fs.mkdirSync(fileDir);
         }
+        if (!fs.existsSync(fileResDir)) {
+          fs.mkdirSync(fileResDir);
+        }
+
         fs.writeFileSync(txtFile, str);
-        setTimeout(() => {
+        const timer = setTimeout(() => {
+          startBlobIsExistSchedule({
+            roomId,
+            msrDelay: data.data.msrDelay,
+            msrMaxDelay: data.data.msrMaxDelay,
+          });
+          clearTimeout(timer);
+        }, msrMaxDelay / 2);
+        const timer1 = setTimeout(() => {
           mp4PushRtmp({
             txt: txtFile,
             rtmpUrl: userLiveRoomInfo.live_room!.rtmp_url!,
             token: liveRoomInfo!.key!,
           });
-        }, 1000 * 10);
+          clearTimeout(timer1);
+        }, msrMaxDelay);
+      } else if (data.data.type === LiveRoomTypeEnum.user_pk) {
+        try {
+          const pkKey = getRandomString(8);
+          await redisController.setExVal({
+            prefix: REDIS_PREFIX.livePkKey,
+            exp: 60 * 5,
+            value: { key: pkKey },
+            key: `${roomId}`,
+            client_ip: getSocketRealIp(socket),
+          });
+          socketEmit<WSLivePkKeyType['data']>({
+            socket,
+            msgType: WsMsgTypeEnum.livePkKey,
+            data: {
+              live_room_id: roomId,
+              key: pkKey,
+            },
+          });
+        } catch (error) {
+          console.log(error);
+        }
       }
     });
 
@@ -363,7 +454,7 @@ export const connectWebSocket = (server) => {
     socket.on(WsMsgTypeEnum.getLiveUser, async (data: WsGetLiveUserType) => {
       prettierInfoLog({
         msg: '收到用户获取当前在线用户',
-        socketId: socket.id,
+        socket,
         roomId: data.data.live_room_id,
       });
       const liveUser = await liveRedisController.getLiveRoomOnlineUser(
@@ -392,10 +483,9 @@ export const connectWebSocket = (server) => {
         return;
       }
       const roomId = userLiveRoomInfo.live_room_id!;
-      const rtmpUrl = userLiveRoomInfo.live_room!.rtmp_url!;
       prettierInfoLog({
         msg: '收到主播断开直播',
-        socketId: socket.id,
+        socket,
         roomId,
       });
       socketEmit<WsRoomNoLiveType['data']>({
@@ -410,13 +500,12 @@ export const connectWebSocket = (server) => {
         userLiveRoomInfo.live_room?.type === LiveRoomTypeEnum.user_msr
       ) {
         liveService.deleteByLiveRoomId(roomId);
-        const cmd = `ps aux | grep ${rtmpUrl} | grep -v grep | awk '{print $2}'`;
-        exec(cmd, (err, stdout, stderr) => {
-          console.log(err, stdout, stderr);
-        });
-        const roomDir = resolveApp(`/src/webm/roomId_${roomId}`);
-        console.log('删除roomDir222');
-        rimrafSync(roomDir);
+        nodeSchedule.cancelJob(`${SCHEDULE_TYPE.blobIsExist}___${roomId}`);
+        console.log('收到主播断开直播，删除直播间的webm目录');
+        const roomDir = path.resolve(WEBM_DIR, `roomId_${roomId}`);
+        if (fs.existsSync(roomDir)) {
+          rimrafSync(roomDir);
+        }
       }
     });
 
@@ -424,7 +513,7 @@ export const connectWebSocket = (server) => {
     socket.on(WsMsgTypeEnum.message, async (data: WsMessageType) => {
       prettierInfoLog({
         msg: '收到用户发送消息',
-        socketId: socket.id,
+        socket,
         roomId: data.data.live_room_id,
       });
       const res = await liveRedisController.getDisableSpeaking({
@@ -432,11 +521,40 @@ export const connectWebSocket = (server) => {
         userId: data.user_info?.id || -1,
       });
       if (!res) {
-        socketEmit<any>({
-          socket,
+        const liveRoomInfo = await liveRoomController.common.find(
+          data.data.live_room_id
+        );
+        const origin_username = data.user_info!.username!;
+        const origin_content = data.data.msg;
+        const content = origin_content;
+        const username = origin_username;
+        const msgVerify = liveRoomInfo?.msg_verify;
+        const msgRes = await wsMessageController.common.create({
+          msg_type: data.data.msgType,
+          user_id: data.user_info?.id,
+          live_room_id: data.data.live_room_id,
+          ip: getSocketRealIp(socket),
+          content,
+          origin_content,
+          username,
+          origin_username,
+          msg_is_file: data.data.msgIsFile,
+          user_agent: data.data.user_agent,
+          send_msg_time: data.data.send_msg_time,
+          redbag_send_id: data.data.redbag_send_id,
+          is_verify:
+            msgVerify === LiveRoomMsgVerifyEnum.yes
+              ? WsMessageMsgIsVerifyEnum.no
+              : WsMessageMsgIsVerifyEnum.yes,
+        });
+        const data2 = { ...data };
+        data2.data.msg = content.slice(0, MSG_MAX_LENGTH);
+        data2.data.username = username;
+        data2.data.msg_id = msgRes.id;
+        ioEmit<any>({
           roomId: data.data.live_room_id,
           msgType: WsMsgTypeEnum.message,
-          data,
+          data: data2,
         });
       } else {
         io.sockets.sockets.forEach((socketItem) => {
@@ -458,13 +576,9 @@ export const connectWebSocket = (server) => {
 
     // 收到心跳
     socket.on(WsMsgTypeEnum.heartbeat, (data: WsHeartbeatType['data']) => {
-      // prettierInfoLog({
-      //   msg: '收到心跳',
-      //   socketId: socket.id,
-      // });
       updateUserJoinedRoom({
         socketId: data.socket_id,
-        client_ip: socket.handshake.address,
+        client_ip: getSocketRealIp(socket),
       });
     });
 
@@ -474,7 +588,7 @@ export const connectWebSocket = (server) => {
       async (data: WsDisableSpeakingType) => {
         prettierInfoLog({
           msg: '收到主播禁言用户',
-          socketId: socket.id,
+          socket,
         });
         try {
           if (!data.user_token) {
@@ -531,7 +645,7 @@ export const connectWebSocket = (server) => {
                 userId: data.data.user_id,
                 liveRoomId: data.data.live_room_id,
                 exp,
-                client_ip: socket.handshake.address,
+                client_ip: getSocketRealIp(socket),
               });
               socketEmit<WsDisableSpeakingType['data']>({
                 socket,
@@ -580,7 +694,7 @@ export const connectWebSocket = (server) => {
       async (data: WsUpdateJoinInfoType) => {
         prettierInfoLog({
           msg: '收到更新加入信息',
-          socketId: socket.id,
+          socket,
           roomId: data.data.live_room_id,
         });
         const res = await liveRedisController.getUserJoinedRoom({
@@ -602,23 +716,53 @@ export const connectWebSocket = (server) => {
             socketId: data.socket_id,
             joinRoomId: data.data.live_room_id,
             userInfo: data.user_info,
-            client_ip: socket.handshake.address,
+            client_ip: getSocketRealIp(socket),
           });
         }
       }
     );
 
-    // 收到offer
-    socket.on(WsMsgTypeEnum.offer, (data: WsOfferType) => {
+    // 收到srsOffer
+    socket.on(WsMsgTypeEnum.srsOffer, (data: WsOfferType) => {
       prettierInfoLog({
-        msg: '收到offer',
-        socketId: socket.id,
+        msg: '收到srsOffer',
+        socket,
         roomId: data.data.live_room_id,
       });
       socketEmit<WsOfferType['data']>({
         roomId: data.data.live_room_id,
         socket,
-        msgType: WsMsgTypeEnum.offer,
+        msgType: WsMsgTypeEnum.srsOffer,
+        data: data.data,
+      });
+    });
+
+    // 收到srsAnswer
+    socket.on(WsMsgTypeEnum.srsAnswer, (data: WsAnswerType) => {
+      prettierInfoLog({
+        msg: '收到srsAnswer',
+        socket,
+        roomId: data.data.live_room_id,
+      });
+      socketEmit<WsAnswerType['data']>({
+        roomId: data.data.live_room_id,
+        socket,
+        msgType: WsMsgTypeEnum.srsAnswer,
+        data: data.data,
+      });
+    });
+
+    // 收到srsCandidate
+    socket.on(WsMsgTypeEnum.srsCandidate, (data: WsCandidateType) => {
+      prettierInfoLog({
+        msg: '收到srsCandidate',
+        socket,
+        roomId: data.data.live_room_id,
+      });
+      socketEmit<WsCandidateType['data']>({
+        socket,
+        roomId: data.data.live_room_id,
+        msgType: WsMsgTypeEnum.srsCandidate,
         data: data.data,
       });
     });
@@ -627,7 +771,7 @@ export const connectWebSocket = (server) => {
     socket.on(WsMsgTypeEnum.nativeWebRtcOffer, (data: WsOfferType) => {
       prettierInfoLog({
         msg: '收到nativeWebRtcOffer',
-        socketId: socket.id,
+        socket,
         roomId: data.data.live_room_id,
       });
       socketEmit<WsOfferType['data']>({
@@ -638,26 +782,11 @@ export const connectWebSocket = (server) => {
       });
     });
 
-    // 收到answer
-    socket.on(WsMsgTypeEnum.answer, (data: WsAnswerType) => {
-      prettierInfoLog({
-        msg: '收到answer',
-        socketId: socket.id,
-        roomId: data.data.live_room_id,
-      });
-      socketEmit<WsAnswerType['data']>({
-        roomId: data.data.live_room_id,
-        socket,
-        msgType: WsMsgTypeEnum.answer,
-        data: data.data,
-      });
-    });
-
     // 收到nativeWebRtcAnswer
     socket.on(WsMsgTypeEnum.nativeWebRtcAnswer, (data: WsAnswerType) => {
       prettierInfoLog({
         msg: '收到nativeWebRtcAnswer',
-        socketId: socket.id,
+        socket,
         roomId: data.data.live_room_id,
       });
       socketEmit<WsAnswerType['data']>({
@@ -668,26 +797,11 @@ export const connectWebSocket = (server) => {
       });
     });
 
-    // 收到candidate
-    socket.on(WsMsgTypeEnum.candidate, (data: WsCandidateType) => {
-      prettierInfoLog({
-        msg: '收到candidate',
-        socketId: socket.id,
-        roomId: data.data.live_room_id,
-      });
-      socketEmit<WsCandidateType['data']>({
-        socket,
-        roomId: data.data.live_room_id,
-        msgType: WsMsgTypeEnum.candidate,
-        data: data.data,
-      });
-    });
-
     // 收到nativeWebRtcCandidate
     socket.on(WsMsgTypeEnum.nativeWebRtcCandidate, (data: WsCandidateType) => {
       prettierInfoLog({
         msg: '收到nativeWebRtcCandidate',
-        socketId: socket.id,
+        socket,
         roomId: data.data.live_room_id,
       });
       socketEmit<WsCandidateType['data']>({
@@ -702,7 +816,7 @@ export const connectWebSocket = (server) => {
     socket.on(WsMsgTypeEnum.msrBlob, async (data: WsMsrBlobType) => {
       prettierInfoLog({
         msg: '收到msrBlob',
-        socketId: socket.id,
+        socket,
         roomId: data.data.live_room_id,
       });
       const userId = data.user_info?.id;
@@ -715,33 +829,41 @@ export const connectWebSocket = (server) => {
         console.log(chalkERROR('userLiveRoomInfo为空'));
         return;
       }
+      // console.log(data.data);
       const roomId = userLiveRoomInfo.live_room_id!;
-      const roomDir = resolveApp(`/src/webm/roomId_${roomId}`);
+      const roomDir = path.resolve(WEBM_DIR, `roomId_${roomId}`);
       const fileDir = `${roomDir}/file`;
-      const blobFile = `${fileDir}/${data.data.blob_id}.webm`;
-
+      const fileResDir = `${fileDir}/res`;
+      const fileTmpDir = `${fileDir}/tmp`;
+      const webmFile = `${fileTmpDir}/${data.data.blob_id}.webm`;
+      const mp4File = `${fileResDir}/${data.data.blob_id}.mp4`;
+      if (!fs.existsSync(WEBM_DIR)) {
+        fs.mkdirSync(WEBM_DIR);
+      }
       if (!fs.existsSync(roomDir)) {
         fs.mkdirSync(roomDir);
       }
       if (!fs.existsSync(fileDir)) {
         fs.mkdirSync(fileDir);
       }
-      fs.writeFileSync(blobFile, data.data.blob);
-      const mp4File = blobFile.replace('.webm', '.mp4');
+      if (!fs.existsSync(fileTmpDir)) {
+        fs.mkdirSync(fileTmpDir);
+      }
+      fs.writeFileSync(webmFile, data.data.blob);
       webmToMp4({
-        input: blobFile,
+        input: webmFile,
         output: mp4File,
       });
-      setTimeout(() => {
-        rimrafSync([blobFile, mp4File]);
-      }, 1000 * 60);
+      if (fs.existsSync(webmFile)) {
+        rimrafSync(webmFile);
+      }
     });
 
     // 断开连接中
     socket.on(WsConnectStatusEnum.disconnecting, (reason) => {
       prettierInfoLog({
         msg: '===断开连接中===',
-        socketId: socket.id,
+        socket,
       });
       console.log(reason);
     });
@@ -750,7 +872,7 @@ export const connectWebSocket = (server) => {
     socket.on(WsConnectStatusEnum.disconnect, async (reason) => {
       prettierInfoLog({
         msg: '===已断开连接===',
-        socketId: socket.id,
+        socket,
       });
       console.log(reason);
       try {
@@ -772,6 +894,7 @@ export const connectWebSocket = (server) => {
             roomId: joinRoomId,
             msgType: WsMsgTypeEnum.liveUser,
             data: {
+              // @ts-ignore
               liveUser,
             },
           });
@@ -794,32 +917,6 @@ export const connectWebSocket = (server) => {
               });
             }
           }
-
-          // const res2 = await liveRedisController.getAnchorLiving({
-          //   liveRoomId: joinRoomId,
-          // });
-          // if (res2) {
-          //   if (
-          //     joinRoomId === res2.value.liveRoomId &&
-          //     socket.id === res2.value.socketId
-          //   ) {
-          //     const [liveRoomInfo] = await Promise.all([
-          //       liveRoomService.find(joinRoomId),
-          //     ]);
-          //     ioEmit<WsRoomNoLiveType['data']>({
-          //       roomId: joinRoomId,
-          //       msgType: WsMsgTypeEnum.roomNoLive,
-          //       data: {
-          //         live_room: liveRoomInfo!,
-          //       },
-          //     });
-          //     // 不能只在on_unpublish回调里面删除live记录，因为on_unpublish会延迟几秒
-          //     // liveController.common.deleteByLiveRoomId(joinRoomId);
-          //     // liveRedisController.delAnchorLiving({
-          //     //   liveRoomId: joinRoomId,
-          //     // });
-          //   }
-          // }
         }
       } catch (error) {
         console.log(error);

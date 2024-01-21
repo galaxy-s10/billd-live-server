@@ -1,6 +1,6 @@
 import { REDIS_PREFIX } from '@/constant';
 import redisController from '@/controller/redis.controller';
-import { IUser } from '@/interface';
+import { IUser } from '@/types/IUser';
 import { filterObj } from '@/utils';
 
 class WSController {
@@ -44,13 +44,13 @@ class WSController {
     });
     if (data.userInfo) {
       await redisController.setHashVal({
-        key: `${REDIS_PREFIX.liveRoomOnlineUser}-${data.joinRoomId}`,
+        key: `${REDIS_PREFIX.liveRoomOnlineUser}${data.joinRoomId}`,
         field: `${data.userInfo.id!}`,
         value: filterObj(data, ['created_at', 'expired_at', 'client_ip']),
       });
     } else {
       await redisController.setHashVal({
-        key: `${REDIS_PREFIX.liveRoomOnlineUser}-${data.joinRoomId}`,
+        key: `${REDIS_PREFIX.liveRoomOnlineUser}${data.joinRoomId}`,
         field: data.socketId,
         value: filterObj(data, ['created_at', 'expired_at', 'client_ip']),
       });
@@ -173,7 +173,7 @@ class WSController {
 
   getLiveRoomOnlineUser = async (liveRoomId: number) => {
     const res = await redisController.getAllHashVal(
-      `${REDIS_PREFIX.liveRoomOnlineUser}-${liveRoomId}`
+      `${REDIS_PREFIX.liveRoomOnlineUser}${liveRoomId}`
     );
     return res.map((v) => JSON.parse(v));
   };

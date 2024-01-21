@@ -7,7 +7,7 @@ import {
 
 import sequelize from '@/config/mysql';
 import { initTable } from '@/init/initDb';
-import { ILiveRoom } from '@/interface';
+import { ILiveRoom } from '@/types/ILiveRoom';
 
 interface LiveRoomModel
   extends Model<

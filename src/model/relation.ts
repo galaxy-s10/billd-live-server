@@ -16,9 +16,12 @@ import User from '@/model/user.model';
 import UserLiveRoom from '@/model/userLiveRoom.model';
 import UserRole from '@/model/userRole.model';
 import Wallet from '@/model/wallet.model';
-import wechatUser from '@/model/wechatUser.model';
+import WechatUser from '@/model/wechatUser.model';
+import WsMessage from '@/model/wsMessage.model';
 
 loadAllModel();
+
+WsMessage.belongsTo(User, { foreignKey: 'user_id', constraints: false });
 
 LiveRoom.belongsToMany(Area, {
   foreignKey: 'live_room_id',
@@ -227,7 +230,7 @@ User.belongsToMany(QqUser, {
   },
 });
 
-wechatUser.belongsToMany(User, {
+WechatUser.belongsToMany(User, {
   foreignKey: 'third_user_id',
   otherKey: 'user_id',
   sourceKey: 'id',
@@ -238,7 +241,7 @@ wechatUser.belongsToMany(User, {
   },
 });
 
-User.belongsToMany(wechatUser, {
+User.belongsToMany(WechatUser, {
   foreignKey: 'user_id',
   otherKey: 'third_user_id',
   targetKey: 'id',

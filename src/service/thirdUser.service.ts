@@ -1,7 +1,8 @@
 import { Op } from 'sequelize';
 
-import { IList, IThirdUser } from '@/interface';
+import { IList } from '@/interface';
 import thirdUserModel from '@/model/thirdUser.model';
+import { IThirdUser } from '@/types/IUser';
 import { handlePaging } from '@/utils';
 
 class ThirdUserService {

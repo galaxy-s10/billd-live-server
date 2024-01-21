@@ -7,7 +7,7 @@ import {
 
 import sequelize from '@/config/mysql';
 import { initTable } from '@/init/initDb';
-import { IQqUser } from '@/interface';
+import { IQqUser } from '@/types/IUser';
 
 interface QqUserModel
   extends Model<

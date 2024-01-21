@@ -2,8 +2,8 @@ import jwt from 'jsonwebtoken';
 
 import { JWT_SECRET } from '@/config/secret';
 import { ALLOW_HTTP_CODE, COMMON_ERR_MSG } from '@/constant';
-import { IUser, UserStatusEnum } from '@/interface';
 import userService from '@/service/user.service';
+import { IUser, UserStatusEnum } from '@/types/IUser';
 
 /**
  * 验证jwt
@@ -27,6 +27,7 @@ export const jwtVerify = (token: string) => {
         async function main() {
           try {
             const userResult = await userService.findAndToken(
+              // @ts-ignore
               decoded.userInfo.id
             );
             if (!userResult) {

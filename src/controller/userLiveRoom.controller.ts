@@ -7,18 +7,17 @@ import successHandler from '@/app/handler/success-handle';
 import { SERVER_LIVE } from '@/config/secret';
 import { ALLOW_HTTP_CODE } from '@/constant';
 import liveRoomController from '@/controller/liveRoom.controller';
+import { IList, IUserLiveRoom } from '@/interface';
+import { CustomError } from '@/model/customError.model';
+import liveRoomService from '@/service/liveRoom.service';
+import userLiveRoomService from '@/service/userLiveRoom.service';
 import {
-  IList,
-  IUserLiveRoom,
   LiveRoomIsShowEnum,
   LiveRoomPullIsShouldAuthEnum,
   LiveRoomStatusEnum,
   LiveRoomTypeEnum,
   LiveRoomUseCDNEnum,
-} from '@/interface';
-import { CustomError } from '@/model/customError.model';
-import liveRoomService from '@/service/liveRoom.service';
-import userLiveRoomService from '@/service/userLiveRoom.service';
+} from '@/types/ILiveRoom';
 
 class UserLiveRoomController {
   common = {

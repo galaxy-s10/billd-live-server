@@ -1,12 +1,13 @@
 import { deleteUseLessObjectKey, isPureNumber } from 'billd-utils';
 import { Op } from 'sequelize';
 
-import { IList, ILiveRoom } from '@/interface';
+import { IList } from '@/interface';
 import areaModel from '@/model/area.model';
 import liveModel from '@/model/live.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
 import userLiveRoomModel from '@/model/userLiveRoom.model';
+import { ILiveRoom } from '@/types/ILiveRoom';
 import { handlePaging } from '@/utils';
 
 class LiveRoomService {

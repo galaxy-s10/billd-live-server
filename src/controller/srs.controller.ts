@@ -1,5 +1,9 @@
+import fs from 'fs';
+import path from 'path';
+
 import { MD5 } from 'crypto-js';
 import { ParameterizedContext } from 'koa';
+import nodeSchedule from 'node-schedule';
 import { rimrafSync } from 'rimraf';
 
 import successHandler from '@/app/handler/success-handle';
@@ -9,20 +13,22 @@ import {
   ALLOW_HTTP_CODE,
   DEFAULT_AUTH_INFO,
   LOCALHOST_URL,
+  SCHEDULE_TYPE,
   SRS_CB_URL_PARAMS,
+  WEBM_DIR,
 } from '@/constant';
 import authController from '@/controller/auth.controller';
 import liveController from '@/controller/live.controller';
 import livePlayController from '@/controller/livePlay.controller';
 import liveRecordController from '@/controller/liveRecord.controller';
 import userLiveRoomController from '@/controller/userLiveRoom.controller';
-import { ISrsCb, ISrsRTC, LiveRoomPullIsShouldAuthEnum } from '@/interface';
-import { IApiV1Clients, IApiV1Streams } from '@/interface-srs';
-import { WsMsgTypeEnum } from '@/interface-ws';
+import { ISrsCb, ISrsRTC } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveRoomService from '@/service/liveRoom.service';
 import userService from '@/service/user.service';
-import { resolveApp } from '@/utils';
+import { LiveRoomPullIsShouldAuthEnum } from '@/types/ILiveRoom';
+import { IApiV1Clients, IApiV1Streams } from '@/types/srs';
+import { WsMsgTypeEnum } from '@/types/websocket';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 import { myaxios } from '@/utils/request';
 
@@ -508,7 +514,10 @@ class SRSController {
           view: 0,
         }),
       ]);
-      wsSocket.io?.to(roomId).emit(WsMsgTypeEnum.roomLiving, { data: {} });
+      wsSocket.io?.to(roomId).emit(WsMsgTypeEnum.roomLiving, {
+        live_room: userLiveRoomInfo.live_room!,
+        anchor_socket_id: '',
+      });
       await next();
     }
   };
@@ -569,9 +578,13 @@ class SRSController {
     wsSocket.io?.to(roomId).emit(WsMsgTypeEnum.roomNoLive);
     console.log(chalkSUCCESS(`[on_unpublish] 房间id：${roomId}，成功`));
     ctx.body = { code: 0, msg: '[on_unpublish] success' };
+    nodeSchedule.cancelJob(`${SCHEDULE_TYPE.blobIsExist}___${roomId}`);
     await next();
-    const roomDir = resolveApp(`/src/webm/roomId_${roomId}`);
-    rimrafSync(roomDir);
+    const roomDir = path.resolve(WEBM_DIR, `roomId_${roomId}`);
+    if (fs.existsSync(roomDir)) {
+      console.log('收到主播断开直播，删除直播间的webm目录');
+      rimrafSync(roomDir);
+    }
   }
 
   async onDvr(ctx: ParameterizedContext, next) {

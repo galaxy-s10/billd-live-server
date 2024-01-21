@@ -6,7 +6,7 @@
 # Email: 2274751790@qq.com
 # FilePath: /billd-live-server/node-pm2.sh
 # Github: https://github.com/galaxy-s10
-# LastEditTime: 2023-06-23 03:39:33
+# LastEditTime: 2024-01-19 13:31:25
 # LastEditors: shuisheng
 ###
 
@@ -92,6 +92,7 @@ pm2 del $JOBNAME-$ENV-$PORT
 echo 使用pm2维护:
 # pm2 start ./src/index.ts --name $JOBNAME-$ENV --interpreter ./node_modules/.bin/nodemon
 
+# npx cross-env NODE_APP_RELEASE_PROJECT_NAME=billd-live-server-prod-4200 NODE_APP_RELEASE_PROJECT_ENV=prod NODE_APP_RELEASE_PROJECT_PORT=4200 pm2 start ./dist/index.js --name billd-live-server-prod-4200
 # npx cross-env NODE_APP_RELEASE_PROJECT_NAME=JOBNAME NODE_APP_RELEASE_PROJECT_ENV=prod NODE_APP_RELEASE_PROJECT_PORT=4200 pm2 start ./dist/index.js --name billd-live-server-prod-4200
 # npx cross-env NODE_APP_RELEASE_PROJECT_NAME=JOBNAME NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=4300 pm2 start ./dist/index.js --name billd-live-server-beta-4300
 npx cross-env NODE_APP_RELEASE_PROJECT_NAME=$JOBNAME NODE_APP_RELEASE_PROJECT_ENV=$ENV NODE_APP_RELEASE_PROJECT_PORT=$PORT pm2 start ./dist/index.js --name $JOBNAME-$ENV-$PORT

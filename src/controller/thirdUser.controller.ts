@@ -2,9 +2,10 @@ import { ParameterizedContext } from 'koa';
 
 import successHandler from '@/app/handler/success-handle';
 import { ALLOW_HTTP_CODE } from '@/constant';
-import { IList, IThirdUser } from '@/interface';
+import { IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import thirdUserService from '@/service/thirdUser.service';
+import { IThirdUser } from '@/types/IUser';
 
 class ThirdUserController {
   async getList(ctx: ParameterizedContext, next) {

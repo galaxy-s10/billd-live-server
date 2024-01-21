@@ -6,10 +6,11 @@ import successHandler from '@/app/handler/success-handle';
 import { ALLOW_HTTP_CODE, REDIS_PREFIX, THIRD_PLATFORM } from '@/constant';
 import authController from '@/controller/auth.controller';
 import redisController from '@/controller/redis.controller';
-import { IList, IUser } from '@/interface';
+import { IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import roleService from '@/service/role.service';
 import userService from '@/service/user.service';
+import { IUser } from '@/types/IUser';
 
 class UserController {
   common = {

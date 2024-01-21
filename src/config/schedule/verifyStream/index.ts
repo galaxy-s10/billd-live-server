@@ -1,10 +1,12 @@
 import { exec } from 'child_process';
 
-import { LOCALHOST_URL, maxBitrate } from '@/constant';
+import nodeSchedule from 'node-schedule';
+
+import { LOCALHOST_URL, SCHEDULE_TYPE, maxBitrate } from '@/constant';
 import srsController from '@/controller/srs.controller';
 import { initUser } from '@/init/initUser';
-import { IApiV1Streams } from '@/interface-srs';
-import { chalkWARN } from '@/utils/chalkTip';
+import { IApiV1Streams } from '@/types/srs';
+import { chalkINFO, chalkWARN } from '@/utils/chalkTip';
 
 // WARN 执行ffmpeg命令返回信息，但不会返回code 0退出，都是非0 code退出
 function executeCommandWithTimeout(command, timeout) {
@@ -81,5 +83,45 @@ export const handleVerifyStream = async () => {
     if (item.kbps.recv_30s > maxBitrate) {
       srsController.common.deleteApiV1Clients(item.publish.cid);
     }
+  });
+};
+
+const rule = new nodeSchedule.RecurrenceRule();
+
+const allHour = 24;
+const allMinute = 60;
+const allSecond = 60;
+const allHourArr: number[] = [];
+const allMinuteArr: number[] = [];
+const allSecondArr: number[] = [];
+
+for (let i = 0; i < allHour; i += 1) {
+  allHourArr.push(i);
+}
+for (let i = 0; i < allMinute; i += 1) {
+  allMinuteArr.push(i);
+}
+for (let i = 0; i < allSecond; i += 1) {
+  allSecondArr.push(i);
+}
+
+// 每2分钟执行
+rule.minute = allMinuteArr.filter((v) => v % 2 === 0);
+rule.second = 0;
+
+// 每5秒执行
+// rule.minute = allMinuteArr.filter((v) => v % 1 === 0);
+// rule.second = allSecondArr.filter((v) => v % 5 === 0);
+
+export const startSchedule = () => {
+  nodeSchedule.scheduleJob(SCHEDULE_TYPE.verifyStream, rule, () => {
+    console.log(
+      chalkINFO(
+        `${new Date().toLocaleString()}，执行${
+          SCHEDULE_TYPE.verifyStream
+        }定时任务`
+      )
+    );
+    handleVerifyStream();
   });
 };

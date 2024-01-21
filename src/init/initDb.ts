@@ -192,19 +192,19 @@ export const deleteAllTable = async (sequelizeInst: Sequelize) => {
  */
 export const initDb = async (
   type: 'force' | 'alert' | 'load',
-  sequelize: Sequelize
+  sequelizeInst: Sequelize
 ) => {
   switch (type) {
     case 'force':
-      await deleteAllForeignKeys(sequelize);
-      await deleteAllIndexs(sequelize);
-      await deleteAllTable(sequelize);
-      await sequelize.sync({ force: true }); // 将创建表,如果表已经存在,则将其首先删除
+      await deleteAllForeignKeys(sequelizeInst);
+      await deleteAllIndexs(sequelizeInst);
+      await deleteAllTable(sequelizeInst);
+      await sequelizeInst.sync({ force: true }); // 将创建表,如果表已经存在,则将其首先删除
       console.log(chalkSUCCESS('初始化数据库所有表完成！'));
       break;
     case 'alert':
       require('@/model/relation');
-      await sequelize.sync({ alter: true }); // 这将检查数据库中表的当前状态(它具有哪些列,它们的数据类型等),然后在表中进行必要的更改以使其与模型匹配.
+      await sequelizeInst.sync({ alter: true }); // 这将检查数据库中表的当前状态(它具有哪些列,它们的数据类型等),然后在表中进行必要的更改以使其与模型匹配.
       console.log(chalkSUCCESS('校正数据库所有表完成！'));
       break;
     case 'load':

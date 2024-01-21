@@ -7,7 +7,7 @@ import {
 
 import sequelize from '@/config/mysql';
 import { initTable } from '@/init/initDb';
-import { IWechatUser } from '@/interface';
+import { IWechatUser } from '@/types/IUser';
 
 interface WechatUserModel
   extends Model<

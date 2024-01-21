@@ -48,15 +48,28 @@ export const CORS_ALLOW_ORIGIN: string | string[] = [
   'https://nuxt2.hsslive.cn',
 ];
 
+/** 消息最大长度 */
+export const MSG_MAX_LENGTH = 150;
+
+export const VIDEO_DIR =
+  PROJECT_ENV === PROJECT_ENV_ENUM.prod
+    ? resolveApp(`/dist/video/`)
+    : resolveApp(`/video/`); // video文件目录
+
+export const WEBM_DIR =
+  PROJECT_ENV === PROJECT_ENV_ENUM.prod
+    ? resolveApp(`/dist/webm/`)
+    : resolveApp(`/webm/`); // webm文件目录
+
 export const STATIC_DIR =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
     ? resolveApp('/dist/public/')
-    : resolveApp('/src/public/'); // 静态文件目录
+    : resolveApp('/public/'); // 静态文件目录
 
 export const UPLOAD_DIR =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
     ? resolveApp('/dist/upload/')
-    : resolveApp('/src/upload/'); // 上传文件接口接收到的文件存放的目录
+    : resolveApp('/upload/'); // 上传文件接口接收到的文件存放的目录
 
 export const SECRET_FILE =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
@@ -124,6 +137,7 @@ export const BLACKLIST_TYPE = {
 
 export const SCHEDULE_TYPE = {
   verifyStream: 'handleVerifyStream',
+  blobIsExist: 'blobIsExist',
 };
 
 export const COMMON_ERR_MSG = {
@@ -134,20 +148,23 @@ export const COMMON_ERR_MSG = {
   shutdown: '停机维护中~',
 };
 
+export const REDIS_PREFIX_ENV = `${PROJECT_NAME}-${PROJECT_ENV}-`;
+
 // redis前缀
 export const REDIS_PREFIX = {
-  emailLogin: `${PROJECT_NAME}-${PROJECT_ENV}-emailLogin___`, // 邮箱登录
-  emailRegister: `${PROJECT_NAME}-${PROJECT_ENV}-emailRegister___`, // 邮箱注册
-  userBindEmail: `${PROJECT_NAME}-${PROJECT_ENV}-userBindEmail___`, // 用户绑定邮箱
-  userCancelBindEmail: `${PROJECT_NAME}-${PROJECT_ENV}-userCancelBindEmail___`, // 用户取消绑定邮箱
-  joined: `${PROJECT_NAME}-${PROJECT_ENV}-joined___`, // 用户加入了房间
-  roomIsLiveing: `${PROJECT_NAME}-${PROJECT_ENV}-roomIsLiveing___`, // 主播正在直播
-  order: `${PROJECT_NAME}-${PROJECT_ENV}-order___`, // 订单
-  fileProgress: `${PROJECT_NAME}-${PROJECT_ENV}-fileProgress___`, // 文件上传进度
-  qrCodeLogin: `${PROJECT_NAME}-${PROJECT_ENV}-qrCodeLogin___`, // 二维码登录
-  disableSpeaking: `${PROJECT_NAME}-${PROJECT_ENV}-disableSpeaking___`, // 禁言用户
-  kick: `${PROJECT_NAME}-${PROJECT_ENV}-kick___`, // 踢掉用户
-  liveRoomOnlineUser: `${PROJECT_NAME}-${PROJECT_ENV}-liveRoomOnlineLisUser`, // 直播间在线用户
+  emailLogin: `${REDIS_PREFIX_ENV}emailLogin___`, // 邮箱登录
+  emailRegister: `${REDIS_PREFIX_ENV}emailRegister___`, // 邮箱注册
+  userBindEmail: `${REDIS_PREFIX_ENV}userBindEmail___`, // 用户绑定邮箱
+  userCancelBindEmail: `${REDIS_PREFIX_ENV}userCancelBindEmail___`, // 用户取消绑定邮箱
+  joined: `${REDIS_PREFIX_ENV}joined___`, // 用户加入了房间
+  roomIsLiveing: `${REDIS_PREFIX_ENV}roomIsLiveing___`, // 主播正在直播
+  order: `${REDIS_PREFIX_ENV}order___`, // 订单
+  fileProgress: `${REDIS_PREFIX_ENV}fileProgress___`, // 文件上传进度
+  qrCodeLogin: `${REDIS_PREFIX_ENV}qrCodeLogin___`, // 二维码登录
+  disableSpeaking: `${REDIS_PREFIX_ENV}disableSpeaking___`, // 禁言用户
+  kick: `${REDIS_PREFIX_ENV}kick___`, // 踢掉用户
+  liveRoomOnlineUser: `${REDIS_PREFIX_ENV}liveRoomOnlineUser___`, // 直播间在线用户
+  livePkKey: `${REDIS_PREFIX_ENV}livePkKey___`, // 直播间打pk秘钥
 };
 
 export const IS_UPLOAD_SERVER = !(PROJECT_ENV === PROJECT_ENV_ENUM.prod); // 是否上传到服务器

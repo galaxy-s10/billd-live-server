@@ -12,13 +12,14 @@ import {
   REDIS_PREFIX,
   THIRD_PLATFORM,
 } from '@/constant';
-import { IList, IWechatUser } from '@/interface';
+import { IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import thirdUserModel from '@/model/thirdUser.model';
 import thirdUserService from '@/service/thirdUser.service';
 import userService from '@/service/user.service';
 import walletService from '@/service/wallet.service';
 import wechatUserService from '@/service/wechatUser.service';
+import { IWechatUser } from '@/types/IUser';
 import { myaxios } from '@/utils/request';
 
 import redisController from './redis.controller';

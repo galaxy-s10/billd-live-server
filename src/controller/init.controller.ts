@@ -21,14 +21,7 @@ import {
 } from '@/init/initData';
 import { mockTimeBatchInsert } from '@/init/initDb';
 import { initUser } from '@/init/initUser';
-import {
-  IInitUser,
-  IUser,
-  LiveRoomIsShowEnum,
-  LiveRoomStatusEnum,
-  LiveRoomTypeEnum,
-  LiveRoomUseCDNEnum,
-} from '@/interface';
+import { IInitUser } from '@/interface';
 import areaModel from '@/model/area.model';
 import areaLiveRoomModel from '@/model/areaLiveRoom.model';
 import authModel from '@/model/auth.model';
@@ -54,6 +47,13 @@ import walletModel from '@/model/wallet.model';
 import liveRoomService from '@/service/liveRoom.service';
 import userService from '@/service/user.service';
 import walletService from '@/service/wallet.service';
+import {
+  LiveRoomIsShowEnum,
+  LiveRoomStatusEnum,
+  LiveRoomTypeEnum,
+  LiveRoomUseCDNEnum,
+} from '@/types/ILiveRoom';
+import { IUser } from '@/types/IUser';
 import { tencentcloudUtils } from '@/utils/tencentcloud';
 
 class InitController {

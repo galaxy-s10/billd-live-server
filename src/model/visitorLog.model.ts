@@ -6,19 +6,18 @@ import {
 } from 'sequelize';
 
 import sequelize from '@/config/mysql';
-import { THIRD_PLATFORM } from '@/constant';
 import { initTable } from '@/init/initDb';
-import { IThirdUser } from '@/types/IUser';
+import { IVisitorLog } from '@/interface';
 
-interface ThirdUserModel
+interface VisitorLogModel
   extends Model<
-      InferAttributes<ThirdUserModel>,
-      InferCreationAttributes<ThirdUserModel>
+      InferAttributes<VisitorLogModel>,
+      InferCreationAttributes<VisitorLogModel>
     >,
-    IThirdUser {}
+    IVisitorLog {}
 
-const model = sequelize.define<ThirdUserModel>(
-  'third_user',
+const model = sequelize.define<VisitorLogModel>(
+  'visitor_log',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -26,18 +25,22 @@ const model = sequelize.define<ThirdUserModel>(
       allowNull: false,
       autoIncrement: true,
     },
+    live_room_id: {
+      type: DataTypes.INTEGER,
+      defaultValue: -1, // -1:非直播间进入 非-1:直播间进入
+    },
     user_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
     },
-    third_user_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+    ip: {
+      type: DataTypes.STRING(200),
     },
-    third_platform: {
+    user_agent: {
+      type: DataTypes.STRING(500),
+    },
+    duration: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: THIRD_PLATFORM.website,
+      defaultValue: 0,
     },
   },
   {
@@ -47,8 +50,8 @@ const model = sequelize.define<ThirdUserModel>(
         fields: ['user_id'],
       },
       {
-        name: 'third_user_id',
-        fields: ['third_user_id'],
+        name: 'ip',
+        fields: ['ip'],
       },
     ],
     paranoid: true,
@@ -60,5 +63,4 @@ const model = sequelize.define<ThirdUserModel>(
 );
 
 initTable({ model, sequelize });
-
 export default model;

@@ -2,7 +2,7 @@ import { isPureNumber } from 'billd-utils';
 import { Op, literal, where } from 'sequelize';
 
 import { THIRD_PLATFORM } from '@/constant';
-import { IList, IUser } from '@/interface';
+import { IList } from '@/interface';
 import areaModel from '@/model/area.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import qqUserModel from '@/model/qqUser.model';
@@ -10,6 +10,7 @@ import roleModel from '@/model/role.model';
 import userModel from '@/model/user.model';
 import walletModel from '@/model/wallet.model';
 import wechatUserModel from '@/model/wechatUser.model';
+import { IUser } from '@/types/IUser';
 import { handlePaging } from '@/utils';
 
 class UserService {
