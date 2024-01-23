@@ -5,12 +5,14 @@ import { ParameterizedContext } from 'koa';
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import { SERVER_LIVE } from '@/config/secret';
-import { ALLOW_HTTP_CODE } from '@/constant';
+import { ALLOW_HTTP_CODE, REDIS_PREFIX } from '@/constant';
 import { IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveRoomService from '@/service/liveRoom.service';
 import userLiveRoomService from '@/service/userLiveRoom.service';
 import { ILiveRoom } from '@/types/ILiveRoom';
+
+import redisController from './redis.controller';
 
 class LiveRoomController {
   common = {
@@ -70,6 +72,28 @@ class LiveRoomController {
     const id = +ctx.params.id;
     const result = await this.common.find(id);
     successHandler({ ctx, data: result });
+    await next();
+  };
+
+  verifyPkKey = async (ctx: ParameterizedContext, next) => {
+    const id = +ctx.params.id;
+    const { key } = ctx.request.query;
+    const result = await redisController.getVal({
+      prefix: REDIS_PREFIX.livePkKey,
+      key: `${id}`,
+    });
+    let pass = false;
+    try {
+      if (result) {
+        const res = JSON.parse(result);
+        if (res.value.key === key) {
+          pass = true;
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    successHandler({ ctx, data: pass });
     await next();
   };
 

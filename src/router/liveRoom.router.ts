@@ -12,6 +12,8 @@ liveRoomRouter.get('/find/:id', liveRoomController.find);
 
 liveRoomRouter.put('/update_key', liveRoomController.updateKey);
 
+liveRoomRouter.get('/verify_pk_key/:id', liveRoomController.verifyPkKey);
+
 liveRoomRouter.put(
   '/update/:id',
   apiVerifyAuth([DEFAULT_AUTH_INFO.LIVE_MANAGE.auth_value]),

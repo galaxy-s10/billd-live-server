@@ -36,6 +36,7 @@
     "@socket.io/redis-adapter": "^8.0.0",
     "alipay-sdk": "^3.4.0",
     "amqplib": "^0.10.3",
+    "autocannon": "^7.14.0",
     "axios": "^1.4.0",
     "billd-deploy": "^1.0.16",
     "billd-html-webpack-plugin": "^1.0.5",
