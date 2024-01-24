@@ -64,7 +64,7 @@ async function clearOld() {
   const queue = [];
   giteeDirAllFile.forEach((url) => {
     const fullurl = `${giteeDir}/${url}`;
-    if (!['node_modules'].includes(url)) {
+    if (!['node_modules', '.git'].includes(url)) {
       queue.push(trash(fullurl));
     }
   });
@@ -72,17 +72,8 @@ async function clearOld() {
 }
 
 clearOld().then(() => {
-  const gitignoreTxt = `
-  node_modules
-  .DS_Store
-  dist
-  /public/**/*
-  /upload/**/*
-  /webm/**/*
-  !/public/README.md
-  !/upload/README.md
-  !/webm/README.md
-  `;
+  const gitignoreTxt =
+    'node_modules\n.DS_Store\ndist\n/public/**/*\n/upload/**/*\n/webm/**/*\n!/public/README.md\n!/upload/README.md\n!/webm/README.md\n';
   fs.writeFileSync(path.resolve(giteeDir, './.gitignore'), gitignoreTxt);
   findFile(dir);
   putFile();
