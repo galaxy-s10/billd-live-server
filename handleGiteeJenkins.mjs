@@ -1,17 +1,14 @@
 // WARN 该文件只是方便我将当前项目复制一份到我电脑的另一个位置（gitee私有仓库的位置)，其他人不需要管这个文件~
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
-const { rimrafSync } = require('rimraf');
+
+import { execSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import trash from 'trash';
 
 const allFile = [];
 const ignore = ['.DS_Store', '.git', '.gitignore', 'node_modules', 'dist'];
-const localDir = path.resolve(__filename, '../');
-const giteeDir = path.resolve(
-  __filename,
-  '../',
-  './../../jenkins/billd-live-server'
-);
+const localDir = '/Users/huangshuisheng/Desktop/hss/github/billd-live-server';
+const giteeDir = '/Users/huangshuisheng/Desktop/hss/jenkins/billd-live-server';
 
 const dir = fs.readdirSync(localDir).filter((item) => {
   if (ignore.includes(item)) {
@@ -62,32 +59,36 @@ function putFile() {
   }
 }
 
-function delFile() {
-  const dockerDir = path.resolve(giteeDir, './docker');
-  const publicDir = path.resolve(giteeDir, './public');
-  const srcDir = path.resolve(giteeDir, './src');
-  const testDir = path.resolve(giteeDir, './test');
-  const uploadDir = path.resolve(giteeDir, './upload');
-  const webmDir = path.resolve(giteeDir, './webm');
-  const allDir = [dockerDir, publicDir, srcDir, testDir, uploadDir, webmDir];
-  allDir.forEach((url) => {
-    if (fs.existsSync(url)) {
-      rimrafSync(url);
+async function clearOld() {
+  const giteeDirAllFile = fs.readdirSync(giteeDir);
+  const queue = [];
+  giteeDirAllFile.forEach((url) => {
+    if (!['node_modules'].includes(url)) {
+      queue.push(trash(url));
     }
   });
+  await Promise.all(queue);
 }
 
-if (path.resolve(__dirname) === giteeDir) {
-  // eslint-disable-next-line
-  console.log('当前在gitee文件目录，直接退出！');
-}
-
-// delFile();
-// findFile(dir);
-// putFile();
-// execSync(`pnpm i`, { cwd: giteeDir });
-// execSync(`git add .`, { cwd: giteeDir });
-// execSync(`git commit -m 'feat: ${new Date().toLocaleString()}'`, {
-//   cwd: giteeDir,
-// });
-// execSync(`git push`, { cwd: giteeDir });
+clearOld().then(() => {
+  const gitignoreTxt = `
+  node_modules
+  .DS_Store
+  dist
+  /public/**/*
+  /upload/**/*
+  /webm/**/*
+  !/public/README.md
+  !/upload/README.md
+  !/webm/README.md
+  `;
+  fs.writeFileSync(path.resolve(giteeDir, './.gitignore'), gitignoreTxt);
+  findFile(dir);
+  putFile();
+  execSync(`pnpm i`, { cwd: giteeDir });
+  execSync(`git add .`, { cwd: giteeDir });
+  execSync(`git commit -m 'feat: ${new Date().toLocaleString()}'`, {
+    cwd: giteeDir,
+  });
+  execSync(`git push`, { cwd: giteeDir });
+});
