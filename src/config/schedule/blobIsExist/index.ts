@@ -49,9 +49,6 @@ export const startBlobIsExistSchedule = (data: {
   const jobName = `${SCHEDULE_TYPE.blobIsExist}___${data.roomId}`;
   blobId = 1;
   const scheduleJob = nodeSchedule.scheduleJob(jobName, rule, () => {
-    // console.log(
-    //   chalkINFO(`${new Date().toLocaleString()}，执行${jobName}定时任务`)
-    // );
     const roomDir = path.resolve(WEBM_DIR, `roomId_${data.roomId}`);
     const fileDir = `${roomDir}/file`;
     const fileResDir = `${fileDir}/res`;

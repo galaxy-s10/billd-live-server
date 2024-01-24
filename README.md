@@ -238,7 +238,7 @@ pnpm run dev
 
 ### 本地开发环境
 
-> 配置：macbookpro 2020 m1，8 核 CPU，16G 内存
+> 配置：macbookpro 2020 Apple M1，8 核 CPU，16G 内存
 
 - 操作系统：mac os 13.3.1
 - node 版本：16.16.0

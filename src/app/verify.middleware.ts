@@ -12,7 +12,7 @@ import {
 import authController from '@/controller/auth.controller';
 import blacklistController from '@/controller/blacklist.controller';
 import { CustomError } from '@/model/customError.model';
-import { chalkINFO, chalkWARN } from '@/utils/chalkTip';
+import { chalkINFO } from '@/utils/chalkTip';
 
 // 前台的所有get和白名单内的接口不需要token
 const frontendWhiteList = [
@@ -46,30 +46,18 @@ const globalWhiteList = ['/init/'];
 const frequentlyWhiteList = [];
 
 export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
-  console.log(chalkINFO('apiBeforeVerify中间件开始'));
+  console.log(chalkINFO('===== apiBeforeVerify中间件开始 ====='));
   const startTime = performance.now();
   const url = ctx.request.path;
   const ip = (ctx.request.headers['x-real-ip'] as string) || '127.0.0.1';
   const consoleEnd = () => {
     const duration = Math.floor(performance.now() - startTime);
-    console.log(chalkINFO('apiBeforeVerify中间件通过！'));
-    console.log(chalkWARN(`apiBeforeVerify中间件耗时：${duration}ms`));
     console.log(
       chalkINFO(
-        `日期：${new Date().toLocaleString()}，ip：${ip}，响应请求：${
-          ctx.request.method
-        } ${url}`
+        `===== apiBeforeVerify中间件通过,耗时:${duration}ms,http状态码:${ctx.status} =====`
       )
     );
   };
-
-  console.log(
-    chalkINFO(
-      `日期：${new Date().toLocaleString()}，ip：${ip}，收到请求 ${
-        ctx.request.method
-      } ${url}请求`
-    )
-  );
 
   console.log(chalk.blueBright('query:'), { ...ctx.request.query });
   console.log(chalk.blueBright('params:'), ctx.params);
@@ -159,9 +147,7 @@ export const apiVerifyAuth = (shouldAuthArr: string[]) => {
     if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
       throw new CustomError(message, code, code);
     }
-    console.log('dddddd111');
     const myAllAuths = await authController.common.getUserAuth(userInfo.id!);
-    console.log('dddddd222');
 
     const myAllAuthsArr = myAllAuths.map((v) => v.auth_value!);
     const diffArr = getArrayDifference(shouldAuthArr, myAllAuthsArr);

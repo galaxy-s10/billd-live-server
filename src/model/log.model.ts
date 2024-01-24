@@ -63,7 +63,7 @@ const model = sequelize.define<LogModel>(
       type: DataTypes.INTEGER,
     },
     api_error: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
     },
     api_err_msg: {
       type: DataTypes.STRING,

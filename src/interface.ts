@@ -192,29 +192,6 @@ export interface IRedbagRecv {
   deleted_at?: string;
 }
 
-export interface ISrsCb {
-  server_id: string;
-  service_id: string;
-  action: string;
-  client_id: string;
-  ip: string;
-  vhost: string;
-  app: string;
-  tcUrl: string;
-  stream: string;
-  param: string;
-  stream_url: string;
-  stream_id: string;
-}
-
-export interface ISrsRTC {
-  api: string;
-  clientip: any;
-  sdp: string;
-  streamurl: string;
-  tid: string;
-}
-
 export interface IWallet {
   id?: number;
   user_id?: number;

@@ -1,0 +1,228 @@
+## 阿里云轻量服务器安装 docker
+
+> 参考：[https://help.aliyun.com/document_detail/264695.html](https://help.aliyun.com/document_detail/264695.html)
+
+## 腾讯云服务器安装 docker
+
+> 参考：[https://cloud.tencent.com/document/product/213/46000](https://cloud.tencent.com/document/product/213/46000)
+
+## docker 镜像
+
+> https://gist.github.com/y0ngb1n/7e8f16af3242c7815e7ca2f0833d3ea6
+>
+> 上海交大：https://docker.mirrors.sjtug.sjtu.edu.cn
+>
+> 打开 Docker 配置文件 /etc/docker/daemon.json，如果该文件不存在，则可以创建该文件。
+
+```
+{
+  "registry-mirrors": ["https://docker.mirrors.sjtug.sjtu.edu.cn"]
+}
+```
+
+配置后重新启动服务。
+
+```
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+```
+
+## 安装 ffmpeg
+
+> 参考：[https://zhuanlan.zhihu.com/p/461818410](https://zhuanlan.zhihu.com/p/461818410)
+
+### 安装 yasm
+
+安装 ffmpeg 之前需要先安装 yasm，安装流程如下:
+
+下载 yasm 源码包
+
+```bash
+wget http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
+```
+
+解压
+
+```bash
+tar zxvf yasm-1.3.0.tar.gz
+```
+
+进入解压后的文件夹
+
+```bash
+cd yasm-1.3.0
+./configure
+make
+make install
+```
+
+### 安装 ffmpeg
+
+下载 ffmpeg 源码包
+
+```bash
+wget http://www.ffmpeg.org/releases/ffmpeg-6.0.tar.gz
+```
+
+解压
+
+```bash
+tar zxvf ffmpeg-6.0.tar.gz
+```
+
+进入解压后的文件夹
+
+```bash
+cd ffmpeg-6.0
+./configure
+make
+make install
+```
+
+## docker 安装 mysql
+
+> [https://hub.docker.com/\_/mysql](https://hub.docker.com/_/mysql)
+
+### 拉镜像
+
+```bash
+docker pull mysql:8.0
+```
+
+### 复制配置文件到本地
+
+先查看配置文件位置：
+
+```bash
+docker run --rm mysql:8.0 mysql --help | grep my.cnf
+```
+
+查看配置文件位置结果：
+
+```bash
+➜  billd-live-server git:(master) ✗ docker run --rm mysql:8.0 mysql --help | grep my.cnf
+                      order of preference, my.cnf, $MYSQL_TCP_PORT,
+/etc/my.cnf /etc/mysql/my.cnf /usr/etc/my.cnf ~/.my.cnf
+➜  billd-live-server git:(master) ✗
+```
+
+意思是按照/etc/my.cnf /etc/mysql/my.cnf /usr/etc/my.cnf ~/.my.cnf 路径按优先排序。
+
+```bash
+➜  billd-live-server git:(master) ✗ docker run --rm mysql cat /etc/my.cnf
+# For advice on how to change settings please see
+# http://dev.mysql.com/doc/refman/8.0/en/server-configuration-defaults.html
+
+[mysqld]
+#
+# Remove leading # and set to the amount of RAM for the most important data
+省略...
+➜  billd-live-server git:(master) ✗
+```
+
+可以得到镜像中 mysql 配置文件路径为：/etc/my.cnf
+
+创建一个临时的容器，在它里面复制配置文件到本地：
+
+> 注意，本地需要存在/Users/huangshuisheng/Desktop/docker/mysql/conf 这个目录
+
+本地复制时用这个命令：
+
+```bash
+LOCAL_DOCKER_MYSQL_PATH=/Users/huangshuisheng/Desktop/docker/mysql \
+DOCKER_MYSQL_TMP=`docker run -d mysql:8.0` \
+&& docker cp $DOCKER_MYSQL_TMP:/etc/my.cnf $LOCAL_DOCKER_MYSQL_PATH/conf \
+&& docker stop $DOCKER_MYSQL_TMP \
+&& docker rm $DOCKER_MYSQL_TMP
+```
+
+### 启动容器
+
+```bash
+# 使用自定义 MySQL 配置文件
+# billd-live-mysql是docker容器名，/Users/huangshuisheng/Desktop/docker/mysql是映射到本机的mysql，123456是密码
+
+LOCAL_DOCKER_MYSQL_PATH=/Users/huangshuisheng/Desktop/docker/mysql \
+&& docker run -d \
+-p 3306:3306 \
+--name billd-live-mysql \
+-e MYSQL_ROOT_PASSWORD=mysql123. \
+-v $LOCAL_DOCKER_MYSQL_PATH/conf/my.cnf:/etc/my.cnf \
+-v $LOCAL_DOCKER_MYSQL_PATH/data:/var/lib/mysql/ \
+mysql:8.0
+```
+
+## docker 安装 redis
+
+### 拉镜像
+
+```bash
+docker pull redis:7.0
+```
+
+### 复制配置文件到本地
+
+> https://raw.githubusercontent.com/redis/redis/7.0/redis.conf
+
+在/Users/huangshuisheng/Desktop/docker/redis/新建 conf 目录
+在/Users/huangshuisheng/Desktop/docker/redis/新建 data 目录
+
+将项目根目录的/docker/redis/conf/redis.conf 和 users.acl 复制到/Users/huangshuisheng/Desktop/docker/redis/conf
+
+### 本地启动容器
+
+```bash
+# 使用自定义 redis 配置文件
+# billd-live-redis是docker容器名，/Users/huangshuisheng/Desktop/docker/redis是映射到本机的redis
+
+LOCAL_DOCKER_RESIS_PATH=/Users/huangshuisheng/Desktop/docker/redis \
+&& docker run -d \
+-p 6379:6379 \
+--name billd-live-redis \
+-v $LOCAL_DOCKER_RESIS_PATH/data:/data \
+-v $LOCAL_DOCKER_RESIS_PATH/conf/redis.conf:/etc/redis/redis.conf \
+-v $LOCAL_DOCKER_RESIS_PATH/conf/users.acl:/etc/redis/users.acl \
+redis:7.0 redis-server /etc/redis/redis.conf
+```
+
+## SRS
+
+### 拉镜像
+
+```bash
+docker pull registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5.0.200
+```
+
+### 复制配置文件到本地
+
+创建一个临时的容器，在它里面复制配置文件到本地：
+
+> 注意，本地需要存在/Users/huangshuisheng/Desktop/docker/srs/ 这个目录
+
+本地复制时用这个命令：
+
+```bash
+LOCAL_DOCKER_SRS_PATH=/Users/huangshuisheng/Desktop/docker/srs \
+DOCKER_SRS_TMP=`docker run -d registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5.0.200` \
+&& docker cp $DOCKER_SRS_TMP:/usr/local/srs/conf $LOCAL_DOCKER_SRS_PATH \
+&& docker cp $DOCKER_SRS_TMP:/usr/local/srs/objs $LOCAL_DOCKER_SRS_PATH \
+&& docker stop $DOCKER_SRS_TMP \
+&& docker rm $DOCKER_SRS_TMP
+```
+
+### 启动容器
+
+```bash
+LOCAL_DOCKER_SRS_PATH=/Users/huangshuisheng/Desktop/docker/srs \
+&& docker run -d --rm \
+--name billd-live-srs \
+--env CANDIDATE=$(ifconfig en0 inet | grep 'inet ' | awk '{print $2}') \
+-p 1935:1935 \
+-p 5001:8080 \
+-p 1985:1985 \
+-p 8000:8000/udp \
+-v $LOCAL_DOCKER_SRS_PATH/conf:/usr/local/srs/conf/ \
+-v $LOCAL_DOCKER_SRS_PATH/objs:/usr/local/srs/objs/ \
+registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5.0.200 objs/srs \
+-c conf/rtc2rtmp.conf
+```

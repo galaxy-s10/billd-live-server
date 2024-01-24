@@ -3,12 +3,11 @@ import { ParameterizedContext } from 'koa';
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import { ALLOW_HTTP_CODE } from '@/constant';
+import srsController from '@/controller/srs.controller';
 import { IList, ILive } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveService from '@/service/live.service';
 import userLiveRoomService from '@/service/userLiveRoom.service';
-
-import srsController from './srs.controller';
 
 class LiveController {
   common = {

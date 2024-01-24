@@ -12,6 +12,7 @@ import {
   REDIS_PREFIX,
   THIRD_PLATFORM,
 } from '@/constant';
+import redisController from '@/controller/redis.controller';
 import { IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import thirdUserModel from '@/model/thirdUser.model';
@@ -21,8 +22,6 @@ import walletService from '@/service/wallet.service';
 import wechatUserService from '@/service/wechatUser.service';
 import { IWechatUser } from '@/types/IUser';
 import { myaxios } from '@/utils/request';
-
-import redisController from './redis.controller';
 
 interface IAccessTokenOk {
   access_token: string;

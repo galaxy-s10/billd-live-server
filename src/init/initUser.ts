@@ -14,6 +14,7 @@ import { fddmSnjsBase64 } from '@/init/base64/fddm_snjs';
 import { fddmXyzcslBase64 } from '@/init/base64/fddm_xyzcsl';
 import { fddmYcjhBase64 } from '@/init/base64/fddm_ycjh';
 import { fddmYycyBase64 } from '@/init/base64/fddm_yycy';
+import { hss_20230707_1_30Base64 } from '@/init/base64/hss_20230707_1_30';
 import { qlzJjbnxyBase64 } from '@/init/base64/qlz_jjbnxy';
 import { zjlBnsdmmBase64 } from '@/init/base64/zjl_bnsdmm';
 import { zjlGqBase64 } from '@/init/base64/zjl_gq';
@@ -24,8 +25,6 @@ import {
   LiveRoomPullIsShouldAuthEnum,
   LiveRoomUseCDNEnum,
 } from '@/types/ILiveRoom';
-
-import { hss_20230707_1_30Base64 } from './base64/hss_20230707_1_30';
 
 export const initUser: Record<string, IInitUser> = {
   admin: {

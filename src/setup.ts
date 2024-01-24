@@ -11,10 +11,9 @@ import { handleRedisKeyExpired } from '@/config/redis/handleRedisKeyExpired';
 import { initSchedule } from '@/config/schedule';
 import { connectWebSocket } from '@/config/websocket';
 import { STATIC_DIR, UPLOAD_DIR } from '@/constant';
+import { initFFmpeg } from '@/init/initFFmpeg';
 import { CustomError } from '@/model/customError.model';
 import { loadAllRoutes } from '@/router';
-
-import { initFFmpeg } from './init/initFFmpeg';
 
 export async function setupKoa({ port }) {
   const app = new Koa();
@@ -66,6 +65,8 @@ export async function setupKoa({ port }) {
   }); // http接口服务
   handleRedisKeyExpired();
   initSchedule();
-  // 初始化FFmpeg推流
-  initFFmpeg(true);
+  setTimeout(() => {
+    // 初始化FFmpeg推流
+    initFFmpeg(true);
+  }, 2000);
 }

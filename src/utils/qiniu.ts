@@ -14,8 +14,7 @@ import {
 } from '@/constant';
 import redisController from '@/controller/redis.controller';
 import { IQiniuData } from '@/interface';
-
-import { chalkERROR } from './chalkTip';
+import { chalkERROR } from '@/utils/chalkTip';
 
 export interface IQiniuKey {
   prefix: string;

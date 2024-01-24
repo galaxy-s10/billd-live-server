@@ -9,14 +9,13 @@ import { connectRedis } from '@/config/redis';
 import { createRedisPubSub } from '@/config/redis/pub';
 import { MYSQL_CONFIG } from '@/config/secret';
 import { PROJECT_ENV, PROJECT_NAME, PROJECT_PORT } from '@/constant';
+import { getIpAddress } from '@/utils';
 import {
   chalkERROR,
   chalkINFO,
   chalkSUCCESS,
   chalkWARN,
 } from '@/utils/chalkTip';
-
-import { getIpAddress } from './utils';
 
 const start = performance.now();
 async function main() {

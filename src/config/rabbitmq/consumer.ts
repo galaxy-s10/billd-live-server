@@ -1,4 +1,4 @@
-import { orderMQChannel, orderQueue } from './index';
+import { orderMQChannel, orderQueue } from '@/config/rabbitmq';
 
 export const initRabbitMQConsumer = () => {
   console.log('initRabbitMQConsumer', orderMQChannel);

@@ -6,7 +6,6 @@ import { chalk, chalkERROR } from '@/utils/chalkTip';
 
 const errorHandler = (error, ctx: ParameterizedContext) => {
   const { path, method } = ctx.request;
-  const time = new Date().toLocaleString();
   const ip = (ctx.request.headers['x-real-ip'] as string) || '127.0.0.1';
   // eslint-disable-next-line
   const errorLog = (error) => {
@@ -47,11 +46,7 @@ const errorHandler = (error, ctx: ParameterizedContext) => {
       return;
     }
 
-    console.log(
-      chalkERROR(
-        `👇👇👇👇 收到自定义错误，日期：${time}，ip：${ip}，${method} ${path} 👇👇👇👇`
-      )
-    );
+    console.log(chalkERROR(`===== 收到自定义错误:${method} ${path} =====`));
 
     // 不手动设置状态的话，默认是404（delete方法返回400），因此，即使走到了error-handle，且ctx.body返回了数据
     // 但是没有手动设置status的话，一样返回不了数据，因为status状态码都返回404了。
@@ -64,9 +59,7 @@ const errorHandler = (error, ctx: ParameterizedContext) => {
 
     errorLog(error);
     console.log(
-      chalkERROR(
-        `👆👆👆👆 收到自定义错误，日期：${time}，ip：${ip}，${method} ${path} 👆👆👆👆`
-      )
+      chalkERROR(`===== 收到自定义错误: ip:${ip},${method} ${path} =====`)
     );
   }
 

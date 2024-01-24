@@ -2,7 +2,12 @@ import { exec } from 'child_process';
 
 import nodeSchedule from 'node-schedule';
 
-import { LOCALHOST_URL, SCHEDULE_TYPE, maxBitrate } from '@/constant';
+import {
+  LOCALHOST_URL,
+  PROJECT_ENV,
+  SCHEDULE_TYPE,
+  maxBitrate,
+} from '@/constant';
 import srsController from '@/controller/srs.controller';
 import { initUser } from '@/init/initUser';
 import { IApiV1Streams } from '@/types/srs';
@@ -114,14 +119,10 @@ rule.second = 0;
 // rule.second = allSecondArr.filter((v) => v % 5 === 0);
 
 export const startSchedule = () => {
-  nodeSchedule.scheduleJob(SCHEDULE_TYPE.verifyStream, rule, () => {
-    console.log(
-      chalkINFO(
-        `${new Date().toLocaleString()}，执行${
-          SCHEDULE_TYPE.verifyStream
-        }定时任务`
-      )
-    );
-    handleVerifyStream();
-  });
+  if (PROJECT_ENV === 'prod') {
+    nodeSchedule.scheduleJob(SCHEDULE_TYPE.verifyStream, rule, () => {
+      console.log(chalkINFO(`执行${SCHEDULE_TYPE.verifyStream}定时任务`));
+      handleVerifyStream();
+    });
+  }
 };
