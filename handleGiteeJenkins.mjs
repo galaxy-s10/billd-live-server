@@ -63,8 +63,9 @@ async function clearOld() {
   const giteeDirAllFile = fs.readdirSync(giteeDir);
   const queue = [];
   giteeDirAllFile.forEach((url) => {
+    const fullurl = `${giteeDir}/${url}`;
     if (!['node_modules'].includes(url)) {
-      queue.push(trash(url));
+      queue.push(trash(fullurl));
     }
   });
   await Promise.all(queue);
