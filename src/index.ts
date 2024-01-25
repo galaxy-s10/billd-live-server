@@ -7,8 +7,8 @@ import { performance } from 'perf_hooks';
 import { connectMysql } from '@/config/mysql';
 import { connectRedis } from '@/config/redis';
 import { createRedisPubSub } from '@/config/redis/pub';
-import { MYSQL_CONFIG } from '@/config/secret';
 import { PROJECT_ENV, PROJECT_NAME, PROJECT_PORT } from '@/constant';
+import { MYSQL_CONFIG } from '@/secret/secret';
 import { getIpAddress } from '@/utils';
 import {
   chalkERROR,

@@ -4,7 +4,6 @@ import { ParameterizedContext } from 'koa';
 
 import { signJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import { SERVER_LIVE } from '@/config/secret';
 import {
   ALLOW_HTTP_CODE,
   PROJECT_ENV,
@@ -44,6 +43,7 @@ import userModel from '@/model/user.model';
 import userLiveRoomModel from '@/model/userLiveRoom.model';
 import userRoleModel from '@/model/userRole.model';
 import walletModel from '@/model/wallet.model';
+import { SERVER_LIVE } from '@/secret/secret';
 import liveRoomService from '@/service/liveRoom.service';
 import userService from '@/service/user.service';
 import walletService from '@/service/wallet.service';

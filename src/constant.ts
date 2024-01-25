@@ -73,13 +73,13 @@ export const UPLOAD_DIR =
 
 export const SECRET_FILE =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
-    ? resolveApp('/dist/secret/secret.js')
+    ? resolveApp('/dist/src/secret/secret.js')
     : resolveApp('/src/secret/secret.ts'); // 秘钥文件
 
 export const SECRETTEMP_FILE =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
-    ? resolveApp('/dist/config/secretTemp.js')
-    : resolveApp('/src/config/secretTemp.ts'); // 秘钥文件模板
+    ? resolveApp('/dist/src/secret/secretTemp.js')
+    : resolveApp('/src/secret/secretTemp.ts'); // 秘钥文件模板
 
 export const QQ_MAIL_CONFIG = {
   from: '2274751790@qq.com', // sender address

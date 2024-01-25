@@ -1,6 +1,6 @@
 import { execSync } from 'child_process';
 
-import { RABBITMQ_CONFIG } from '@/config/secret';
+import { RABBITMQ_CONFIG } from '@/secret/secret';
 import { chalkERROR, chalkSUCCESS, chalkWARN, emoji } from '@/utils/chalkTip';
 
 export const dockerRunRabbitMQ = (init = true) => {

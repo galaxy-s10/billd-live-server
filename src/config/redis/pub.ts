@@ -1,6 +1,6 @@
 import { createClient } from 'redis';
 
-import { REDIS_CONFIG } from '@/config/secret';
+import { REDIS_CONFIG } from '@/secret/secret';
 import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 
 export const pubClient = createClient({

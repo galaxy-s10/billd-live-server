@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize';
 
-import { MYSQL_CONFIG } from '@/config/secret';
 import { initDb } from '@/init/initDb';
+import { MYSQL_CONFIG } from '@/secret/secret';
 import {
   chalkERROR,
   chalkINFO,

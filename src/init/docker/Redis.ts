@@ -1,6 +1,6 @@
 import { execSync } from 'child_process';
 
-import { REDIS_CONFIG } from '@/config/secret';
+import { REDIS_CONFIG } from '@/secret/secret';
 import { chalkERROR, chalkSUCCESS, chalkWARN, emoji } from '@/utils/chalkTip';
 
 export const dockerRunRedis = (init = true) => {

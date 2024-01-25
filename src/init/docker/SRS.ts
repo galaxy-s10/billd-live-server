@@ -1,6 +1,6 @@
 import { execSync } from 'child_process';
 
-import { SRS_CONFIG } from '@/config/secret';
+import { SRS_CONFIG } from '@/secret/secret';
 import { chalkERROR, chalkSUCCESS, chalkWARN, emoji } from '@/utils/chalkTip';
 
 export const dockerRunSRS = (init = true) => {

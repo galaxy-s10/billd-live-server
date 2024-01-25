@@ -2,11 +2,26 @@ import { LOCALHOST_URL, PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 
 export const JWT_SECRET = '**********'; // jwt秘钥
 
-export const IP_WHITE_LIST = ['127.0.0.1']; // ip白名单
+export const IP_URL = {
+  tencent: {
+    localIp: 'localhost',
+    serverIp: '**********',
+  },
+  ali: {
+    localIp: 'localhost',
+    serverIp: '**********',
+  },
+};
+
+export const IP_WHITE_LIST = [IP_URL.tencent.serverIp, IP_URL.ali.serverIp]; // ip白名单
 
 export const QQ_CLIENT_ID = '**********'; // qq登录APP ID
 export const QQ_CLIENT_SECRET = '**********'; // qq登录APP Key
 export const QQ_REDIRECT_URI = '**********'; // qq登录回调地址
+
+export const WECHAT_APPID = '**********'; // wechat登录APP ID
+export const WECHAT_SECRET = '**********'; // wechat登录APP Key
+export const WECHAT_REDIRECT_URI = '**********'; // wechat登录回调地址
 
 // WARN 七牛云属实拉胯，不用它了，QINIU_PILI_LIVE里面的值可以随便填（但一定要有值），反正用不到。
 export const QINIU_ACCESSKEY = '**********'; // 七牛云秘钥
@@ -88,7 +103,9 @@ export const REDIS_CONFIG = {
       ? 'billd_live_redis_test'
       : '*************',
   password:
-    PROJECT_ENV === PROJECT_ENV_ENUM.development ? 'redis123.' : '**********',
+    PROJECT_ENV === PROJECT_ENV_ENUM.development
+      ? 'redis123.'
+      : '*************',
 }; // Redis配置
 
 export const SRS_CONFIG = {

@@ -4,7 +4,6 @@ import { getRandomString } from 'billd-utils';
 import { existsSync, outputFileSync, removeSync } from 'fs-extra';
 import qiniu from 'qiniu';
 
-import { QINIU_ACCESSKEY, QINIU_SECRETKEY } from '@/config/secret';
 import {
   QINIU_LIVE,
   QINIU_UPLOAD_PROGRESS_TYPE,
@@ -14,6 +13,7 @@ import {
 } from '@/constant';
 import redisController from '@/controller/redis.controller';
 import { IQiniuData } from '@/interface';
+import { QINIU_ACCESSKEY, QINIU_SECRETKEY } from '@/secret/secret';
 import { chalkERROR } from '@/utils/chalkTip';
 
 export interface IQiniuKey {

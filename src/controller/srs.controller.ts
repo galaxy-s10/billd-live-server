@@ -7,7 +7,6 @@ import nodeSchedule from 'node-schedule';
 import { rimrafSync } from 'rimraf';
 
 import successHandler from '@/app/handler/success-handle';
-import { SRS_CONFIG } from '@/config/secret';
 import { wsSocket } from '@/config/websocket';
 import {
   ALLOW_HTTP_CODE,
@@ -23,6 +22,7 @@ import livePlayController from '@/controller/livePlay.controller';
 import liveRecordController from '@/controller/liveRecord.controller';
 import userLiveRoomController from '@/controller/userLiveRoom.controller';
 import { CustomError } from '@/model/customError.model';
+import { SRS_CONFIG } from '@/secret/secret';
 import liveRoomService from '@/service/liveRoom.service';
 import userService from '@/service/user.service';
 import { LiveRoomPullIsShouldAuthEnum } from '@/types/ILiveRoom';

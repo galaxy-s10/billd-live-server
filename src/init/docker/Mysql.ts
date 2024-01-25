@@ -1,6 +1,6 @@
 import { execSync } from 'child_process';
 
-import { MYSQL_CONFIG } from '@/config/secret';
+import { MYSQL_CONFIG } from '@/secret/secret';
 import { chalkERROR, chalkSUCCESS, chalkWARN, emoji } from '@/utils/chalkTip';
 
 export const dockerRunMysql = (init = true) => {

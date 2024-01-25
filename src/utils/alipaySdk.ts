@@ -1,7 +1,7 @@
 import AlipaySdk from 'alipay-sdk';
 import { getRandomString } from 'billd-utils';
 
-import { ALIPAY_LIVE_CONFIG } from '@/config/secret';
+import { ALIPAY_LIVE_CONFIG } from '@/secret/secret';
 
 // 支付宝开放平台（自然博客直播）：https://open.alipay.com/develop/pm/sub/appinfo?appId=2021003193626441
 

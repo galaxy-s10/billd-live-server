@@ -8,7 +8,7 @@ import {
   TENCENTCLOUD_LIVE,
   TENCENTCLOUD_SECRETID,
   TENCENTCLOUD_SECRETKEY,
-} from '@/config/secret';
+} from '@/secret/secret';
 import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
 
 function getSignFn({ endpoint, params }) {

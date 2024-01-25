@@ -1,9 +1,9 @@
 import { exec, spawnSync } from 'child_process';
 
-import { SERVER_LIVE } from '@/config/secret';
 import { PROJECT_ENV, PROJECT_ENV_ENUM, SRS_CB_URL_PARAMS } from '@/constant';
 import srsController from '@/controller/srs.controller';
 import { initUser } from '@/init/initUser';
+import { SERVER_LIVE } from '@/secret/secret';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
 import {

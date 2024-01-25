@@ -4,11 +4,11 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import { SERVER_LIVE } from '@/config/secret';
 import { ALLOW_HTTP_CODE } from '@/constant';
 import liveRoomController from '@/controller/liveRoom.controller';
 import { IList, IUserLiveRoom } from '@/interface';
 import { CustomError } from '@/model/customError.model';
+import { SERVER_LIVE } from '@/secret/secret';
 import liveRoomService from '@/service/liveRoom.service';
 import userLiveRoomService from '@/service/userLiveRoom.service';
 import {

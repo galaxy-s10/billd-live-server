@@ -4,11 +4,6 @@ import { ParameterizedContext } from 'koa';
 import { authJwt, signJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import {
-  QQ_CLIENT_ID,
-  QQ_CLIENT_SECRET,
-  QQ_REDIRECT_URI,
-} from '@/config/secret';
-import {
   ALLOW_HTTP_CODE,
   COOKIE_DOMAIN,
   DEFAULT_ROLE_INFO,
@@ -19,6 +14,11 @@ import {
 import { IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import thirdUserModel from '@/model/thirdUser.model';
+import {
+  QQ_CLIENT_ID,
+  QQ_CLIENT_SECRET,
+  QQ_REDIRECT_URI,
+} from '@/secret/secret';
 import qqUserService from '@/service/qqUser.service';
 import thirdUserService from '@/service/thirdUser.service';
 import userService from '@/service/user.service';

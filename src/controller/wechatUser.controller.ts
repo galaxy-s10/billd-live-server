@@ -3,7 +3,6 @@ import { ParameterizedContext } from 'koa';
 
 import { signJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import { WECHAT_APPID, WECHAT_SECRET } from '@/config/secret';
 import {
   ALLOW_HTTP_CODE,
   DEFAULT_ROLE_INFO,
@@ -16,6 +15,7 @@ import redisController from '@/controller/redis.controller';
 import { IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import thirdUserModel from '@/model/thirdUser.model';
+import { WECHAT_APPID, WECHAT_SECRET } from '@/secret/secret';
 import thirdUserService from '@/service/thirdUser.service';
 import userService from '@/service/user.service';
 import walletService from '@/service/wallet.service';
