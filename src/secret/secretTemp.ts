@@ -52,7 +52,7 @@ export const MYSQL_CONFIG = {
     port: { 3306: 3306 },
     MYSQL_ROOT_PASSWORD:
       PROJECT_ENV === PROJECT_ENV_ENUM.development
-        ? 'mysql123.'
+        ? '*********'
         : '********************',
     volume:
       PROJECT_ENV === PROJECT_ENV_ENUM.development
@@ -71,7 +71,7 @@ export const MYSQL_CONFIG = {
   username: 'root',
   password:
     PROJECT_ENV === PROJECT_ENV_ENUM.development
-      ? 'mysql123.'
+      ? '*********'
       : '********************',
 }; // Mysql配置
 
@@ -104,7 +104,7 @@ export const REDIS_CONFIG = {
       : '*************',
   password:
     PROJECT_ENV === PROJECT_ENV_ENUM.development
-      ? 'redis123.'
+      ? '*********'
       : '*************',
 }; // Redis配置
 
