@@ -41,11 +41,11 @@ async function main() {
     ).default.common.initDefault();
     const port = +PROJECT_PORT;
     await (await import('./setup')).setupKoa({ port });
+    console.log();
     console.log(chalkWARN(`监听端口: ${port}`));
     console.log(chalkWARN(`项目名称: ${PROJECT_NAME}`));
     console.log(chalkWARN(`项目环境: ${PROJECT_ENV}`));
     console.log(chalkWARN(`mysql数据库: ${MYSQL_CONFIG.database}`));
-    console.log();
     getIpAddress().forEach((ip) => {
       console.log(chalkSUCCESS(`http://${ip}:${port}/`));
     });

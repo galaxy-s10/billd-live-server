@@ -54,6 +54,7 @@ import {
   LiveRoomUseCDNEnum,
 } from '@/types/ILiveRoom';
 import { IUser } from '@/types/IUser';
+import { chalkWARN } from '@/utils/chalkTip';
 import { tencentcloudUtils } from '@/utils/tencentcloud';
 
 class InitController {
@@ -76,7 +77,7 @@ class InitController {
           this.common.initArea(),
         ]);
       } catch (error) {
-        console.log('已初始化数据库，不能在初始化了');
+        console.log(chalkWARN('已初始化数据库，不能在初始化了'));
       }
     },
     initArea: async () => {
