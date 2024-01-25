@@ -1,6 +1,6 @@
 // eslint-disable-next-line
-import './init/alias';
-import './init/initFile';
+import './alias';
+import './initFile';
 
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import { dockerRunMysql } from '@/init/docker/Mysql';
