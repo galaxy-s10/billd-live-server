@@ -73,8 +73,8 @@ export const UPLOAD_DIR =
 
 export const SECRET_FILE =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
-    ? resolveApp('/dist/config/secret.js')
-    : resolveApp('/src/config/secret.ts'); // 秘钥文件
+    ? resolveApp('/dist/secret/secret.js')
+    : resolveApp('/src/secret/secret.ts'); // 秘钥文件
 
 export const SECRETTEMP_FILE =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
