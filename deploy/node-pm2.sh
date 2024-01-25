@@ -6,7 +6,7 @@
 # Email: 2274751790@qq.com
 # FilePath: /billd-live-server/deploy/node-pm2.sh
 # Github: https://github.com/galaxy-s10
-# LastEditTime: 2024-01-25 10:05:27
+# LastEditTime: 2024-01-25 10:57:31
 # LastEditors: shuisheng
 ###
 
@@ -42,7 +42,7 @@ echo 查看npm版本:
 npm -v
 
 echo 设置npm淘宝镜像:
-npm config set registry https://registry.npm.taobao.org/
+npm config set registry https://registry.npmmirror.com/
 
 echo 查看当前npm镜像:
 npm get registry
@@ -58,7 +58,7 @@ echo 查看pnpm版本:
 pnpm -v
 
 echo 设置pnpm淘宝镜像:
-pnpm config set registry https://registry.npm.taobao.org/
+pnpm config set registry https://registry.npmmirror.com/
 pnpm config set @billd:registry http://registry.hsslive.cn/
 
 echo 查看当前pnpm镜像:
