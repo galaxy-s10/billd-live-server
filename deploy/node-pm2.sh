@@ -4,9 +4,9 @@
 # Date: 2022-04-26 01:54:48
 # Description: https://github.com/galaxy-s10/sh/blob/master/pm2.sh
 # Email: 2274751790@qq.com
-# FilePath: /billd-live-server/node-pm2.sh
+# FilePath: /billd-live-server/deploy/node-pm2.sh
 # Github: https://github.com/galaxy-s10
-# LastEditTime: 2024-01-19 13:31:25
+# LastEditTime: 2024-01-25 10:05:27
 # LastEditors: shuisheng
 ###
 
@@ -27,6 +27,10 @@ WORKSPACE=$3    #约定$3为Jenkins工作区
 PORT=$4         #约定$4为端口号
 TAG=$5          #约定$5为git标签
 PUBLICDIR=/node #约定公共目录为/node
+
+# 注意：要先进入项目所在的目录，然后再执行pm2命令!!!
+# 否则的话约等于在其他目录执行npm run dev,如果所在的目录没有package.json文件就会报错！
+cd $PUBLICDIR/$JOBNAME/$ENV
 
 echo 删除node_modules:
 rm -rf node_modules
@@ -71,10 +75,6 @@ fi
 
 echo 查看pm2版本:
 pm2 -v
-
-# 注意：要先进入项目所在的目录，然后再执行pm2命令!!!
-# 否则的话约等于在其他目录执行npm run dev,如果所在的目录没有package.json文件就会报错！
-cd $PUBLICDIR/$JOBNAME/$ENV
 
 echo 开始安装依赖:
 pnpm install
