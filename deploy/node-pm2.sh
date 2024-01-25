@@ -6,7 +6,7 @@
 # Email: 2274751790@qq.com
 # FilePath: /billd-live-server/deploy/node-pm2.sh
 # Github: https://github.com/galaxy-s10
-# LastEditTime: 2024-01-25 10:57:31
+# LastEditTime: 2024-01-25 16:41:43
 # LastEditors: shuisheng
 ###
 

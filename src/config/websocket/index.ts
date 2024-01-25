@@ -97,11 +97,15 @@ export function socketEmit<T>({
   roomId?: number;
   data?: T;
 }) {
-  // console.log('===== websocketsocketEmit =====', roomId, socket.id, msgType);
-  if (roomId) {
-    socket.to(`${roomId}`).emit(msgType, data);
-  } else {
-    socket.emit(msgType, data);
+  try {
+    // console.log('===== websocket socketEmit =====', roomId, socket.id, msgType);
+    if (roomId) {
+      socket.to(`${roomId}`).emit(msgType, data);
+    } else {
+      socket.emit(msgType, data);
+    }
+  } catch (error) {
+    console.log(error);
   }
 }
 
@@ -116,11 +120,15 @@ export function ioEmit<T>({
   msgType: WsMsgTypeEnum;
   data?: T;
 }) {
-  // console.log('===== websocketioEmit =====', roomId, msgType);
-  if (roomId) {
-    io.to(`${roomId}`).emit(msgType, data);
-  } else {
-    io.emit(msgType, data);
+  try {
+    // console.log('===== websocket ioEmit =====', roomId, msgType);
+    if (roomId) {
+      io.to(`${roomId}`).emit(msgType, data);
+    } else {
+      io.emit(msgType, data);
+    }
+  } catch (error) {
+    console.log(error);
   }
 }
 
@@ -388,7 +396,8 @@ export const connectWebSocket = (server) => {
           msg: '===== websocket已断开连接 =====',
           socket,
         });
-        console.log(reason);
+        console.log(reason, Object.keys(io));
+        console.log(io.to);
         handleWsDisconnect({ io, socket });
       } catch (error) {
         console.log(error);

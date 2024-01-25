@@ -257,7 +257,6 @@ export async function handleWsDisconnect(args: { io: Server; socket: Socket }) {
   });
   if (res1) {
     const { joinRoomId, userInfo } = res1.value;
-    const liveUser = await getRoomAllUser(io, joinRoomId);
     ioEmit<WsLeavedType['data']>({
       io,
       roomId: joinRoomId,
@@ -268,11 +267,11 @@ export async function handleWsDisconnect(args: { io: Server; socket: Socket }) {
       },
     });
     ioEmit<WSGetRoomAllUserType['data']>({
+      io,
       roomId: joinRoomId,
       msgType: WsMsgTypeEnum.liveUser,
       data: {
-        // @ts-ignore
-        liveUser,
+        liveUser: [],
       },
     });
     const userId = userInfo?.id;
