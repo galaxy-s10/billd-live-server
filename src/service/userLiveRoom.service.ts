@@ -1,4 +1,4 @@
-import { deleteUseLessObjectKey } from 'billd-utils';
+import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import { Op } from 'sequelize';
 
 import { IList, IUserLiveRoom } from '@/interface';
@@ -51,9 +51,12 @@ class UserLiveRoomService {
         [Op.lt]: new Date(+rangTimeEnd!),
       };
     }
-    // @ts-ignore
+    const orderRes: any[] = [];
+    if (orderName && orderBy) {
+      orderRes.push([orderName, orderBy]);
+    }
     const result = await userLiveRoomModel.findAndCountAll({
-      order: [[orderName, orderBy]],
+      order: [...orderRes],
       limit,
       offset,
       where: {
@@ -130,23 +133,16 @@ class UserLiveRoomService {
   }
 
   /** 修改用户直播间 */
-  async update({ id, user_id, live_room_id }: IUserLiveRoom) {
-    const result = await userLiveRoomModel.update(
-      {
-        user_id,
-        live_room_id,
-      },
-      { where: { id } }
-    );
+  async update(data: IUserLiveRoom) {
+    const { id } = data;
+    const data2 = filterObj(data, ['id']);
+    const result = await userLiveRoomModel.update(data2, { where: { id } });
     return result;
   }
 
   /** 创建用户直播间 */
-  async create({ user_id, live_room_id }: IUserLiveRoom) {
-    const result = await userLiveRoomModel.create({
-      user_id,
-      live_room_id,
-    });
+  async create(data: IUserLiveRoom) {
+    const result = await userLiveRoomModel.create(data);
     return result;
   }
 

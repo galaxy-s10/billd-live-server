@@ -87,12 +87,15 @@ class QQUserService {
       ];
       allWhere[Op.or] = keyWordWhere;
     }
-    // @ts-ignore
+    const orderRes: any[] = [];
+    if (orderName && orderBy) {
+      orderRes.push([orderName, orderBy]);
+    }
     const result = await qqUserModel.findAndCountAll({
       attributes: {
         exclude: ['password', 'token'],
       },
-      order: [[orderName, orderBy]],
+      order: [...orderRes],
       limit,
       offset,
       where: {

@@ -53,11 +53,7 @@ const map = {
 
 async function foo() {
   const result = await autocannon({
-    url: `${baseUrl}/area/live_room_list?${objectToUrlParams({
-      id: '1',
-      nowPage: '1',
-      pageSize: '10',
-    })}`,
+    url: `${baseUrl}/live/list?live_room_is_show=0&orderName=created_at&orderBy=desc`,
     method: 'GET',
     connections: 10, // 并发连接数。可选默认值：10
     pipelining: 1, // 每个连接的管道请求数。当大于 1 时将导致ClientAPI 抛出异常。可选默认值：1

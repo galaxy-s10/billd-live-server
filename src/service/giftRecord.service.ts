@@ -1,14 +1,14 @@
-import { filterObj, isPureNumber } from 'billd-utils';
+import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import { Op } from 'sequelize';
 
-import { IBlacklist, IList } from '@/interface';
-import blacklistModel from '@/model/blacklist.model';
+import { IGiftRecord, IList } from '@/interface';
+import giftModel from '@/model/giftRecord.model';
 import { handlePaging } from '@/utils';
 
-class BlackListService {
-  /** 黑名单是否存在 */
+class GiftRecordService {
+  /** 礼物记录是否存在 */
   async isExist(ids: number[]) {
-    const res = await blacklistModel.count({
+    const res = await giftModel.count({
       where: {
         id: {
           [Op.in]: ids,
@@ -18,9 +18,16 @@ class BlackListService {
     return res === ids.length;
   }
 
-  /** 获取黑名单列表 */
+  /** 获取礼物记录列表 */
   async getList({
     id,
+    is_recv,
+    goods_id,
+    goods_nums,
+    order_id,
+    live_room_id,
+    send_user_id,
+    recv_user_id,
     orderBy,
     orderName,
     nowPage,
@@ -29,31 +36,32 @@ class BlackListService {
     rangTimeType,
     rangTimeStart,
     rangTimeEnd,
-  }: IList<IBlacklist>) {
+  }: IList<IGiftRecord>) {
     let offset;
     let limit;
     if (nowPage && pageSize) {
       offset = (+nowPage - 1) * +pageSize;
       limit = +pageSize;
     }
-    const allWhere: any = {};
-    if (id !== undefined && isPureNumber(`${id}`)) {
-      allWhere.id = id;
-    }
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+      is_recv,
+      goods_id,
+      goods_nums,
+      order_id,
+      live_room_id,
+      send_user_id,
+      recv_user_id,
+    });
     if (keyWord) {
       const keyWordWhere = [
         {
-          ip: {
+          goods_snapshot: {
             [Op.like]: `%${keyWord}%`,
           },
         },
         {
-          user_id: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          msg: {
+          remark: {
             [Op.like]: `%${keyWord}%`,
           },
         },
@@ -70,7 +78,7 @@ class BlackListService {
     if (orderName && orderBy) {
       orderRes.push([orderName, orderBy]);
     }
-    const result = await blacklistModel.findAndCountAll({
+    const result = await giftModel.findAndCountAll({
       order: [...orderRes],
       limit,
       offset,
@@ -81,35 +89,29 @@ class BlackListService {
     return handlePaging(result, nowPage, pageSize);
   }
 
-  /** 查找黑名单 */
+  /** 查找礼物记录 */
   async find(id: number) {
-    const result = await blacklistModel.findOne({ where: { id } });
+    const result = await giftModel.findOne({ where: { id } });
     return result;
   }
 
-  /** 根据ip查找黑名单 */
-  async findByIp(ip: string) {
-    const result = await blacklistModel.findOne({ where: { ip } });
-    return result;
-  }
-
-  /** 修改黑名单 */
-  async update(data: IBlacklist) {
+  /** 修改礼物记录 */
+  async update(data: IGiftRecord) {
     const { id } = data;
     const data2 = filterObj(data, ['id']);
-    const result = await blacklistModel.update(data2, { where: { id } });
+    const result = await giftModel.update(data2, { where: { id } });
     return result;
   }
 
-  /** 创建黑名单 */
-  async create(data: IBlacklist) {
-    const result = await blacklistModel.create(data);
+  /** 创建礼物记录 */
+  async create(data: IGiftRecord) {
+    const result = await giftModel.create(data);
     return result;
   }
 
-  /** 删除黑名单 */
+  /** 删除礼物记录 */
   async delete(id: number) {
-    const result = await blacklistModel.destroy({
+    const result = await giftModel.destroy({
       where: { id },
       individualHooks: true,
     });
@@ -117,4 +119,4 @@ class BlackListService {
   }
 }
 
-export default new BlackListService();
+export default new GiftRecordService();

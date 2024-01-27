@@ -1,4 +1,4 @@
-import { deleteUseLessObjectKey, isPureNumber } from 'billd-utils';
+import { deleteUseLessObjectKey, filterObj, isPureNumber } from 'billd-utils';
 import { Op, literal } from 'sequelize';
 
 import { IList, ILivePlay } from '@/interface';
@@ -81,7 +81,10 @@ class LivePlayService {
         [Op.lt]: new Date(+rangTimeEnd!),
       };
     }
-    // @ts-ignore
+    const orderRes: any[] = [];
+    if (orderName && orderBy) {
+      orderRes.push([orderName, orderBy]);
+    }
     const result = await livePlayModel.findAndCountAll({
       include: [
         {
@@ -117,10 +120,7 @@ class LivePlayService {
           ],
         ],
       },
-      order: [
-        [literal('live_room_weight'), 'desc'],
-        [orderName, orderBy],
-      ],
+      order: [[literal('live_room_weight'), 'desc'], ...orderRes],
       limit,
       offset,
       where: {
@@ -159,82 +159,16 @@ class LivePlayService {
   }
 
   /** 修改直播 */
-  async update({
-    id,
-    live_room_id,
-    user_id,
-    random_id,
-    srs_action,
-    srs_app,
-    srs_client_id,
-    srs_ip,
-    srs_param,
-    srs_server_id,
-    srs_service_id,
-    srs_stream,
-    srs_stream_id,
-    srs_stream_url,
-    srs_tcUrl,
-    srs_vhost,
-  }: ILivePlay) {
-    const result = await livePlayModel.update(
-      {
-        live_room_id,
-        user_id,
-        random_id,
-        srs_action,
-        srs_app,
-        srs_client_id,
-        srs_ip,
-        srs_param,
-        srs_server_id,
-        srs_service_id,
-        srs_stream,
-        srs_stream_id,
-        srs_stream_url,
-        srs_tcUrl,
-        srs_vhost,
-      },
-      { where: { id } }
-    );
+  async update(data: ILivePlay) {
+    const { id } = data;
+    const data2 = filterObj(data, ['id']);
+    const result = await livePlayModel.update(data2, { where: { id } });
     return result;
   }
 
   /** 创建直播 */
-  async create({
-    live_room_id,
-    user_id,
-    random_id,
-    srs_action,
-    srs_app,
-    srs_client_id,
-    srs_ip,
-    srs_param,
-    srs_server_id,
-    srs_service_id,
-    srs_stream,
-    srs_stream_id,
-    srs_stream_url,
-    srs_tcUrl,
-    srs_vhost,
-  }: ILivePlay) {
-    const result = await livePlayModel.create({
-      live_room_id,
-      user_id,
-      random_id,
-      srs_action,
-      srs_app,
-      srs_client_id,
-      srs_ip,
-      srs_param,
-      srs_server_id,
-      srs_service_id,
-      srs_stream,
-      srs_stream_id,
-      srs_stream_url,
-      srs_tcUrl,
-      srs_vhost,
-    });
+  async create(data: ILivePlay) {
+    const result = await livePlayModel.create(data);
     return result;
   }
 

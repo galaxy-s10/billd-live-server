@@ -29,7 +29,8 @@ const model = sequelize.define<WalletModel>(
       type: DataTypes.INTEGER,
     },
     balance: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
   },
   {

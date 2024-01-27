@@ -1,4 +1,4 @@
-import { deleteUseLessObjectKey } from 'billd-utils';
+import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import { Op, cast, col } from 'sequelize';
 
 import { IList, IWallet } from '@/interface';
@@ -102,23 +102,16 @@ class WalletService {
   }
 
   /** 修改钱包 */
-  async update({ id, user_id, balance }: IWallet) {
-    const result = await walletModel.update(
-      {
-        user_id,
-        balance,
-      },
-      { where: { id } }
-    );
+  async update(data: IWallet) {
+    const { id } = data;
+    const data2 = filterObj(data, ['id']);
+    const result = await walletModel.update(data2, { where: { id } });
     return result;
   }
 
   /** 创建钱包 */
-  async create({ user_id, balance }: IWallet) {
-    const result = await walletModel.create({
-      user_id,
-      balance,
-    });
+  async create(data: IWallet) {
+    const result = await walletModel.create(data);
     return result;
   }
 

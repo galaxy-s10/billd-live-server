@@ -1,12 +1,25 @@
-import { deleteUseLessObjectKey, isPureNumber } from 'billd-utils';
+import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import { Op, literal } from 'sequelize';
 
+import { REDIS_PREFIX } from '@/constant';
+import redisController from '@/controller/redis.controller';
 import { IList, ILive } from '@/interface';
 import areaModel from '@/model/area.model';
 import liveModel from '@/model/live.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
 import { handlePaging } from '@/utils';
+
+async function handleDelRedisByDbLiveList() {
+  try {
+    await redisController.del({
+      prefix: REDIS_PREFIX.dbLiveList,
+      key: '',
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 class LiveService {
   /** 直播是否存在 */
@@ -43,16 +56,7 @@ class LiveService {
       offset = (+nowPage - 1) * +pageSize;
       limit = +pageSize;
     }
-    const allWhere: any = {};
-    if (id !== undefined && isPureNumber(`${id}`)) {
-      allWhere.id = id;
-    }
-    if (live_room_id !== undefined && isPureNumber(`${live_room_id}`)) {
-      allWhere.live_room_id = live_room_id;
-    }
-    if (user_id !== undefined && isPureNumber(`${user_id}`)) {
-      allWhere.user_id = user_id;
-    }
+    const allWhere: any = deleteUseLessObjectKey({ id, live_room_id, user_id });
     if (keyWord) {
       const keyWordWhere = [
         {
@@ -83,7 +87,10 @@ class LiveService {
       is_show: live_room_is_show,
       status: live_room_status,
     });
-    // @ts-ignore
+    const orderRes: any[] = [];
+    if (orderName && orderBy) {
+      orderRes.push([orderName, orderBy]);
+    }
     const result = await liveModel.findAndCountAll({
       include: [
         {
@@ -122,10 +129,7 @@ class LiveService {
           ],
         ],
       },
-      order: [
-        [literal('live_room_weight'), 'desc'],
-        [orderName, orderBy],
-      ],
+      order: [[literal('live_room_weight'), 'desc'], ...orderRes],
       limit,
       offset,
       where: {
@@ -181,48 +185,11 @@ class LiveService {
   };
 
   /** 修改直播 */
-  async update({
-    id,
-    socket_id,
-    live_room_id,
-    user_id,
-    track_audio,
-    track_video,
-    srs_action,
-    srs_app,
-    srs_client_id,
-    srs_ip,
-    srs_param,
-    srs_server_id,
-    srs_service_id,
-    srs_stream,
-    srs_stream_id,
-    srs_stream_url,
-    srs_tcUrl,
-    srs_vhost,
-  }: ILive) {
-    const result = await liveModel.update(
-      {
-        socket_id,
-        live_room_id,
-        user_id,
-        track_audio,
-        track_video,
-        srs_action,
-        srs_app,
-        srs_client_id,
-        srs_ip,
-        srs_param,
-        srs_server_id,
-        srs_service_id,
-        srs_stream,
-        srs_stream_id,
-        srs_stream_url,
-        srs_tcUrl,
-        srs_vhost,
-      },
-      { where: { id } }
-    );
+  async update(data: ILive) {
+    const { id } = data;
+    const data2 = filterObj(data, ['id']);
+    const result = await liveModel.update(data2, { where: { id } });
+    handleDelRedisByDbLiveList();
     return result;
   }
 
@@ -267,48 +234,14 @@ class LiveService {
       },
       { where: { live_room_id } }
     );
+    handleDelRedisByDbLiveList();
     return result;
   }
 
   /** 创建直播 */
-  async create({
-    socket_id,
-    live_room_id,
-    user_id,
-    track_audio,
-    track_video,
-    srs_action,
-    srs_app,
-    srs_client_id,
-    srs_ip,
-    srs_param,
-    srs_server_id,
-    srs_service_id,
-    srs_stream,
-    srs_stream_id,
-    srs_stream_url,
-    srs_tcUrl,
-    srs_vhost,
-  }: ILive) {
-    const result = await liveModel.create({
-      socket_id,
-      live_room_id,
-      user_id,
-      track_audio,
-      track_video,
-      srs_action,
-      srs_app,
-      srs_client_id,
-      srs_ip,
-      srs_param,
-      srs_server_id,
-      srs_service_id,
-      srs_stream,
-      srs_stream_id,
-      srs_stream_url,
-      srs_tcUrl,
-      srs_vhost,
-    });
+  async create(data: ILive) {
+    const result = await liveModel.create(data);
+    handleDelRedisByDbLiveList();
     return result;
   }
 
@@ -318,6 +251,7 @@ class LiveService {
       where: { id },
       individualHooks: true,
     });
+    handleDelRedisByDbLiveList();
     return result;
   }
 
@@ -329,18 +263,21 @@ class LiveService {
     const res = await liveModel.destroy({
       where: { live_room_id: data.live_room_id, socket_id: data.socket_id },
     });
+    handleDelRedisByDbLiveList();
     return res;
   };
 
   /** 删除直播 */
   deleteByLiveRoomId = async (live_room_id: number) => {
     const res = await liveModel.destroy({ where: { live_room_id } });
+    handleDelRedisByDbLiveList();
     return res;
   };
 
   /** 删除直播 */
   deleteBySocketId = async (socket_id: string) => {
     const res = await liveModel.destroy({ where: { socket_id } });
+    handleDelRedisByDbLiveList();
     return res;
   };
 }

@@ -1,4 +1,4 @@
-import { isPureNumber } from 'billd-utils';
+import { filterObj, isPureNumber } from 'billd-utils';
 import { Op, literal } from 'sequelize';
 
 import { IList, ILiveRecord } from '@/interface';
@@ -65,7 +65,10 @@ class LivePlayService {
         [Op.lt]: new Date(+rangTimeEnd!),
       };
     }
-    // @ts-ignore
+    const orderRes: any[] = [];
+    if (orderName && orderBy) {
+      orderRes.push([orderName, orderBy]);
+    }
     const result = await liveRecordModel.findAndCountAll({
       include: [
         {
@@ -101,10 +104,7 @@ class LivePlayService {
           ],
         ],
       },
-      order: [
-        [literal('live_room_weight'), 'desc'],
-        [orderName, orderBy],
-      ],
+      order: [[literal('live_room_weight'), 'desc'], ...orderRes],
       limit,
       offset,
       where: {
@@ -121,20 +121,10 @@ class LivePlayService {
   }
 
   /** 修改直播记录 */
-  async update({
-    id,
-    client_id,
-    live_room_id,
-    user_id,
-    danmu,
-    duration,
-    view,
-    end_time,
-  }: ILiveRecord) {
-    const result = await liveRecordModel.update(
-      { client_id, live_room_id, user_id, danmu, duration, view, end_time },
-      { where: { id } }
-    );
+  async update(data: ILiveRecord) {
+    const { id } = data;
+    const data2 = filterObj(data, ['id']);
+    const result = await liveRecordModel.update(data2, { where: { id } });
     return result;
   }
 
@@ -201,33 +191,8 @@ class LivePlayService {
   }
 
   /** 创建直播记录 */
-  async create({
-    client_id,
-    live_room_id,
-    user_id,
-    danmu,
-    duration,
-    view,
-    end_time,
-  }: ILiveRecord) {
-    const result = await liveRecordModel.create({
-      client_id,
-      live_room_id,
-      user_id,
-      danmu,
-      duration,
-      view,
-      end_time,
-    });
-    return result;
-  }
-
-  /** 删除直播记录 */
-  async delete(id: number) {
-    const result = await liveRecordModel.destroy({
-      where: { id },
-      individualHooks: true,
-    });
+  async create(data: ILiveRecord) {
+    const result = await liveRecordModel.create(data);
     return result;
   }
 
@@ -246,6 +211,15 @@ class LivePlayService {
     });
     return res;
   };
+
+  /** 删除直播记录 */
+  async delete(id: number) {
+    const result = await liveRecordModel.destroy({
+      where: { id },
+      individualHooks: true,
+    });
+    return result;
+  }
 }
 
 export default new LivePlayService();

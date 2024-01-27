@@ -1,4 +1,4 @@
-import { deleteUseLessObjectKey } from 'billd-utils';
+import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import { Op, literal } from 'sequelize';
 
 import { IArea, IList } from '@/interface';
@@ -70,10 +70,14 @@ class AreaService {
         [Op.lt]: new Date(+rangTimeEnd!),
       };
     }
+    const orderRes: any[] = [];
+    if (orderName && orderBy) {
+      orderRes.push([orderName, orderBy]);
+    }
     // @ts-ignore
     const result = await areaModel.findAndCountAll({
       distinct: true,
-      order: [[orderName, orderBy]],
+      order: [...orderRes],
       limit,
       offset,
       where: {
@@ -187,6 +191,10 @@ class AreaService {
       is_show: live_room_is_show,
       status: live_room_status,
     });
+    const orderRes: any[] = [];
+    if (orderName && orderBy) {
+      orderRes.push([orderName, orderBy]);
+    }
     // @ts-ignore
     const result = await areaModel.findAndCountAll({
       include: [
@@ -232,7 +240,7 @@ class AreaService {
           order: [['live_room_weight', 'desc']],
         },
       ],
-      order: [[orderName, orderBy]],
+      order: [...orderRes],
       limit,
       offset,
       where: {
@@ -256,25 +264,16 @@ class AreaService {
   }
 
   /** 修改分区 */
-  async update({ id, name, remark, weight }: IArea) {
-    const result = await areaModel.update(
-      {
-        name,
-        remark,
-        weight,
-      },
-      { where: { id } }
-    );
+  async update(data: IArea) {
+    const { id } = data;
+    const data2 = filterObj(data, ['id']);
+    const result = await areaModel.update(data2, { where: { id } });
     return result;
   }
 
   /** 创建分区 */
-  async create({ name, remark, weight }: IArea) {
-    const result = await areaModel.create({
-      name,
-      remark,
-      weight,
-    });
+  async create(data: IArea) {
+    const result = await areaModel.create(data);
     return result;
   }
 

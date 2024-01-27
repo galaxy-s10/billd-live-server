@@ -1,10 +1,12 @@
 import { ParameterizedContext } from 'koa';
 
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE, MSG_MAX_LENGTH } from '@/constant';
+import { ALLOW_HTTP_CODE, MSG_MAX_LENGTH, REDIS_PREFIX } from '@/constant';
 import { IList, IWsMessage } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import wsMessageService from '@/service/wsMessage.service';
+
+import redisController from './redis.controller';
 
 class WsMessageController {
   common = {
@@ -51,6 +53,65 @@ class WsMessageController {
     find: (id: number) => wsMessageService.find(id),
     updateIsShow: ({ id, is_show }: IWsMessage) =>
       wsMessageService.update({ id, is_show }),
+    getList: async ({
+      msg_type,
+      redbag_send_id,
+      live_room_id,
+      user_id,
+      msg_is_file,
+      ip,
+      is_show,
+      is_verify,
+      orderBy = 'asc',
+      orderName = 'id',
+      nowPage,
+      pageSize,
+      keyWord,
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    }: IList<IWsMessage>) => {
+      try {
+        const oldCache = await redisController.getVal({
+          prefix: REDIS_PREFIX.dbLiveRoomHistoryMsgList,
+          key: `${live_room_id!}`,
+        });
+        if (oldCache) {
+          return JSON.parse(oldCache).value;
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      const result = await wsMessageService.getList({
+        msg_type,
+        redbag_send_id,
+        live_room_id,
+        user_id,
+        msg_is_file,
+        ip,
+        is_show,
+        is_verify,
+        orderBy,
+        orderName,
+        nowPage,
+        pageSize,
+        keyWord,
+        rangTimeType,
+        rangTimeStart,
+        rangTimeEnd,
+      });
+      try {
+        redisController.setExVal({
+          prefix: REDIS_PREFIX.dbLiveRoomHistoryMsgList,
+          key: `${live_room_id!}`,
+          value: result,
+          exp: 3,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+      return result;
+    },
   };
 
   async update(ctx: ParameterizedContext, next) {
@@ -93,46 +154,12 @@ class WsMessageController {
     await next();
   }
 
-  async getList(ctx: ParameterizedContext, next) {
-    const {
-      msg_type,
-      redbag_send_id,
-      live_room_id,
-      user_id,
-      msg_is_file,
-      ip,
-      is_show,
-      is_verify,
-      orderBy = 'asc',
-      orderName = 'id',
-      nowPage,
-      pageSize,
-      keyWord,
-      rangTimeType,
-      rangTimeStart,
-      rangTimeEnd,
-    }: IList<IWsMessage> = ctx.request.query;
-    const result = await wsMessageService.getList({
-      msg_type,
-      redbag_send_id,
-      live_room_id,
-      user_id,
-      msg_is_file,
-      ip,
-      is_show,
-      is_verify,
-      orderBy,
-      orderName,
-      nowPage,
-      pageSize,
-      keyWord,
-      rangTimeType,
-      rangTimeStart,
-      rangTimeEnd,
-    });
+  getList = async (ctx: ParameterizedContext, next) => {
+    const data = ctx.request.query;
+    const result = await this.common.getList(data);
     successHandler({ ctx, data: result });
     await next();
-  }
+  };
 
   find = async (ctx: ParameterizedContext, next) => {
     const id = +ctx.params.id;

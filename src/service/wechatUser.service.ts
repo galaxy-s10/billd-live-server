@@ -87,12 +87,15 @@ class WechatUserService {
       ];
       allWhere[Op.or] = keyWordWhere;
     }
-    // @ts-ignore
+    const orderRes: any[] = [];
+    if (orderName && orderBy) {
+      orderRes.push([orderName, orderBy]);
+    }
     const result = await wechatUserModel.findAndCountAll({
       attributes: {
         exclude: ['password', 'token'],
       },
-      order: [[orderName, orderBy]],
+      order: [...orderRes],
       limit,
       offset,
       where: {
@@ -147,30 +150,8 @@ class WechatUserService {
   }
 
   /** 创建wechat用户 */
-  async create({
-    appid,
-    openid,
-    nickname,
-    sex,
-    province,
-    city,
-    country,
-    headimgurl,
-    privilege,
-    unionid,
-  }: IWechatUser) {
-    const result = await wechatUserModel.create({
-      appid,
-      openid,
-      nickname,
-      sex,
-      province,
-      city,
-      country,
-      headimgurl,
-      privilege,
-      unionid,
-    });
+  async create(data: IWechatUser) {
+    const result = await wechatUserModel.create(data);
     return result;
   }
 

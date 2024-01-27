@@ -1,4 +1,4 @@
-import { deleteUseLessObjectKey } from 'billd-utils';
+import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import Sequelize from 'sequelize';
 
 import { IList, IOrder } from '@/interface';
@@ -81,7 +81,10 @@ class OrderService {
         [Op.lt]: new Date(+rangTimeEnd!),
       };
     }
-    // @ts-ignore
+    const orderRes: any[] = [];
+    if (orderName && orderBy) {
+      orderRes.push([orderName, orderBy]);
+    }
     const result = await orderModel.findAndCountAll({
       include: [
         {
@@ -91,7 +94,7 @@ class OrderService {
           },
         },
       ],
-      order: [[orderName, orderBy]],
+      order: [...orderRes],
       limit,
       offset,
       where: {
@@ -166,98 +169,16 @@ class OrderService {
   }
 
   /** 修改订单 */
-  async update({
-    id,
-    client_ip,
-    billd_live_user_id,
-    billd_live_goods_id,
-    billd_live_live_room_id,
-    billd_live_order_subject,
-    billd_live_order_version,
-    product_code,
-    qr_code,
-    buyer_logon_id,
-    buyer_user_id,
-    buyer_pay_amount,
-    total_amount,
-    invoice_amount,
-    point_amount,
-    receipt_amount,
-    trade_no,
-    out_trade_no,
-    send_pay_date,
-    trade_status,
-  }: IOrder) {
-    const result = await orderModel.update(
-      {
-        client_ip,
-        billd_live_user_id,
-        billd_live_goods_id,
-        billd_live_live_room_id,
-        billd_live_order_subject,
-        billd_live_order_version,
-        product_code,
-        qr_code,
-        buyer_logon_id,
-        buyer_user_id,
-        buyer_pay_amount,
-        total_amount,
-        invoice_amount,
-        point_amount,
-        receipt_amount,
-        trade_no,
-        out_trade_no,
-        send_pay_date,
-        trade_status,
-      },
-      { where: { id } }
-    );
+  async update(data: IOrder) {
+    const { id } = data;
+    const data2 = filterObj(data, ['id']);
+    const result = await orderModel.update(data2, { where: { id } });
     return result;
   }
 
   /** 创建订单 */
-  async create({
-    client_ip,
-    billd_live_user_id,
-    billd_live_goods_id,
-    billd_live_live_room_id,
-    billd_live_order_subject,
-    billd_live_order_version,
-    product_code,
-    qr_code,
-    buyer_logon_id,
-    buyer_user_id,
-    buyer_pay_amount,
-    total_amount,
-    invoice_amount,
-    point_amount,
-    receipt_amount,
-    trade_no,
-    out_trade_no,
-    send_pay_date,
-    trade_status,
-  }: IOrder) {
-    const result = await orderModel.create({
-      client_ip,
-      billd_live_user_id,
-      billd_live_goods_id,
-      billd_live_live_room_id,
-      billd_live_order_subject,
-      billd_live_order_version,
-      product_code,
-      qr_code,
-      buyer_logon_id,
-      buyer_user_id,
-      buyer_pay_amount,
-      total_amount,
-      invoice_amount,
-      point_amount,
-      receipt_amount,
-      trade_no,
-      out_trade_no,
-      send_pay_date,
-      trade_status,
-    });
+  async create(data: IOrder) {
+    const result = await orderModel.create(data);
     return result;
   }
 

@@ -207,7 +207,7 @@ class QqUserController {
         // @ts-ignore
         await userInfo.setRoles([DEFAULT_ROLE_INFO.SUPER_ADMIN.id]);
       }
-      await walletService.create({ user_id: userInfo.id, balance: '0.00' });
+      await walletService.create({ user_id: userInfo.id, balance: 0 });
       await thirdUserModel.create({
         user_id: userInfo.id,
         third_user_id: qqUser.id,

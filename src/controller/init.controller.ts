@@ -246,7 +246,7 @@ class InitController {
       const handleWallet = async (item: IUser) => {
         const flag = await walletService.findByUserId(item.id!);
         if (!flag) {
-          await walletService.create({ user_id: item.id, balance: '0.00' });
+          await walletService.create({ user_id: item.id, balance: 0 });
         } else {
           // console.log(chalkWARN(`id为${item.id!}的用户已存在钱包！`));
         }

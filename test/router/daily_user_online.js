@@ -138,7 +138,8 @@ async function foo() {
         throughputStr += tmp;
       }
     });
-    console.log(`路径:${result.url}; 压测持续时间:${result.duration}秒`);
+    console.log(`压测开始时间:${new Date().toLocaleString()} `);
+    console.log(`路径:${result.url};`);
     console.log();
     console.log(codeStr);
     console.log();
@@ -147,6 +148,9 @@ async function foo() {
     console.log(throughputStr);
     console.log();
     console.log(requestsStr);
+    console.log(
+      `压测结束时间:${new Date().toLocaleString()},总共持续${result.duration}秒`
+    );
   }
 }
 foo();

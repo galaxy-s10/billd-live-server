@@ -1,4 +1,4 @@
-import { deleteUseLessObjectKey, isPureNumber } from 'billd-utils';
+import { deleteUseLessObjectKey, filterObj, isPureNumber } from 'billd-utils';
 import { Op } from 'sequelize';
 
 import { IList } from '@/interface';
@@ -89,7 +89,10 @@ class LiveRoomService {
         [Op.lt]: new Date(+rangTimeEnd!),
       };
     }
-    // @ts-ignore
+    const orderRes: any[] = [];
+    if (orderName && orderBy) {
+      orderRes.push([orderName, orderBy]);
+    }
     const result = await liveRoomModel.findAndCountAll({
       include: [
         // {
@@ -130,7 +133,7 @@ class LiveRoomService {
         // ],
       },
       distinct: true,
-      order: [[orderName, orderBy]],
+      order: [...orderRes],
       limit,
       offset,
       where: {
@@ -198,82 +201,16 @@ class LiveRoomService {
   }
 
   /** 修改直播间 */
-  async update({
-    id,
-    status,
-    is_show,
-    remark,
-    cover_img,
-    bg_img,
-    name,
-    desc,
-    key,
-    type,
-    pull_is_should_auth,
-    weight,
-    cdn,
-    rtmp_url,
-    flv_url,
-    hls_url,
-  }: ILiveRoom) {
-    const result = await liveRoomModel.update(
-      {
-        status,
-        is_show,
-        remark,
-        cover_img,
-        bg_img,
-        name,
-        desc,
-        key,
-        type,
-        pull_is_should_auth,
-        weight,
-        cdn,
-        rtmp_url,
-        flv_url,
-        hls_url,
-      },
-      { where: { id } }
-    );
+  async update(data: ILiveRoom) {
+    const { id } = data;
+    const data2 = filterObj(data, ['id']);
+    const result = await liveRoomModel.update(data2, { where: { id } });
     return result;
   }
 
   /** 创建直播间 */
-  async create({
-    status,
-    is_show,
-    remark,
-    cover_img,
-    bg_img,
-    name,
-    desc,
-    key,
-    type,
-    pull_is_should_auth,
-    weight,
-    cdn,
-    rtmp_url,
-    flv_url,
-    hls_url,
-  }: ILiveRoom) {
-    const result = await liveRoomModel.create({
-      status,
-      is_show,
-      remark,
-      cover_img,
-      bg_img,
-      name,
-      desc,
-      key,
-      type,
-      pull_is_should_auth,
-      weight,
-      cdn,
-      rtmp_url,
-      flv_url,
-      hls_url,
-    });
+  async create(data: ILiveRoom) {
+    const result = await liveRoomModel.create(data);
     return result;
   }
 

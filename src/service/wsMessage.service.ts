@@ -1,11 +1,24 @@
 import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import { Op } from 'sequelize';
 
+import { REDIS_PREFIX } from '@/constant';
+import redisController from '@/controller/redis.controller';
 import { IList, IWsMessage } from '@/interface';
 import roleModel from '@/model/role.model';
 import userModel from '@/model/user.model';
 import wsMessageModel from '@/model/wsMessage.model';
 import { handlePaging } from '@/utils';
+
+async function handleDelRedisByDbLiveRoomHistoryMsgList() {
+  try {
+    await redisController.del({
+      prefix: REDIS_PREFIX.dbLiveRoomHistoryMsgList,
+      key: '',
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 class WsMessageService {
   /** 消息是否存在 */

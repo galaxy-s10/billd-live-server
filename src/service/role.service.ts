@@ -1,3 +1,4 @@
+import { filterObj } from 'billd-utils';
 import { Op } from 'sequelize';
 
 import { IList, IRole } from '@/interface';
@@ -65,9 +66,12 @@ class RoleService {
         [Op.lt]: new Date(+rangTimeEnd!),
       };
     }
-    // @ts-ignore
+    const orderRes: any[] = [];
+    if (orderName && orderBy) {
+      orderRes.push([orderName, orderBy]);
+    }
     const result = await roleModel.findAndCountAll({
-      order: [[orderName, orderBy]],
+      order: [...orderRes],
       limit,
       offset,
       distinct: true,
@@ -117,9 +121,12 @@ class RoleService {
         [Op.lt]: new Date(+rangTimeEnd!),
       };
     }
-    // @ts-ignore
+    const orderRes: any[] = [];
+    if (orderName && orderBy) {
+      orderRes.push([orderName, orderBy]);
+    }
     const result = await roleModel.findAndCountAll({
-      order: [[orderName, orderBy]],
+      order: [...orderRes],
       distinct: true,
       where: {
         ...allWhere,
@@ -209,21 +216,10 @@ class RoleService {
   }
 
   /** 修改角色 */
-  async update({ id, p_id, role_name, role_value, type, priority }: IRole) {
-    const result = await roleModel.update(
-      {
-        p_id,
-        role_name,
-        role_value,
-        type,
-        priority,
-      },
-      {
-        where: {
-          id,
-        },
-      }
-    );
+  async update(data: IRole) {
+    const { id } = data;
+    const data2 = filterObj(data, ['id']);
+    const result = await roleModel.update(data2, { where: { id } });
     return result;
   }
 
@@ -287,14 +283,8 @@ class RoleService {
   }
 
   /** 创建角色 */
-  async create({ p_id, role_name, role_value, type, priority }: IRole) {
-    const result = await roleModel.create({
-      p_id,
-      role_name,
-      role_value,
-      type,
-      priority,
-    });
+  async create(data: IRole) {
+    const result = await roleModel.create(data);
     return result;
   }
 

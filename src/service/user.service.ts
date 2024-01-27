@@ -82,12 +82,15 @@ class UserService {
         [Op.lt]: new Date(+rangTimeEnd!),
       };
     }
-    // @ts-ignore
+    const orderRes: any[] = [];
+    if (orderName && orderBy) {
+      orderRes.push([orderName, orderBy]);
+    }
     const result = await userModel.findAndCountAll({
       attributes: {
         exclude: ['password', 'token'],
       },
-      order: [[orderName, orderBy]],
+      order: [...orderRes],
       limit,
       offset,
       where: {
@@ -259,8 +262,8 @@ class UserService {
   }
 
   /** 创建用户 */
-  async create(props: IUser) {
-    const result = await userModel.create(props);
+  async create(data: IUser) {
+    const result = await userModel.create(data);
     return result;
   }
 

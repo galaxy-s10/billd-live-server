@@ -2,12 +2,14 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE } from '@/constant';
+import { ALLOW_HTTP_CODE, REDIS_PREFIX } from '@/constant';
 import srsController from '@/controller/srs.controller';
 import { IList, ILive } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveService from '@/service/live.service';
 import userLiveRoomService from '@/service/userLiveRoom.service';
+
+import redisController from './redis.controller';
 
 class LiveController {
   common = {
@@ -26,6 +28,17 @@ class LiveController {
       rangTimeStart,
       rangTimeEnd,
     }: IList<ILive>) => {
+      try {
+        const oldCache = await redisController.getVal({
+          prefix: REDIS_PREFIX.dbLiveList,
+          key: '',
+        });
+        if (oldCache) {
+          return JSON.parse(oldCache).value;
+        }
+      } catch (error) {
+        console.log(error);
+      }
       const result = await liveService.getList({
         id,
         live_room_id,
@@ -41,6 +54,16 @@ class LiveController {
         rangTimeStart,
         rangTimeEnd,
       });
+      try {
+        redisController.setExVal({
+          prefix: REDIS_PREFIX.dbLiveList,
+          key: '',
+          value: result,
+          exp: 60,
+        });
+      } catch (error) {
+        console.log(error);
+      }
       return result;
     },
 

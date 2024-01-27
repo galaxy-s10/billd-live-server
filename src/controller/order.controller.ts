@@ -59,11 +59,9 @@ class OrderController {
                 orderInfo.billd_live_user_id || -1
               );
               if (userWallet) {
-                const oldBalance = Number(userWallet.balance) * 100;
-                const addBalance = Number(aliPayRes.totalAmount) * 100;
-                const newbalance = `${((oldBalance + addBalance) / 100).toFixed(
-                  2
-                )}`;
+                const oldBalance = userWallet.balance!;
+                const addBalance = Number(aliPayRes.totalAmount);
+                const newbalance = oldBalance + addBalance;
                 await walletService.updateByUserId({
                   user_id: orderInfo.billd_live_user_id,
                   balance: newbalance,
@@ -100,28 +98,28 @@ class OrderController {
       );
     }
     const { price, name: subject } = goodsInfo;
-    let total_amount = price;
+    let total_amount = `${Number(price) / 100}`;
 
     if (goodsInfo.type === GoodsTypeEnum.recharge) {
       const newmoney = Number(money);
-      if (newmoney === 0) {
+      if (newmoney <= 0) {
         throw new CustomError(
-          `付款金额不能为0！`,
+          `付款金额不能小于或等于0！`,
           ALLOW_HTTP_CODE.paramsError,
           ALLOW_HTTP_CODE.paramsError
         );
       }
-      total_amount = Number(newmoney).toFixed(2);
-    } else if (Number(price) === 0) {
+      total_amount = `${newmoney}`;
+    } else if (Number(price) <= 0) {
       throw new CustomError(
-        `付款金额不能为0！`,
+        `付款金额不能小于或等于0！`,
         ALLOW_HTTP_CODE.paramsError,
         ALLOW_HTTP_CODE.paramsError
       );
     }
 
     const res = await aliPaySdk.precreate({
-      total_amount: total_amount!,
+      total_amount,
       subject: subject!,
     });
 

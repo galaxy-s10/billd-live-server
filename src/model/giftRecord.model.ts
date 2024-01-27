@@ -7,17 +7,17 @@ import {
 
 import sequelize from '@/config/mysql';
 import { initTable } from '@/init/initDb';
-import { IGoods } from '@/interface';
+import { GiftRecordIsRecv, IGiftRecord } from '@/interface';
 
 interface GoodsModel
   extends Model<
       InferAttributes<GoodsModel>,
       InferCreationAttributes<GoodsModel>
     >,
-    IGoods {}
+    IGiftRecord {}
 
 const model = sequelize.define<GoodsModel>(
-  'goods',
+  'gift_record',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -25,38 +25,33 @@ const model = sequelize.define<GoodsModel>(
       allowNull: false,
       autoIncrement: true,
     },
-    name: {
-      type: DataTypes.STRING,
+    is_recv: {
+      type: DataTypes.INTEGER,
+      defaultValue: GiftRecordIsRecv.no,
     },
-    type: {
-      type: DataTypes.STRING,
-    },
-    desc: {
-      type: DataTypes.STRING,
-    },
-    short_desc: {
-      type: DataTypes.STRING,
-    },
-    cover: {
-      type: DataTypes.STRING,
-    },
-    price: {
+    goods_id: {
       type: DataTypes.INTEGER,
     },
-    original_price: {
+    goods_nums: {
       type: DataTypes.INTEGER,
     },
-    nums: {
+    goods_snapshot: {
+      type: DataTypes.STRING(500),
+    },
+    order_id: {
       type: DataTypes.INTEGER,
     },
-    badge: {
-      type: DataTypes.STRING,
+    live_room_id: {
+      type: DataTypes.INTEGER,
     },
-    badge_bg: {
-      type: DataTypes.STRING,
+    send_user_id: {
+      type: DataTypes.INTEGER,
+    },
+    recv_user_id: {
+      type: DataTypes.INTEGER,
     },
     remark: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(500),
     },
   },
   {

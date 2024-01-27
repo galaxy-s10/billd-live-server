@@ -1,3 +1,4 @@
+import { filterObj } from 'billd-utils';
 import Sequelize from 'sequelize';
 
 import { IList, ILiveConfig } from '@/interface';
@@ -75,9 +76,12 @@ class LiveConfigService {
         [Op.lt]: new Date(+rangTimeEnd!),
       };
     }
-    // @ts-ignore
+    const orderRes: any[] = [];
+    if (orderName && orderBy) {
+      orderRes.push([orderName, orderBy]);
+    }
     const result = await liveConfigModel.findAndCountAll({
-      order: [[orderName, orderBy]],
+      order: [...orderRes],
       limit,
       offset,
       where: {
@@ -92,25 +96,15 @@ class LiveConfigService {
     return result;
   }
 
-  async create({ type, key, value, desc }: ILiveConfig) {
-    const result = await liveConfigModel.create({
-      type,
-      key,
-      value,
-      desc,
-    });
+  async create(data: ILiveConfig) {
+    const result = await liveConfigModel.create(data);
     return result;
   }
 
-  async update({ id, key, value, desc }: ILiveConfig) {
-    const result = await liveConfigModel.update(
-      {
-        key,
-        value,
-        desc,
-      },
-      { where: { id } }
-    );
+  async update(data: ILiveConfig) {
+    const { id } = data;
+    const data2 = filterObj(data, ['id']);
+    const result = await liveConfigModel.update(data2, { where: { id } });
     return result;
   }
 

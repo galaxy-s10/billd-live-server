@@ -1,4 +1,4 @@
-import { deleteUseLessObjectKey } from 'billd-utils';
+import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import { Op } from 'sequelize';
 
 import { GoodsTypeEnum, IGoods, IList } from '@/interface';
@@ -27,7 +27,6 @@ class GoodsService {
     short_desc,
     badge,
     badge_bg,
-    remark,
     orderBy,
     orderName,
     nowPage,
@@ -51,7 +50,6 @@ class GoodsService {
       short_desc,
       badge,
       badge_bg,
-      remark,
     });
     if (keyWord) {
       const keyWordWhere = [
@@ -84,9 +82,12 @@ class GoodsService {
         [Op.lt]: new Date(+rangTimeEnd!),
       };
     }
-    // @ts-ignore
+    const orderRes: any[] = [];
+    if (orderName && orderBy) {
+      orderRes.push([orderName, orderBy]);
+    }
     const result = await goodsModel.findAndCountAll({
-      order: [[orderName, orderBy]],
+      order: [...orderRes],
       limit,
       offset,
       where: {
@@ -109,62 +110,16 @@ class GoodsService {
   }
 
   /** 修改商品 */
-  async update({
-    id,
-    type,
-    name,
-    short_desc,
-    cover,
-    price,
-    original_price,
-    nums,
-    badge,
-    badge_bg,
-    remark,
-  }: IGoods) {
-    const result = await goodsModel.update(
-      {
-        type,
-        name,
-        short_desc,
-        cover,
-        price,
-        original_price,
-        nums,
-        badge,
-        badge_bg,
-        remark,
-      },
-      { where: { id } }
-    );
+  async update(data: IGoods) {
+    const { id } = data;
+    const data2 = filterObj(data, ['id']);
+    const result = await goodsModel.update(data2, { where: { id } });
     return result;
   }
 
   /** 创建商品 */
-  async create({
-    type,
-    name,
-    short_desc,
-    cover,
-    price,
-    original_price,
-    nums,
-    badge,
-    badge_bg,
-    remark,
-  }: IGoods) {
-    const result = await goodsModel.create({
-      type,
-      name,
-      short_desc,
-      cover,
-      price,
-      original_price,
-      nums,
-      badge,
-      badge_bg,
-      remark,
-    });
+  async create(data: IGoods) {
+    const result = await goodsModel.create(data);
     return result;
   }
 

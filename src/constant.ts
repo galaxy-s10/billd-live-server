@@ -165,6 +165,8 @@ export const REDIS_PREFIX = {
   kick: `${REDIS_PREFIX_ENV}kick___`, // 踢掉用户
   liveRoomOnlineUser: `${REDIS_PREFIX_ENV}liveRoomOnlineUser___`, // 直播间在线用户
   livePkKey: `${REDIS_PREFIX_ENV}livePkKey___`, // 直播间打pk秘钥
+  dbLiveList: `${REDIS_PREFIX_ENV}dbLiveList___`, // 直播间打pk秘钥
+  dbLiveRoomHistoryMsgList: `${REDIS_PREFIX_ENV}dbLiveRoomHistoryMsgList___`, // 直播间打pk秘钥
 };
 
 export const IS_UPLOAD_SERVER = !(PROJECT_ENV === PROJECT_ENV_ENUM.prod); // 是否上传到服务器

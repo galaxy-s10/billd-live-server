@@ -195,7 +195,7 @@ export interface IRedbagRecv {
 export interface IWallet {
   id?: number;
   user_id?: number;
-  balance?: string;
+  balance?: number;
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -286,12 +286,34 @@ export interface IGoods {
   desc?: string;
   short_desc?: string;
   cover?: string;
-  price?: string;
-  original_price?: string;
+  price?: number;
+  original_price?: number;
   nums?: number;
   badge?: string;
   badge_bg?: string;
   remark?: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
+export enum GiftRecordIsRecv {
+  yew,
+  no,
+}
+
+export interface IGiftRecord {
+  id?: number;
+  is_recv?: GiftRecordIsRecv;
+  goods_id?: number;
+  goods_nums?: number;
+  goods_snapshot?: string;
+  order_id?: number;
+  live_room_id?: number;
+  send_user_id?: number;
+  recv_user_id?: number;
+  remark?: string;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
