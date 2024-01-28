@@ -1,5 +1,5 @@
 import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
-import { Op, cast, col } from 'sequelize';
+import { Op, cast, col, literal } from 'sequelize';
 
 import { IList, IWallet } from '@/interface';
 import userModel from '@/model/user.model';
@@ -95,6 +95,19 @@ class WalletService {
     const result = await walletModel.update(
       {
         balance,
+      },
+      { where: { user_id } }
+    );
+    return result;
+  }
+
+  /** 修改钱包 */
+  async changeBalanceByUserId({ user_id, balance }: IWallet) {
+    const result = await walletModel.update(
+      {
+        balance: literal(
+          `\`balance\` ${balance! > 0 ? `+${balance!}` : `-${balance!}`}`
+        ),
       },
       { where: { user_id } }
     );

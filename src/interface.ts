@@ -63,6 +63,23 @@ export interface IQiniuData {
   deleted_at?: string;
 }
 
+export interface ISignin {
+  id?: number;
+  user_id?: number;
+  live_room_id?: number;
+  nums?: number;
+
+  /** 用户信息 */
+  username?: string;
+  user?: IUser;
+  /** 直播间信息 */
+  live_room?: ILiveRoom;
+
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
 export interface IInitUser extends IUser {
   user_roles: number[];
   live_room: ILiveRoom & {
@@ -196,6 +213,33 @@ export interface IWallet {
   id?: number;
   user_id?: number;
   balance?: number;
+
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
+export enum WalletRecordEnum {
+  reward,
+  recharge,
+  signin,
+}
+
+export enum WalletRecordAmountStatusEnum {
+  add,
+  del,
+}
+
+export interface IWalletRecord {
+  id?: number;
+  user_id?: number;
+  order_id?: number;
+  type?: WalletRecordEnum;
+  name?: string;
+  amount?: number;
+  amount_status?: WalletRecordAmountStatusEnum;
+  remark?: string;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -297,14 +341,19 @@ export interface IGoods {
   deleted_at?: string;
 }
 
-export enum GiftRecordIsRecv {
+export enum GiftRecordIsRecvEnum {
   yew,
   no,
 }
 
+export enum GiftRecordStatusEnum {
+  ok,
+  balanceError,
+}
+
 export interface IGiftRecord {
   id?: number;
-  is_recv?: GiftRecordIsRecv;
+  is_recv?: GiftRecordIsRecvEnum;
   goods_id?: number;
   goods_nums?: number;
   goods_snapshot?: string;
@@ -312,6 +361,7 @@ export interface IGiftRecord {
   live_room_id?: number;
   send_user_id?: number;
   recv_user_id?: number;
+  status?: GiftRecordStatusEnum;
   remark?: string;
 
   created_at?: string;

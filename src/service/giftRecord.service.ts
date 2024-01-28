@@ -1,9 +1,9 @@
 import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
-import { Op } from 'sequelize';
+import { Op, literal } from 'sequelize';
 
 import { IGiftRecord, IList } from '@/interface';
 import giftModel from '@/model/giftRecord.model';
-import { handlePaging } from '@/utils';
+import { handleGroupPaging, handlePaging } from '@/utils';
 
 class GiftRecordService {
   /** 礼物记录是否存在 */
@@ -28,6 +28,7 @@ class GiftRecordService {
     live_room_id,
     send_user_id,
     recv_user_id,
+    status,
     orderBy,
     orderName,
     nowPage,
@@ -52,6 +53,7 @@ class GiftRecordService {
       live_room_id,
       send_user_id,
       recv_user_id,
+      status,
     });
     if (keyWord) {
       const keyWordWhere = [
@@ -87,6 +89,92 @@ class GiftRecordService {
       },
     });
     return handlePaging(result, nowPage, pageSize);
+  }
+
+  /** 获取礼物记录列表 */
+  async getGiftGroupList({
+    id,
+    is_recv,
+    goods_id,
+    goods_nums,
+    order_id,
+    live_room_id,
+    send_user_id,
+    recv_user_id,
+    status,
+    orderBy,
+    orderName,
+    nowPage,
+    pageSize,
+    keyWord,
+    rangTimeType,
+    rangTimeStart,
+    rangTimeEnd,
+  }: IList<IGiftRecord>) {
+    let offset;
+    let limit;
+    if (nowPage && pageSize) {
+      offset = (+nowPage - 1) * +pageSize;
+      limit = +pageSize;
+    }
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+      is_recv,
+      goods_id,
+      goods_nums,
+      order_id,
+      live_room_id,
+      send_user_id,
+      recv_user_id,
+      status,
+    });
+    if (keyWord) {
+      const keyWordWhere = [
+        {
+          goods_snapshot: {
+            [Op.like]: `%${keyWord}%`,
+          },
+        },
+        {
+          remark: {
+            [Op.like]: `%${keyWord}%`,
+          },
+        },
+      ];
+      allWhere[Op.or] = keyWordWhere;
+    }
+    if (rangTimeType) {
+      allWhere[rangTimeType] = {
+        [Op.gt]: new Date(+rangTimeStart!),
+        [Op.lt]: new Date(+rangTimeEnd!),
+      };
+    }
+    const orderRes: any[] = [];
+    if (orderName && orderBy) {
+      orderRes.push([orderName, orderBy]);
+    }
+    const result = await giftModel.findAndCountAll({
+      attributes: [
+        'live_room_id',
+        [literal(`count(goods_id)`), 'nums'],
+        [literal(`GROUP_CONCAT(DISTINCT goods_id)`), 'goods_id'],
+        [
+          literal(
+            `SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT goods_snapshot, '__fgx__'),'__fgx__',1)`
+          ),
+          'goods_snapshot',
+        ],
+      ],
+      order: [...orderRes],
+      limit,
+      offset,
+      group: ['goods_id'],
+      where: {
+        ...allWhere,
+      },
+      raw: true,
+    });
+    return handleGroupPaging(result, nowPage, pageSize);
   }
 
   /** 查找礼物记录 */

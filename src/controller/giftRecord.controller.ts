@@ -2,10 +2,22 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE } from '@/constant';
-import { IGiftRecord, IList } from '@/interface';
+import { ALLOW_HTTP_CODE, ERROR_BUSINESS_CODE } from '@/constant';
+import {
+  GiftRecordIsRecvEnum,
+  GiftRecordStatusEnum,
+  IGiftRecord,
+  IList,
+  WalletRecordAmountStatusEnum,
+  WalletRecordEnum,
+} from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import giftRecordService from '@/service/giftRecord.service';
+
+import goodsController from './goods.controller';
+import liveRoomController from './liveRoom.controller';
+import walletController from './wallet.controller';
+import walletRecordController from './walletRecord.controller';
 
 class GiftRecordController {
   common = {
@@ -13,6 +25,7 @@ class GiftRecordController {
       is_recv,
       goods_id,
       goods_nums,
+      goods_snapshot,
       order_id,
       live_room_id,
       send_user_id,
@@ -23,6 +36,7 @@ class GiftRecordController {
         is_recv,
         goods_id,
         goods_nums,
+        goods_snapshot,
         order_id,
         live_room_id,
         send_user_id,
@@ -30,6 +44,40 @@ class GiftRecordController {
         remark,
       }),
     find: (id: number) => giftRecordService.find(id),
+    update: async ({
+      id,
+      is_recv,
+      goods_id,
+      goods_nums,
+      order_id,
+      live_room_id,
+      send_user_id,
+      recv_user_id,
+      status,
+      remark,
+    }: IGiftRecord) => {
+      const isExist = await giftRecordService.isExist([id!]);
+      if (!isExist) {
+        throw new CustomError(
+          `不存在id为${id!}的礼物记录！`,
+          ALLOW_HTTP_CODE.paramsError,
+          ALLOW_HTTP_CODE.paramsError
+        );
+      }
+      const res = giftRecordService.update({
+        id,
+        is_recv,
+        goods_id,
+        goods_nums,
+        order_id,
+        live_room_id,
+        send_user_id,
+        recv_user_id,
+        status,
+        remark,
+      });
+      return res;
+    },
   };
 
   async getList(ctx: ParameterizedContext, next) {
@@ -73,34 +121,8 @@ class GiftRecordController {
     await next();
   }
 
-  find = async (ctx: ParameterizedContext, next) => {
-    const id = +ctx.params.id;
-    const result = await this.common.find(id);
-    successHandler({ ctx, data: result });
-    await next();
-  };
-
-  async update(ctx: ParameterizedContext, next) {
-    const id = +ctx.params.id;
+  async getGiftGroupList(ctx: ParameterizedContext, next) {
     const {
-      is_recv,
-      goods_id,
-      goods_nums,
-      order_id,
-      live_room_id,
-      send_user_id,
-      recv_user_id,
-      remark,
-    }: IGiftRecord = ctx.request.body;
-    const isExist = await giftRecordService.isExist([id]);
-    if (!isExist) {
-      throw new CustomError(
-        `不存在id为${id}的礼物记录！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
-      );
-    }
-    await giftRecordService.update({
       id,
       is_recv,
       goods_id,
@@ -109,22 +131,141 @@ class GiftRecordController {
       live_room_id,
       send_user_id,
       recv_user_id,
-      remark,
+      orderBy,
+      orderName,
+      nowPage,
+      pageSize,
+      keyWord,
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    }: IList<IGiftRecord> = ctx.request.query;
+    const result = await giftRecordService.getGiftGroupList({
+      id,
+      is_recv,
+      goods_id,
+      goods_nums,
+      order_id,
+      live_room_id,
+      send_user_id,
+      recv_user_id,
+      orderBy,
+      orderName,
+      nowPage,
+      pageSize,
+      keyWord,
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
     });
-    successHandler({ ctx });
+    successHandler({ ctx, data: result });
     await next();
   }
 
-  async create(ctx: ParameterizedContext, next) {
+  find = async (ctx: ParameterizedContext, next) => {
+    const id = +ctx.params.id;
+    const result = await this.common.find(id);
+    successHandler({ ctx, data: result });
+    await next();
+  };
+
+  update = async (ctx: ParameterizedContext, next) => {
+    const id = +ctx.params.id;
+    const data: IGiftRecord = ctx.request.body;
+    const isExist = await giftRecordService.isExist([id]);
+    if (!isExist) {
+      throw new CustomError(
+        `不存在id为${id}的礼物记录！`,
+        ALLOW_HTTP_CODE.paramsError,
+        ALLOW_HTTP_CODE.paramsError
+      );
+    }
+    await this.common.update({
+      id,
+      ...data,
+    });
+    successHandler({ ctx });
+    await next();
+  };
+
+  create = async (ctx: ParameterizedContext, next) => {
     const { code, userInfo, message } = await authJwt(ctx);
     if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
       throw new CustomError(message, code, code);
     }
-    const data: IGiftRecord = ctx.request.body;
-    await this.common.create(data);
+    const { live_room_id, goods_id, goods_nums }: IGiftRecord =
+      ctx.request.body;
+    if (!live_room_id || !goods_id || !goods_nums) {
+      throw new CustomError(
+        `参数缺失！`,
+        ALLOW_HTTP_CODE.paramsError,
+        ALLOW_HTTP_CODE.paramsError
+      );
+    }
+    const walletRes = await walletController.common.findByUserId(userInfo.id!);
+    if (!walletRes) {
+      throw new CustomError(
+        `你没有钱包！`,
+        ALLOW_HTTP_CODE.paramsError,
+        ALLOW_HTTP_CODE.paramsError
+      );
+    }
+    const liveRoomRes = await liveRoomController.common.find(live_room_id);
+    if (!liveRoomRes) {
+      throw new CustomError(
+        `不存在id为${live_room_id}的直播间！`,
+        ALLOW_HTTP_CODE.paramsError,
+        ALLOW_HTTP_CODE.paramsError
+      );
+    }
+    const goodsRes = await goodsController.common.find(goods_id);
+    if (!goodsRes) {
+      throw new CustomError(
+        `不存在id为${goods_id}的商品！`,
+        ALLOW_HTTP_CODE.paramsError,
+        ALLOW_HTTP_CODE.paramsError
+      );
+    }
+    const goodsAmount = goodsRes.price! * goods_nums;
+    const remainBalance = walletRes.balance! - goodsAmount;
+    if (remainBalance < 0) {
+      throw new CustomError(
+        `余额不足!`,
+        ALLOW_HTTP_CODE.paramsError,
+        ERROR_BUSINESS_CODE.balanceNotEnough
+      );
+    }
+    const recordRes = await this.common.create({
+      live_room_id,
+      goods_id,
+      goods_nums,
+      goods_snapshot: JSON.stringify(goodsRes),
+      send_user_id: userInfo.id!,
+      recv_user_id: liveRoomRes.user_live_room?.user.id,
+      is_recv: GiftRecordIsRecvEnum.no,
+    });
+    try {
+      await walletController.common.updateByUserId({
+        user_id: userInfo.id!,
+        balance: remainBalance,
+      });
+      await walletRecordController.common.create({
+        user_id: userInfo.id!,
+        type: WalletRecordEnum.reward,
+        name: goodsRes.name,
+        amount: goodsAmount,
+        amount_status: WalletRecordAmountStatusEnum.del,
+      });
+    } catch (error) {
+      console.log(error);
+      this.common.update({
+        id: recordRes.id,
+        status: GiftRecordStatusEnum.balanceError,
+      });
+    }
     successHandler({ ctx });
     await next();
-  }
+  };
 
   async delete(ctx: ParameterizedContext, next) {
     const id = +ctx.params.id;

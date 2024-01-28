@@ -6,6 +6,8 @@ const giftRecordRouter = new Router({ prefix: '/gift_record' });
 
 giftRecordRouter.get('/list', giftRecordController.getList);
 
-giftRecordRouter.get('/create', giftRecordController.create);
+giftRecordRouter.get('/gift_group_list', giftRecordController.getGiftGroupList);
+
+giftRecordRouter.post('/create', giftRecordController.create);
 
 export default giftRecordRouter;

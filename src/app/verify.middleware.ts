@@ -7,7 +7,7 @@ import {
   ALLOW_HTTP_CODE,
   BLACKLIST_TYPE,
   COMMON_ERR_MSG,
-  ERROR_HTTP_CODE,
+  ERROR_BUSINESS_CODE,
 } from '@/constant';
 import authController from '@/controller/auth.controller';
 import blacklistController from '@/controller/blacklist.controller';
@@ -74,14 +74,14 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
     throw new CustomError(
       `当前ip:${ip}调用api频繁,${COMMON_ERR_MSG.banIp}`,
       ALLOW_HTTP_CODE.forbidden,
-      ERROR_HTTP_CODE.banIp
+      ERROR_BUSINESS_CODE.banIp
     );
   } else if (inBlacklist?.type === BLACKLIST_TYPE.adminDisableUser) {
     // 管理员手动禁用
     throw new CustomError(
       COMMON_ERR_MSG.adminDisableUser,
       ALLOW_HTTP_CODE.forbidden,
-      ERROR_HTTP_CODE.adminDisableUser
+      ERROR_BUSINESS_CODE.adminDisableUser
     );
   }
 
@@ -101,7 +101,7 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
       throw new CustomError(
         `当前ip:${ip}调用api频繁,${COMMON_ERR_MSG.banIp}`,
         ALLOW_HTTP_CODE.forbidden,
-        ERROR_HTTP_CODE.banIp
+        ERROR_BUSINESS_CODE.banIp
       );
     }
   }

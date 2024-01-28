@@ -7,21 +7,17 @@ import {
 
 import sequelize from '@/config/mysql';
 import { initTable } from '@/init/initDb';
-import {
-  GiftRecordIsRecvEnum,
-  GiftRecordStatusEnum,
-  IGiftRecord,
-} from '@/interface';
+import { IWalletRecord } from '@/interface';
 
-interface GoodsModel
+interface WalletModel
   extends Model<
-      InferAttributes<GoodsModel>,
-      InferCreationAttributes<GoodsModel>
+      InferAttributes<WalletModel>,
+      InferCreationAttributes<WalletModel>
     >,
-    IGiftRecord {}
+    IWalletRecord {}
 
-const model = sequelize.define<GoodsModel>(
-  'gift_record',
+const model = sequelize.define<WalletModel>(
+  'wallet_record',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -29,34 +25,23 @@ const model = sequelize.define<GoodsModel>(
       allowNull: false,
       autoIncrement: true,
     },
-    is_recv: {
+    user_id: {
       type: DataTypes.INTEGER,
-      defaultValue: GiftRecordIsRecvEnum.no,
-    },
-    goods_id: {
-      type: DataTypes.INTEGER,
-    },
-    goods_nums: {
-      type: DataTypes.INTEGER,
-    },
-    goods_snapshot: {
-      type: DataTypes.STRING(500),
     },
     order_id: {
       type: DataTypes.INTEGER,
     },
-    live_room_id: {
+    type: {
       type: DataTypes.INTEGER,
     },
-    send_user_id: {
+    name: {
+      type: DataTypes.STRING(200),
+    },
+    amount: {
       type: DataTypes.INTEGER,
     },
-    recv_user_id: {
+    amount_status: {
       type: DataTypes.INTEGER,
-    },
-    status: {
-      type: DataTypes.INTEGER,
-      defaultValue: GiftRecordStatusEnum.ok,
     },
     remark: {
       type: DataTypes.STRING(500),

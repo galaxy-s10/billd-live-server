@@ -322,9 +322,9 @@ export const bulkCreateGoods: IGoods[] = [
     name: '鲜花',
     desc: '一朵鲜花',
     short_desc: '鲜花',
-    price: 0,
-    original_price: 0,
-    badge: 'free',
+    price: 1,
+    original_price: 1,
+    badge: '',
     badge_bg: 'pink',
     nums: 1,
     cover:

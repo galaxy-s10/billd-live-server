@@ -95,13 +95,14 @@ export const DOMAIN_URL = 'localhost'; // 本地地址，一般是localhost或�
 // .hsslive.cn
 export const COOKIE_DOMAIN = '.hsslive.cn';
 
-export const ERROR_HTTP_CODE = {
+export const ERROR_BUSINESS_CODE = {
   serverError: 10000, // 服务器错误
   banIp: 1000,
-  adminDisableUser: 1001,
+  adminDisableUser: 1001, // 管理员禁用了用户
   notFound: 1002, // 返回了404的http状态码
   errStatusCode: 1003, // 返回了即不是200也不是404的http状态码
   shutdown: 1004, // 停机维护
+  balanceNotEnough: 1005, // 余额不足
 };
 
 export const ALLOW_HTTP_CODE = {

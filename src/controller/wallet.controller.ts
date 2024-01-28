@@ -1,5 +1,6 @@
 import { ParameterizedContext } from 'koa';
 
+import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import { ALLOW_HTTP_CODE } from '@/constant';
 import { IList, IWallet } from '@/interface';
@@ -8,7 +9,13 @@ import walletService from '@/service/wallet.service';
 
 class LiveRoomController {
   common = {
-    create: (data: IWallet) => walletService.create(data),
+    create: ({ user_id, balance }: IWallet) =>
+      walletService.create({ user_id, balance }),
+    findByUserId: (userId: number) => walletService.findByUserId(userId),
+    updateByUserId: ({ user_id, balance }: IWallet) =>
+      walletService.updateByUserId({ user_id, balance }),
+    changeBalanceByUserId: ({ user_id, balance }: IWallet) =>
+      walletService.changeBalanceByUserId({ user_id, balance }),
   };
 
   async getList(ctx: ParameterizedContext, next) {
@@ -49,6 +56,16 @@ class LiveRoomController {
     await next();
   }
 
+  findMyWallet = async (ctx: ParameterizedContext, next) => {
+    const { code, userInfo, message } = await authJwt(ctx);
+    if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
+      throw new CustomError(message, code, code);
+    }
+    const result = await this.common.findByUserId(userInfo.id!);
+    successHandler({ ctx, data: result });
+    await next();
+  };
+
   async update(ctx: ParameterizedContext, next) {
     const id = +ctx.params.id;
     const { user_id, balance }: IWallet = ctx.request.body;
@@ -70,11 +87,8 @@ class LiveRoomController {
   }
 
   async create(ctx: ParameterizedContext, next) {
-    const { user_id, balance }: IWallet = ctx.request.body;
-    await this.common.create({
-      user_id,
-      balance,
-    });
+    const data: IWallet = ctx.request.body;
+    await this.common.create(data);
     successHandler({ ctx });
     await next();
   }

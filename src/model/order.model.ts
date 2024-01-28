@@ -57,19 +57,19 @@ const model = sequelize.define<OrderModel>(
       type: DataTypes.STRING(100),
     },
     buyer_pay_amount: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING,
     },
     total_amount: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING,
     },
     invoice_amount: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING,
     },
     point_amount: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING,
     },
     receipt_amount: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING,
     },
     trade_no: {
       type: DataTypes.STRING(100),

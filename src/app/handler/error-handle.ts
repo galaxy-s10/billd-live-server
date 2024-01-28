@@ -1,6 +1,10 @@
 import { ParameterizedContext } from 'koa';
 
-import { ALLOW_HTTP_CODE, ERROR_HTTP_CODE, HTTP_ERROE_MSG } from '@/constant';
+import {
+  ALLOW_HTTP_CODE,
+  ERROR_BUSINESS_CODE,
+  HTTP_ERROE_MSG,
+} from '@/constant';
 import { CustomError } from '@/model/customError.model';
 import { chalk, chalkERROR } from '@/utils/chalkTip';
 
@@ -27,7 +31,7 @@ const errorHandler = (error, ctx: ParameterizedContext) => {
       console.log(chalkERROR(`收到非自定义错误！`));
       const defaultError = {
         code: ALLOW_HTTP_CODE.serverError,
-        errorCode: ERROR_HTTP_CODE.serverError,
+        errorCode: ERROR_BUSINESS_CODE.serverError,
         error: error.message,
         message: HTTP_ERROE_MSG.serverError,
       };

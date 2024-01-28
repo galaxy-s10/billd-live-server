@@ -1,3 +1,4 @@
+import { asyncUpdate } from 'billd-utils';
 import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
@@ -5,13 +6,21 @@ import successHandler from '@/app/handler/success-handle';
 import { ALLOW_HTTP_CODE, REDIS_PREFIX } from '@/constant';
 import goodsControllerfrom from '@/controller/goods.controller';
 import redisController from '@/controller/redis.controller';
-import { GoodsTypeEnum, IList, IOrder, PayStatusEnum } from '@/interface';
+import {
+  GoodsTypeEnum,
+  IList,
+  IOrder,
+  PayStatusEnum,
+  WalletRecordAmountStatusEnum,
+  WalletRecordEnum,
+} from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import orderService from '@/service/order.service';
 import walletService from '@/service/wallet.service';
-import { asyncWraper } from '@/utils';
 import { aliPaySdk } from '@/utils/alipaySdk';
 import { chalkERROR } from '@/utils/chalkTip';
+
+import walletRecordController from './walletRecord.controller';
 
 class OrderController {
   common = {
@@ -38,42 +47,48 @@ class OrderController {
           //   tradeNo: '2023060422001457971417335312',
           //   tradeStatus: 'WAIT_BUYER_PAY',
           // };
-          asyncWraper(async () => {
-            const orderRes = await orderService.updatePayOk({
-              id: orderInfo.id,
-              buyer_logon_id: aliPayRes.buyerLogonId,
-              buyer_pay_amount: aliPayRes.buyerPayAmount,
-              buyer_user_id: aliPayRes.buyerUserId,
-              invoice_amount: aliPayRes.invoiceAmount,
-              out_trade_no: aliPayRes.outTradeNo,
-              point_amount: aliPayRes.pointAmount,
-              receipt_amount: aliPayRes.receiptAmount,
-              total_amount: aliPayRes.totalAmount,
-              send_pay_date: aliPayRes.sendPayDate,
-              trade_no: aliPayRes.tradeNo,
-              trade_status: aliPayRes.tradeStatus,
-              billd_live_order_version: 1,
-            });
-            if (orderRes[0]) {
-              const userWallet = await walletService.findByUserId(
-                orderInfo.billd_live_user_id || -1
-              );
-              if (userWallet) {
-                const oldBalance = userWallet.balance!;
-                const addBalance = Number(aliPayRes.totalAmount);
-                const newbalance = oldBalance + addBalance;
-                await walletService.updateByUserId({
-                  user_id: orderInfo.billd_live_user_id,
-                  balance: newbalance,
-                });
-              }
-            }
+          const orderRes = await orderService.updatePayOk({
+            id: orderInfo.id,
+            buyer_logon_id: aliPayRes.buyerLogonId,
+            buyer_pay_amount: aliPayRes.buyerPayAmount,
+            buyer_user_id: aliPayRes.buyerUserId,
+            invoice_amount: aliPayRes.invoiceAmount,
+            out_trade_no: aliPayRes.outTradeNo,
+            point_amount: aliPayRes.pointAmount,
+            receipt_amount: aliPayRes.receiptAmount,
+            total_amount: aliPayRes.totalAmount,
+            send_pay_date: aliPayRes.sendPayDate,
+            trade_no: aliPayRes.tradeNo,
+            trade_status: aliPayRes.tradeStatus,
+            billd_live_order_version: 1,
           });
+          if (orderRes[0]) {
+            const userWallet = await walletService.findByUserId(
+              orderInfo.billd_live_user_id || -1
+            );
+            if (userWallet) {
+              const oldBalance = userWallet.balance!;
+              const addBalance = Number(aliPayRes.totalAmount) * 100;
+              const newbalance = oldBalance + addBalance;
+              await walletService.updateByUserId({
+                user_id: orderInfo.billd_live_user_id,
+                balance: newbalance,
+              });
+              await walletRecordController.common.create({
+                user_id: orderInfo.billd_live_user_id,
+                order_id: orderInfo.id,
+                type: WalletRecordEnum.recharge,
+                name: orderInfo.billd_live_order_subject,
+                amount: addBalance,
+                amount_status: WalletRecordAmountStatusEnum.add,
+              });
+            }
+          }
         }
         return { aliPayRes };
       }
       if (isExpired) {
-        asyncWraper(async () => {
+        asyncUpdate(async () => {
           await orderService.update({
             id: orderInfo.id,
             trade_status: PayStatusEnum.timeout,
@@ -98,7 +113,7 @@ class OrderController {
       );
     }
     const { price, name: subject } = goodsInfo;
-    let total_amount = `${Number(price) / 100}`;
+    let total_amount = (Number(price) / 100).toFixed(2);
 
     if (goodsInfo.type === GoodsTypeEnum.recharge) {
       const newmoney = Number(money);
@@ -109,7 +124,7 @@ class OrderController {
           ALLOW_HTTP_CODE.paramsError
         );
       }
-      total_amount = `${newmoney}`;
+      total_amount = (Number(newmoney) / 100).toFixed(2);
     } else if (Number(price) <= 0) {
       throw new CustomError(
         `付款金额不能小于或等于0！`,
@@ -117,7 +132,6 @@ class OrderController {
         ALLOW_HTTP_CODE.paramsError
       );
     }
-
     const res = await aliPaySdk.precreate({
       total_amount,
       subject: subject!,
@@ -131,7 +145,7 @@ class OrderController {
       );
     }
 
-    asyncWraper(async () => {
+    asyncUpdate(async () => {
       const createDate: IOrder = {
         billd_live_user_id: userInfo?.id,
         billd_live_goods_id: goodsId,

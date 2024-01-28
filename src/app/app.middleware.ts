@@ -4,7 +4,7 @@ import { authJwt } from '@/app/auth/authJwt';
 import {
   ALLOW_HTTP_CODE,
   CORS_ALLOW_ORIGIN,
-  ERROR_HTTP_CODE,
+  ERROR_BUSINESS_CODE,
   PROJECT_ENV,
 } from '@/constant';
 import logController from '@/controller/log.controller';
@@ -117,7 +117,7 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
       } else {
         const defaultSuccess = {
           statusCode,
-          errorCode: ERROR_HTTP_CODE.errStatusCode,
+          errorCode: ERROR_BUSINESS_CODE.errStatusCode,
           error: msg,
           message: msg,
           duration,
@@ -150,7 +150,7 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
     if (!(error instanceof CustomError)) {
       const defaultError = {
         statusCode: ALLOW_HTTP_CODE.serverError,
-        errorCode: ERROR_HTTP_CODE.serverError,
+        errorCode: ERROR_BUSINESS_CODE.serverError,
         error: error?.message,
         message: '服务器错误！',
         duration,
@@ -161,9 +161,10 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
     }
     // 是CustomError，判断errorCode，非法的错误（频繁请求和被禁用）不写入日志
     if (
-      ![ERROR_HTTP_CODE.banIp, ERROR_HTTP_CODE.adminDisableUser].includes(
-        error.errorCode
-      )
+      ![
+        ERROR_BUSINESS_CODE.banIp,
+        ERROR_BUSINESS_CODE.adminDisableUser,
+      ].includes(error.errorCode)
     ) {
       insertLog({
         statusCode: error.statusCode,
