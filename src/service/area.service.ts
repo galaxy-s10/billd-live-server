@@ -101,15 +101,11 @@ class AreaService {
       offset = (+nowPage - 1) * +pageSize;
       limit = +pageSize;
     }
-    const inst = await areaModel.findOne({ where: { id: area_id } });
-    // @ts-ignore
-    const count = (await inst?.countLive_rooms()) || 0;
     const subWhere = deleteUseLessObjectKey({
       is_show: live_room_is_show,
       status: live_room_status,
     });
-    // @ts-ignore
-    const result = await inst.getLive_rooms({
+    const result = await liveRoomModel.findAndCountAll({
       limit,
       offset,
       include: [
@@ -118,6 +114,7 @@ class AreaService {
           through: {
             attributes: [],
           },
+          where: { id: area_id },
         },
         {
           model: liveModel,
@@ -132,9 +129,12 @@ class AreaService {
           },
         },
       ],
+      attributes: {
+        exclude: ['key'],
+      },
       where: { ...subWhere },
     });
-    return handlePaging({ rows: result, count }, nowPage, pageSize);
+    return handlePaging(result, nowPage, pageSize);
   }
 
   /** 获取分区列表 */

@@ -31,6 +31,7 @@ class LiveRoomService {
     type,
     cdn,
     pull_is_should_auth,
+    hidden_cover_img,
     orderBy,
     orderName,
     nowPage,
@@ -124,7 +125,7 @@ class LiveRoomService {
         },
       ],
       attributes: {
-        exclude: ['key'],
+        exclude: hidden_cover_img ? ['key', 'cover_img'] : ['key'],
         // include: [
         //   [col('user_live_room.id'), 'idd'],
         //   [col('user_live_room.user.id'), 'user_id'],

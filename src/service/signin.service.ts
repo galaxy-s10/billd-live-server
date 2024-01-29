@@ -80,12 +80,10 @@ class SigninService {
           attributes: {
             exclude: ['password', 'token'],
           },
-          // right: true,
-          // where: {}, // 这个where条件即使什么也没有，也得写一个{}，或者使用required: true,
           where: {
             ...userWhere,
           },
-          include: [{ model: roleModel }],
+          include: [{ model: roleModel, through: { attributes: [] } }],
         },
       ],
       order: [...orderRes],

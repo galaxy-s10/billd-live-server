@@ -11,6 +11,7 @@ import Order from '@/model/order.model';
 import QqUser from '@/model/qqUser.model';
 import Role from '@/model/role.model';
 import RoleAuth from '@/model/roleAuth.model';
+import Signin from '@/model/signin.model';
 import ThirdUser from '@/model/thirdUser.model';
 import User from '@/model/user.model';
 import UserLiveRoom from '@/model/userLiveRoom.model';
@@ -71,6 +72,11 @@ User.belongsToMany(LiveRoom, {
     model: UserLiveRoom,
     unique: false, // 不生成唯一索引
   },
+});
+
+Signin.belongsTo(User, {
+  foreignKey: 'user_id',
+  constraints: false,
 });
 
 UserLiveRoom.belongsTo(LiveRoom, {
