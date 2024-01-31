@@ -7,14 +7,17 @@ import {
 
 import sequelize from '@/config/mysql';
 import { initTable } from '@/init/initDb';
-import { ISignin } from '@/interface';
+import { ISigninStatistics } from '@/interface';
 
-interface SignModel
-  extends Model<InferAttributes<SignModel>, InferCreationAttributes<SignModel>>,
-    ISignin {}
+interface SigninStatisticsModel
+  extends Model<
+      InferAttributes<SigninStatisticsModel>,
+      InferCreationAttributes<SigninStatisticsModel>
+    >,
+    ISigninStatistics {}
 
-const model = sequelize.define<SignModel>(
-  'signin',
+const model = sequelize.define<SigninStatisticsModel>(
+  'signin_statistics',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -32,8 +35,26 @@ const model = sequelize.define<SignModel>(
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
+    max_nums: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    sum_nums: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    recently_signin_time: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
   },
   {
+    indexes: [
+      {
+        name: 'user_id',
+        fields: ['user_id'],
+      },
+    ],
     paranoid: true,
     freezeTableName: true,
     createdAt: 'created_at',

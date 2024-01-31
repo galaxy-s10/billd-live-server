@@ -1,16 +1,16 @@
 import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import { Op } from 'sequelize';
 
-import { IList, ISignin } from '@/interface';
+import { IList, ISigninStatistics } from '@/interface';
 import roleModel from '@/model/role.model';
-import signinModel from '@/model/signin.model';
+import signinStatisticsModel from '@/model/signinStatistics.model';
 import userModel from '@/model/user.model';
 import { handlePaging } from '@/utils';
 
-class SigninService {
-  /** 签到记录是否存在 */
+class SigninStatisticsService {
+  /** 签到统计是否存在 */
   async isExist(ids: number[]) {
-    const res = await signinModel.count({
+    const res = await signinStatisticsModel.count({
       where: {
         id: {
           [Op.in]: ids,
@@ -20,7 +20,7 @@ class SigninService {
     return res === ids.length;
   }
 
-  /** 获取签到记录列表 */
+  /** 获取签到统计列表 */
   async getList({
     id,
     username,
@@ -34,7 +34,7 @@ class SigninService {
     rangTimeType,
     rangTimeStart,
     rangTimeEnd,
-  }: IList<ISignin>) {
+  }: IList<ISigninStatistics>) {
     let offset;
     let limit;
     if (nowPage && pageSize) {
@@ -73,7 +73,7 @@ class SigninService {
       ];
       userWhere[Op.or] = keyWordWhere;
     }
-    const result = await signinModel.findAndCountAll({
+    const result = await signinStatisticsModel.findAndCountAll({
       include: [
         {
           model: userModel,
@@ -95,18 +95,30 @@ class SigninService {
       distinct: true,
     });
 
-    return handlePaging<ISignin>(result, nowPage, pageSize);
+    return handlePaging<ISigninStatistics>(result, nowPage, pageSize);
   }
 
-  /** 查找签到记录 */
+  /** 查找签到统计 */
   async find(id: number) {
-    const result = await signinModel.findOne({ where: { id } });
+    const result = await signinStatisticsModel.findOne({ where: { id } });
     return result;
   }
 
-  /** 查找当天是否签到记录 */
-  async findIsSignin({ user_id, rangTimeStart, rangTimeEnd }: IList<ISignin>) {
-    const result = await signinModel.findOne({
+  /** 查找签到统计 */
+  async findByUserId(user_id: number) {
+    const result = await signinStatisticsModel.findOne({
+      where: { user_id },
+    });
+    return result;
+  }
+
+  /** 查找当天是否签到统计 */
+  async findIsSignin({
+    user_id,
+    rangTimeStart,
+    rangTimeEnd,
+  }: IList<ISigninStatistics>) {
+    const result = await signinStatisticsModel.findOne({
       where: {
         user_id,
         created_at: {
@@ -117,23 +129,23 @@ class SigninService {
     return result;
   }
 
-  /** 修改签到记录 */
-  async update(data: ISignin) {
+  /** 修改签到统计 */
+  async update(data: ISigninStatistics) {
     const { id } = data;
     const data2 = filterObj(data, ['id']);
-    const result = await signinModel.update(data2, { where: { id } });
+    const result = await signinStatisticsModel.update(data2, { where: { id } });
     return result;
   }
 
-  /** 创建签到记录 */
-  async create(data: ISignin) {
-    const result = await signinModel.create(data);
+  /** 创建签到统计 */
+  async create(data: ISigninStatistics) {
+    const result = await signinStatisticsModel.create(data);
     return result;
   }
 
-  /** 删除签到记录 */
+  /** 删除签到统计 */
   async delete(id: number) {
-    const result = await signinModel.destroy({
+    const result = await signinStatisticsModel.destroy({
       where: { id },
       individualHooks: true,
     });
@@ -141,4 +153,4 @@ class SigninService {
   }
 }
 
-export default new SigninService();
+export default new SigninStatisticsService();

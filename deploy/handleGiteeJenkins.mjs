@@ -71,13 +71,15 @@ async function clearOld() {
   });
   await Promise.all(queue);
   const queue1 = [];
-  const giteeDirSrcAllFile = fs.readdirSync(path.resolve(giteeDir, './src'));
+  const srcDir = path.resolve(giteeDir, './src');
+  const giteeDirSrcAllFile = fs.readdirSync(srcDir);
   giteeDirSrcAllFile.forEach((url) => {
-    const fullurl = `${giteeDir}/${url}`;
-    if (!['secret'].includes(url)) {
-      queue1.push(trash(fullurl));
-    }
+    const fullurl = `${srcDir}/${url}`;
+    // if (!['secret'].includes(url)) {
+    queue1.push(trash(fullurl));
+    // }
   });
+  await Promise.all(queue1);
 }
 
 clearOld().then(() => {

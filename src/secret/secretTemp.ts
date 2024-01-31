@@ -1,7 +1,8 @@
-import { LOCALHOST_URL, PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 
 export const JWT_SECRET = '**********'; // jwt秘钥
 
+// 服务器ip地址，腾讯云：**********；阿里云：**********
 export const IP_URL = {
   tencent: {
     localIp: 'localhost',
@@ -154,11 +155,11 @@ export const ALIPAY_LIVE_CONFIG = {
 export const SERVER_LIVE = {
   PushDomain:
     PROJECT_ENV === PROJECT_ENV_ENUM.development
-      ? `rtmp://${LOCALHOST_URL}`
+      ? `rtmp://${IP_URL.ali.localIp}`
       : '**********', // 推流域名
   PullDomain:
     PROJECT_ENV === PROJECT_ENV_ENUM.development
-      ? `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port['8080']}`
+      ? `http://${IP_URL.ali.localIp}:${SRS_CONFIG.docker.port['8080']}`
       : '**********', // 拉流域名
   AppName: 'livestream',
 };

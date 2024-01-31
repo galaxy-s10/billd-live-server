@@ -11,7 +11,7 @@ import Order from '@/model/order.model';
 import QqUser from '@/model/qqUser.model';
 import Role from '@/model/role.model';
 import RoleAuth from '@/model/roleAuth.model';
-import Signin from '@/model/signin.model';
+import SigninStatistics from '@/model/signinStatistics.model';
 import ThirdUser from '@/model/thirdUser.model';
 import User from '@/model/user.model';
 import UserLiveRoom from '@/model/userLiveRoom.model';
@@ -74,7 +74,7 @@ User.belongsToMany(LiveRoom, {
   },
 });
 
-Signin.belongsTo(User, {
+SigninStatistics.belongsTo(User, {
   foreignKey: 'user_id',
   constraints: false,
 });

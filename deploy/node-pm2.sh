@@ -6,7 +6,7 @@
 # Email: 2274751790@qq.com
 # FilePath: /billd-live-server/deploy/node-pm2.sh
 # Github: https://github.com/galaxy-s10
-# LastEditTime: 2024-01-25 16:41:43
+# LastEditTime: 2024-01-29 20:29:32
 # LastEditors: shuisheng
 ###
 
@@ -81,6 +81,9 @@ pnpm install
 
 # echo 开始打包:
 # pnpm run build || true
+
+echo 当前文件列表:
+echo $(ls -A | xargs)
 
 echo 删除旧的pm2服务:
 pm2 del $JOBNAME-$ENV-$PORT
