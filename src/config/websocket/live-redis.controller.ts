@@ -7,6 +7,7 @@ class WSController {
   /** 获取用户进入的房间 */
   getUserJoinedRoom = async (data: {
     socketId: string;
+    joinRoomId: number;
   }): Promise<{
     value: {
       joinRoomId: number;
@@ -19,7 +20,7 @@ class WSController {
   } | null> => {
     const res = await redisController.getVal({
       prefix: `${REDIS_PREFIX.joined}`,
-      key: data.socketId,
+      key: `${data.joinRoomId}___${data.socketId}`,
     });
     return res ? JSON.parse(res) : null;
   };
@@ -35,37 +36,34 @@ class WSController {
   }) => {
     const res = await redisController.setExVal({
       prefix: `${REDIS_PREFIX.joined}`,
-      key: data.socketId,
+      key: `${data.joinRoomId}___${data.socketId}`,
       value: filterObj(data, ['created_at', 'expired_at', 'client_ip']),
-      exp: 60 * 1,
+      exp: 30,
       created_at: data.created_at,
       expired_at: data.expired_at,
       client_ip: data.client_ip,
     });
-    if (data.userInfo) {
-      await redisController.setHashVal({
-        key: `${REDIS_PREFIX.liveRoomOnlineUser}${data.joinRoomId}`,
-        field: `${data.userInfo.id!}`,
-        value: filterObj(data, ['created_at', 'expired_at', 'client_ip']),
-      });
-    } else {
-      await redisController.setHashVal({
-        key: `${REDIS_PREFIX.liveRoomOnlineUser}${data.joinRoomId}`,
-        field: data.socketId,
-        value: filterObj(data, ['created_at', 'expired_at', 'client_ip']),
-      });
-    }
-
+    await redisController.setHashVal({
+      key: `${REDIS_PREFIX.liveRoomOnlineUser}${data.joinRoomId}`,
+      field: data.socketId,
+      value: filterObj(data, ['created_at', 'expired_at', 'client_ip']),
+    });
     return res;
   };
 
   /** 删除用户进入的房间 */
-  delUserJoinedRoom = async (data: { socketId: string }) => {
-    const res = await redisController.del({
+  delUserJoinedRoom = async (data: {
+    socketId: string;
+    joinRoomId: number;
+  }) => {
+    await redisController.del({
       prefix: `${REDIS_PREFIX.joined}`,
-      key: data.socketId,
+      key: `${data.joinRoomId}___${data.socketId}`,
     });
-    return res;
+    await redisController.delHashVal({
+      key: `${REDIS_PREFIX.liveRoomOnlineUser}${data.joinRoomId}`,
+      field: data.socketId,
+    });
   };
 
   /** 删除主播正在直播 */
@@ -90,7 +88,7 @@ class WSController {
       prefix: `${REDIS_PREFIX.roomIsLiveing}`,
       key: `${data.liveRoomId}`,
       value: filterObj(data, ['created_at', 'expired_at', 'client_ip']),
-      exp: 60 * 1,
+      exp: 30,
       created_at: data.created_at,
       expired_at: data.expired_at,
       client_ip: data.client_ip,

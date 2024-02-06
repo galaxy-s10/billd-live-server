@@ -2,7 +2,7 @@ import { Server, Socket } from 'socket.io';
 
 import {
   handleWsDisableSpeaking,
-  handleWsDisconnect,
+  handleWsDisconnecting,
   handleWsGetLiveUser,
   handleWsJoin,
   handleWsMessage,
@@ -62,10 +62,12 @@ export async function getRoomAllUser(io, roomId: number) {
 
 export async function updateUserJoinedRoom(data: {
   socketId: string;
+  liveRoomId: number;
   client_ip: string;
 }) {
   const res = await liveRedisController.getUserJoinedRoom({
     socketId: data.socketId,
+    joinRoomId: data.liveRoomId,
   });
   if (res) {
     liveRedisController.setUserJoinedRoom({
@@ -238,12 +240,13 @@ export const connectWebSocket = (server) => {
     });
 
     // 收到心跳
-    socket.on(WsMsgTypeEnum.heartbeat, (data: WsHeartbeatType['data']) => {
+    socket.on(WsMsgTypeEnum.heartbeat, (data: WsHeartbeatType) => {
       try {
-        updateUserJoinedRoom({
-          socketId: data.socket_id,
-          client_ip: getSocketRealIp(socket),
-        });
+        // updateUserJoinedRoom({
+        //   socketId: data.data.socket_id,
+        //   liveRoomId: data.data.live_room_id,
+        //   client_ip: getSocketRealIp(socket),
+        // });
       } catch (error) {
         console.log(error);
       }
@@ -387,6 +390,7 @@ export const connectWebSocket = (server) => {
         socket,
       });
       console.log(reason);
+      handleWsDisconnecting({ io, socket });
     });
 
     // 已断开连接
@@ -396,9 +400,7 @@ export const connectWebSocket = (server) => {
           msg: '===== websocket已断开连接 =====',
           socket,
         });
-        console.log(reason, Object.keys(io));
-        console.log(io.to);
-        handleWsDisconnect({ io, socket });
+        console.log(reason);
       } catch (error) {
         console.log(error);
       }

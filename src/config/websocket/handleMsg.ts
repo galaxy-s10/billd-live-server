@@ -7,12 +7,7 @@ import { rimrafSync } from 'rimraf';
 import { Server, Socket } from 'socket.io';
 
 import { jwtVerify } from '@/app/auth/authJwt';
-import {
-  getRoomAllUser,
-  getSocketRealIp,
-  ioEmit,
-  socketEmit,
-} from '@/config/websocket';
+import { getSocketRealIp, ioEmit, socketEmit } from '@/config/websocket';
 import liveRedisController from '@/config/websocket/live-redis.controller';
 import {
   DEFAULT_AUTH_INFO,
@@ -52,12 +47,11 @@ import { mp4PushRtmp, webmToMp4 } from '@/utils/process';
 import { startBlobIsExistSchedule } from '../schedule/blobIsExist';
 
 export async function handleWsJoin(args: {
-  io: Server;
   roomId: number;
   socket: Socket;
   data: WsJoinType;
 }) {
-  const { io, roomId, socket, data } = args;
+  const { roomId, socket, data } = args;
   if (!roomId) {
     console.log(chalkERROR('roomId为空'));
     return;
@@ -88,16 +82,6 @@ export async function handleWsJoin(args: {
     joinRoomId: roomId,
     userInfo: data.user_info,
     client_ip: getSocketRealIp(socket),
-  });
-  const liveUser = await getRoomAllUser(io, roomId);
-  socketEmit<WSGetRoomAllUserType['data']>({
-    socket,
-    roomId,
-    msgType: WsMsgTypeEnum.liveUser,
-    data: {
-      // @ts-ignore
-      liveUser,
-    },
   });
   if (liveRoomInfo.type === LiveRoomTypeEnum.system && liveInfo) {
     socketEmit<WsRoomLivingType['data']>({
@@ -250,46 +234,60 @@ export async function handleWsMsrBlob(args: { data: WsMsrBlobType }) {
   }
 }
 
-export async function handleWsDisconnect(args: { io: Server; socket: Socket }) {
+export function handleWsDisconnecting(args: { io: Server; socket: Socket }) {
   const { io, socket } = args;
-  const res1 = await liveRedisController.getUserJoinedRoom({
-    socketId: socket.id,
+  socket.rooms.forEach((roomIdStr) => {
+    const roomId = Number(roomIdStr);
+    if (Number.isNaN(roomId)) return;
+    liveRedisController
+      .getUserJoinedRoom({
+        socketId: socket.id,
+        joinRoomId: roomId,
+      })
+      .then(async (res1) => {
+        if (res1) {
+          const { joinRoomId, userInfo } = res1.value;
+          try {
+            liveRedisController.delUserJoinedRoom({
+              socketId: socket.id,
+              joinRoomId,
+            });
+          } catch (error) {
+            console.log(error);
+          }
+          ioEmit<WsLeavedType['data']>({
+            io,
+            roomId: joinRoomId,
+            msgType: WsMsgTypeEnum.leaved,
+            data: {
+              socket_id: socket.id,
+              user_info: userInfo,
+            },
+          });
+          const userId = userInfo?.id;
+          if (!userId) {
+            console.log(chalkERROR('userId为空'));
+            return;
+          }
+          const userLiveRoomInfo = await userLiveRoomService.findByUserId(
+            userId
+          );
+          if (userLiveRoomInfo) {
+            if (
+              userLiveRoomInfo.live_room?.type === LiveRoomTypeEnum.user_wertc
+            ) {
+              liveService.deleteByLiveRoomIdAndSocketId({
+                live_room_id: userLiveRoomInfo.live_room_id!,
+                socket_id: socket.id,
+              });
+            }
+          }
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   });
-  if (res1) {
-    const { joinRoomId, userInfo } = res1.value;
-    ioEmit<WsLeavedType['data']>({
-      io,
-      roomId: joinRoomId,
-      msgType: WsMsgTypeEnum.leaved,
-      data: {
-        socket_id: socket.id,
-        user_info: userInfo,
-      },
-    });
-    ioEmit<WSGetRoomAllUserType['data']>({
-      io,
-      roomId: joinRoomId,
-      msgType: WsMsgTypeEnum.liveUser,
-      data: {
-        liveUser: [],
-      },
-    });
-    const userId = userInfo?.id;
-    if (!userId) {
-      console.log(chalkERROR('userId为空'));
-      return;
-    }
-    const userLiveRoomInfo = await userLiveRoomService.findByUserId(userId);
-    if (userLiveRoomInfo) {
-      const roomId = userLiveRoomInfo.live_room_id!;
-      if (userLiveRoomInfo.live_room?.type === LiveRoomTypeEnum.user_wertc) {
-        liveService.deleteByLiveRoomIdAndSocketId({
-          live_room_id: roomId,
-          socket_id: socket.id,
-        });
-      }
-    }
-  }
 }
 
 export async function handleWsRoomNoLive(args: {
@@ -472,7 +470,6 @@ export async function handleWsGetLiveUser(args: {
   const liveUser = await liveRedisController.getLiveRoomOnlineUser(
     data.data.live_room_id
   );
-  // const liveUser = await getRoomAllUser(io, data.data.live_room_id);
   socketEmit<WSGetRoomAllUserType['data']>({
     socket,
     msgType: WsMsgTypeEnum.liveUser,
@@ -489,6 +486,7 @@ export async function handleWsUpdateJoinInfo(args: {
   const { socket, data } = args;
   const res = await liveRedisController.getUserJoinedRoom({
     socketId: data.socket_id,
+    joinRoomId: data.data.live_room_id,
   });
   liveRoomService.update({
     id: data.data.live_room_id,

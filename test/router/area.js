@@ -54,12 +54,27 @@ const map = {
 
 async function foo() {
   const result = await autocannon({
-    url: `${baseUrl}/area/live_room_list?id=1&live_room_is_show=0&nowPage=1&pageSize=10`,
+    // url: `https://blog.codedogs.top`,
+    // url: `http://localhost:3300/tag/list?nowPage=1&pageSize=20`,
+    // url: `http://localhost:3300/article/list?orderName=created_at&orderBy=desc&types=&nowPage=1&pageSize=10`,
+    // url: `https://api.hsslive.cn/prodapi/article/list?orderName=created_at&orderBy=desc&types=&nowPage=1&pageSize=20`,
+    // url: `http://localhost:3000`,
+    url: `https://www.hsslive.cn`,
+    // url: `https://www.ldmnq.com`,
+    // url: `https://www.xdyun.com`,
+    // url: `http://106.15.9.244:7002`,
     method: 'GET',
     connections: 10, // 并发连接数。可选默认值：10
     pipelining: 1, // 每个连接的管道请求数。当大于 1 时将导致ClientAPI 抛出异常。可选默认值：1
     duration: 5, // 运行的秒数。可以是时间字符串。可选默认值：10
   });
+  // const result = await autocannon({
+  //   url: `${baseUrl}/area/live_room_list?id=1&live_room_is_show=0&nowPage=1&pageSize=10`,
+  //   method: 'GET',
+  //   connections: 10, // 并发连接数。可选默认值：10
+  //   pipelining: 1, // 每个连接的管道请求数。当大于 1 时将导致ClientAPI 抛出异常。可选默认值：1
+  //   duration: 5, // 运行的秒数。可以是时间字符串。可选默认值：10
+  // });
   // const result = await autocannon({
   //   url: `${baseUrl}/area/list`,
   //   method: 'GET',
