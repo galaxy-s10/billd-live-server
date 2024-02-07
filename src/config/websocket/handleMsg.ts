@@ -47,11 +47,12 @@ import { mp4PushRtmp, webmToMp4 } from '@/utils/process';
 import { startBlobIsExistSchedule } from '../schedule/blobIsExist';
 
 export async function handleWsJoin(args: {
-  roomId: number;
+  io: Server;
   socket: Socket;
+  roomId: number;
   data: WsJoinType;
 }) {
-  const { roomId, socket, data } = args;
+  const { socket, io, roomId, data } = args;
   if (!roomId) {
     console.log(chalkERROR('roomId为空'));
     return;
@@ -83,38 +84,41 @@ export async function handleWsJoin(args: {
     userInfo: data.user_info,
     client_ip: getSocketRealIp(socket),
   });
-  if (liveRoomInfo.type === LiveRoomTypeEnum.system && liveInfo) {
-    socketEmit<WsRoomLivingType['data']>({
-      socket,
-      msgType: WsMsgTypeEnum.roomLiving,
-      data: {
-        live_room: liveRoomInfo,
-        anchor_socket_id: liveInfo.socket_id!,
-      },
-    });
-    liveRedisController.setUserJoinedRoom({
-      socketId: socket.id,
-      joinRoomId: roomId,
-      userInfo: data.user_info,
-      client_ip: getSocketRealIp(socket),
-    });
-  } else if (liveInfo && liveRoomInfo) {
-    socketEmit<WsRoomLivingType['data']>({
-      socket,
-      msgType: WsMsgTypeEnum.roomLiving,
-      data: {
-        live_room: liveRoomInfo,
-        anchor_socket_id: liveInfo.socket_id!,
-      },
-    });
-    liveRedisController.setUserJoinedRoom({
-      socketId: socket.id,
-      joinRoomId: roomId,
-      userInfo: data.user_info,
-      client_ip: getSocketRealIp(socket),
-    });
+  if (liveInfo) {
+    if (liveRoomInfo.type === LiveRoomTypeEnum.system) {
+      socketEmit<WsRoomLivingType['data']>({
+        socket,
+        msgType: WsMsgTypeEnum.roomLiving,
+        data: {
+          live_room: liveRoomInfo,
+          anchor_socket_id: liveInfo.socket_id!,
+        },
+      });
+      liveRedisController.setUserJoinedRoom({
+        socketId: socket.id,
+        joinRoomId: roomId,
+        userInfo: data.user_info,
+        client_ip: getSocketRealIp(socket),
+      });
+    } else {
+      socketEmit<WsRoomLivingType['data']>({
+        socket,
+        msgType: WsMsgTypeEnum.roomLiving,
+        data: {
+          live_room: liveRoomInfo,
+          anchor_socket_id: liveInfo.socket_id!,
+        },
+      });
+      liveRedisController.setUserJoinedRoom({
+        socketId: socket.id,
+        joinRoomId: roomId,
+        userInfo: data.user_info,
+        client_ip: getSocketRealIp(socket),
+      });
+    }
   }
-
+  const roomsMap = io.of('/').adapter.rooms;
+  const socketList = roomsMap.get(`${data.data.live_room_id}`);
   socketEmit<WsOtherJoinType['data']>({
     socket,
     msgType: WsMsgTypeEnum.otherJoin,
@@ -124,6 +128,7 @@ export async function handleWsJoin(args: {
       live_room_user_info: liveRoomInfo.user!,
       join_socket_id: socket.id,
       join_user_info: data.user_info,
+      socket_list: socketList ? [...socketList] : [],
     },
   });
 }
@@ -349,7 +354,10 @@ export async function handleWsStartLive(args: {
     name: data.data.name,
     type: data.data.type,
   });
-  if (data.data.type === LiveRoomTypeEnum.user_wertc) {
+  if (
+    data.data.type === LiveRoomTypeEnum.user_wertc ||
+    data.data.type === LiveRoomTypeEnum.user_wertc_meeting
+  ) {
     await liveService.create({
       live_room_id: Number(roomId),
       user_id: userId,
@@ -440,6 +448,7 @@ export async function handleWsStartLive(args: {
     }, msrMaxDelay);
   } else if (data.data.type === LiveRoomTypeEnum.user_pk) {
     try {
+      console.log('livePkKeylivePkKey');
       const pkKey = getRandomString(8);
       await redisController.setExVal({
         prefix: REDIS_PREFIX.livePkKey,
@@ -457,7 +466,8 @@ export async function handleWsStartLive(args: {
         },
       });
     } catch (error) {
-      console.log(error);
+      console.error('user_pk错误');
+      console.error(error);
     }
   }
 }

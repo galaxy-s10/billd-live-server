@@ -6,7 +6,7 @@ import {
   SECRET_FILE,
   STATIC_DIR,
   UPLOAD_DIR,
-} from '@/constant';
+} from '../constant';
 
 export function handleSecretFile() {
   const isExist = fs.existsSync(SECRET_FILE);
