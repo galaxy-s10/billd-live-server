@@ -42,8 +42,11 @@ billd 直播间，目前实现了类似 [bilibili 的 Web 在线直播](https://
 - [x] 原生 webrtc 推拉流
 - [x] srs webrtc 推流，`http-flv` 或 `hls`拉流
 - [x] msr 推流，ffmpeg 转码，`http-flv` 或 `hls`拉流
+- [x] 一对一打 PK
+- [ ] 一对多打 PK
 - [x] 前端混流
 - [x] 推流鉴权
+- [x] 拉流鉴权
 - [x] [OBS](https://github.com/obsproject/obs-studio)、[FFmpeg](https://ffmpeg.org)推流
 - [x] 用户模块（qq 登录）
 - [x] 支付模块（支付宝当面付）
@@ -51,7 +54,8 @@ billd 直播间，目前实现了类似 [bilibili 的 Web 在线直播](https://
 - [x] 商品模块
 - [x] 适配移动端
 - [x] 在线后台
-- [x] 接入腾讯云直播
+- [x] 接入腾讯云-云直播
+- [ ] 接入腾讯云-实时音视频 TRTC
 
 ## 技术栈
 
@@ -66,10 +70,10 @@ apifox：[https://apifox.com/apidoc/shared-c7556b54-17b2-494e-a039-572d83f103ed]
 
 ## 客户端下载
 
-安卓端：[点击下载](https://resource.hsslive.cn/billd-live/image/e859ec0e1fac824ce92b6522104f53ed.apk)
-苹果端：TODO
-Windows 端：TODO
-Mac 端：TODO
+- 安卓端：[点击下载](https://resource.hsslive.cn/billd-live/image/e859ec0e1fac824ce92b6522104f53ed.apk)
+- 苹果端：TODO
+- Windows 端：TODO
+- Mac 端：TODO
 
 ## 预览
 
@@ -121,9 +125,9 @@ Mac 端：TODO
   style="height:500px"
 />
 
-### 安卓端
+### 安卓端（flutter）
 
-- 首页、分区、排行
+-
 
 <img
   src="https://resource.hsslive.cn/billd-live/image/38a0fae4c5104913ca0b7617ca58b518.webp" 
@@ -146,7 +150,7 @@ Mac 端：TODO
   style="width:300px"
 />
 
-- 我的已登录/未登录
+-
 
 <img
   src="https://resource.hsslive.cn/billd-live/image/3a777718d31f94e6d25071d29f5e5185.webp" 
@@ -214,7 +218,7 @@ pnpm i billd-utils@latest billd-scss@latest billd-html-webpack-plugin@latest
 
 > 本地必须要有 docker、ffmpeg 环境！
 >
-> 项目启动后，会在项目的 src/config/目录下生成 secret.ts 文件，请填写里面的信息，MYSQL_CONFIG、REDIS_CONFIG、SRS_CONFIG 必填！
+> 项目启动后，会在项目的 src/secret/目录下生成 secret.ts 文件，请填写里面的信息，MYSQL_CONFIG、REDIS_CONFIG、SRS_CONFIG 必填！
 
 ```bash
 # 1.初始化docker容器
@@ -230,7 +234,7 @@ pnpm run dev
 - [x] 三星 s10
 - [x] ipad air 3
 
-## FAQ
+## 常见问题
 
 [https://live.hsslive.cn/about/faq](https://live.hsslive.cn/about/faq)
 
@@ -238,7 +242,7 @@ pnpm run dev
 
 ### 本地开发环境
 
-> 配置：macbookpro 2020 Apple M1，8 核 CPU，16G 内存
+> 配置：macbookpro 2020 m1，8 核 CPU，16G 内存
 
 - 操作系统：mac os 13.3.1
 - node 版本：16.16.0
