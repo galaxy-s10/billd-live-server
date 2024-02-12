@@ -56,7 +56,7 @@ const errorHandler = (error, ctx: ParameterizedContext) => {
     // 但是没有手动设置status的话，一样返回不了数据，因为status状态码都返回404了。
     ctx.status = error.statusCode;
     ctx.body = {
-      code: error.errorCode,
+      code: error.statusCode,
       errorCode: error.errorCode,
       message: error?.message || HTTP_ERROE_MSG[error.statusCode],
     };
