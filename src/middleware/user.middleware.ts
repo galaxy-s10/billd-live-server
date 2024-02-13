@@ -35,8 +35,8 @@ export const verifyProp = async (ctx: ParameterizedContext, next) => {
   } catch (error: any) {
     throw new CustomError(
       error.message,
-      ALLOW_HTTP_CODE.paramsError,
-      ALLOW_HTTP_CODE.paramsError
+      error.statusCode || ALLOW_HTTP_CODE.paramsError,
+      error.errorCode || ALLOW_HTTP_CODE.paramsError
     );
   }
 };
