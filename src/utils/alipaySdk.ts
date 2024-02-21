@@ -48,7 +48,7 @@ class AliPaySdkClass {
        * notify_url，类型：字符串。最大长度256，可选，示例值：http://api.test.alipay.net/atinterface/receive_notify.htm
        * 支付宝服务器主动通知商户服务器里指定的页面http/https路径。
        */
-      // notify_url: 'https://live.hsslive.cn/auth_pay',
+      // notify_url: 'https://live.xxx.cn/auth_pay',
     };
     // https://opendocs.alipay.com/open/f540afd8_alipay.trade.precreate?scene=19&pathHash=d3c84596
     const aliPayRes = await this.sdk.exec('alipay.trade.precreate', {

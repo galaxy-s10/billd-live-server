@@ -10,7 +10,7 @@ import { apiBeforeVerify } from '@/app/verify.middleware';
 import { handleRedisKeyExpired } from '@/config/redis/handleRedisKeyExpired';
 import { initSchedule } from '@/config/schedule';
 import { connectWebSocket } from '@/config/websocket';
-import { STATIC_DIR, UPLOAD_DIR } from '@/constant';
+import { COMMON_HTTP_CODE, STATIC_DIR, UPLOAD_DIR } from '@/constant';
 import { initFFmpeg } from '@/init/initFFmpeg';
 import { CustomError } from '@/model/customError.model';
 import { loadAllRoutes } from '@/router';
@@ -37,7 +37,11 @@ export async function setupKoa({ port }) {
       },
       onError(err) {
         console.log('koaBody错误', err);
-        throw new CustomError(err.message, 500, 500);
+        throw new CustomError(
+          err.message,
+          COMMON_HTTP_CODE.serverError,
+          COMMON_HTTP_CODE.serverError
+        );
       },
       // parsedMethods: ['POST', 'PUT', 'PATCH', 'GET', 'HEAD', 'DELETE'], // 声明将解析正文的 HTTP 方法，默认值['POST', 'PUT', 'PATCH']。替换strict选项。
       // strict: true, // 废弃了。如果启用，则不解析 GET、HEAD、DELETE 请求，默认true。即delete不会解析data数据

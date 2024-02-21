@@ -118,7 +118,7 @@ rule.second = 0;
 // rule.minute = allMinuteArr.filter((v) => v % 1 === 0);
 // rule.second = allSecondArr.filter((v) => v % 5 === 0);
 
-export const startSchedule = () => {
+export const startVerifyStreamSchedule = () => {
   if (PROJECT_ENV === 'prod') {
     nodeSchedule.scheduleJob(SCHEDULE_TYPE.verifyStream, rule, () => {
       console.log(chalkINFO(`执行${SCHEDULE_TYPE.verifyStream}定时任务`));

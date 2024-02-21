@@ -1,7 +1,7 @@
 import { ParameterizedContext } from 'koa';
 
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE } from '@/constant';
+import { COMMON_HTTP_CODE } from '@/constant';
 import { IList, ILog } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import logService from '@/service/log.service';
@@ -75,8 +75,8 @@ class LogController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的日志！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const result = await logService.update({
@@ -152,8 +152,8 @@ class LogController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的日志！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const result = await logService.delete(id);

@@ -24,9 +24,9 @@ export const WECHAT_APPID = '**********'; // wechat登录APP ID
 export const WECHAT_SECRET = '**********'; // wechat登录APP Key
 export const WECHAT_REDIRECT_URI = '**********'; // wechat登录回调地址
 
-// WARN 七牛云属实拉胯，不用它了，QINIU_PILI_LIVE里面的值可以随便填（但一定要有值），反正用不到。
 export const QINIU_ACCESSKEY = '**********'; // 七牛云秘钥
 export const QINIU_SECRETKEY = '**********'; // 七牛云秘钥
+// WARN 七牛云直播服务属实拉胯，不用它了，QINIU_PILI_LIVE里面的值可以随便填（但一定要有值），反正用不到。
 export const QINIU_PILI_LIVE = {
   // 推流鉴权方式：静态鉴权(static)，https://developer.qiniu.com/pili/6678/push-the-current-authentication
   // 推流地址格式：rtmp://<RTMPPublishDomain>/<Hub>/<streamTitle>?key=<PublishKey>
@@ -53,27 +53,27 @@ export const MYSQL_CONFIG = {
     port: { 3306: 3306 },
     MYSQL_ROOT_PASSWORD:
       PROJECT_ENV === PROJECT_ENV_ENUM.development
-        ? '*********'
-        : '********************',
+        ? '*************'
+        : '*************',
     volume:
       PROJECT_ENV === PROJECT_ENV_ENUM.development
-        ? '/Users/huangshuisheng/Desktop/docker/mysql'
-        : '********************',
+        ? '*************'
+        : '*************',
   },
   database:
     PROJECT_ENV === PROJECT_ENV_ENUM.development
-      ? 'billd_live_test'
+      ? '*************'
       : '*************',
   host:
     PROJECT_ENV === PROJECT_ENV_ENUM.development
       ? '127.0.0.1'
-      : '********************',
+      : '*************',
   port: 3306,
   username: 'root',
   password:
     PROJECT_ENV === PROJECT_ENV_ENUM.development
-      ? '*********'
-      : '********************',
+      ? '*************'
+      : '*************',
 }; // Mysql配置
 
 export enum REDIS_DATABASE {
@@ -88,7 +88,7 @@ export const REDIS_CONFIG = {
     port: { 6379: 6379 },
     volume:
       PROJECT_ENV === PROJECT_ENV_ENUM.development
-        ? '/Users/huangshuisheng/Desktop/docker/redis'
+        ? '*************'
         : '*************',
   },
   database: 0,
@@ -96,16 +96,16 @@ export const REDIS_CONFIG = {
     port: 6379,
     host:
       PROJECT_ENV === PROJECT_ENV_ENUM.development
-        ? '127.0.0.1'
-        : '***********',
+        ? '*************'
+        : '*************',
   },
   username:
     PROJECT_ENV === PROJECT_ENV_ENUM.development
-      ? 'billd_live_redis_test'
+      ? '*************'
       : '*************',
   password:
     PROJECT_ENV === PROJECT_ENV_ENUM.development
-      ? '*********'
+      ? '*************'
       : '*************',
 }; // Redis配置
 
@@ -123,7 +123,7 @@ export const SRS_CONFIG = {
     },
     volume:
       PROJECT_ENV === PROJECT_ENV_ENUM.development
-        ? '/Users/huangshuisheng/Desktop/docker/srs'
+        ? '*************'
         : '*************',
   },
   // CANDIDATE填你的本机ip地址
@@ -161,5 +161,5 @@ export const SERVER_LIVE = {
     PROJECT_ENV === PROJECT_ENV_ENUM.development
       ? `http://${IP_URL.ali.localIp}:${SRS_CONFIG.docker.port['8080']}`
       : '**********', // 拉流域名
-  AppName: 'livestream',
+  AppName: '**********',
 };

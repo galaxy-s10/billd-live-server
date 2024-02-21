@@ -1,9 +1,9 @@
 import { ParameterizedContext } from 'koa';
 
 import {
-  ALLOW_HTTP_CODE,
-  ERROR_BUSINESS_CODE,
-  HTTP_ERROE_MSG,
+  COMMON_ERROE_MSG,
+  COMMON_ERROR_CODE,
+  COMMON_HTTP_CODE,
 } from '@/constant';
 import { CustomError } from '@/model/customError.model';
 import { chalk, chalkERROR } from '@/utils/chalkTip';
@@ -13,7 +13,7 @@ const errorHandler = (error, ctx: ParameterizedContext) => {
   const ip = (ctx.request.headers['x-real-ip'] as string) || '127.0.0.1';
   // eslint-disable-next-line
   const errorLog = (error) => {
-    console.log(chalk.redBright('statusCode:'), error.statusCode);
+    console.log(chalk.redBright('httpStatusCode:'), error.httpStatusCode);
     console.log(chalk.redBright('errorCode:'), error.errorCode);
     console.log(chalk.redBright('message:'), error.message);
     console.log(chalk.redBright('query:'), { ...ctx.request.query });
@@ -30,10 +30,10 @@ const errorHandler = (error, ctx: ParameterizedContext) => {
     if (!(error instanceof CustomError)) {
       console.log(chalkERROR(`收到非自定义错误！`));
       const defaultError = {
-        code: ALLOW_HTTP_CODE.serverError,
-        errorCode: ERROR_BUSINESS_CODE.serverError,
+        code: COMMON_HTTP_CODE.serverError,
+        errorCode: COMMON_ERROR_CODE.serverError,
         error: error.message,
-        message: HTTP_ERROE_MSG.serverError,
+        message: COMMON_ERROE_MSG.serverError,
       };
       ctx.status = defaultError.code;
       ctx.body = {
@@ -54,11 +54,11 @@ const errorHandler = (error, ctx: ParameterizedContext) => {
 
     // 不手动设置状态的话，默认是404（delete方法返回400），因此，即使走到了error-handle，且ctx.body返回了数据
     // 但是没有手动设置status的话，一样返回不了数据，因为status状态码都返回404了。
-    ctx.status = error.statusCode;
+    ctx.status = error.httpStatusCode;
     ctx.body = {
-      code: error.statusCode,
+      code: error.errorCode,
       errorCode: error.errorCode,
-      message: error?.message || HTTP_ERROE_MSG[error.statusCode],
+      message: error?.message || COMMON_ERROE_MSG[error.httpStatusCode],
     };
 
     errorLog(error);

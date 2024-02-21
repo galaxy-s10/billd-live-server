@@ -31,7 +31,7 @@ import {
 } from '@/types/websocket';
 import { chalkINFO, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 
-export function getSocketRealIp(socket?: Socket) {
+export function getSocketRealIp(socket: Socket) {
   if (!socket) {
     return '-1';
   }
@@ -40,7 +40,7 @@ export function getSocketRealIp(socket?: Socket) {
 }
 
 // 获取所有连接的socket客户端
-export async function getAllSockets(io) {
+async function getAllSockets(io) {
   const allSocketsMap = await io.fetchSockets();
   const res = Object.keys(allSocketsMap).map((item) => {
     return {
@@ -60,11 +60,19 @@ export async function getRoomAllUser(io, roomId: number) {
   return res2;
 }
 
-export async function updateUserJoinedRoom(data: {
+async function updateUserJoinedRoom(data: {
   socketId: string;
   liveRoomId: number;
-  client_ip: string;
+  roomLiving?: boolean;
+  clientIp: string;
 }) {
+  if (data.roomLiving) {
+    liveRedisController.setLiveRoomIsLiving({
+      socketId: data.socketId,
+      liveRoomId: data.liveRoomId,
+      client_ip: data.clientIp,
+    });
+  }
   const res = await liveRedisController.getUserJoinedRoom({
     socketId: data.socketId,
     joinRoomId: data.liveRoomId,
@@ -75,7 +83,7 @@ export async function updateUserJoinedRoom(data: {
       joinRoomId: res.value.joinRoomId,
       userInfo: res.value.userInfo,
       created_at: res.created_at,
-      client_ip: data.client_ip,
+      client_ip: data.clientIp,
     });
   }
 }
@@ -143,6 +151,7 @@ export const connectWebSocket = (server) => {
   const oneK = 1000;
   const io = new Server(server, {
     maxHttpBufferSize: oneK * 1000 * 100,
+    // parser: customParser,
   });
 
   wsSocket.io = io;
@@ -191,7 +200,7 @@ export const connectWebSocket = (server) => {
           msg: '收到主播开始直播',
           socket,
         });
-        handleWsStartLive({ socket, data });
+        handleWsStartLive({ io, socket, data });
       } catch (error) {
         console.log(error);
       }
@@ -242,11 +251,12 @@ export const connectWebSocket = (server) => {
     // 收到心跳
     socket.on(WsMsgTypeEnum.heartbeat, (data: WsHeartbeatType) => {
       try {
-        // updateUserJoinedRoom({
-        //   socketId: data.data.socket_id,
-        //   liveRoomId: data.data.live_room_id,
-        //   client_ip: getSocketRealIp(socket),
-        // });
+        updateUserJoinedRoom({
+          socketId: data.data.socket_id,
+          liveRoomId: data.data.live_room_id,
+          roomLiving: data.data.roomLiving,
+          clientIp: getSocketRealIp(socket),
+        });
       } catch (error) {
         console.log(error);
       }

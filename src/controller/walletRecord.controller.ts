@@ -2,7 +2,7 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE } from '@/constant';
+import { COMMON_HTTP_CODE } from '@/constant';
 import { IList, IWalletRecord } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import walletRecordService from '@/service/walletRecord.service';
@@ -71,7 +71,7 @@ class WalletRecordController {
 
   getMyList = async (ctx: ParameterizedContext, next) => {
     const { code, errorCode, userInfo, message } = await authJwt(ctx);
-    if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
+    if (code !== COMMON_HTTP_CODE.success || !userInfo) {
       throw new CustomError(message, code, errorCode);
     }
     const data = ctx.request.query;
@@ -102,8 +102,8 @@ class WalletRecordController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的钱包记录！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     await walletRecordService.update({
@@ -133,8 +133,8 @@ class WalletRecordController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的钱包记录！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     await walletRecordService.delete(id);

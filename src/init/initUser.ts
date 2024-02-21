@@ -4,6 +4,7 @@ import {
   DEFAULT_ROLE_INFO,
   PROJECT_ENV,
   PROJECT_ENV_ENUM,
+  QINIU_RESOURCE,
   SERVER_VIDEO_DIR,
   VIDEO_DIR,
 } from '@/constant';
@@ -30,8 +31,7 @@ export const initUser: Record<string, IInitUser> = {
   admin: {
     id: 1,
     username: 'admin',
-    avatar:
-      'https://resource.hsslive.cn/billd-live/image/def9f85caeb1bf7602ae1bc37f00b03d.webp',
+    avatar: `${QINIU_RESOURCE.url}/billd-live/image/def9f85caeb1bf7602ae1bc37f00b03d.webp`,
     user_roles: [DEFAULT_ROLE_INFO.SUPER_ADMIN.id],
     live_room: {
       id: 1,
@@ -51,8 +51,7 @@ export const initUser: Record<string, IInitUser> = {
     id: 2,
     username: 'CoCo',
     user_roles: [DEFAULT_ROLE_INFO.LIVE_ADMIN.id],
-    avatar:
-      'https://resource.hsslive.cn/billd-live/image/15a116a978cadb34e9fbf0061a4145bc.webp',
+    avatar: `${QINIU_RESOURCE.url}/billd-live/image/15a116a978cadb34e9fbf0061a4145bc.webp`,
     live_room: {
       id: 2,
       name: '房东的猫-云烟成雨',
@@ -70,8 +69,7 @@ export const initUser: Record<string, IInitUser> = {
   systemUser2: {
     id: 3,
     username: 'Dukoo',
-    avatar:
-      'https://resource.hsslive.cn/billd-live/image/752a40d44811c99278961410da656464.webp',
+    avatar: `${QINIU_RESOURCE.url}/billd-live/image/752a40d44811c99278961410da656464.webp`,
     user_roles: [DEFAULT_ROLE_INFO.SVIP_USER.id],
     live_room: {
       id: 3,
@@ -93,8 +91,7 @@ export const initUser: Record<string, IInitUser> = {
   systemUser3: {
     id: 4,
     username: 'MoonTIT',
-    avatar:
-      'https://resource.hsslive.cn/billd-live/image/2b045c7f02febd23893244e923115535.webp',
+    avatar: `${QINIU_RESOURCE.url}/billd-live/image/2b045c7f02febd23893244e923115535.webp`,
     user_roles: [DEFAULT_ROLE_INFO.VIP_USER.id],
     live_room: {
       id: 4,
@@ -116,8 +113,7 @@ export const initUser: Record<string, IInitUser> = {
   systemUser4: {
     id: 5,
     username: 'Nill',
-    avatar:
-      'https://resource.hsslive.cn/billd-live/image/2142b19fe33e1fd7ed848104f64c4fd4.webp',
+    avatar: `${QINIU_RESOURCE.url}/billd-live/image/2142b19fe33e1fd7ed848104f64c4fd4.webp`,
     user_roles: [DEFAULT_ROLE_INFO.VIP_USER.id],
     live_room: {
       id: 5,
@@ -139,8 +135,7 @@ export const initUser: Record<string, IInitUser> = {
   systemUser5: {
     id: 6,
     username: 'Ojin',
-    avatar:
-      'https://resource.hsslive.cn/billd-live/image/7e048083bb5dccde76018625b644c84b.webp',
+    avatar: `${QINIU_RESOURCE.url}/billd-live/image/7e048083bb5dccde76018625b644c84b.webp`,
     user_roles: [DEFAULT_ROLE_INFO.VIP_USER.id],
     live_room: {
       id: 6,

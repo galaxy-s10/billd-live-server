@@ -3,7 +3,7 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE, PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import { COMMON_HTTP_CODE, PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import { IAuth, IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import authService from '@/service/auth.service';
@@ -47,7 +47,7 @@ class AuthController {
   /** 获取我的权限 */
   getMyAuth = async (ctx: ParameterizedContext, next) => {
     const { code, userInfo, message } = await authJwt(ctx);
-    if (code !== ALLOW_HTTP_CODE.ok) {
+    if (code !== COMMON_HTTP_CODE.success) {
       throw new CustomError(message, code, code);
     }
     const res = await this.common.getUserAuth(userInfo!.id!);
@@ -150,8 +150,8 @@ class AuthController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的权限！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const result = await authService.findByPid(id);
@@ -166,8 +166,8 @@ class AuthController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的权限！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const result = await this.commonGetAllChildAuth(id);
@@ -187,16 +187,16 @@ class AuthController {
     if (!p_id) {
       throw new CustomError(
         'p_id不能为空！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const isExist = p_id === 0 ? false : await authService.isExist([p_id]);
     if (!isExist) {
       throw new CustomError(
         `不存在id为${p_id}的权限！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     await authService.create({
@@ -218,8 +218,8 @@ class AuthController {
       if (role.type === 1) {
         throw new CustomError(
           '测试环境不能操作默认权限！',
-          ALLOW_HTTP_CODE.forbidden,
-          ALLOW_HTTP_CODE.forbidden
+          COMMON_HTTP_CODE.forbidden,
+          COMMON_HTTP_CODE.forbidden
         );
       }
     }
@@ -229,22 +229,22 @@ class AuthController {
     if (!p_id) {
       throw new CustomError(
         `p_id不能为空！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     if (id === 1 && p_id !== 0) {
       throw new CustomError(
         `不能修改根权限的p_id哦！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     if (id === p_id) {
       throw new CustomError(
         `父权限不能等于子权限！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     if (id === 1) {
@@ -261,16 +261,16 @@ class AuthController {
       if (!isExist) {
         throw new CustomError(
           `${[id, p_id].toString()}中存在不存在的权限！`,
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
       const c_auth: any = await authService.find(p_id);
       if (id !== 1 && c_auth.p_id === id) {
         throw new CustomError(
           `不能将自己的子权限作为父权限！`,
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
       await authService.update({
@@ -295,8 +295,8 @@ class AuthController {
       if (role.type === 1) {
         throw new CustomError(
           '测试环境不能操作默认权限！',
-          ALLOW_HTTP_CODE.forbidden,
-          ALLOW_HTTP_CODE.forbidden
+          COMMON_HTTP_CODE.forbidden,
+          COMMON_HTTP_CODE.forbidden
         );
       }
     }
@@ -322,8 +322,8 @@ class AuthController {
     if (!id) {
       throw new CustomError(
         `id不能为空！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     if (PROJECT_ENV === PROJECT_ENV_ENUM.beta) {
@@ -331,8 +331,8 @@ class AuthController {
       if (role.type === 1) {
         throw new CustomError(
           '测试环境不能操作默认权限！',
-          ALLOW_HTTP_CODE.forbidden,
-          ALLOW_HTTP_CODE.forbidden
+          COMMON_HTTP_CODE.forbidden,
+          COMMON_HTTP_CODE.forbidden
         );
       }
     }
@@ -366,8 +366,8 @@ class AuthController {
     if (!id) {
       throw new CustomError(
         `id不能为空！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     if (PROJECT_ENV === PROJECT_ENV_ENUM.beta) {
@@ -375,31 +375,31 @@ class AuthController {
       if (role.type === 1) {
         throw new CustomError(
           `测试环境不能操作默认权限！`,
-          ALLOW_HTTP_CODE.forbidden,
-          ALLOW_HTTP_CODE.forbidden
+          COMMON_HTTP_CODE.forbidden,
+          COMMON_HTTP_CODE.forbidden
         );
       }
     }
     if (id === undefined) {
       throw new CustomError(
         `请传入id！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     if (!c_auths || !c_auths.length) {
       throw new CustomError(
         `请传入要删除的子权限！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const isExist = await authService.isExist([id, ...c_auths]);
     if (!isExist) {
       throw new CustomError(
         `${[id, ...c_auths].toString()}中存在不存在的权限！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const all_child_auths: any = await authService.findByPid(id);
@@ -408,8 +408,8 @@ class AuthController {
     if (hasDiff.length) {
       throw new CustomError(
         `${c_auths.toString()}中的权限父级id不是${id}！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const queue: any = [];

@@ -2,7 +2,7 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE } from '@/constant';
+import { COMMON_HTTP_CODE } from '@/constant';
 import { IList, IWallet } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import walletService from '@/service/wallet.service';
@@ -58,7 +58,7 @@ class LiveRoomController {
 
   findMyWallet = async (ctx: ParameterizedContext, next) => {
     const { code, userInfo, message } = await authJwt(ctx);
-    if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
+    if (code !== COMMON_HTTP_CODE.success || !userInfo) {
       throw new CustomError(message, code, code);
     }
     const result = await this.common.findByUserId(userInfo.id!);
@@ -73,8 +73,8 @@ class LiveRoomController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的直播间！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     await walletService.update({
@@ -99,8 +99,8 @@ class LiveRoomController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的直播间！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     await walletService.delete(id);

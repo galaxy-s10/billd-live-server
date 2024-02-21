@@ -3,7 +3,7 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt, signJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE, REDIS_PREFIX, THIRD_PLATFORM } from '@/constant';
+import { COMMON_HTTP_CODE, REDIS_PREFIX, THIRD_PLATFORM } from '@/constant';
 import authController from '@/controller/auth.controller';
 import redisController from '@/controller/redis.controller';
 import { IList } from '@/interface';
@@ -25,8 +25,8 @@ class UserController {
     if (!THIRD_PLATFORM[platform]) {
       throw new CustomError(
         'platform错误！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const res = await redisController.getVal({
@@ -47,8 +47,8 @@ class UserController {
     if (!THIRD_PLATFORM[platform]) {
       throw new CustomError(
         'platform错误！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     let { exp } = ctx.request.body;
@@ -89,8 +89,8 @@ class UserController {
     if (!userInfo) {
       throw new CustomError(
         '账号或密码错误！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const token = signJwt({
@@ -147,7 +147,7 @@ class UserController {
 
   async getUserInfo(ctx: ParameterizedContext, next) {
     const { code, userInfo, message } = await authJwt(ctx);
-    if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
+    if (code !== COMMON_HTTP_CODE.success || !userInfo) {
       throw new CustomError(message, code, code);
     }
     const [auths, result] = await Promise.all([
@@ -161,23 +161,23 @@ class UserController {
 
   async updatePwd(ctx: ParameterizedContext, next) {
     const { code, userInfo, message } = await authJwt(ctx);
-    if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
+    if (code !== COMMON_HTTP_CODE.success || !userInfo) {
       throw new CustomError(message, code, code);
     }
     const { oldpwd, newpwd } = ctx.request.body;
     if (!oldpwd || !newpwd) {
       throw new CustomError(
         `oldpwd和newpwd不能为空！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const user = await userService.findPwd(userInfo.id!);
     if (user?.password !== oldpwd) {
       throw new CustomError(
         `旧密码错误！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     await userService.updatePwd({
@@ -194,24 +194,24 @@ class UserController {
     if (!username) {
       throw new CustomError(
         'username不能为空！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const isExist = await userService.isExist([id]);
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的用户！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const isExistSameName = await userService.isSameName(username);
     if (isExistSameName && isExistSameName.id !== id) {
       throw new CustomError(
         `已存在用户名为${username}的用户！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     await userService.update({
@@ -233,8 +233,8 @@ class UserController {
     if (!user_roles || !user_roles.length) {
       throw new CustomError(
         'user_roles要求number[]！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
 
@@ -242,8 +242,8 @@ class UserController {
     if (!isExistUser) {
       throw new CustomError(
         `不存在id为${user_id}的用户！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const ids = arrayUnique(user_roles);
@@ -251,8 +251,8 @@ class UserController {
     if (!isExistRole) {
       throw new CustomError(
         `${ids.toString()}中存在不存在的角色！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const result = await roleService.updateUserRole({

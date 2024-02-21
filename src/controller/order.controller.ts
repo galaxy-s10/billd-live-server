@@ -3,7 +3,7 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE, REDIS_PREFIX } from '@/constant';
+import { COMMON_HTTP_CODE, REDIS_PREFIX } from '@/constant';
 import goodsControllerfrom from '@/controller/goods.controller';
 import redisController from '@/controller/redis.controller';
 import {
@@ -108,8 +108,8 @@ class OrderController {
     if (!goodsInfo) {
       throw new CustomError(
         `不存在该商品！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const { price, name: subject } = goodsInfo;
@@ -120,16 +120,16 @@ class OrderController {
       if (newmoney <= 0) {
         throw new CustomError(
           `付款金额不能小于或等于0！`,
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
       total_amount = (Number(newmoney) / 100).toFixed(2);
     } else if (Number(price) <= 0) {
       throw new CustomError(
         `付款金额不能小于或等于0！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const res = await aliPaySdk.precreate({
@@ -140,8 +140,8 @@ class OrderController {
     if (res.aliPayRes.code !== '10000') {
       throw new CustomError(
         res.aliPayRes.subMsg,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
 

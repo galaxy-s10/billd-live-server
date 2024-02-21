@@ -122,7 +122,7 @@ class TencentcloudClass {
     };
     try {
       const res = await this.liveClient.DropLiveStream(params);
-      console.log(chalkSUCCESS('断开直播推流成功！'));
+      console.log(chalkSUCCESS('断开直播推流成功！'), res);
       return { res };
     } catch (err) {
       console.log(err);
@@ -140,7 +140,7 @@ class TencentcloudClass {
       rtmp: `rtmp://${url}`,
       flv: `https://${url}.flv`,
       hls: `https://${url}.m3u8`,
-      udp: `webrtc://${url}`,
+      webrtc: `webrtc://${url}`,
     };
   };
 
@@ -158,10 +158,16 @@ class TencentcloudClass {
     const txSecret = cryptojs
       .MD5(TENCENTCLOUD_LIVE.Key + StreamName + Hex(txTime))
       .toString();
-    const url = `rtmp://${TENCENTCLOUD_LIVE.PushDomain}/${
-      TENCENTCLOUD_LIVE.AppName
-    }/${StreamName}?txSecret=${txSecret}&txTime=${Hex(txTime)}`;
-    return url;
+    const obsurl = `${TENCENTCLOUD_LIVE.PushDomain}/${TENCENTCLOUD_LIVE.AppName}/`;
+    const obskey = `${StreamName}?txSecret=${txSecret}&txTime=${Hex(txTime)}`;
+    const fullurl = `${obsurl}${obskey}`;
+    return {
+      obs: { url: obsurl, key: obskey },
+      rtmp: `rtmp://${fullurl}`,
+      flv: `https://${fullurl}.flv`,
+      hls: `https://${fullurl}.m3u8`,
+      webrtc: `webrtc://${fullurl}`,
+    };
   };
 }
 

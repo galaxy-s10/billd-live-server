@@ -34,9 +34,12 @@ export const handleRedisKeyExpired = () => {
 
         // 房间不直播了
         if (redisKey.indexOf(REDIS_PREFIX.roomIsLiveing) === 0) {
-          const liveId = redisKey.replace(`${REDIS_PREFIX.roomIsLiveing}`, '');
-          console.log('房间不直播了', liveId);
-          liveController.common.delete(+liveId);
+          const liveRoomId = redisKey.replace(
+            `${REDIS_PREFIX.roomIsLiveing}`,
+            ''
+          );
+          console.log('房间不直播了', liveRoomId);
+          liveController.common.deleteByLiveRoomId(+liveRoomId);
         }
       } catch (error) {
         console.log(error);

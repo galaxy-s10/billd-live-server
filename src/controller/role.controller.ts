@@ -3,7 +3,7 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE } from '@/constant';
+import { COMMON_HTTP_CODE } from '@/constant';
 import { IList, IRole } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import authService from '@/service/auth.service';
@@ -119,8 +119,8 @@ class RoleController {
     if (Number.isNaN(+id)) {
       throw new CustomError(
         `id格式不对`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const { rows } = await roleService.getAllList({
@@ -177,8 +177,8 @@ class RoleController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的角色！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const result = await roleService.getRoleAuth(id);
@@ -205,7 +205,7 @@ class RoleController {
   // 获取我的角色
   getMyRole = async (ctx: ParameterizedContext, next) => {
     const { code, userInfo, message } = await authJwt(ctx);
-    if (code !== ALLOW_HTTP_CODE.ok) {
+    if (code !== COMMON_HTTP_CODE.success) {
       throw new CustomError(message, code, code);
     }
     const result = await roleService.getUserRole(userInfo!.id!);
@@ -216,7 +216,7 @@ class RoleController {
   // 获取我的角色（递归找所有）
   getMyAllRole = async (ctx: ParameterizedContext, next) => {
     const { code, userInfo, message } = await authJwt(ctx);
-    if (code !== ALLOW_HTTP_CODE.ok) {
+    if (code !== COMMON_HTTP_CODE.success) {
       throw new CustomError(message, code, code);
     }
     const result = await this.common.getUserAllRole(userInfo!.id!);
@@ -239,8 +239,8 @@ class RoleController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的角色！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const result = await this.common.getAllChildRole(id);
@@ -256,8 +256,8 @@ class RoleController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的角色！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const result = await roleService.findByPid(id);
@@ -273,16 +273,16 @@ class RoleController {
     if (!role_auths) {
       throw new CustomError(
         `role_auths不能为空`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const isExistRole = await roleService.isExist([id]);
     if (!isExistRole) {
       throw new CustomError(
         `不存在id为${id}的角色！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const isExistAuth =
@@ -290,8 +290,8 @@ class RoleController {
     if (!isExistAuth) {
       throw new CustomError(
         `${role_auths.toString()}中存在不存在的权限！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const role: any = await roleService.find(id);
@@ -308,22 +308,22 @@ class RoleController {
     if (!p_id) {
       throw new CustomError(
         `p_id不能为空！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     if (id === 1 && p_id !== 0) {
       throw new CustomError(
         `不能修改根角色的p_id！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     if (id === p_id) {
       throw new CustomError(
         `父角色不能等于子角色！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     if (id === 1) {
@@ -340,16 +340,16 @@ class RoleController {
       if (!isExist) {
         throw new CustomError(
           `${[id, p_id].toString()}中存在不存在的角色！`,
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
       const c_role: any = await roleService.find(p_id);
       if (id !== 1 && c_role.p_id === id) {
         throw new CustomError(
           `不能将自己的子角色作为父角色！`,
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
       await roleService.update({
@@ -379,8 +379,8 @@ class RoleController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${p_id!}的角色！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     await roleService.create({
@@ -401,30 +401,30 @@ class RoleController {
     if (!id) {
       throw new CustomError(
         `id不能为空！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     if (id === undefined) {
       throw new CustomError(
         `id不能为空！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     if (!c_roles || !c_roles.length) {
       throw new CustomError(
         `请传入要删除的子角色！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const isExist = await roleService.isExist([id, ...c_roles]);
     if (!isExist) {
       throw new CustomError(
         `${[id, ...c_roles].toString()}中存在不存在的角色！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const all_child_roles: any = await roleService.findByPid(id);
@@ -433,8 +433,8 @@ class RoleController {
     if (hasDiff.length) {
       throw new CustomError(
         `${c_roles.toString()}中的角色父级id不是${id}！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const queue: any = [];
@@ -460,37 +460,37 @@ class RoleController {
     if (!id) {
       throw new CustomError(
         `id不能为空！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     if (id === undefined) {
       throw new CustomError(
         `请传入id！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     if (!c_roles || !c_roles.length) {
       throw new CustomError(
         `请传入要新增的子角色！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     if (c_roles.includes(id)) {
       throw new CustomError(
         `父级角色不能在子角色里面！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const isExist = await roleService.isExist([id, ...c_roles]);
     if (!isExist) {
       throw new CustomError(
         `${[id, ...c_roles].toString()}中存在不存在的角色！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const result1: any = await roleService.findAllByInId(c_roles);
@@ -499,8 +499,8 @@ class RoleController {
     if (!isUnique) {
       throw new CustomError(
         `${c_roles.toString()}不是同一个父级角色！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     await roleService.updateMany(c_roles, id);
@@ -514,16 +514,16 @@ class RoleController {
     if (id === 1) {
       throw new CustomError(
         `不能删除根角色！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const role: any = await roleService.find(id);
     if (!role) {
       throw new CustomError(
         `不存在id为${id}的角色！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const auths = await role.getAuths();

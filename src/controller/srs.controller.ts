@@ -9,7 +9,7 @@ import { rimrafSync } from 'rimraf';
 import successHandler from '@/app/handler/success-handle';
 import { wsSocket } from '@/config/websocket';
 import {
-  ALLOW_HTTP_CODE,
+  COMMON_HTTP_CODE,
   DEFAULT_AUTH_INFO,
   LOCALHOST_URL,
   SCHEDULE_TYPE,
@@ -105,8 +105,8 @@ class SRSController {
       if (livePlayInfo.end_time) {
         throw new CustomError(
           `已观看结束，不能踢了`,
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
       res = await this.common.deleteApiV1Clients(livePlayInfo.srs_client_id!);

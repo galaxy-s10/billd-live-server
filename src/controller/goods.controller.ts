@@ -1,7 +1,7 @@
 import { ParameterizedContext } from 'koa';
 
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE } from '@/constant';
+import { COMMON_HTTP_CODE } from '@/constant';
 import { IGoods, IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import goodsService from '@/service/goods.service';
@@ -86,8 +86,8 @@ class GoodsController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的商品！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     await goodsService.update({
@@ -142,8 +142,8 @@ class GoodsController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的商品！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     await goodsService.delete(id);

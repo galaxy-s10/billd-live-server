@@ -73,7 +73,7 @@ class RedisController {
   }) => {
     const createdAt = +new Date();
     // 执行HSET命令并指定已存在的字段，那么这个字段的值会被新值覆盖。
-    // 你不希望覆盖已存在的字段的值，你可以使用HSETNX命令，这个命令只有在指定的字段不存在时，才会设置值。
+    // 你不希望覆盖已存在的字段的值，你可以使用hSetNX命令，这个命令只有在指定的字段不存在时，才会设置值。
     const res = await redisClient.hSet(
       data.key,
       data.field,
@@ -88,6 +88,11 @@ class RedisController {
 
   delHashVal = async (data: { key: string; field: string }) => {
     const res = await redisClient.hDel(data.key, data.field);
+    return res;
+  };
+
+  setExpire = async (data: { key: string; seconds: number }) => {
+    const res = await redisClient.expire(data.key, data.seconds);
     return res;
   };
 

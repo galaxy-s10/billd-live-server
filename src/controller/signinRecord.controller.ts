@@ -3,7 +3,7 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE } from '@/constant';
+import { COMMON_HTTP_CODE } from '@/constant';
 import signinStatisticsController from '@/controller/signinStatistics.controller';
 import {
   IList,
@@ -77,7 +77,7 @@ class SigninRecordController {
 
   todayIsSignin = async (ctx: ParameterizedContext, next) => {
     const { code, errorCode, userInfo, message } = await authJwt(ctx);
-    if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
+    if (code !== COMMON_HTTP_CODE.success || !userInfo) {
       throw new CustomError(message, code, errorCode);
     }
     const res = await this.common.todayIsSignin(userInfo.id!);
@@ -87,15 +87,15 @@ class SigninRecordController {
 
   create = async (ctx: ParameterizedContext, next) => {
     const { code, errorCode, userInfo, message } = await authJwt(ctx);
-    if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
+    if (code !== COMMON_HTTP_CODE.success || !userInfo) {
       throw new CustomError(message, code, errorCode);
     }
     const today = await this.common.todayIsSignin(userInfo.id!);
     if (today) {
       throw new CustomError(
         `今天已签到过了！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const { live_room_id }: ISigninRecord = ctx.request.body;

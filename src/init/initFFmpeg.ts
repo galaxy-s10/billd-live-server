@@ -132,7 +132,7 @@ async function addLive({
     if (res) {
       rtmp_url = tencentcloudUtils.getPushUrl({
         roomId: live_room_id,
-      });
+      }).rtmp;
       const pullUrlRes = tencentcloudUtils.getPullUrl({
         roomId: live_room_id,
       });

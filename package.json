@@ -8,7 +8,7 @@
   "license": "MIT",
   "author": "shuisheng <2274751790@qq.com>",
   "scripts": {
-    "build": "rimraf dist && tsc -P ./tsconfig.json || true",
+    "build": "rimraf dist && tsc -P ./tsconfig.prod.json || true",
     "cz": "cz",
     "copy": "ts-node ./deploy/handleGiteeJenkins.mjs",
     "dev": "cross-env NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=development NODE_APP_RELEASE_PROJECT_PORT=4300 nodemon --exec node -r @swc-node/register ./src/index.ts",
@@ -25,7 +25,7 @@
     "release:first": "standard-version --first-release",
     "start:beta": "cross-env NODE_ENV=production NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=4300 nodemon ./dist/index.js",
     "start:prod": "cross-env NODE_ENV=production NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=prod NODE_APP_RELEASE_PROJECT_PORT=4200 nodemon ./dist/index.js",
-    "typecheck": "tsc -p ./tsconfig.json --noEmit"
+    "typecheck": "tsc -p ./tsconfig.prod.json --noEmit"
   },
   "config": {
     "commitizen": {
@@ -38,8 +38,8 @@
     "amqplib": "^0.10.3",
     "autocannon": "^7.14.0",
     "axios": "^1.4.0",
-    "billd-deploy": "^1.0.16",
-    "billd-html-webpack-plugin": "^1.0.5",
+    "billd-deploy": "^1.0.23",
+    "billd-html-webpack-plugin": "^1.0.6",
     "billd-scss": "^0.0.8",
     "billd-utils": "^0.0.22",
     "chalk": "^4.1.2",
@@ -69,6 +69,7 @@
     "rimraf": "^5.0.1",
     "sequelize": "^6.32.1",
     "socket.io": "^4.7.2",
+    "socket.io-msgpack-parser": "^3.0.2",
     "ssh2": "^1.7.0",
     "tencentcloud-sdk-nodejs": "^4.0.616",
     "trash": "^8.1.1"

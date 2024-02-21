@@ -43,6 +43,7 @@ import {
 } from '@/types/websocket';
 import { chalkERROR, chalkWARN } from '@/utils/chalkTip';
 import { mp4PushRtmp, webmToMp4 } from '@/utils/process';
+import { tencentcloudUtils } from '@/utils/tencentcloud';
 
 import { startBlobIsExistSchedule } from '../schedule/blobIsExist';
 
@@ -67,6 +68,8 @@ export async function handleWsJoin(args: {
   }
   socket.join(`${roomId}`);
   console.log(chalkWARN(`${socket.id}进入房间号:${roomId}`));
+  const roomsMap = io.of('/').adapter.rooms;
+  const socketList = roomsMap.get(`${data.data.live_room_id}`);
   socketEmit<WsJoinType['data']>({
     socket,
     msgType: WsMsgTypeEnum.joined,
@@ -76,6 +79,7 @@ export async function handleWsJoin(args: {
       live_room_id: roomId,
       live_room: liveRoomInfo,
       user_info: data.user_info,
+      socket_list: socketList ? [...socketList] : [],
     },
   });
   liveRedisController.setUserJoinedRoom({
@@ -92,6 +96,7 @@ export async function handleWsJoin(args: {
         data: {
           live_room: liveRoomInfo,
           anchor_socket_id: liveInfo.socket_id!,
+          socket_list: socketList ? [...socketList] : [],
         },
       });
       liveRedisController.setUserJoinedRoom({
@@ -107,6 +112,7 @@ export async function handleWsJoin(args: {
         data: {
           live_room: liveRoomInfo,
           anchor_socket_id: liveInfo.socket_id!,
+          socket_list: socketList ? [...socketList] : [],
         },
       });
       liveRedisController.setUserJoinedRoom({
@@ -117,8 +123,6 @@ export async function handleWsJoin(args: {
       });
     }
   }
-  const roomsMap = io.of('/').adapter.rooms;
-  const socketList = roomsMap.get(`${data.data.live_room_id}`);
   socketEmit<WsOtherJoinType['data']>({
     socket,
     msgType: WsMsgTypeEnum.otherJoin,
@@ -278,14 +282,10 @@ export function handleWsDisconnecting(args: { io: Server; socket: Socket }) {
             userId
           );
           if (userLiveRoomInfo) {
-            if (
-              userLiveRoomInfo.live_room?.type === LiveRoomTypeEnum.user_wertc
-            ) {
-              liveService.deleteByLiveRoomIdAndSocketId({
-                live_room_id: userLiveRoomInfo.live_room_id!,
-                socket_id: socket.id,
-              });
-            }
+            liveService.deleteByLiveRoomIdAndSocketId({
+              live_room_id: userLiveRoomInfo.live_room_id!,
+              socket_id: socket.id,
+            });
           }
         }
       })
@@ -317,24 +317,24 @@ export async function handleWsRoomNoLive(args: {
     msgType: WsMsgTypeEnum.roomNoLive,
     data: { live_room: userLiveRoomInfo.live_room! },
   });
-  if (userLiveRoomInfo.live_room?.type === LiveRoomTypeEnum.user_wertc) {
-    liveService.deleteByLiveRoomId(roomId);
-  } else if (userLiveRoomInfo.live_room?.type === LiveRoomTypeEnum.user_msr) {
-    liveService.deleteByLiveRoomId(roomId);
-    nodeSchedule.cancelJob(`${SCHEDULE_TYPE.blobIsExist}___${roomId}`);
-    console.log('收到主播断开直播，删除直播间的webm目录');
-    const roomDir = path.resolve(WEBM_DIR, `roomId_${roomId}`);
-    if (fs.existsSync(roomDir)) {
-      rimrafSync(roomDir);
-    }
+  tencentcloudUtils.dropLiveStream({
+    roomId,
+  });
+  liveService.deleteByLiveRoomId(roomId);
+  console.log('收到主播断开直播，删除直播间的webm目录');
+  nodeSchedule.cancelJob(`${SCHEDULE_TYPE.blobIsExist}___${roomId}`);
+  const roomDir = path.resolve(WEBM_DIR, `roomId_${roomId}`);
+  if (fs.existsSync(roomDir)) {
+    rimrafSync(roomDir);
   }
 }
 
 export async function handleWsStartLive(args: {
+  io: Server;
   socket: Socket;
   data: WsStartLiveType;
 }) {
-  const { socket, data } = args;
+  const { io, socket, data } = args;
   const userId = data.user_info?.id;
   if (!userId) {
     console.log(chalkERROR('userId为空'));
@@ -354,9 +354,14 @@ export async function handleWsStartLive(args: {
     name: data.data.name,
     type: data.data.type,
   });
+  liveRedisController.setLiveRoomIsLiving({
+    socketId: data.socket_id,
+    liveRoomId: Number(roomId),
+    client_ip: getSocketRealIp(socket),
+  });
   if (
-    data.data.type === LiveRoomTypeEnum.user_wertc ||
-    data.data.type === LiveRoomTypeEnum.user_wertc_meeting
+    data.data.type === LiveRoomTypeEnum.wertc_live ||
+    data.data.type === LiveRoomTypeEnum.wertc_meeting_one
   ) {
     await liveService.create({
       live_room_id: Number(roomId),
@@ -365,6 +370,8 @@ export async function handleWsStartLive(args: {
       track_audio: 1,
       track_video: 1,
     });
+    const roomsMap = io.of('/').adapter.rooms;
+    const socketList = roomsMap.get(`${roomId}`);
     socketEmit<WsRoomLivingType['data']>({
       msgType: WsMsgTypeEnum.roomLiving,
       roomId,
@@ -372,9 +379,10 @@ export async function handleWsStartLive(args: {
       data: {
         live_room: userLiveRoomInfo.live_room!,
         anchor_socket_id: data.socket_id,
+        socket_list: socketList ? [...socketList] : [],
       },
     });
-  } else if (data.data.type === LiveRoomTypeEnum.user_msr) {
+  } else if (data.data.type === LiveRoomTypeEnum.msr) {
     /**
      * 业务设计：
      * 1，客户端开始msr直播，携带delay、max_delay参数
@@ -446,9 +454,11 @@ export async function handleWsStartLive(args: {
         token: liveRoomInfo!.key!,
       });
     }, msrMaxDelay);
-  } else if (data.data.type === LiveRoomTypeEnum.user_pk) {
+  } else if (
+    data.data.type === LiveRoomTypeEnum.pk ||
+    data.data.type === LiveRoomTypeEnum.tencent_css_pk
+  ) {
     try {
-      console.log('livePkKeylivePkKey');
       const pkKey = getRandomString(8);
       await redisController.setExVal({
         prefix: REDIS_PREFIX.livePkKey,
@@ -500,7 +510,6 @@ export async function handleWsUpdateJoinInfo(args: {
   });
   liveRoomService.update({
     id: data.data.live_room_id,
-    rtmp_url: data.data.rtmp_url,
   });
   if (data.data.track) {
     liveService.updateByRoomId({

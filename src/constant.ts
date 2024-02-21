@@ -1,3 +1,4 @@
+import { prodDomain } from './spec-config';
 import { resolveApp } from './utils';
 
 export enum PROJECT_ENV_ENUM {
@@ -21,17 +22,17 @@ export enum QINIU_UPLOAD_PROGRESS_TYPE {
 }
 
 export const QINIU_BACKUP = {
-  domain: 'backup.hsslive.cn',
-  url: 'http://backup.hsslive.cn/',
+  domain: `backup.${prodDomain}`,
+  url: `http://backup.${prodDomain}/`,
   bucket: 'hss-backup',
   prefix: {
-    'mysql/': 'mysql/',
+    'billd-live/mysql/': 'billd-live/mysql/',
   },
 };
 
-export const QINIU_LIVE = {
-  domain: 'resource.hsslive.cn',
-  url: 'https://resource.hsslive.cn/',
+export const QINIU_RESOURCE = {
+  domain: `resource.${prodDomain}`,
+  url: `https://resource.${prodDomain}`,
   bucket: 'hssblog',
   prefix: {
     'billd-live/image/': 'billd-live/image/',
@@ -40,12 +41,13 @@ export const QINIU_LIVE = {
 };
 
 export const CORS_ALLOW_ORIGIN: string | string[] = [
-  'https://www.hsslive.cn',
-  'https://admin.hsslive.cn',
-  'https://live.hsslive.cn',
-  'https://live-admin.hsslive.cn',
-  'https://live-api.hsslive.cn',
-  'https://nuxt2.hsslive.cn',
+  `https://www.${prodDomain}`,
+  `https://admin.${prodDomain}`,
+  `https://live.${prodDomain}`,
+  `https://live-admin.${prodDomain}`,
+  `https://nuxt2.${prodDomain}`,
+  `https://next.${prodDomain}`,
+  `https://project.${prodDomain}`,
 ];
 
 /** 消息最大长度 */
@@ -81,23 +83,15 @@ export const SECRETTEMP_FILE =
     ? resolveApp('/dist/secret/secretTemp.js')
     : resolveApp('/src/secret/secretTemp.ts'); // 秘钥文件模板
 
-export const QQ_MAIL_CONFIG = {
-  from: '2274751790@qq.com', // sender address
-  to: '2274751790@qq.com', // list of receivers
-};
-
 export const maxBitrate = 1000 * 3; // 最大码率，3m
 
 export const SERVER_VIDEO_DIR = '/node/video/'; // 服务器video目录
 export const LOCALHOST_URL = 'localhost'; // 本地地址，一般是localhost或者127.0.0.1，但也可以是其他本地地址，如192.168.x.x
 export const DOMAIN_URL = 'localhost'; // 本地地址，一般是localhost或者127.0.0.1，但也可以是其他本地地址，如192.168.x.x
 
-// .hsslive.cn
-export const COOKIE_DOMAIN = '.hsslive.cn';
-
-export const ERROR_BUSINESS_CODE = {
+export const COMMON_ERROR_CODE = {
   serverError: 10000, // 服务器错误
-  banIp: 1000,
+  banIp: 1000, // 黑名单禁用了ip
   adminDisableUser: 1001, // 管理员禁用了用户
   notFound: 1002, // 返回了404的http状态码
   errStatusCode: 1003, // 返回了即不是200也不是404的http状态码
@@ -105,8 +99,8 @@ export const ERROR_BUSINESS_CODE = {
   balanceNotEnough: 1005, // 余额不足
 };
 
-export const ALLOW_HTTP_CODE = {
-  ok: 200, // 成功
+export const COMMON_HTTP_CODE = {
+  success: 200, // 成功
   apiCache: 304, // 接口缓存
   paramsError: 400, // 参数错误
   unauthorized: 401, // 未授权
@@ -116,7 +110,7 @@ export const ALLOW_HTTP_CODE = {
   serverError: 500, // 服务器错误
 };
 
-export const HTTP_ERROE_MSG = {
+export const COMMON_ERROE_MSG = {
   paramsError: '参数错误！',
   unauthorized: '未授权！',
   forbidden: '权限不足！',
@@ -124,7 +118,7 @@ export const HTTP_ERROE_MSG = {
   serverError: '服务器错误！',
 };
 
-export const HTTP_SUCCESS_MSG = {
+export const COMMON_SUCCESS_MSG = {
   GET: '获取成功！',
   POST: '新增成功！',
   PUT: '修改成功！',
@@ -139,6 +133,7 @@ export const BLACKLIST_TYPE = {
 export const SCHEDULE_TYPE = {
   verifyStream: 'handleVerifyStream',
   blobIsExist: 'blobIsExist',
+  liveRoomIsLive: 'liveRoomIsLive',
 };
 
 export const COMMON_ERR_MSG = {
@@ -166,8 +161,8 @@ export const REDIS_PREFIX = {
   kick: `${REDIS_PREFIX_ENV}kick___`, // 踢掉用户
   liveRoomOnlineUser: `${REDIS_PREFIX_ENV}liveRoomOnlineUser___`, // 直播间在线用户
   livePkKey: `${REDIS_PREFIX_ENV}livePkKey___`, // 直播间打pk秘钥
-  dbLiveList: `${REDIS_PREFIX_ENV}dbLiveList___`, // 直播间打pk秘钥
-  dbLiveRoomHistoryMsgList: `${REDIS_PREFIX_ENV}dbLiveRoomHistoryMsgList___`, // 直播间打pk秘钥
+  dbLiveList: `${REDIS_PREFIX_ENV}dbLiveList___`, // 直播间在线列表
+  dbLiveRoomHistoryMsgList: `${REDIS_PREFIX_ENV}dbLiveRoomHistoryMsgList___`, // 直播间历史消息
 };
 
 export const IS_UPLOAD_SERVER = !(PROJECT_ENV === PROJECT_ENV_ENUM.prod); // 是否上传到服务器

@@ -1,7 +1,7 @@
 import { ParameterizedContext } from 'koa';
 
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE, MSG_MAX_LENGTH, REDIS_PREFIX } from '@/constant';
+import { COMMON_HTTP_CODE, MSG_MAX_LENGTH, REDIS_PREFIX } from '@/constant';
 import { IList, IWsMessage } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import wsMessageService from '@/service/wsMessage.service';
@@ -29,8 +29,8 @@ class WsMessageController {
       if (content && content?.length > MSG_MAX_LENGTH) {
         throw new CustomError(
           `消息长度最大${MSG_MAX_LENGTH}！`,
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
       return wsMessageService.create({
@@ -174,8 +174,8 @@ class WsMessageController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的消息！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     await wsMessageService.delete(id);

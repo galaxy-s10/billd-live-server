@@ -2,9 +2,9 @@ import { filterObj } from 'billd-utils';
 import jwt from 'jsonwebtoken';
 
 import {
-  ALLOW_HTTP_CODE,
+  COMMON_ERROR_CODE,
   COMMON_ERR_MSG,
-  ERROR_BUSINESS_CODE,
+  COMMON_HTTP_CODE,
 } from '@/constant';
 import { JWT_SECRET } from '@/secret/secret';
 import userService from '@/service/user.service';
@@ -30,7 +30,7 @@ export const jwtVerify = (token: string) => {
         if (err.message.indexOf('invalid') !== -1) {
           message = COMMON_ERR_MSG.invalidToken;
         }
-        resolve({ code: ALLOW_HTTP_CODE.unauthorized, message });
+        resolve({ code: COMMON_HTTP_CODE.unauthorized, message });
         return;
       }
       async function main() {
@@ -42,7 +42,7 @@ export const jwtVerify = (token: string) => {
           if (!userResult) {
             // 这个用户已经被删除了
             resolve({
-              code: ALLOW_HTTP_CODE.unauthorized,
+              code: COMMON_HTTP_CODE.unauthorized,
               message: '该用户不存在！',
             });
             return;
@@ -50,7 +50,7 @@ export const jwtVerify = (token: string) => {
           if (userResult.token !== token) {
             // 异地登录（防止修改密码后，原本的token还能用）
             resolve({
-              code: ALLOW_HTTP_CODE.unauthorized,
+              code: COMMON_HTTP_CODE.unauthorized,
               message: COMMON_ERR_MSG.jwtExpired,
             });
             return;
@@ -58,19 +58,19 @@ export const jwtVerify = (token: string) => {
           if (userResult.status === UserStatusEnum.disable) {
             // 账号被禁用了
             resolve({
-              code: ALLOW_HTTP_CODE.unauthorized,
-              errorCode: ERROR_BUSINESS_CODE.adminDisableUser,
+              code: COMMON_HTTP_CODE.unauthorized,
+              errorCode: COMMON_ERROR_CODE.adminDisableUser,
               message: COMMON_ERR_MSG.adminDisableUser,
             });
             return;
           }
           resolve({
-            code: ALLOW_HTTP_CODE.ok,
+            code: COMMON_HTTP_CODE.success,
             message: '验证token通过！',
             userInfo: filterObj(userResult.get(), ['token']),
           });
         } catch (error: any) {
-          resolve({ code: ALLOW_HTTP_CODE.paramsError, message: error });
+          resolve({ code: COMMON_HTTP_CODE.paramsError, message: error });
         }
       }
       // 如果token正确，解密token获取用户id，根据id查数据库的token判断是否一致。
@@ -85,7 +85,7 @@ export const jwtVerify = (token: string) => {
 export const authJwt = async (ctx) => {
   // 首先判断请求头有没有authorization
   if (ctx.req.headers.authorization === undefined) {
-    return { code: ALLOW_HTTP_CODE.unauthorized, message: '未登录！' };
+    return { code: COMMON_HTTP_CODE.unauthorized, message: '未登录！' };
   }
 
   const token = ctx.req.headers.authorization?.split(' ')[1];

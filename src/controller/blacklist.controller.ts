@@ -1,7 +1,7 @@
 import { ParameterizedContext } from 'koa';
 
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE } from '@/constant';
+import { COMMON_HTTP_CODE } from '@/constant';
 import { IBlacklist, IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import blacklistService from '@/service/blacklist.service';
@@ -57,8 +57,8 @@ class BlacklistController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的黑名单！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     await blacklistService.update({
@@ -89,8 +89,8 @@ class BlacklistController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的黑名单！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     await blacklistService.delete(id);

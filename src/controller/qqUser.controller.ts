@@ -4,8 +4,7 @@ import { ParameterizedContext } from 'koa';
 import { authJwt, signJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import {
-  ALLOW_HTTP_CODE,
-  COOKIE_DOMAIN,
+  COMMON_HTTP_CODE,
   DEFAULT_ROLE_INFO,
   PROJECT_ENV,
   PROJECT_ENV_ENUM,
@@ -23,15 +22,16 @@ import qqUserService from '@/service/qqUser.service';
 import thirdUserService from '@/service/thirdUser.service';
 import userService from '@/service/user.service';
 import walletService from '@/service/wallet.service';
+import { prodDomain } from '@/spec-config';
 import { IQqUser } from '@/types/IUser';
 import { myaxios } from '@/utils/request';
 
-// WARN 有时候qq登录的回调会是这样的：https://admin.hsslive.cn/oauth/qq_login?error=100070&error_description=the+account+has+security+exception&state=99
+// WARN 有时候qq登录的回调会是这样的：https://admin.xxx.cn/oauth/qq_login?error=100070&error_description=the+account+has+security+exception&state=99
 // WARN 即qq那边的回调错误，导致这个的原因可能是科学上网，关掉科学上网或者换个节点应该就能解决。
 
 // WARN 目前的流程是qq授权成功后，postmessage给本地的页面发通知
 // 然后本地发起请求，如果本地调用线上的https接口，Set-Cookie会不生效（因为子域名、主域名都不一样，
-// 本地是localhost，而线上是hsslive.cn），虽然Set-Cookie不生效，但是仍然会返回token，因此
+// 本地是localhost，而线上是xxx.cn），虽然Set-Cookie不生效，但是仍然会返回token，因此
 // 上层的应用（也就是前后台的页面）可以使用返回的token，不使用cookie
 // 如果是线上环境，就没有这个问题，因为主域名一样，只是子域名不一样。
 
@@ -160,8 +160,8 @@ class QqUserController {
     if (accessToken.error) {
       throw new CustomError(
         JSON.stringify(accessToken),
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     console.log('getAccessToken成功');
@@ -173,8 +173,8 @@ class QqUserController {
     if (error) {
       throw new CustomError(
         `qq登录getMeOauth错误`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     console.log('getMeOauth成功');
@@ -233,18 +233,18 @@ class QqUserController {
            * secure
            * 一个布尔值，指示是否仅发送 cookie 通过 HTTPS（对于 HTTP，默认为 false，对于 HTTPS 默认为 true）。
            * 这里判断如果是本地开发，就设置false，因为本地是http://localhost，不是https，如果是线上，就设置
-           * true，因为线上是https://admin.hsslive.cn
+           * true，因为线上是https://admin.xxx.cn
            */
           secure: false,
           /**
            * domain
-           * 设置域名为hsslive.cn，因为接口服务部署在api.hsslive.cn，在admin.hsslive.cn请求api.hsslive.cn，默认api.hsslive.cn的Set-Cookie
-           * 设置的domain是api.hsslive.cn，不会设置到admin.hsslive.cn站点下，因此手动设置domain为hsslive.cn
+           * 设置域名为xxx.cn，因为接口服务部署在api.xxx.cn，在admin.xxx.cn请求api.xxx.cn，默认api.xxx.cn的Set-Cookie
+           * 设置的domain是api.xxx.cn，不会设置到admin.xxx.cn站点下，因此手动设置domain为xxx.cn
            */
           domain:
             ctx.header.origin?.indexOf('localhost') !== -1
               ? 'localhost'
-              : COOKIE_DOMAIN,
+              : `${prodDomain}`,
         });
       } else {
         console.log('不存在qq账号，非localhost设置cookie', token);
@@ -255,18 +255,18 @@ class QqUserController {
            * secure
            * 一个布尔值，指示是否仅发送 cookie 通过 HTTPS（对于 HTTP，默认为 false，对于 HTTPS 默认为 true）。
            * 这里判断如果是本地开发，就设置false，因为本地是http://localhost，不是https，如果是线上，就设置
-           * true，因为线上是https://admin.hsslive.cn
+           * true，因为线上是https://admin.xxx.cn
            */
           secure: true,
           /**
            * domain
-           * 设置域名为hsslive.cn，因为接口服务部署在api.hsslive.cn，在admin.hsslive.cn请求api.hsslive.cn，默认api.hsslive.cn的Set-Cookie
-           * 设置的domain是api.hsslive.cn，不会设置到admin.hsslive.cn站点下，因此手动设置domain为hsslive.cn
+           * 设置域名为xxx.cn，因为接口服务部署在api.xxx.cn，在admin.xxx.cn请求api.xxx.cn，默认api.xxx.cn的Set-Cookie
+           * 设置的domain是api.xxx.cn，不会设置到admin.xxx.cn站点下，因此手动设置domain为xxx.cn
            */
           domain:
             ctx.header.origin?.indexOf('localhost') !== -1
               ? 'localhost'
-              : COOKIE_DOMAIN,
+              : `${prodDomain}`,
         });
       }
       successHandler({ ctx, data: token, message: 'qq登录成功！' });
@@ -277,8 +277,8 @@ class QqUserController {
       if (!oldQqUser) {
         throw new CustomError(
           `qq登录oldQqUser错误`,
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
       const thirdUserInfo = await thirdUserService.findUser({
@@ -288,16 +288,16 @@ class QqUserController {
       if (!thirdUserInfo) {
         throw new CustomError(
           `qq登录thirdUserInfo错误`,
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
       const userInfo = await userService.find(thirdUserInfo.user_id!);
       if (!userInfo) {
         throw new CustomError(
           `qq登录userInfo错误`,
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
       const token = signJwt({
@@ -320,18 +320,18 @@ class QqUserController {
            * secure
            * 一个布尔值，指示是否仅发送 cookie 通过 HTTPS（对于 HTTP，默认为 false，对于 HTTPS 默认为 true）。
            * 这里判断如果是本地开发，就设置false，因为本地是http://localhost，不是https，如果是线上，就设置
-           * true，因为线上是https://admin.hsslive.cn
+           * true，因为线上是https://admin.xxx.cn
            */
           secure: false,
           /**
            * domain
-           * 设置域名为hsslive.cn，因为接口服务部署在api.hsslive.cn，在admin.hsslive.cn请求api.hsslive.cn，默认api.hsslive.cn的Set-Cookie
-           * 设置的domain是api.hsslive.cn，不会设置到admin.hsslive.cn站点下，因此手动设置domain为hsslive.cn
+           * 设置域名为xxx.cn，因为接口服务部署在api.xxx.cn，在admin.xxx.cn请求api.xxx.cn，默认api.xxx.cn的Set-Cookie
+           * 设置的domain是api.xxx.cn，不会设置到admin.xxx.cn站点下，因此手动设置domain为xxx.cn
            */
           domain:
             ctx.header.origin?.indexOf('localhost') !== -1
               ? 'localhost'
-              : COOKIE_DOMAIN,
+              : `${prodDomain}`,
         });
       } else {
         console.log('已存在qq账号，非localhost设置cookie', token);
@@ -342,18 +342,18 @@ class QqUserController {
            * secure
            * 一个布尔值，指示是否仅发送 cookie 通过 HTTPS（对于 HTTP，默认为 false，对于 HTTPS 默认为 true）。
            * 这里判断如果是本地开发，就设置false，因为本地是http://localhost，不是https，如果是线上，就设置
-           * true，因为线上是https://admin.hsslive.cn
+           * true，因为线上是https://admin.xxx.cn
            */
           secure: true,
           /**
            * domain
-           * 设置域名为hsslive.cn，因为接口服务部署在api.hsslive.cn，在admin.hsslive.cn请求api.hsslive.cn，默认api.hsslive.cn的Set-Cookie
-           * 设置的domain是api.hsslive.cn，不会设置到admin.hsslive.cn站点下，因此手动设置domain为hsslive.cn
+           * 设置域名为xxx.cn，因为接口服务部署在api.xxx.cn，在admin.xxx.cn请求api.xxx.cn，默认api.xxx.cn的Set-Cookie
+           * 设置的domain是api.xxx.cn，不会设置到admin.xxx.cn站点下，因此手动设置domain为xxx.cn
            */
           domain:
             ctx.header.origin?.indexOf('localhost') !== -1
               ? 'localhost'
-              : COOKIE_DOMAIN,
+              : `${prodDomain}`,
         });
       }
       successHandler({ ctx, data: token, message: 'qq登录成功！' });
@@ -412,7 +412,7 @@ class QqUserController {
     const { code } = ctx.request.body; // 注意此code会在10分钟内过期。
 
     const { code: authCode, userInfo, message } = await authJwt(ctx);
-    if (authCode !== ALLOW_HTTP_CODE.ok) {
+    if (authCode !== COMMON_HTTP_CODE.success) {
       throw new CustomError(message, authCode, authCode);
     }
     const result: any = await thirdUserService.findByUserId(userInfo!.id!);
@@ -422,8 +422,8 @@ class QqUserController {
     if (ownIsBind.length) {
       throw new CustomError(
         `你已经绑定过qq，请先解绑原qq！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const accessToken = await this.getAccessToken(code);
@@ -451,8 +451,8 @@ class QqUserController {
     if (isExist) {
       throw new CustomError(
         `该qq账号已被其他人绑定了！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const qqUser: any = await qqUserService.create(qqUserInfo);
@@ -516,8 +516,8 @@ class QqUserController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的qq用户！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const result = await qqUserService.delete(id);

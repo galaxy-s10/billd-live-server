@@ -4,10 +4,10 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
 import {
-  ALLOW_HTTP_CODE,
   BLACKLIST_TYPE,
+  COMMON_ERROR_CODE,
   COMMON_ERR_MSG,
-  ERROR_BUSINESS_CODE,
+  COMMON_HTTP_CODE,
 } from '@/constant';
 import authController from '@/controller/auth.controller';
 import blacklistController from '@/controller/blacklist.controller';
@@ -73,15 +73,15 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
     // 频繁操作
     throw new CustomError(
       `当前ip:${ip}调用api频繁,${COMMON_ERR_MSG.banIp}`,
-      ALLOW_HTTP_CODE.forbidden,
-      ERROR_BUSINESS_CODE.banIp
+      COMMON_HTTP_CODE.forbidden,
+      COMMON_ERROR_CODE.banIp
     );
   } else if (inBlacklist?.type === BLACKLIST_TYPE.adminDisableUser) {
     // 管理员手动禁用
     throw new CustomError(
       COMMON_ERR_MSG.adminDisableUser,
-      ALLOW_HTTP_CODE.forbidden,
-      ERROR_BUSINESS_CODE.adminDisableUser
+      COMMON_HTTP_CODE.forbidden,
+      COMMON_ERROR_CODE.adminDisableUser
     );
   }
 
@@ -100,8 +100,8 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
       });
       throw new CustomError(
         `当前ip:${ip}调用api频繁,${COMMON_ERR_MSG.banIp}`,
-        ALLOW_HTTP_CODE.forbidden,
-        ERROR_BUSINESS_CODE.banIp
+        COMMON_HTTP_CODE.forbidden,
+        COMMON_ERROR_CODE.banIp
       );
     }
   }
@@ -127,7 +127,7 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
     return;
   }
   const { code, message } = await authJwt(ctx);
-  if (code !== ALLOW_HTTP_CODE.ok) {
+  if (code !== COMMON_HTTP_CODE.success) {
     consoleEnd();
     throw new CustomError(message, code, code);
   }
@@ -144,7 +144,7 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
 export const apiVerifyAuth = (shouldAuthArr: string[]) => {
   return async (ctx: ParameterizedContext, next) => {
     const { code, userInfo, message } = await authJwt(ctx);
-    if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
+    if (code !== COMMON_HTTP_CODE.success || !userInfo) {
       throw new CustomError(message, code, code);
     }
     const myAllAuths = await authController.common.getUserAuth(userInfo.id!);
@@ -154,8 +154,8 @@ export const apiVerifyAuth = (shouldAuthArr: string[]) => {
     if (diffArr.length > 0) {
       throw new CustomError(
         `缺少${diffArr.join()}权限！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
+        COMMON_HTTP_CODE.forbidden,
+        COMMON_HTTP_CODE.forbidden
       );
     } else {
       await next();

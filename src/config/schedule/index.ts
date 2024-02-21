@@ -1,5 +1,7 @@
-import { startSchedule } from '@/config/schedule/verifyStream';
+import { startLiveRoomIsLiveSchedule } from '@/config/schedule/liveRoomIsLive/';
+import { startVerifyStreamSchedule } from '@/config/schedule/verifyStream';
 
 export const initSchedule = () => {
-  startSchedule();
+  startVerifyStreamSchedule();
+  startLiveRoomIsLiveSchedule();
 };

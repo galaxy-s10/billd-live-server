@@ -4,7 +4,7 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE } from '@/constant';
+import { COMMON_HTTP_CODE } from '@/constant';
 import liveRoomController from '@/controller/liveRoom.controller';
 import { IList, IUserLiveRoom } from '@/interface';
 import { CustomError } from '@/model/customError.model';
@@ -79,8 +79,8 @@ class UserLiveRoomController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的用户直播间！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     await userLiveRoomService.update({
@@ -94,15 +94,15 @@ class UserLiveRoomController {
 
   create = async (ctx: ParameterizedContext, next) => {
     const { code, userInfo, message } = await authJwt(ctx);
-    if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
+    if (code !== COMMON_HTTP_CODE.success || !userInfo) {
       throw new CustomError(message, code, code);
     }
     const isExist = await this.common.findByUserId(userInfo.id!);
     if (isExist) {
       throw new CustomError(
         `你已开通直播间！`,
-        ALLOW_HTTP_CODE.forbidden,
-        ALLOW_HTTP_CODE.forbidden
+        COMMON_HTTP_CODE.forbidden,
+        COMMON_HTTP_CODE.forbidden
       );
     }
 
@@ -112,7 +112,7 @@ class UserLiveRoomController {
     const liveRoom = await liveRoomController.common.create({
       name: `${userInfo.username!.slice(0, 10)}的直播间`,
       key: rtmptoken,
-      type: LiveRoomTypeEnum.user_obs,
+      type: LiveRoomTypeEnum.obs,
       weight: 21,
       cdn: LiveRoomUseCDNEnum.no,
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
@@ -155,8 +155,8 @@ class UserLiveRoomController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的用户直播间！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     await userLiveRoomService.delete(id);

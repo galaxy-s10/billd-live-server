@@ -5,7 +5,7 @@ import { ParameterizedContext } from 'koa';
 import { signJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import {
-  ALLOW_HTTP_CODE,
+  COMMON_HTTP_CODE,
   PROJECT_ENV,
   PROJECT_ENV_ENUM,
   THIRD_PLATFORM,
@@ -87,8 +87,8 @@ class InitController {
       } else {
         throw new CustomError(
           '已经初始化过分区，不能再初始化了！',
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
     },
@@ -99,8 +99,8 @@ class InitController {
       } else {
         throw new CustomError(
           '已经初始化过直播配置，不能再初始化了！',
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
     },
@@ -111,8 +111,8 @@ class InitController {
       } else {
         throw new CustomError(
           '已经初始化过角色，不能再初始化了！',
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
     },
@@ -123,8 +123,8 @@ class InitController {
       } else {
         throw new CustomError(
           '已经初始化过权限了，不能再初始化了！',
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
     },
@@ -135,8 +135,8 @@ class InitController {
       } else {
         throw new CustomError(
           '已经初始化过商品了，不能再初始化了！',
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
     },
@@ -147,8 +147,8 @@ class InitController {
       } else {
         throw new CustomError(
           '已经初始化过角色权限了，不能再初始化了！',
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
     },
@@ -271,8 +271,8 @@ class InitController {
       // } else {
       //   throw new CustomError(
       //     `已经初始化过${mockDayDataModel.name}表了，不能再初始化了！`,
-      //     ALLOW_HTTP_CODE.paramsError,
-      //     ALLOW_HTTP_CODE.paramsError
+      //     COMMON_HTTP_CODE.paramsError,
+      //     COMMON_HTTP_CODE.paramsError
       //   );
       // }
     },
@@ -348,8 +348,8 @@ class InitController {
     // if (PROJECT_ENV !== PROJECT_ENV_ENUM.development) {
     //   throw new CustomError(
     //     '非开发环境，不能初始化用户！',
-    //     ALLOW_HTTP_CODE.paramsError,
-    //     ALLOW_HTTP_CODE.paramsError
+    //     COMMON_HTTP_CODE.paramsError,
+    //     COMMON_HTTP_CODE.paramsError
     //   );
     // }
     await this.common.initUser();
@@ -407,8 +407,8 @@ class InitController {
     if (PROJECT_ENV !== PROJECT_ENV_ENUM.development) {
       throw new CustomError(
         '非开发环境，不能重建表！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     await Promise.all([
@@ -435,8 +435,8 @@ class InitController {
     if (PROJECT_ENV !== PROJECT_ENV_ENUM.development) {
       throw new CustomError(
         '非开发环境，不能删除用户！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const { userId } = ctx.request.body;
@@ -447,8 +447,8 @@ class InitController {
       throw new CustomError(
         // eslint-disable-next-line
         `不存在id为${userId}的用户！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const promise1: any[] = [];

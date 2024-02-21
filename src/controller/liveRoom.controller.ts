@@ -4,7 +4,7 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE, REDIS_PREFIX } from '@/constant';
+import { COMMON_HTTP_CODE, REDIS_PREFIX } from '@/constant';
 import redisController from '@/controller/redis.controller';
 import { IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
@@ -100,15 +100,15 @@ class LiveRoomController {
 
   updateKey = async (ctx: ParameterizedContext, next) => {
     const { code, userInfo, message } = await authJwt(ctx);
-    if (code !== ALLOW_HTTP_CODE.ok || !userInfo) {
+    if (code !== COMMON_HTTP_CODE.success || !userInfo) {
       throw new CustomError(message, code, code);
     }
     const liveRoom = await userLiveRoomService.findByUserId(userInfo.id || -1);
     if (!liveRoom) {
       throw new CustomError(
         `你还没有开通直播间！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     } else {
       const key = cryptojs
@@ -210,8 +210,8 @@ class LiveRoomController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的直播间！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     await liveRoomService.delete(id);

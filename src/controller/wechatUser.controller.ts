@@ -4,7 +4,7 @@ import { ParameterizedContext } from 'koa';
 import { signJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import {
-  ALLOW_HTTP_CODE,
+  COMMON_HTTP_CODE,
   DEFAULT_ROLE_INFO,
   PROJECT_ENV,
   PROJECT_ENV_ENUM,
@@ -156,8 +156,8 @@ class WechatUserController {
     if (!THIRD_PLATFORM[platform]) {
       throw new CustomError(
         'platform错误！',
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     let { exp } = ctx.request.body;
@@ -171,8 +171,8 @@ class WechatUserController {
     if (accessToken.errcode) {
       throw new CustomError(
         JSON.stringify(accessToken),
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     console.log('getAccessToken成功');
@@ -184,8 +184,8 @@ class WechatUserController {
     if (wxUserInfo.errcode) {
       throw new CustomError(
         `wechat登录getUserInfo错误`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     console.log('wechat登录getUserInfo成功');
@@ -272,8 +272,8 @@ class WechatUserController {
       if (!oldWechatUser) {
         throw new CustomError(
           `wechat登录oldWechatUser错误`,
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
       const thirdUserInfo = await thirdUserService.findUser({
@@ -283,16 +283,16 @@ class WechatUserController {
       if (!thirdUserInfo) {
         throw new CustomError(
           `wechat登录thirdUserInfo错误`,
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
       const userInfo = await userService.find(thirdUserInfo.user_id!);
       if (!userInfo) {
         throw new CustomError(
           `wechat登录userInfo错误`,
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
       const token = signJwt({
@@ -415,8 +415,8 @@ class WechatUserController {
     if (!isExist) {
       throw new CustomError(
         `不存在id为${id}的wechat用户！`,
-        ALLOW_HTTP_CODE.paramsError,
-        ALLOW_HTTP_CODE.paramsError
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
       );
     }
     const result = await wechatUserService.delete(id);

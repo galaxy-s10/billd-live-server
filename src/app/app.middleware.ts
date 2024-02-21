@@ -2,9 +2,9 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
 import {
-  ALLOW_HTTP_CODE,
+  COMMON_ERROR_CODE,
+  COMMON_HTTP_CODE,
   CORS_ALLOW_ORIGIN,
-  ERROR_BUSINESS_CODE,
   PROJECT_ENV,
 } from '@/constant';
 import logController from '@/controller/log.controller';
@@ -14,7 +14,7 @@ import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 // 全局错误处理中间件
 export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
   const insertLog = async (info: {
-    statusCode: number;
+    httpStatusCode: number;
     errorCode: number;
     duration: number;
     error: string;
@@ -41,7 +41,7 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
           // ctx.request.hostname存在时获取主机名。当 app.proxy 是 true 时支持 X-Forwarded-Host，否则使用 Host。
           api_hostname: ctx.request.hostname, // ctx.request.hostname不带端口号;ctx.request.host带端口号
           api_path: ctx.request.path,
-          api_status_code: info.statusCode,
+          api_status_code: info.httpStatusCode,
           api_error: info.error,
           api_err_msg: info.message,
           api_duration: info.duration,
@@ -84,8 +84,8 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
       console.log('白名单，不插入日志');
       return;
     }
-    const statusCode = ctx.status;
-    const msg = `【ERROR】客户端请求:${ctx.request.method} ${ctx.request.path},服务端响应http状态码:${statusCode}`;
+    const httpStatusCode = ctx.status;
+    const msg = `【ERROR】客户端请求:${ctx.request.method} ${ctx.request.path},服务端响应http状态码:${httpStatusCode}`;
     /**
      * 如果通过了catchErrorMiddle中间件，但是返回的状态不是200，
      * 代表了在next前面没有设置ctx状态码，因此默认就是返回404！
@@ -94,17 +94,17 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
      * 让catchErrorMiddle中间件判断错误，并且返回错误数据！
      */
     if (
-      statusCode !== ALLOW_HTTP_CODE.ok &&
-      statusCode !== ALLOW_HTTP_CODE.apiCache
+      httpStatusCode !== COMMON_HTTP_CODE.success &&
+      httpStatusCode !== COMMON_HTTP_CODE.apiCache
     ) {
       if (
-        [ALLOW_HTTP_CODE.notFound, ALLOW_HTTP_CODE.methodNotAllowed].includes(
-          statusCode
+        [COMMON_HTTP_CODE.notFound, COMMON_HTTP_CODE.methodNotAllowed].includes(
+          httpStatusCode
         )
       ) {
         const defaultSuccess = {
-          statusCode,
-          errorCode: statusCode,
+          httpStatusCode,
+          errorCode: httpStatusCode,
           error: msg,
           message: msg,
           duration,
@@ -116,8 +116,8 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
         insertLog(defaultSuccess);
       } else {
         const defaultSuccess = {
-          statusCode,
-          errorCode: ERROR_BUSINESS_CODE.errStatusCode,
+          httpStatusCode,
+          errorCode: COMMON_ERROR_CODE.errStatusCode,
           error: msg,
           message: msg,
           duration,
@@ -128,11 +128,11 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
         );
         insertLog(defaultSuccess);
       }
-      throw new CustomError(msg, statusCode, statusCode);
+      throw new CustomError(msg, httpStatusCode, httpStatusCode);
     } else {
       const defaultSuccess = {
-        statusCode,
-        errorCode: statusCode,
+        httpStatusCode,
+        errorCode: httpStatusCode,
         error: '请求成功！',
         message: '请求成功！',
         duration,
@@ -149,8 +149,8 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
     ctx.app.emit('error', error, ctx);
     if (!(error instanceof CustomError)) {
       const defaultError = {
-        statusCode: ALLOW_HTTP_CODE.serverError,
-        errorCode: ERROR_BUSINESS_CODE.serverError,
+        httpStatusCode: COMMON_HTTP_CODE.serverError,
+        errorCode: COMMON_ERROR_CODE.serverError,
         error: error?.message,
         message: '服务器错误！',
         duration,
@@ -161,13 +161,12 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
     }
     // 是CustomError，判断errorCode，非法的错误（频繁请求和被禁用）不写入日志
     if (
-      ![
-        ERROR_BUSINESS_CODE.banIp,
-        ERROR_BUSINESS_CODE.adminDisableUser,
-      ].includes(error.errorCode)
+      ![COMMON_ERROR_CODE.banIp, COMMON_ERROR_CODE.adminDisableUser].includes(
+        error.errorCode
+      )
     ) {
       insertLog({
-        statusCode: error.statusCode,
+        httpStatusCode: error.httpStatusCode,
         error: error.message,
         errorCode: error.errorCode,
         message: error.message,

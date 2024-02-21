@@ -1,7 +1,7 @@
 import { ParameterizedContext } from 'koa';
 
 import successHandler from '@/app/handler/success-handle';
-import { ALLOW_HTTP_CODE } from '@/constant';
+import { COMMON_HTTP_CODE } from '@/constant';
 import { IList, ILivePlay } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import livePlayService from '@/service/livePlay.service';
@@ -65,8 +65,8 @@ class LivePlayController {
       if (!isExist) {
         throw new CustomError(
           `不存在id为${id}的直播！`,
-          ALLOW_HTTP_CODE.paramsError,
-          ALLOW_HTTP_CODE.paramsError
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
         );
       }
       await livePlayService.delete(id);
