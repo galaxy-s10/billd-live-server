@@ -141,19 +141,27 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
   consoleEnd();
 };
 
+export async function handleVerifyAuth({ ctx, shouldAuthArr }) {
+  const { code, userInfo, message } = await authJwt(ctx);
+  if (code !== COMMON_HTTP_CODE.success || !userInfo) {
+    throw new CustomError(message, code, code);
+  }
+  const myAllAuths = await authController.common.getUserAuth(userInfo.id!);
+
+  const myAllAuthsArr = myAllAuths.map((v) => v.auth_value!);
+  const diffArr = getArrayDifference(shouldAuthArr, myAllAuthsArr);
+  if (diffArr.length > 0) {
+    return { flag: false, userInfo, diffArr };
+  }
+  return { flag: true, userInfo, diffArr: [] };
+}
+
 export const apiVerifyAuth = (shouldAuthArr: string[]) => {
   return async (ctx: ParameterizedContext, next) => {
-    const { code, userInfo, message } = await authJwt(ctx);
-    if (code !== COMMON_HTTP_CODE.success || !userInfo) {
-      throw new CustomError(message, code, code);
-    }
-    const myAllAuths = await authController.common.getUserAuth(userInfo.id!);
-
-    const myAllAuthsArr = myAllAuths.map((v) => v.auth_value!);
-    const diffArr = getArrayDifference(shouldAuthArr, myAllAuthsArr);
-    if (diffArr.length > 0) {
+    const res = await handleVerifyAuth({ ctx, shouldAuthArr });
+    if (!res.flag) {
       throw new CustomError(
-        `缺少${diffArr.join()}权限！`,
+        `缺少${res.diffArr.join()}权限！`,
         COMMON_HTTP_CODE.forbidden,
         COMMON_HTTP_CODE.forbidden
       );
