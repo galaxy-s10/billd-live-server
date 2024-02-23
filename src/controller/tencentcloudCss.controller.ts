@@ -6,6 +6,7 @@ import { COMMON_HTTP_CODE, DEFAULT_AUTH_INFO } from '@/constant';
 import liveController from '@/controller/live.controller';
 import liveRecordController from '@/controller/liveRecord.controller';
 import { CustomError } from '@/model/customError.model';
+import liveRoomService from '@/service/liveRoom.service';
 import { tencentcloudUtils } from '@/utils/tencentcloud';
 
 class TencentcloudCssController {
@@ -21,13 +22,21 @@ class TencentcloudCssController {
         COMMON_HTTP_CODE.forbidden,
         COMMON_HTTP_CODE.forbidden
       );
-    } else {
-      await next();
     }
-    const res = tencentcloudUtils.getPushUrl({
+    const pushRes = tencentcloudUtils.getPushUrl({
       roomId: liveRoomId,
     });
+    const pullRes = tencentcloudUtils.getPullUrl({
+      roomId: liveRoomId,
+    });
+
     await Promise.all([
+      liveRoomService.update({
+        id: liveRoomId,
+        rtmp_url: pullRes.rtmp,
+        flv_url: pullRes.flv,
+        hls_url: pullRes.hls,
+      }),
       liveController.common.create({
         live_room_id: liveRoomId,
         user_id: authRes.userInfo.id,
@@ -56,7 +65,7 @@ class TencentcloudCssController {
         view: 0,
       }),
     ]);
-    successHandler({ ctx, data: res });
+    successHandler({ ctx, data: pushRes });
     await next();
   }
 }

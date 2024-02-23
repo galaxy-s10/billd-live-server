@@ -1,9 +1,8 @@
 import { exec, spawnSync } from 'child_process';
 
-import { PROJECT_ENV, PROJECT_ENV_ENUM, SRS_CB_URL_PARAMS } from '@/constant';
+import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import srsController from '@/controller/srs.controller';
 import { initUser } from '@/init/initUser';
-import { SERVER_LIVE } from '@/secret/secret';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
 import {
@@ -51,7 +50,12 @@ async function addLive({
   let flv_url = '';
   let hls_url = '';
   let rtmp_url = '';
-  let token = '';
+  let webrtc_url = '';
+  let push_rtmp_url = '';
+  let push_obs_server = '';
+  let push_obs_stream_key = '';
+  let push_webrtc_url = '';
+  let push_srt_url = '';
   async function main() {
     await liveService.deleteByLiveRoomId(live_room_id);
     // 开发环境时判断devFFmpeg，是true的才初始化ffmpeg
@@ -79,11 +83,7 @@ async function addLive({
       // ]);
       // const { pid } = ffmpegCmd;
       // console.log(chalkWARN('ffmpeg进程pid'), pid);
-      const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec copy -acodec copy -f flv '${rtmp_url}${
-        cdn === LiveRoomUseCDNEnum.no
-          ? `?${SRS_CB_URL_PARAMS.publishKey}=${token}`
-          : ''
-      }'`;
+      const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec copy -acodec copy -f flv '${push_rtmp_url}'`;
       // const ffmpegSyncCmd = `${ffmpegCmd} 1>/dev/null 2>&1 &`;
       try {
         // WARN 使用execSync的话，命令最后需要添加：1>/dev/null 2>&1 &，否则会自动退出进程；
@@ -111,9 +111,13 @@ async function addLive({
       rtmp_url,
       flv_url,
       hls_url,
+      webrtc_url,
+      push_rtmp_url,
+      push_obs_server,
+      push_obs_stream_key,
+      push_webrtc_url,
+      push_srt_url,
       type: LiveRoomTypeEnum.system,
-      // status: LiveRoomStatusEnum.normal,
-      // is_show: LiveRoomIsShowEnum.yes,
     });
   }
 
@@ -130,14 +134,21 @@ async function addLive({
     });
     if (err) return;
     if (res) {
-      rtmp_url = tencentcloudUtils.getPushUrl({
+      const pushRes = tencentcloudUtils.getPushUrl({
         roomId: live_room_id,
-      }).rtmp;
+      });
+      push_rtmp_url = pushRes.push_rtmp_url;
+      push_obs_server = pushRes.push_obs_server;
+      push_obs_stream_key = pushRes.push_obs_stream_key;
+      push_webrtc_url = pushRes.push_webrtc_url;
+      push_srt_url = pushRes.push_srt_url;
       const pullUrlRes = tencentcloudUtils.getPullUrl({
         roomId: live_room_id,
       });
+      rtmp_url = pullUrlRes.rtmp;
       flv_url = pullUrlRes.flv;
       hls_url = pullUrlRes.hls;
+      webrtc_url = pullUrlRes.webrtc;
       await main();
       // 这个不能省，cdn不是推流到srs的，所以不能用不了srs的onpublish回调
       liveService.create({
@@ -152,11 +163,25 @@ async function addLive({
 
   if (cdn === LiveRoomUseCDNEnum.no) {
     const liveRoomInfo = await liveRoomService.findKey(live_room_id);
-    token = liveRoomInfo!.key!;
-    rtmp_url = `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}`;
-    flv_url = `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.flv`;
-    hls_url = `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.m3u8`;
-    await main();
+    const key = liveRoomInfo?.key;
+    if (key) {
+      const pushRes = srsController.common.getPushUrl({
+        liveRoomId: live_room_id,
+        type: LiveRoomTypeEnum.system,
+        key,
+      });
+      push_rtmp_url = pushRes.push_rtmp_url;
+      push_obs_server = pushRes.push_obs_server;
+      push_obs_stream_key = pushRes.push_obs_stream_key;
+      push_webrtc_url = pushRes.push_webrtc_url;
+      push_srt_url = pushRes.push_srt_url;
+      const pullRes = srsController.common.getPullUrl(live_room_id);
+      rtmp_url = pullRes.rtmp;
+      flv_url = pullRes.flv;
+      hls_url = pullRes.hls;
+      webrtc_url = pullRes.webrtc;
+      await main();
+    }
   }
 }
 

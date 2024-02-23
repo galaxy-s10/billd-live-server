@@ -19,6 +19,7 @@ import {
 import authController from '@/controller/auth.controller';
 import liveRoomController from '@/controller/liveRoom.controller';
 import redisController from '@/controller/redis.controller';
+import srsController from '@/controller/srs.controller';
 import wsMessageController from '@/controller/wsMessage.controller';
 import { WsMessageMsgIsVerifyEnum } from '@/interface';
 import liveService from '@/service/live.service';
@@ -347,12 +348,32 @@ export async function handleWsStartLive(args: {
   }
   const roomId = userLiveRoomInfo.live_room_id!;
   const liveRoomInfo = await liveRoomService.findKey(roomId);
+  let pullRes: {
+    rtmp: string;
+    flv: string;
+    hls: string;
+    webrtc: string;
+  };
+  if (
+    [LiveRoomTypeEnum.tencent_css, LiveRoomTypeEnum.tencent_css_pk].includes(
+      data.data.type
+    )
+  ) {
+    pullRes = tencentcloudUtils.getPullUrl({
+      roomId,
+    });
+  } else {
+    pullRes = srsController.common.getPullUrl(roomId);
+  }
 
   liveRoomService.update({
     id: roomId,
     cover_img: data.data.cover_img,
     name: data.data.name,
     type: data.data.type,
+    rtmp_url: pullRes.rtmp,
+    flv_url: pullRes.flv,
+    hls_url: pullRes.hls,
   });
   liveRedisController.setLiveRoomIsLiving({
     socketId: data.socket_id,

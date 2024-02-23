@@ -59,16 +59,34 @@ const model = sequelize.define<LiveRoomModel>(
       type: DataTypes.TEXT,
     },
     bg_img: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(200),
     },
     rtmp_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(200),
     },
     flv_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(200),
     },
     hls_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(200),
+    },
+    webrtc_url: {
+      type: DataTypes.STRING(200),
+    },
+    push_rtmp_url: {
+      type: DataTypes.STRING(200),
+    },
+    push_obs_server: {
+      type: DataTypes.STRING(200),
+    },
+    push_obs_stream_key: {
+      type: DataTypes.STRING(200),
+    },
+    push_webrtc_url: {
+      type: DataTypes.STRING(200),
+    },
+    push_srt_url: {
+      type: DataTypes.STRING(200),
     },
   },
   {

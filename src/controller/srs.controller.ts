@@ -22,10 +22,13 @@ import livePlayController from '@/controller/livePlay.controller';
 import liveRecordController from '@/controller/liveRecord.controller';
 import userLiveRoomController from '@/controller/userLiveRoom.controller';
 import { CustomError } from '@/model/customError.model';
-import { SRS_CONFIG } from '@/secret/secret';
+import { SERVER_LIVE, SRS_CONFIG } from '@/secret/secret';
 import liveRoomService from '@/service/liveRoom.service';
 import userService from '@/service/user.service';
-import { LiveRoomPullIsShouldAuthEnum } from '@/types/ILiveRoom';
+import {
+  LiveRoomPullIsShouldAuthEnum,
+  LiveRoomTypeEnum,
+} from '@/types/ILiveRoom';
 import { IApiV1Clients, IApiV1Streams, ISrsCb, ISrsRTC } from '@/types/srs';
 import { WsMsgTypeEnum } from '@/types/websocket';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
@@ -49,6 +52,28 @@ class SRSController {
       myaxios.delete(
         `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port[1985]}/api/v1/clients/${clientId}`
       ),
+    getPullUrl: (liveRoomId: number) => {
+      return {
+        rtmp: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${liveRoomId}`,
+        flv: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${liveRoomId}.flv`,
+        hls: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${liveRoomId}.m3u8`,
+        webrtc: ``,
+      };
+    },
+    getPushUrl: (data: {
+      liveRoomId: number;
+      type: LiveRoomTypeEnum;
+      key: string;
+    }) => {
+      const key = `?${SRS_CB_URL_PARAMS.publishType}=${data.type}&${SRS_CB_URL_PARAMS.publishKey}=${data.key}`;
+      return {
+        push_rtmp_url: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${data.liveRoomId}${key}`,
+        push_obs_server: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${data.liveRoomId}`,
+        push_obs_stream_key: key,
+        push_webrtc_url: ``,
+        push_srt_url: ``,
+      };
+    },
   };
 
   rtcV1Publish = async (ctx: ParameterizedContext, next) => {

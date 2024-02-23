@@ -8,10 +8,11 @@ import { COMMON_HTTP_CODE, REDIS_PREFIX } from '@/constant';
 import redisController from '@/controller/redis.controller';
 import { IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
-import { SERVER_LIVE } from '@/secret/secret';
 import liveRoomService from '@/service/liveRoom.service';
 import userLiveRoomService from '@/service/userLiveRoom.service';
 import { ILiveRoom } from '@/types/ILiveRoom';
+
+import srsController from './srs.controller';
 
 class LiveRoomController {
   common = {
@@ -33,6 +34,12 @@ class LiveRoomController {
       rtmp_url,
       flv_url,
       hls_url,
+      webrtc_url,
+      push_rtmp_url,
+      push_obs_server,
+      push_obs_stream_key,
+      push_webrtc_url,
+      push_srt_url,
       hidden_cover_img,
       orderBy = 'asc',
       orderName = 'id',
@@ -55,6 +62,12 @@ class LiveRoomController {
       rtmp_url,
       flv_url,
       hls_url,
+      webrtc_url,
+      push_rtmp_url,
+      push_obs_server,
+      push_obs_stream_key,
+      push_webrtc_url,
+      push_srt_url,
       hidden_cover_img,
       orderBy,
       orderName,
@@ -114,15 +127,21 @@ class LiveRoomController {
       const key = cryptojs
         .MD5(`${+new Date()}___${getRandomString(6)}`)
         .toString();
-      const rtmp_url = `${SERVER_LIVE.PushDomain}/${
-        SERVER_LIVE.AppName
-      }/roomId___${liveRoom.live_room!.id!}`;
+      const pushRes = srsController.common.getPushUrl({
+        liveRoomId: liveRoom.live_room!.id!,
+        type: liveRoom.live_room!.type!,
+        key,
+      });
       await this.common.update({
         id: liveRoom.live_room!.id!,
         key,
-        rtmp_url,
+        push_rtmp_url: pushRes.push_rtmp_url,
+        push_obs_server: pushRes.push_obs_server,
+        push_obs_stream_key: pushRes.push_obs_stream_key,
+        push_webrtc_url: pushRes.push_webrtc_url,
+        push_srt_url: pushRes.push_srt_url,
       });
-      successHandler({ ctx, data: { rtmp_url, key } });
+      successHandler({ ctx, data: pushRes });
     }
     await next();
   };
@@ -143,6 +162,12 @@ class LiveRoomController {
       cdn,
       flv_url,
       hls_url,
+      webrtc_url,
+      push_rtmp_url,
+      push_obs_server,
+      push_obs_stream_key,
+      push_webrtc_url,
+      push_srt_url,
     }: ILiveRoom = ctx.request.body;
     await this.common.create({
       status,
@@ -160,6 +185,12 @@ class LiveRoomController {
       rtmp_url,
       flv_url,
       hls_url,
+      webrtc_url,
+      push_rtmp_url,
+      push_obs_server,
+      push_obs_stream_key,
+      push_webrtc_url,
+      push_srt_url,
     });
     successHandler({ ctx });
     await next();
@@ -182,6 +213,12 @@ class LiveRoomController {
       cdn,
       flv_url,
       hls_url,
+      webrtc_url,
+      push_rtmp_url,
+      push_obs_server,
+      push_obs_stream_key,
+      push_webrtc_url,
+      push_srt_url,
     }: ILiveRoom = ctx.request.body;
     await this.common.update({
       id,
@@ -199,6 +236,12 @@ class LiveRoomController {
       rtmp_url,
       flv_url,
       hls_url,
+      webrtc_url,
+      push_rtmp_url,
+      push_obs_server,
+      push_obs_stream_key,
+      push_webrtc_url,
+      push_srt_url,
     });
     successHandler({ ctx });
     await next();

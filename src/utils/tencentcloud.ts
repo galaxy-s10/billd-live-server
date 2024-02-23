@@ -101,11 +101,11 @@ class TencentcloudClass {
 
     try {
       const res = await this.liveClient.DescribeLiveStreamOnlineList(params);
-      console.log(chalkSUCCESS('查询直播中的流成功！'));
+      console.log(chalkSUCCESS('查询腾讯云直播中的流成功！'));
       return { res };
     } catch (err) {
       console.log(err);
-      console.log(chalkERROR('查询直播中的流错误！'));
+      console.log(chalkERROR('查询腾讯云直播中的流错误！'));
       return { err };
     }
   };
@@ -122,11 +122,11 @@ class TencentcloudClass {
     };
     try {
       const res = await this.liveClient.DropLiveStream(params);
-      console.log(chalkSUCCESS('断开直播推流成功！'), res);
+      console.log(chalkSUCCESS('断开腾讯云直播推流成功！'), res);
       return { res };
     } catch (err) {
       console.log(err);
-      console.log(chalkERROR('断开直播推流错误！'));
+      console.log(chalkERROR('断开腾讯云直播推流错误！'));
       return { err };
     }
   };
@@ -158,15 +158,13 @@ class TencentcloudClass {
     const txSecret = cryptojs
       .MD5(TENCENTCLOUD_LIVE.Key + StreamName + Hex(txTime))
       .toString();
-    const obsurl = `${TENCENTCLOUD_LIVE.PushDomain}/${TENCENTCLOUD_LIVE.AppName}/`;
-    const obskey = `${StreamName}?txSecret=${txSecret}&txTime=${Hex(txTime)}`;
-    const fullurl = `${obsurl}${obskey}`;
+    const key = `${StreamName}?txSecret=${txSecret}&txTime=${Hex(txTime)}`;
     return {
-      obs: { url: obsurl, key: obskey },
-      rtmp: `rtmp://${fullurl}`,
-      flv: `https://${fullurl}.flv`,
-      hls: `https://${fullurl}.m3u8`,
-      webrtc: `webrtc://${fullurl}`,
+      push_rtmp_url: `rtmp://${TENCENTCLOUD_LIVE.PushDomain}/${TENCENTCLOUD_LIVE.AppName}/${key}`,
+      push_obs_server: `rtmp://${TENCENTCLOUD_LIVE.PushDomain}/${TENCENTCLOUD_LIVE.AppName}/`,
+      push_obs_stream_key: key,
+      push_webrtc_url: `webrtc://${TENCENTCLOUD_LIVE.PushDomain}/${TENCENTCLOUD_LIVE.AppName}/${StreamName}${key}`,
+      push_srt_url: ``,
     };
   };
 }
