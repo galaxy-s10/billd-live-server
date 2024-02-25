@@ -125,7 +125,24 @@ class LiveRoomService {
         },
       ],
       attributes: {
-        exclude: hidden_cover_img ? ['key', 'cover_img'] : ['key'],
+        exclude: hidden_cover_img
+          ? [
+              'key',
+              'push_rtmp_url',
+              'push_obs_server',
+              'push_obs_stream_key',
+              'push_webrtc_url',
+              'push_srt_url',
+              'cover_img',
+            ]
+          : [
+              'key',
+              'push_rtmp_url',
+              'push_obs_server',
+              'push_obs_stream_key',
+              'push_webrtc_url',
+              'push_srt_url',
+            ],
         // include: [
         //   [col('user_live_room.id'), 'idd'],
         //   [col('user_live_room.user.id'), 'user_id'],
@@ -171,7 +188,14 @@ class LiveRoomService {
         },
       ],
       attributes: {
-        exclude: ['key'],
+        exclude: [
+          'key',
+          'push_rtmp_url',
+          'push_obs_server',
+          'push_obs_stream_key',
+          'push_webrtc_url',
+          'push_srt_url',
+        ],
       },
       where: { id },
     });
@@ -181,7 +205,14 @@ class LiveRoomService {
   /** 查找直播间key */
   async findKey(id: number) {
     const result = await liveRoomModel.findOne({
-      attributes: ['key'],
+      attributes: [
+        'key',
+        'push_rtmp_url',
+        'push_obs_server',
+        'push_obs_stream_key',
+        'push_webrtc_url',
+        'push_srt_url',
+      ],
       where: { id },
       include: [
         {

@@ -130,7 +130,14 @@ class AreaService {
         },
       ],
       attributes: {
-        exclude: ['key'],
+        exclude: [
+          'key',
+          'push_rtmp_url',
+          'push_obs_server',
+          'push_obs_stream_key',
+          'push_webrtc_url',
+          'push_srt_url',
+        ],
       },
       where: { ...subWhere },
     });
@@ -205,7 +212,14 @@ class AreaService {
             {
               model: liveRoomModel,
               attributes: {
-                exclude: ['key'],
+                exclude: [
+                  'key',
+                  'push_rtmp_url',
+                  'push_obs_server',
+                  'push_obs_stream_key',
+                  'push_webrtc_url',
+                  'push_srt_url',
+                ],
               },
               include: [
                 {
@@ -256,6 +270,16 @@ class AreaService {
       include: [
         {
           model: liveRoomModel,
+          attributes: {
+            exclude: [
+              'key',
+              'push_rtmp_url',
+              'push_obs_server',
+              'push_obs_stream_key',
+              'push_webrtc_url',
+              'push_srt_url',
+            ],
+          },
         },
       ],
       where: { id },
