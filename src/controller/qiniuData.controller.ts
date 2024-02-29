@@ -37,16 +37,25 @@ import QiniuUtils, { IQiniuKey } from '@/utils/qiniu';
 import { myaxios } from '@/utils/request';
 
 class QiniuController {
-  async getToken(ctx: ParameterizedContext, next) {
-    const token = QiniuUtils.getQiniuToken();
+  getToken = async (ctx: ParameterizedContext, next) => {
+    // @ts-ignore
+    const { prefix, hash, ext }: IQiniuKey = ctx.request.query;
+    if (!QINIU_BACKUP.prefix[prefix] && !QINIU_RESOURCE.prefix[prefix]) {
+      throw new CustomError(
+        '错误的prefix',
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
+      );
+    }
+    const key = `${prefix + hash}.${ext}`;
+    const token = QiniuUtils.getQiniuToken({ keyToOverwrite: key });
     successHandler({
       ctx,
       data: token,
-      message: '获取七牛云token成功，有效期1小时？',
+      message: '获取七牛云token成功，有效期10分钟',
     });
-
     await next();
-  }
+  };
 
   prefetchQiniu = async (urls: string[]) => {
     try {

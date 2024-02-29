@@ -66,11 +66,13 @@ class QiniuUtils {
    * @param {*} expires 过期时间，单位：秒，默认600秒
    * @return {*}
    */
-  getQiniuToken(expires = 600) {
+  getQiniuToken(data: { expires?: number; keyToOverwrite?: string }) {
     const mac = new qiniu.auth.digest.Mac(QINIU_ACCESSKEY, QINIU_SECRETKEY);
     const options: qiniu.rs.PutPolicyOptions = {
-      scope: QINIU_RESOURCE.bucket,
-      expires, // 过期时间
+      scope: data.keyToOverwrite
+        ? `${QINIU_RESOURCE.bucket}:${data.keyToOverwrite}`
+        : QINIU_RESOURCE.bucket,
+      expires: data.expires || 600, // 过期时间
       // callbackUrl: '',
       returnBody:
         '{"key":"$(key)","hash":"$(etag)","fsize":$(fsize),"bucket":"$(bucket)","mimeType":"$(mimeType)"}',
@@ -171,7 +173,7 @@ class QiniuUtils {
         putTime: respBody.putTime.toString(),
       }; // copy成功返回的respBody是null，这里将getQiniuStat的respBody设置给它
     }
-    const uploadToken = this.getQiniuToken();
+    const uploadToken = this.getQiniuToken({});
     const { config } = this;
     const formUploader = new qiniu.resume_up.ResumeUploader(config);
     const putExtra = new qiniu.resume_up.PutExtra();
@@ -252,7 +254,7 @@ class QiniuUtils {
     filepath: string;
     originalFilename: string;
   }) {
-    const uploadToken = this.getQiniuToken();
+    const uploadToken = this.getQiniuToken({});
     const { config } = this;
     const formUploader = new qiniu.form_up.FormUploader(config);
     const putExtra = new qiniu.form_up.PutExtra();

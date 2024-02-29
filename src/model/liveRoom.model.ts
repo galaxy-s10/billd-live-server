@@ -56,7 +56,7 @@ const model = sequelize.define<LiveRoomModel>(
       type: DataTypes.INTEGER,
     },
     cover_img: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING(200),
     },
     bg_img: {
       type: DataTypes.STRING(200),

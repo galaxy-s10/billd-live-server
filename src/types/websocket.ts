@@ -48,6 +48,8 @@ export enum WsMsgTypeEnum {
   getLiveUser = 'getLiveUser',
   /** 更新加入信息 */
   updateJoinInfo = 'updateJoinInfo',
+  /** 更新直播间预览图 */
+  updateLiveRoomCoverImg = 'updateLiveRoomCoverImg',
   /** 心跳 */
   heartbeat = 'heartbeat',
   /** 开始直播 */
@@ -64,6 +66,13 @@ export enum WsMsgTypeEnum {
   srsOffer = 'srsOffer',
   srsAnswer = 'srsAnswer',
   srsCandidate = 'srsCandidate',
+
+  startRemoteDesk = 'startRemoteDesk',
+  remoteDeskMoveMsg = 'remoteDeskMoveMsg',
+
+  remoteDeskOffer = 'remoteDeskOffer',
+  remoteDeskAnswer = 'remoteDeskAnswer',
+  remoteDeskCandidate = 'remoteDeskCandidate',
 
   nativeWebRtcOffer = 'nativeWebRtcOffer',
   nativeWebRtcAnswer = 'nativeWebRtcAnswer',
@@ -117,6 +126,12 @@ export type WsRoomLivingType = IWsFormat<{
 /** 直播间没在直播 */
 export type WsRoomNoLiveType = IWsFormat<{
   live_room: ILiveRoom;
+}>;
+
+export type WsRemoteDeskMoveMsgType = IWsFormat<{
+  roomId: string;
+  sender: string;
+  receiver: string;
 }>;
 
 export interface IDanmu {
@@ -174,13 +189,17 @@ export type WsOtherJoinType = IWsFormat<{
 
 /** 开始直播 */
 export type WsStartLiveType = IWsFormat<{
-  cover_img: string;
   name: string;
   type: LiveRoomTypeEnum;
   /** 单位：毫秒 */
   msrDelay: number;
   /** 单位：毫秒 */
   msrMaxDelay: number;
+}>;
+
+/** 更新直播间预览图 */
+export type WsUpdateLiveRoomCoverImg = IWsFormat<{
+  cover_img: string;
 }>;
 
 /** 用户加入直播间 */
@@ -190,6 +209,7 @@ export type WsJoinType = IWsFormat<{
   live_room?: ILiveRoom;
   anchor_info?: IUser;
   user_info?: IUser;
+  isRemoteDesk?: boolean;
   socket_list?: string[];
 }>;
 
@@ -217,12 +237,19 @@ export type WsMsrBlobType = IWsFormat<{
   max_delay: number;
 }>;
 
+export type WsStartRemoteDesk = IWsFormat<{
+  sender: string;
+  receiver: string;
+  roomId: string;
+}>;
+
 export type WsOfferType = IWsFormat<{
   live_room: ILiveRoom;
   sdp: any;
   sender: string;
   receiver: string;
   live_room_id: number;
+  isRemoteDesk?: boolean;
 }>;
 
 export type WsAnswerType = IWsFormat<{

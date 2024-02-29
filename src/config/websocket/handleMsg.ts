@@ -41,6 +41,7 @@ import {
   WsRoomNoLiveType,
   WsStartLiveType,
   WsUpdateJoinInfoType,
+  WsUpdateLiveRoomCoverImg,
 } from '@/types/websocket';
 import { chalkERROR, chalkWARN } from '@/utils/chalkTip';
 import { mp4PushRtmp, webmToMp4 } from '@/utils/process';
@@ -57,6 +58,24 @@ export async function handleWsJoin(args: {
   const { socket, io, roomId, data } = args;
   if (!roomId) {
     console.log(chalkERROR('roomId为空'));
+    return;
+  }
+  if (data.data.isRemoteDesk) {
+    socket.join(`${roomId}`);
+    console.log(chalkWARN(`${socket.id}进入房间号:${roomId}`));
+    const roomsMap = io.of('/').adapter.rooms;
+    const socketList = roomsMap.get(`${data.data.live_room_id}`);
+    socketEmit<WsJoinType['data']>({
+      socket,
+      msgType: WsMsgTypeEnum.joined,
+      data: {
+        isRemoteDesk: true,
+        socket_id: data.socket_id,
+        live_room_id: roomId,
+        user_info: data.user_info,
+        socket_list: socketList ? [...socketList] : [],
+      },
+    });
     return;
   }
   const [liveRoomInfo, liveInfo] = await Promise.all([
@@ -368,7 +387,6 @@ export async function handleWsStartLive(args: {
 
   liveRoomService.update({
     id: roomId,
-    cover_img: data.data.cover_img,
     name: data.data.name,
     type: data.data.type,
     rtmp_url: pullRes.rtmp,
@@ -501,6 +519,26 @@ export async function handleWsStartLive(args: {
       console.error(error);
     }
   }
+}
+
+export async function handleWsUpdateLiveRoomCoverImg(
+  data: WsUpdateLiveRoomCoverImg
+) {
+  const userId = data.user_info?.id;
+  if (!userId) {
+    console.log(chalkERROR('userId为空'));
+    return;
+  }
+  const userLiveRoomInfo = await userLiveRoomService.findByUserId(userId);
+  if (!userLiveRoomInfo) {
+    console.log(chalkERROR('userLiveRoomInfo为空'));
+    return;
+  }
+  const roomId = userLiveRoomInfo.live_room_id!;
+  liveRoomService.update({
+    id: roomId,
+    cover_img: data.data.cover_img,
+  });
 }
 
 export async function handleWsGetLiveUser(args: {

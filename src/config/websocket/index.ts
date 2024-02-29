@@ -10,6 +10,7 @@ import {
   handleWsRoomNoLive,
   handleWsStartLive,
   handleWsUpdateJoinInfo,
+  handleWsUpdateLiveRoomCoverImg,
 } from '@/config/websocket/handleMsg';
 import liveRedisController from '@/config/websocket/live-redis.controller';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
@@ -25,9 +26,12 @@ import {
   WsMsgTypeEnum,
   WsMsrBlobType,
   WsOfferType,
+  WsRemoteDeskMoveMsgType,
   WsRoomNoLiveType,
   WsStartLiveType,
+  WsStartRemoteDesk,
   WsUpdateJoinInfoType,
+  WsUpdateLiveRoomCoverImg,
 } from '@/types/websocket';
 import { chalkINFO, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 
@@ -248,6 +252,30 @@ export const connectWebSocket = (server) => {
       }
     });
 
+    // 收到remoteDeskMoveMsg
+    socket.on(
+      WsMsgTypeEnum.remoteDeskMoveMsg,
+      (data: WsRemoteDeskMoveMsgType) => {
+        try {
+          prettierInfoLog({
+            msg: '收到remoteDeskMoveMsg',
+            socket,
+            // @ts-ignore
+            roomId: data.data.roomId,
+          });
+          socketEmit({
+            // @ts-ignore
+            roomId: data.data.roomId,
+            socket,
+            msgType: WsMsgTypeEnum.remoteDeskMoveMsg,
+            data: data.data,
+          });
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    );
+
     // 收到心跳
     socket.on(WsMsgTypeEnum.heartbeat, (data: WsHeartbeatType) => {
       try {
@@ -287,6 +315,39 @@ export const connectWebSocket = (server) => {
       } catch (error) {
         console.log(error);
       }
+    });
+
+    // 收到更新直播间预览图
+    socket.on(
+      WsMsgTypeEnum.updateLiveRoomCoverImg,
+      (data: WsUpdateLiveRoomCoverImg) => {
+        try {
+          prettierInfoLog({
+            msg: '收到更新直播间预览图',
+            socket,
+          });
+          handleWsUpdateLiveRoomCoverImg(data);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    );
+
+    // 收到startRemoteDesk
+    socket.on(WsMsgTypeEnum.startRemoteDesk, (data: WsStartRemoteDesk) => {
+      prettierInfoLog({
+        msg: '收到startRemoteDesk',
+        socket,
+        // @ts-ignore
+        roomId: data.data.roomId,
+      });
+      socketEmit({
+        // @ts-ignore
+        roomId: data.data.roomId,
+        socket,
+        msgType: WsMsgTypeEnum.startRemoteDesk,
+        data,
+      });
     });
 
     // 收到srsOffer

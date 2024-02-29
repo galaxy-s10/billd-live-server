@@ -12,7 +12,7 @@ const qiniuRouter = new Router({ prefix: '/qiniu_data' });
 // WARN 不要在新增/删除文章的控制器里面直接调用七牛云控制器，操作文章就仅仅操作文章可以了，别涉及到七牛云控制器的操作，如果确实需要的，就让前端在操作文章后，主动调七牛云的接口操作
 
 // 获取token
-// qiniuRouter.get('/get_token', qiniuController.getToken);
+qiniuRouter.get('/get_token', qiniuController.getToken);
 
 qiniuRouter.get('/list', qiniuController.getList);
 
