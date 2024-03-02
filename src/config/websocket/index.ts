@@ -26,7 +26,7 @@ import {
   WsMsgTypeEnum,
   WsMsrBlobType,
   WsOfferType,
-  WsRemoteDeskMoveMsgType,
+  WsRemoteDeskBehaviorType,
   WsRoomNoLiveType,
   WsStartLiveType,
   WsStartRemoteDesk,
@@ -252,13 +252,13 @@ export const connectWebSocket = (server) => {
       }
     });
 
-    // 收到remoteDeskMoveMsg
+    // 收到remoteDeskBehavior
     socket.on(
-      WsMsgTypeEnum.remoteDeskMoveMsg,
-      (data: WsRemoteDeskMoveMsgType) => {
+      WsMsgTypeEnum.remoteDeskBehavior,
+      (data: WsRemoteDeskBehaviorType) => {
         try {
           prettierInfoLog({
-            msg: '收到remoteDeskMoveMsg',
+            msg: '收到remoteDeskBehavior',
             socket,
             // @ts-ignore
             roomId: data.data.roomId,
@@ -267,7 +267,7 @@ export const connectWebSocket = (server) => {
             // @ts-ignore
             roomId: data.data.roomId,
             socket,
-            msgType: WsMsgTypeEnum.remoteDeskMoveMsg,
+            msgType: WsMsgTypeEnum.remoteDeskBehavior,
             data: data.data,
           });
         } catch (error) {
