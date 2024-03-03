@@ -20,6 +20,46 @@ DOCKER_SRS_TMP=`docker run -d registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5.0.20
 && docker rm $DOCKER_SRS_TMP
 ```
 
+如果上面的命令报错，则一步步来：
+
+1.启动一个临时容器
+
+```bash
+docker run -d registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5.0.200
+```
+
+实际执行效果：
+
+```bash
+➜  billd-live-server git:(master) ✗ docker run -d registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5.0.200
+946e41646b6ab02fa0a34f417b3560ddc620b0e2032f755faa7f60a68d3b9834
+➜  billd-live-server git:(master) ✗
+```
+
+> 启动容器后，会返回容器的 id
+
+2.复制 conf
+
+```bash
+docker cp 946e41646b6ab02fa0a34f417b3560ddc620b0e2032f755faa7f60a68d3b9834:/usr/local/srs/conf C:\\Users\\huangshuisheng\\Desktop\\docker\\srs
+```
+
+3.复制 objs
+
+```bash
+docker cp 946e41646b6ab02fa0a34f417b3560ddc620b0e2032f755faa7f60a68d3b9834:/usr/local/srs/objs C:\\Users\\huangshuisheng\\Desktop\\docker\\srs
+```
+
+4.复制完成了，停止和删除临时容器
+
+```bash
+docker stop 946e41646b6ab02fa0a34f417b3560ddc620b0e2032f755faa7f60a68d3b9834
+```
+
+```bash
+docker rm 946e41646b6ab02fa0a34f417b3560ddc620b0e2032f755faa7f60a68d3b9834
+```
+
 mac、linux 启动容器
 
 ```bash
