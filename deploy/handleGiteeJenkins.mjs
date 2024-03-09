@@ -82,16 +82,20 @@ async function clearOld() {
   await Promise.all(queue1);
 }
 
-clearOld().then(() => {
-  findFile(dir);
-  putFile();
-  const gitignoreTxt =
-    'node_modules\n.DS_Store\ndist\n/public/**/*\n/upload/**/*\n/webm/**/*\n!/public/README.md\n!/upload/README.md\n!/webm/README.md\n';
-  fs.writeFileSync(path.resolve(giteeDir, './.gitignore'), gitignoreTxt);
-  execSync(`pnpm i`, { cwd: giteeDir });
-  execSync(`git add .`, { cwd: giteeDir });
-  execSync(`git commit -m 'feat: ${new Date().toLocaleString()}'`, {
-    cwd: giteeDir,
+if (process.cwd().indexOf('jenkins') !== -1) {
+  console.log('当前目录错误');
+} else {
+  clearOld().then(() => {
+    findFile(dir);
+    putFile();
+    const gitignoreTxt =
+      'node_modules\n.DS_Store\ndist\n/public/**/*\n/upload/**/*\n/webm/**/*\n!/public/README.md\n!/upload/README.md\n!/webm/README.md\n';
+    fs.writeFileSync(path.resolve(giteeDir, './.gitignore'), gitignoreTxt);
+    execSync(`pnpm i`, { cwd: giteeDir });
+    execSync(`git add .`, { cwd: giteeDir });
+    execSync(`git commit -m 'feat: ${new Date().toLocaleString()}'`, {
+      cwd: giteeDir,
+    });
+    execSync(`git push`, { cwd: giteeDir });
   });
-  execSync(`git push`, { cwd: giteeDir });
-});
+}
