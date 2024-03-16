@@ -59,7 +59,7 @@ pnpm -v
 
 echo 设置pnpm淘宝镜像:
 pnpm config set registry https://registry.npmmirror.com/
-pnpm config set @billd:registry http://registry.hsslive.cn/
+pnpm config set @billd:registry https://registry.hsslive.cn/
 
 echo 查看当前pnpm镜像:
 pnpm config get registry
