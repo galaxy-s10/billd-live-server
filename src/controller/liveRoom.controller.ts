@@ -168,6 +168,12 @@ class LiveRoomController {
       push_obs_stream_key,
       push_webrtc_url,
       push_srt_url,
+      forward_bilibili_url,
+      forward_douyin_url,
+      forward_douyu_url,
+      forward_huya_url,
+      forward_kuaishou_url,
+      forward_xiaohongshu_url,
     }: ILiveRoom = ctx.request.body;
     await this.common.create({
       status,
@@ -191,6 +197,12 @@ class LiveRoomController {
       push_obs_stream_key,
       push_webrtc_url,
       push_srt_url,
+      forward_bilibili_url,
+      forward_douyin_url,
+      forward_douyu_url,
+      forward_huya_url,
+      forward_kuaishou_url,
+      forward_xiaohongshu_url,
     });
     successHandler({ ctx });
     await next();
@@ -219,6 +231,12 @@ class LiveRoomController {
       push_obs_stream_key,
       push_webrtc_url,
       push_srt_url,
+      forward_bilibili_url,
+      forward_douyin_url,
+      forward_douyu_url,
+      forward_huya_url,
+      forward_kuaishou_url,
+      forward_xiaohongshu_url,
     }: ILiveRoom = ctx.request.body;
     await this.common.update({
       id,
@@ -242,6 +260,12 @@ class LiveRoomController {
       push_obs_stream_key,
       push_webrtc_url,
       push_srt_url,
+      forward_bilibili_url,
+      forward_douyin_url,
+      forward_douyu_url,
+      forward_huya_url,
+      forward_kuaishou_url,
+      forward_xiaohongshu_url,
     });
     successHandler({ ctx });
     await next();

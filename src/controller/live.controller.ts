@@ -8,6 +8,7 @@ import { IList, ILive } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveService from '@/service/live.service';
 import userLiveRoomService from '@/service/userLiveRoom.service';
+import { getForwardList, killPid } from '@/utils/process';
 
 import redisController from './redis.controller';
 
@@ -158,6 +159,30 @@ class LiveController {
     }
     const roomId = userLiveRoomInfo.live_room_id!;
     const res = await liveService.findAllLiveByRoomId(roomId);
+    successHandler({ ctx, data: res });
+    await next();
+  }
+
+  async getForwardList(ctx: ParameterizedContext, next) {
+    const res: any = await getForwardList();
+    let list: any[] = [];
+    if (res.stdout !== '') {
+      list = res.stdout.split('\n');
+    }
+    successHandler({ ctx, data: { list, res } });
+    await next();
+  }
+
+  async killForward(ctx: ParameterizedContext, next) {
+    const { pid } = ctx.params;
+    if (pid) {
+      throw new CustomError(
+        'pid为空',
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
+      );
+    }
+    const res = await killPid(pid);
     successHandler({ ctx, data: res });
     await next();
   }

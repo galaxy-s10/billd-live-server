@@ -1,4 +1,5 @@
-import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import { PROJECT_ENV, PROJECT_ENV_ENUM } from '../constant';
+import { prodDomain } from '../spec-config';
 
 export const JWT_SECRET = '**********'; // jwt秘钥
 
@@ -18,7 +19,7 @@ export const IP_WHITE_LIST = [IP_URL.tencent.serverIp, IP_URL.ali.serverIp]; // 
 
 export const QQ_CLIENT_ID = '**********'; // qq登录APP ID
 export const QQ_CLIENT_SECRET = '**********'; // qq登录APP Key
-export const QQ_REDIRECT_URI = '**********'; // qq登录回调地址
+export const QQ_REDIRECT_URI = `**********${prodDomain}**********`; // qq登录回调地址
 
 export const WECHAT_APPID = '**********'; // wechat登录APP ID
 export const WECHAT_SECRET = '**********'; // wechat登录APP Key
@@ -164,5 +165,8 @@ export const SERVER_LIVE = {
   AppName: '**********',
 };
 
-export const BILIBILI_LIVE_PUSH_KEY =
-  '****************************************************************************************';
+export const BILIBILI_LIVE_PUSH_KEY = '';
+
+export const DOUYU_LIVE_PUSH_KEY = '';
+
+export const HUYA_LIVE_PUSH_KEY = '';

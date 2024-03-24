@@ -254,7 +254,7 @@ export const initUser: Record<string, IInitUser> = {
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
-      prodFFmpeg: true, // 初始化ffmpeg
+      prodFFmpeg: false, // 初始化ffmpeg
       localFile: path.resolve(SERVER_VIDEO_DIR, 'zjl_ylxb.mp4'),
     },
   },

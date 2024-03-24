@@ -32,6 +32,7 @@ import {
 import { IApiV1Clients, IApiV1Streams, ISrsCb, ISrsRTC } from '@/types/srs';
 import { WsMsgTypeEnum } from '@/types/websocket';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
+import { forwardToOtherPlatform } from '@/utils/process';
 import { myaxios } from '@/utils/request';
 
 class SRSController {
@@ -39,6 +40,10 @@ class SRSController {
     getApiV1ClientDetail: (clientId: string) =>
       myaxios.get(
         `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port[1985]}/api/v1/clients/${clientId}`
+      ),
+    getApiV1StreamsDetail: (streamsId: string) =>
+      myaxios.get(
+        `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port[1985]}/api/v1/streams/${streamsId}`
       ),
     getApiV1Clients: ({ start, count }: { start: number; count: number }) =>
       myaxios.get<IApiV1Clients>(
@@ -477,6 +482,66 @@ class SRSController {
           id: Number(roomId),
           type: Number(paramsPublishType),
         });
+        if (result) {
+          if (
+            Number(paramsPublishType) === LiveRoomTypeEnum.forward_bilibili ||
+            Number(paramsPublishType) === LiveRoomTypeEnum.forward_huya ||
+            Number(paramsPublishType) === LiveRoomTypeEnum.forward_all
+          ) {
+            let index = 0;
+            const max = 30;
+            const timer = setInterval(() => {
+              if (index > max) {
+                clearInterval(timer);
+              }
+              index += 1;
+              // 根据body.stream_id，轮询判断查找流里面的audio，audio有值了，再转推流
+              this.common
+                .getApiV1StreamsDetail(body.stream_id)
+                .then((res) => {
+                  if (res && res.stream?.video && res.stream?.audio) {
+                    clearInterval(timer);
+                    console.log(chalkSUCCESS('开始转推'));
+                    if (
+                      Number(paramsPublishType) ===
+                      LiveRoomTypeEnum.forward_bilibili
+                    ) {
+                      forwardToOtherPlatform({
+                        platform: 'bilibili',
+                        localFlv: result.flv_url!,
+                        remoteRtmp: result.forward_bilibili_url!,
+                      });
+                    } else if (
+                      Number(paramsPublishType) ===
+                      LiveRoomTypeEnum.forward_huya
+                    ) {
+                      forwardToOtherPlatform({
+                        platform: 'douyu',
+                        localFlv: result.flv_url!,
+                        remoteRtmp: result.forward_huya_url!,
+                      });
+                    } else if (
+                      Number(paramsPublishType) === LiveRoomTypeEnum.forward_all
+                    ) {
+                      forwardToOtherPlatform({
+                        platform: 'bilibili',
+                        localFlv: result.flv_url!,
+                        remoteRtmp: result.forward_bilibili_url!,
+                      });
+                      forwardToOtherPlatform({
+                        platform: 'douyu',
+                        localFlv: result.flv_url!,
+                        remoteRtmp: result.forward_huya_url!,
+                      });
+                    }
+                  }
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            }, 1000);
+          }
+        }
       }
       const isLiveing = await liveController.common.findByLiveRoomId(
         Number(roomId)

@@ -62,31 +62,49 @@ const model = sequelize.define<LiveRoomModel>(
       type: DataTypes.STRING(200),
     },
     rtmp_url: {
-      type: DataTypes.STRING(200),
+      type: DataTypes.STRING(500),
     },
     flv_url: {
-      type: DataTypes.STRING(200),
+      type: DataTypes.STRING(500),
     },
     hls_url: {
-      type: DataTypes.STRING(200),
+      type: DataTypes.STRING(500),
     },
     webrtc_url: {
-      type: DataTypes.STRING(200),
+      type: DataTypes.STRING(500),
     },
     push_rtmp_url: {
-      type: DataTypes.STRING(200),
+      type: DataTypes.STRING(500),
     },
     push_obs_server: {
-      type: DataTypes.STRING(200),
+      type: DataTypes.STRING(500),
     },
     push_obs_stream_key: {
-      type: DataTypes.STRING(200),
+      type: DataTypes.STRING(500),
     },
     push_webrtc_url: {
-      type: DataTypes.STRING(200),
+      type: DataTypes.STRING(500),
     },
     push_srt_url: {
-      type: DataTypes.STRING(200),
+      type: DataTypes.STRING(500),
+    },
+    forward_bilibili_url: {
+      type: DataTypes.STRING(500),
+    },
+    forward_huya_url: {
+      type: DataTypes.STRING(500),
+    },
+    forward_douyu_url: {
+      type: DataTypes.STRING(500),
+    },
+    forward_douyin_url: {
+      type: DataTypes.STRING(500),
+    },
+    forward_kuaishou_url: {
+      type: DataTypes.STRING(500),
+    },
+    forward_xiaohongshu_url: {
+      type: DataTypes.STRING(500),
     },
   },
   {

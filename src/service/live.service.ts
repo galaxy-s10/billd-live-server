@@ -109,6 +109,12 @@ class LiveService {
               'push_obs_stream_key',
               'push_webrtc_url',
               'push_srt_url',
+              'forward_bilibili_url',
+              'forward_huya_url',
+              'forward_huya_url',
+              'forward_douyin_url',
+              'forward_kuaishou_url',
+              'forward_xiaohongshu_url',
             ],
           },
           include: [
@@ -132,6 +138,12 @@ class LiveService {
           'push_obs_stream_key',
           'push_webrtc_url',
           'push_srt_url',
+          'forward_bilibili_url',
+          'forward_huya_url',
+          'forward_huya_url',
+          'forward_douyin_url',
+          'forward_kuaishou_url',
+          'forward_xiaohongshu_url',
         ],
         include: [
           [

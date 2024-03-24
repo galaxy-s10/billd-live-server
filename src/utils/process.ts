@@ -1,6 +1,71 @@
 import { exec, execSync } from 'child_process';
 
-import { SRS_CB_URL_PARAMS } from '@/constant';
+import { PROJECT_ENV, PROJECT_ENV_ENUM, SRS_CB_URL_PARAMS } from '@/constant';
+import { BILIBILI_LIVE_PUSH_KEY } from '@/secret/secret';
+import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
+
+export function pushToBilibili(flag = true) {
+  let listFile = '/Users/huangshuisheng/Movies/Videos/list.txt';
+  if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
+    listFile = '/node/video/list.txt';
+  }
+  const cmd = `ffmpeg -threads 1 -readrate 1 -stream_loop -1 -f concat -safe 0 -i '${listFile}' -vcodec h264 -acodec aac -f flv '${BILIBILI_LIVE_PUSH_KEY}'`;
+  try {
+    if (flag) {
+      exec(cmd);
+      console.log(chalkSUCCESS(`FFmpeg推流到bilibili成功`));
+    }
+  } catch (error) {
+    console.log(chalkERROR(`FFmpeg推流到bilibili失败`));
+    console.log(error);
+  }
+}
+
+export function forwardToOtherPlatform({
+  platform,
+  localFlv,
+  remoteRtmp,
+}: {
+  platform:
+    | 'bilibili'
+    | 'xiaohongshu'
+    | 'kuaishou'
+    | 'douyu'
+    | 'douyin'
+    | 'huya';
+  localFlv: string;
+  remoteRtmp: string;
+}) {
+  // const cmd = `ffmpeg -f flv -i '${localFlv}?forwardToOtherPlatform=${platform}' -c copy -f flv '${remoteRtmp}'`;
+  const cmd = `ffmpeg -f flv -i '${localFlv}?forwardToOtherPlatform=${platform}' -c:v copy -c:a aac -f flv '${remoteRtmp}'`;
+  // const cmd = `ffmpeg -f flv -i '${localFlv}?forwardToOtherPlatform=${platform}' -c copy -f flv 'rtmp://localhost/livestream/roomId___12?pushkey=159117a86318005a17e2c55ff318d998&pushtype=1'`;
+  try {
+    exec(cmd);
+    console.log(cmd);
+    console.log(chalkSUCCESS(`FFmpeg转推到${platform}成功`));
+  } catch (error) {
+    console.log(chalkERROR(`FFmpeg转推到${platform}失败`));
+    console.log(error);
+  }
+}
+
+export function getForwardList() {
+  return new Promise((resolve) => {
+    const cmd = `ps aux | grep  ?forwardToOtherPlatform= | grep -v grep`;
+    exec(cmd, (err, stdout, stderr) => {
+      resolve({ cmd, err, stdout, stderr });
+    });
+  });
+}
+
+export function killPid(pid: string) {
+  return new Promise((resolve) => {
+    const cmd = `kill -9 ${pid}`;
+    exec(cmd, (err, stdout, stderr) => {
+      resolve({ cmd, err, stdout, stderr });
+    });
+  });
+}
 
 /** 杀死所有ffmpeg进程 */
 export function killAllFFmpeg() {

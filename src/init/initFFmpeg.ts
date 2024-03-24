@@ -3,7 +3,6 @@ import { exec, spawnSync } from 'child_process';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import srsController from '@/controller/srs.controller';
 import { initUser } from '@/init/initUser';
-import { BILIBILI_LIVE_PUSH_KEY } from '@/secret/secret';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
 import {
@@ -13,22 +12,6 @@ import {
 } from '@/types/ILiveRoom';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 import { tencentcloudUtils } from '@/utils/tencentcloud';
-
-export function pushToBilibili() {
-  let listFile = '/Users/huangshuisheng/Movies/Videos/list.txt';
-  if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
-    listFile = '/node/video/list.txt';
-  }
-  const cmd = `ffmpeg -threads 1 -readrate 1 -stream_loop -1 -f concat -safe 0 -i '${listFile}' -vcodec h264 -acodec aac -f flv '${BILIBILI_LIVE_PUSH_KEY}'`;
-  console.log(cmd);
-  try {
-    exec(cmd);
-    console.log(chalkSUCCESS(`FFmpeg推流到bilibili成功`));
-  } catch (error) {
-    console.log(chalkERROR(`FFmpeg推流到bilibili失败`));
-    console.log(error);
-  }
-}
 
 function ffmpegIsInstalled() {
   const res = spawnSync('ffmpeg', ['-version']);
