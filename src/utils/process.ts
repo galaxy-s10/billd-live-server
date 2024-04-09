@@ -1,7 +1,11 @@
 import { exec, execSync } from 'child_process';
 
 import { PROJECT_ENV, PROJECT_ENV_ENUM, SRS_CB_URL_PARAMS } from '@/constant';
-import { BILIBILI_LIVE_PUSH_KEY } from '@/secret/secret';
+import {
+  BILIBILI_LIVE_PUSH_KEY,
+  SERVER_LIVE,
+  SRS_CONFIG,
+} from '@/secret/secret';
 import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
 
 export function pushToBilibili(flag = true) {
@@ -37,7 +41,14 @@ export function forwardToOtherPlatform({
   remoteRtmp: string;
 }) {
   // const cmd = `ffmpeg -f flv -i '${localFlv}?forwardToOtherPlatform=${platform}' -c copy -f flv '${remoteRtmp}'`;
-  const cmd = `ffmpeg -f flv -i '${localFlv}?forwardToOtherPlatform=${platform}' -c:v copy -c:a aac -f flv '${remoteRtmp}'`;
+  let localFlvRes = localFlv;
+  if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
+    localFlvRes = localFlv.replace(
+      SERVER_LIVE.PullDomain,
+      `http://localhost:${SRS_CONFIG.docker.port[8080]}`
+    );
+  }
+  const cmd = `ffmpeg -f flv -i '${localFlvRes}?forwardToOtherPlatform=${platform}' -c:v copy -c:a aac -f flv '${remoteRtmp}'`;
   // const cmd = `ffmpeg -f flv -i '${localFlv}?forwardToOtherPlatform=${platform}' -c copy -f flv 'rtmp://localhost/livestream/roomId___12?pushkey=159117a86318005a17e2c55ff318d998&pushtype=1'`;
   try {
     exec(cmd);
