@@ -29,6 +29,7 @@ import { LiveRoomMsgVerifyEnum, LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import {
   WSGetRoomAllUserType,
   WSLivePkKeyType,
+  WsBatchSendOffer,
   WsDisableSpeakingType,
   WsGetLiveUserType,
   WsJoinType,
@@ -152,6 +153,31 @@ export async function handleWsJoin(args: {
       live_room_user_info: liveRoomInfo.user!,
       join_socket_id: socket.id,
       join_user_info: data.user_info,
+      socket_list: socketList ? [...socketList] : [],
+    },
+  });
+}
+
+export function handleWsBatchSendOffer(args: {
+  io: Server;
+  socket: Socket;
+  roomId: number;
+  data: WsBatchSendOffer;
+}) {
+  const { socket, io, roomId, data } = args;
+  if (!roomId) {
+    console.log(chalkERROR('roomId为空'));
+    return;
+  }
+  const roomsMap = io.of('/').adapter.rooms;
+  const socketList = roomsMap.get(`${data.data.roomId}`);
+
+  socketEmit<WsBatchSendOffer['data']>({
+    socket,
+    msgType: WsMsgTypeEnum.batchSendOffer,
+    roomId,
+    data: {
+      roomId: `${roomId}`,
       socket_list: socketList ? [...socketList] : [],
     },
   });

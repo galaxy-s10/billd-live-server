@@ -1,6 +1,7 @@
 import { Server, Socket } from 'socket.io';
 
 import {
+  handleWsBatchSendOffer,
   handleWsDisableSpeaking,
   handleWsDisconnecting,
   handleWsGetLiveUser,
@@ -16,6 +17,7 @@ import liveRedisController from '@/config/websocket/live-redis.controller';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import {
   WsAnswerType,
+  WsBatchSendOffer,
   WsCandidateType,
   WsConnectStatusEnum,
   WsDisableSpeakingType,
@@ -192,6 +194,21 @@ export const connectWebSocket = (server) => {
           roomId,
         });
         handleWsJoin({ io, socket, roomId, data });
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
+    // 收到batchSendOffer
+    socket.on(WsMsgTypeEnum.batchSendOffer, (data: WsBatchSendOffer) => {
+      try {
+        const { roomId } = data.data;
+        prettierInfoLog({
+          msg: '收到batchSendOffer',
+          socket,
+          roomId: Number(roomId),
+        });
+        handleWsBatchSendOffer({ io, socket, roomId: Number(roomId), data });
       } catch (error) {
         console.log(error);
       }
