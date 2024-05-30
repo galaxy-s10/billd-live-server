@@ -27,13 +27,13 @@ import liveRoomService from '@/service/liveRoom.service';
 import userLiveRoomService from '@/service/userLiveRoom.service';
 import { LiveRoomMsgVerifyEnum, LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import {
-  WSGetRoomAllUserType,
-  WSLivePkKeyType,
   WsBatchSendOffer,
   WsDisableSpeakingType,
   WsGetLiveUserType,
+  WsGetRoomAllUserType,
   WsJoinType,
   WsLeavedType,
+  WsLivePkKeyType,
   WsMessageType,
   WsMsgTypeEnum,
   WsMsrBlobType,
@@ -532,7 +532,7 @@ export async function handleWsStartLive(args: {
         key: `${roomId}`,
         client_ip: getSocketRealIp(socket),
       });
-      socketEmit<WSLivePkKeyType['data']>({
+      socketEmit<WsLivePkKeyType['data']>({
         socket,
         msgType: WsMsgTypeEnum.livePkKey,
         data: {
@@ -575,7 +575,7 @@ export async function handleWsGetLiveUser(args: {
   const liveUser = await liveRedisController.getLiveRoomOnlineUser(
     data.data.live_room_id
   );
-  socketEmit<WSGetRoomAllUserType['data']>({
+  socketEmit<WsGetRoomAllUserType['data']>({
     socket,
     msgType: WsMsgTypeEnum.liveUser,
     data: {

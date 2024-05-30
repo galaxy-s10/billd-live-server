@@ -116,10 +116,10 @@ export function webmToMp4(data: { input: string; output: string }) {
   // console.log(cmd, 'webmToMp4');
   try {
     execSync(cmd, { stdio: 'ignore' });
-    // console.log(new Date().toLocaleString(), '转码成功', data.input);
+    // console.log('转码成功', data.input);
     return true;
   } catch (error: any) {
-    // console.log(new Date().toLocaleString(), '转码失败', data.input);
+    // console.log('转码失败', data.input);
     console.error('命令:', cmd);
     console.error('命令执行失败:', error.status);
     console.error('标准输出:', error.stdout);

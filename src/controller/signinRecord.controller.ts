@@ -141,19 +141,19 @@ class SigninRecordController {
         sum_nums: count,
         recently_signin_time: dayjs(nowTime).format('YYYY-MM-DD HH:mm:ss'),
       });
-      const signinAmount = 50;
-      await walletController.common.changeBalanceByUserId({
-        user_id: userInfo.id,
-        balance: signinAmount,
-      });
-      await walletRecordController.common.create({
-        user_id: userInfo.id,
-        type: WalletRecordEnum.signin,
-        name: '签到奖励',
-        amount: signinAmount,
-        amount_status: WalletRecordAmountStatusEnum.add,
-      });
     }
+    const signinAmount = 50;
+    await walletController.common.changeBalanceByUserId({
+      user_id: userInfo.id,
+      balance: signinAmount,
+    });
+    await walletRecordController.common.create({
+      user_id: userInfo.id,
+      type: WalletRecordEnum.signin,
+      name: '签到奖励',
+      amount: signinAmount,
+      amount_status: WalletRecordAmountStatusEnum.add,
+    });
     successHandler({ ctx, data: { nums } });
     await next();
   };

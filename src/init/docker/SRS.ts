@@ -50,7 +50,7 @@ export const dockerRunSRS = (init = true) => {
     console.log(chalkSUCCESS(`启动SRS成功！`), emoji.get('✅'));
     // const child = exec(srsSh, {}, (error, stdout, stderr) => {
     //   console.log(
-    //     chalkSUCCESS(`${new Date().toLocaleString()},初始化SRS成功！`)
+    //     chalkSUCCESS(`初始化SRS成功！`)
     //   );
     //   console.log('error', error);
     //   console.log('stdout', stdout);
@@ -58,12 +58,12 @@ export const dockerRunSRS = (init = true) => {
     // });
     // child.on('exit', () => {
     //   console.log(
-    //     chalkINFO(`${new Date().toLocaleString()},dockerStartSRS子进程退出了,${srsSh}`)
+    //     chalkINFO(`dockerStartSRS子进程退出了,${srsSh}`)
     //   );
     // });
     // child.on('error', () => {
     //   console.log(
-    //     chalkERROR(`${new Date().toLocaleString()},dockerStartSRS子进程错误,${srsSh}`)
+    //     chalkERROR(`dockerStartSRS子进程错误,${srsSh}`)
     //   );
     // });
   } catch (error) {

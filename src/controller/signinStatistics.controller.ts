@@ -51,7 +51,6 @@ class SigninStatisticsController {
   getList = async (ctx: ParameterizedContext, next) => {
     const {
       id,
-      nums,
       username,
       user_id,
       live_room_id,
@@ -66,7 +65,6 @@ class SigninStatisticsController {
     }: IList<ISigninStatistics> = ctx.request.query;
     const result = await signinStatisticsService.getList({
       id,
-      nums,
       username,
       user_id,
       live_room_id,
