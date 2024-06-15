@@ -75,31 +75,35 @@ export const deleteForeignKeys = async (data: {
     const { sequelizeInst, model } = data;
     const queryInterface = sequelizeInst.getQueryInterface();
     let allTables: string[] = [];
-    if (model) {
-      allTables = [model.name];
-    } else {
+    if (model === undefined) {
       allTables = await queryInterface.showAllTables();
+    } else if (model && allTables.find((v) => v === model.name)) {
+      allTables = [model.name];
     }
     console.log(chalkWARN(`需要删除外键的表:${allTables.toString()}`));
-    const allIndexs: any = [];
-    allTables.forEach((v) => {
-      allIndexs.push(queryInterface.showIndex(v));
-    });
-    const allConstraint: any = [];
-    allTables.forEach((v) => {
-      allConstraint.push(queryInterface.getForeignKeysForTables([v]));
-    });
-    const res1 = await Promise.all(allConstraint);
-    const allConstraint1: any = [];
-    res1.forEach((v) => {
-      const tableName = Object.keys(v)[0];
-      const constraint: string[] = v[tableName];
-      constraint.forEach((item) => {
-        allConstraint1.push(queryInterface.removeConstraint(tableName, item));
+    if (allTables.length) {
+      const allIndexs: any = [];
+      allTables.forEach((v) => {
+        allIndexs.push(queryInterface.showIndex(v));
       });
-      console.log(chalkINFO(`${tableName}表的外键: ${constraint.toString()}`));
-    });
-    await Promise.all(allConstraint1);
+      const allConstraint: any = [];
+      allTables.forEach((v) => {
+        allConstraint.push(queryInterface.getForeignKeysForTables([v]));
+      });
+      const res1 = await Promise.all(allConstraint);
+      const allConstraint1: any = [];
+      res1.forEach((v) => {
+        const tableName = Object.keys(v)[0];
+        const constraint: string[] = v[tableName];
+        constraint.forEach((item) => {
+          allConstraint1.push(queryInterface.removeConstraint(tableName, item));
+        });
+        console.log(
+          chalkINFO(`${tableName}表的外键: ${constraint.toString()}`)
+        );
+      });
+      await Promise.all(allConstraint1);
+    }
     console.log(chalkSUCCESS(`删除${allTables.toString()}表的外键成功！`));
   } catch (err) {
     console.log(chalkERROR(`删除外键失败！`), err);
@@ -115,30 +119,34 @@ export const deleteIndexs = async (data: {
     const { sequelizeInst, model } = data;
     const queryInterface = sequelizeInst.getQueryInterface();
     let allTables: string[] = [];
-    if (model) {
-      allTables = [model.name];
-    } else {
+    if (model === undefined) {
       allTables = await queryInterface.showAllTables();
+    } else if (model && allTables.find((v) => v === model.name)) {
+      allTables = [model.name];
     }
     console.log(chalkWARN(`需要删除索引的表:${allTables.toString()}`));
-    const allIndexs: any = [];
-    allTables.forEach((v) => {
-      allIndexs.push(queryInterface.showIndex(v));
-    });
-    const res1 = await Promise.all(allIndexs);
-    const allIndexs1: any = [];
-    res1.forEach((v: any[]) => {
-      const { tableName }: { tableName: string } = v[0];
-      const indexStrArr: string[] = [];
-      v.forEach((x) => {
-        indexStrArr.push(x.name);
-        if (x.name !== 'PRIMARY') {
-          allIndexs1.push(queryInterface.removeIndex(tableName, x.name));
-        }
+    if (allTables.length) {
+      const allIndexs: any = [];
+      allTables.forEach((v) => {
+        allIndexs.push(queryInterface.showIndex(v));
       });
-      console.log(chalkINFO(`${tableName}表的索引: ${indexStrArr.toString()}`));
-    });
-    await Promise.all(allIndexs1);
+      const res1 = await Promise.all(allIndexs);
+      const allIndexs1: any = [];
+      res1.forEach((v: any[]) => {
+        const { tableName }: { tableName: string } = v[0];
+        const indexStrArr: string[] = [];
+        v.forEach((x) => {
+          indexStrArr.push(x.name);
+          if (x.name !== 'PRIMARY') {
+            allIndexs1.push(queryInterface.removeIndex(tableName, x.name));
+          }
+        });
+        console.log(
+          chalkINFO(`${tableName}表的索引: ${indexStrArr.toString()}`)
+        );
+      });
+      await Promise.all(allIndexs1);
+    }
     console.log(chalkSUCCESS(`删除${allTables.toString()}表的索引成功！`));
   } catch (err) {
     console.log(chalkERROR(`删除索引失败！`), err);
