@@ -163,7 +163,7 @@ class TencentcloudClass {
       push_rtmp_url: `rtmp://${TENCENTCLOUD_LIVE.PushDomain}/${TENCENTCLOUD_LIVE.AppName}/${key}`,
       push_obs_server: `rtmp://${TENCENTCLOUD_LIVE.PushDomain}/${TENCENTCLOUD_LIVE.AppName}/`,
       push_obs_stream_key: key,
-      push_webrtc_url: `webrtc://${TENCENTCLOUD_LIVE.PushDomain}/${TENCENTCLOUD_LIVE.AppName}/${StreamName}${key}`,
+      push_webrtc_url: `webrtc://${TENCENTCLOUD_LIVE.PushDomain}/${TENCENTCLOUD_LIVE.AppName}/${key}`,
       push_srt_url: ``,
     };
   };

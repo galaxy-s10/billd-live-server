@@ -295,7 +295,7 @@ export const connectWebSocket = (server) => {
 
     // 收到心跳
     socket.on(WsMsgTypeEnum.heartbeat, (data: WsHeartbeatType) => {
-      console.log('收到心跳', data);
+      // console.log('收到心跳', data);
       try {
         updateUserJoinedRoom({
           socketId: data.data.socket_id,
