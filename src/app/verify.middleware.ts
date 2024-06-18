@@ -37,6 +37,8 @@ const frontendWhiteList = [
   '/srs/on_stop',
   '/srs/on_unpublish',
   '/srs/on_dvr',
+  '/tencentcloud_css/on_publish',
+  '/tencentcloud_css/on_unpublish',
 ];
 
 // 全局白名单

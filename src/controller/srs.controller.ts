@@ -210,6 +210,7 @@ class SRSController {
       await next();
       return;
     }
+    // body.param格式：?pushtype=0&pushkey=xxxxx
     const params = new URLSearchParams(body.param);
     const paramsUserToken = params.get(SRS_CB_URL_PARAMS.userToken);
     const paramsUserId = params.get(SRS_CB_URL_PARAMS.userId);
@@ -290,6 +291,7 @@ class SRSController {
       await next();
       return;
     }
+    // body.param格式：?pushtype=0&pushkey=xxxxx
     const params = new URLSearchParams(body.param);
     const paramsUserToken = params.get(SRS_CB_URL_PARAMS.userToken);
     const paramsUserId = params.get(SRS_CB_URL_PARAMS.userId);
@@ -460,6 +462,7 @@ class SRSController {
       ctx.body = { code: 1, msg: '[on_publish] fail, roomId is not exist' };
       await next();
     } else {
+      // body.param格式：?pushtype=0&pushkey=xxxxx
       const params = new URLSearchParams(body.param);
       const paramsPublishKey = params.get(SRS_CB_URL_PARAMS.publishKey);
       const paramsPublishType = params.get(SRS_CB_URL_PARAMS.publishType);
@@ -628,6 +631,7 @@ class SRSController {
       await next();
       return;
     }
+    // body.param格式：?pushtype=0&pushkey=xxxxx
     const params = new URLSearchParams(body.param);
     const paramsPublishKey = params.get(SRS_CB_URL_PARAMS.publishKey);
     if (!paramsPublishKey) {

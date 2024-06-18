@@ -6,4 +6,11 @@ const tencentcloudCssRouter = new Router({ prefix: '/tencentcloud_css' });
 
 tencentcloudCssRouter.post('/push', tencentcloudCssController.push);
 
+tencentcloudCssRouter.post('/on_publish', tencentcloudCssController.onPublish);
+
+tencentcloudCssRouter.post(
+  '/on_unpublish',
+  tencentcloudCssController.onUnpublish
+);
+
 export default tencentcloudCssRouter;
