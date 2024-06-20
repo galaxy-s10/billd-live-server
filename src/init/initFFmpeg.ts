@@ -2,6 +2,7 @@ import { exec, spawnSync } from 'child_process';
 
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import srsController from '@/controller/srs.controller';
+import userLiveRoomController from '@/controller/userLiveRoom.controller';
 import { initUser } from '@/init/initUser';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
@@ -134,8 +135,14 @@ async function addLive({
     });
     if (err) return;
     if (res) {
+      const [userLiveRoomInfo] = await Promise.all([
+        userLiveRoomController.common.findByLiveRoomIdAndKey(
+          Number(live_room_id)
+        ),
+      ]);
       const pushRes = tencentcloudUtils.getPushUrl({
         roomId: live_room_id,
+        key: userLiveRoomInfo?.live_room?.key,
       });
       push_rtmp_url = pushRes.push_rtmp_url;
       push_obs_server = pushRes.push_obs_server;

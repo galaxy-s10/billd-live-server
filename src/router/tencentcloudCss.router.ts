@@ -6,6 +6,8 @@ const tencentcloudCssRouter = new Router({ prefix: '/tencentcloud_css' });
 
 tencentcloudCssRouter.post('/push', tencentcloudCssController.push);
 
+tencentcloudCssRouter.get('/remote_auth', tencentcloudCssController.remoteAuth);
+
 tencentcloudCssRouter.post('/on_publish', tencentcloudCssController.onPublish);
 
 tencentcloudCssRouter.post(

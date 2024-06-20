@@ -25,6 +25,8 @@ class UserLiveRoomController {
     findByUserId: (userId: number) => userLiveRoomService.findByUserId(userId),
     findByLiveRoomId: (liveRoomId: number) =>
       userLiveRoomService.findByLiveRoomId(liveRoomId),
+    findByLiveRoomIdAndKey: (liveRoomId: number) =>
+      userLiveRoomService.findByLiveRoomIdAndKey(liveRoomId),
   };
 
   async getList(ctx: ParameterizedContext, next) {

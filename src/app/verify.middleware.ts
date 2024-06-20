@@ -39,6 +39,7 @@ const frontendWhiteList = [
   '/srs/on_dvr',
   '/tencentcloud_css/on_publish',
   '/tencentcloud_css/on_unpublish',
+  '/tencentcloud_css/remote_auth',
 ];
 
 // 全局白名单

@@ -158,6 +158,48 @@ class UserLiveRoomService {
     return result;
   }
 
+  /** 查找用户直播间带key */
+  async findByLiveRoomIdAndKey(live_room_id: number) {
+    const result = await userLiveRoomModel.findOne({
+      include: [
+        {
+          model: userModel,
+          attributes: {
+            exclude: ['password', 'token'],
+          },
+        },
+        {
+          model: liveRoomModel,
+          attributes: {
+            exclude: [
+              'push_rtmp_url',
+              'push_obs_server',
+              'push_obs_stream_key',
+              'push_webrtc_url',
+              'push_srt_url',
+              'forward_bilibili_url',
+              'forward_huya_url',
+              'forward_huya_url',
+              'forward_douyin_url',
+              'forward_kuaishou_url',
+              'forward_xiaohongshu_url',
+            ],
+          },
+          include: [
+            {
+              model: areaModel,
+              through: {
+                attributes: [],
+              },
+            },
+          ],
+        },
+      ],
+      where: { live_room_id },
+    });
+    return result;
+  }
+
   /** 修改用户直播间 */
   async update(data: IUserLiveRoom) {
     const { id } = data;

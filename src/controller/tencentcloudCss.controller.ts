@@ -34,8 +34,12 @@ class TencentcloudCssController {
         COMMON_HTTP_CODE.forbidden
       );
     }
+    const [userLiveRoomInfo] = await Promise.all([
+      userLiveRoomController.common.findByLiveRoomIdAndKey(Number(liveRoomId)),
+    ]);
     const pushRes = tencentcloudUtils.getPushUrl({
       roomId: liveRoomId,
+      key: userLiveRoomInfo?.live_room?.key,
     });
     const pullRes = tencentcloudUtils.getPullUrl({
       roomId: liveRoomId,
@@ -79,6 +83,122 @@ class TencentcloudCssController {
     successHandler({ ctx, data: pushRes });
     await next();
   }
+
+  remoteAuth = async (ctx: ParameterizedContext, next) => {
+    const roomId = ctx.query['roomId'];
+    const paramsPublishKey = ctx.query[SRS_CB_URL_PARAMS.publishKey];
+    if (!roomId) {
+      console.log(chalkERROR(`[tencentcloud_css_remoteAuth] 房间id不存在！`));
+      successHandler({
+        httpStatusCode: 403,
+        ctx,
+        data: '[tencentcloud_css_remoteAuth] fail, roomId is not exist',
+      });
+      await next();
+      return;
+    }
+    // stream_param格式：'txSecret=xxxx&txTime=xxx&aa=123&bb=456',
+    if (!paramsPublishKey) {
+      console.log(chalkERROR(`[tencentcloud_css_remoteAuth] 没有推流token`));
+      successHandler({
+        httpStatusCode: 403,
+        ctx,
+        data: '[tencentcloud_css_remoteAuth] fail, no token',
+      });
+      await next();
+      return;
+    }
+    const result = await liveRoomService.findKey(Number(roomId));
+    const rtmptoken = result?.key;
+    if (rtmptoken !== paramsPublishKey) {
+      console.log(
+        chalkERROR(`[tencentcloud_css_remoteAuth] 房间id：${roomId}，鉴权失败`)
+      );
+      successHandler({
+        httpStatusCode: 403,
+        ctx,
+        data: '[tencentcloud_css_remoteAuth] fail, auth fail',
+      });
+      await next();
+      return;
+    }
+    // const isLiveing = await liveController.common.findByLiveRoomId(
+    //   Number(roomId)
+    // );
+    // if (isLiveing) {
+    //   console.log(
+    //     chalkERROR(
+    //       `[tencentcloud_css_remoteAuth] 房间id：${roomId}，鉴权成功，但是正在直播，不允许推流`
+    //     )
+    //   );
+    //   ctx.body = {
+    //     code: 1,
+    //     msg: '[tencentcloud_css_remoteAuth] fail, room is living',
+    //   };
+    //   await next();
+    //   return;
+    // }
+    const [userLiveRoomInfo] = await Promise.all([
+      userLiveRoomController.common.findByLiveRoomId(Number(roomId)),
+    ]);
+    if (!userLiveRoomInfo) {
+      console.log(
+        chalkERROR(
+          '[tencentcloud_css_remoteAuth] userLiveRoomInfo为空，不允许推流'
+        )
+      );
+      successHandler({
+        httpStatusCode: 403,
+        ctx,
+        data: '[tencentcloud_css_remoteAuth] fail, userLiveRoomInfo is not exist',
+      });
+      await next();
+      return;
+    }
+    console.log(
+      chalkSUCCESS(
+        `[tencentcloud_css_remoteAuth] 房间id：${roomId}，所有验证通过，允许推流`
+      )
+    );
+    successHandler({
+      ctx,
+      data: '[tencentcloud_css_remoteAuth] all success, pass',
+    });
+    await Promise.all([
+      liveController.common.create({
+        live_room_id: Number(roomId),
+        user_id: userLiveRoomInfo.user_id,
+        socket_id: '-1',
+        track_audio: 1,
+        track_video: 1,
+        srs_action: '',
+        srs_app: '',
+        srs_client_id: '',
+        srs_ip: '',
+        srs_param: '',
+        srs_server_id: '',
+        srs_service_id: '',
+        srs_stream: '',
+        srs_stream_id: '',
+        srs_stream_url: '',
+        srs_tcUrl: '',
+        srs_vhost: '',
+      }),
+      liveRecordController.common.create({
+        client_id: '',
+        live_room_id: Number(roomId),
+        user_id: userLiveRoomInfo.user_id,
+        danmu: 0,
+        duration: 0,
+        view: 0,
+      }),
+    ]);
+    wsSocket.io?.to(roomId).emit(WsMsgTypeEnum.roomLiving, {
+      live_room: userLiveRoomInfo.live_room!,
+      anchor_socket_id: '',
+    });
+    await next();
+  };
 
   onPublish = async (ctx: ParameterizedContext, next) => {
     console.log('tencentcloud_css-onPublish');
@@ -134,22 +254,22 @@ class TencentcloudCssController {
         await next();
         return;
       }
-      const isLiveing = await liveController.common.findByLiveRoomId(
-        Number(roomId)
-      );
-      if (isLiveing) {
-        console.log(
-          chalkERROR(
-            `[tencentcloud_css_on_publish] 房间id：${roomId}，鉴权成功，但是正在直播，不允许推流`
-          )
-        );
-        ctx.body = {
-          code: 1,
-          msg: '[tencentcloud_css_on_publish] fail, room is living',
-        };
-        await next();
-        return;
-      }
+      // const isLiveing = await liveController.common.findByLiveRoomId(
+      //   Number(roomId)
+      // );
+      // if (isLiveing) {
+      //   console.log(
+      //     chalkERROR(
+      //       `[tencentcloud_css_on_publish] 房间id：${roomId}，鉴权成功，但是正在直播，不允许推流`
+      //     )
+      //   );
+      //   ctx.body = {
+      //     code: 1,
+      //     msg: '[tencentcloud_css_on_publish] fail, room is living',
+      //   };
+      //   await next();
+      //   return;
+      // }
       const [userLiveRoomInfo] = await Promise.all([
         userLiveRoomController.common.findByLiveRoomId(Number(roomId)),
       ]);
