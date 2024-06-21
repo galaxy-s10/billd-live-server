@@ -149,7 +149,7 @@ class TencentcloudClass {
    * 拼装推流 URL
    * https://cloud.tencent.com/document/product/267/32720
    */
-  getPushUrl = (data: { roomId: number; key }) => {
+  getPushUrl = (data: { roomId: number; key: string }) => {
     // 推流鉴权方式：静态鉴权(static)，https://developer.qiniu.com/pili/6678/push-the-current-authentication
     // 推流地址格式：rtmp://<Domain>/<AppName>/<StreamName>?txSecret=xxx&txTime=xxxx
     // https://cloud.tencent.com/document/product/267/32720
@@ -159,9 +159,9 @@ class TencentcloudClass {
     const txSecret = cryptojs
       .MD5(TENCENTCLOUD_LIVE.Key + StreamName + Hex(txTime))
       .toString();
-    const key = `${StreamName}?txSecret=${txSecret}&txTime=${Hex(
-      txTime
-    )}&roomId=${data.roomId}&${SRS_CB_URL_PARAMS.publishKey}=${data.key}`;
+    const key = `${StreamName}?txSecret=${txSecret}&txTime=${Hex(txTime)}&${
+      SRS_CB_URL_PARAMS.roomId
+    }=${data.roomId}&${SRS_CB_URL_PARAMS.publishKey}=${data.key}`;
     return {
       push_rtmp_url: `rtmp://${TENCENTCLOUD_LIVE.PushDomain}/${TENCENTCLOUD_LIVE.AppName}/${key}`,
       push_obs_server: `rtmp://${TENCENTCLOUD_LIVE.PushDomain}/${TENCENTCLOUD_LIVE.AppName}/`,

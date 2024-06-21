@@ -70,7 +70,7 @@ class SRSController {
       type: LiveRoomTypeEnum;
       key: string;
     }) => {
-      const key = `?${SRS_CB_URL_PARAMS.publishType}=${data.type}&${SRS_CB_URL_PARAMS.publishKey}=${data.key}`;
+      const key = `?${SRS_CB_URL_PARAMS.roomId}=${data.liveRoomId}&${SRS_CB_URL_PARAMS.publishType}=${data.type}&${SRS_CB_URL_PARAMS.publishKey}=${data.key}`;
       return {
         push_rtmp_url: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${data.liveRoomId}${key}`,
         push_obs_server: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${data.liveRoomId}`,

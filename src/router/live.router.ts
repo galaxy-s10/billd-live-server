@@ -6,6 +6,8 @@ const liveRouter = new Router({ prefix: '/live' });
 
 liveRouter.get('/list', liveController.getList);
 
+liveRouter.get('/list_duplicate_removal', liveController.listDuplicateRemoval);
+
 liveRouter.post('/close_live', liveController.closeLive);
 
 liveRouter.get('/is_live', liveController.isLive);

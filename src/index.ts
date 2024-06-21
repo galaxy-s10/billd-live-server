@@ -45,6 +45,7 @@ async function main() {
     console.log(chalkWARN(`监听端口: ${port}`));
     console.log(chalkWARN(`项目名称: ${PROJECT_NAME}`));
     console.log(chalkWARN(`项目环境: ${PROJECT_ENV}`));
+    console.log(chalkWARN(`mysql host: ${MYSQL_CONFIG.host}`));
     console.log(chalkWARN(`mysql数据库: ${MYSQL_CONFIG.database}`));
     getIpAddress().forEach((ip) => {
       console.log(chalkSUCCESS(`http://${ip}:${port}/`));

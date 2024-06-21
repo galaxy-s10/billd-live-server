@@ -272,7 +272,7 @@ class LiveService {
   }
 
   /** 删除直播 */
-  async delete(id: number) {
+  async delete(id: number | number[]) {
     const result = await liveModel.destroy({
       where: { id },
       individualHooks: true,

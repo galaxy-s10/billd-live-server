@@ -39,7 +39,7 @@ class TencentcloudCssController {
     ]);
     const pushRes = tencentcloudUtils.getPushUrl({
       roomId: liveRoomId,
-      key: userLiveRoomInfo?.live_room?.key,
+      key: userLiveRoomInfo?.live_room?.key || '',
     });
     const pullRes = tencentcloudUtils.getPullUrl({
       roomId: liveRoomId,
@@ -85,8 +85,8 @@ class TencentcloudCssController {
   }
 
   remoteAuth = async (ctx: ParameterizedContext, next) => {
-    const roomId = ctx.query['roomId'];
-    const paramsPublishKey = ctx.query[SRS_CB_URL_PARAMS.publishKey];
+    const roomId = ctx.query[SRS_CB_URL_PARAMS.roomId] as string;
+    const paramsPublishKey = ctx.query[SRS_CB_URL_PARAMS.publishKey] as string;
     if (!roomId) {
       console.log(chalkERROR(`[tencentcloud_css_remoteAuth] 房间id不存在！`));
       successHandler({
@@ -122,9 +122,9 @@ class TencentcloudCssController {
       await next();
       return;
     }
-    // const isLiveing = await liveController.common.findByLiveRoomId(
-    //   Number(roomId)
-    // );
+    const isLiveing = await liveController.common.findByLiveRoomId(
+      Number(roomId)
+    );
     // if (isLiveing) {
     //   console.log(
     //     chalkERROR(
@@ -164,35 +164,39 @@ class TencentcloudCssController {
       ctx,
       data: '[tencentcloud_css_remoteAuth] all success, pass',
     });
-    await Promise.all([
-      liveController.common.create({
-        live_room_id: Number(roomId),
-        user_id: userLiveRoomInfo.user_id,
-        socket_id: '-1',
-        track_audio: 1,
-        track_video: 1,
-        srs_action: '',
-        srs_app: '',
-        srs_client_id: '',
-        srs_ip: '',
-        srs_param: '',
-        srs_server_id: '',
-        srs_service_id: '',
-        srs_stream: '',
-        srs_stream_id: '',
-        srs_stream_url: '',
-        srs_tcUrl: '',
-        srs_vhost: '',
-      }),
-      liveRecordController.common.create({
-        client_id: '',
-        live_room_id: Number(roomId),
-        user_id: userLiveRoomInfo.user_id,
-        danmu: 0,
-        duration: 0,
-        view: 0,
-      }),
-    ]);
+    await Promise.all(
+      [
+        !isLiveing
+          ? liveController.common.create({
+              live_room_id: Number(roomId),
+              user_id: userLiveRoomInfo.user_id,
+              socket_id: '-1',
+              track_audio: 1,
+              track_video: 1,
+              srs_action: '',
+              srs_app: '',
+              srs_client_id: '',
+              srs_ip: '',
+              srs_param: '',
+              srs_server_id: '',
+              srs_service_id: '',
+              srs_stream: '',
+              srs_stream_id: '',
+              srs_stream_url: '',
+              srs_tcUrl: '',
+              srs_vhost: '',
+            })
+          : false,
+        liveRecordController.common.create({
+          client_id: '',
+          live_room_id: Number(roomId),
+          user_id: userLiveRoomInfo.user_id,
+          danmu: 0,
+          duration: 0,
+          view: 0,
+        }),
+      ].filter((v) => v !== false)
+    );
     wsSocket.io?.to(roomId).emit(WsMsgTypeEnum.roomLiving, {
       live_room: userLiveRoomInfo.live_room!,
       anchor_socket_id: '',
@@ -219,7 +223,7 @@ class TencentcloudCssController {
       const params = new URLSearchParams(body.stream_param);
       const paramsPublishKey = params.get(SRS_CB_URL_PARAMS.publishKey);
       const txSecret = cryptojs
-        .MD5(TENCENTCLOUD_LIVE.CbKey + '' + body.t)
+        .MD5(`${TENCENTCLOUD_LIVE.CbKey}${body.t}`)
         .toString();
       if (txSecret !== body.sign) {
         console.log(chalkERROR(`[tencentcloud_css_on_publish] sign校验错误`));

@@ -44,6 +44,6 @@ const model = sequelize.define<DeskUserModel>(
   }
 );
 
-initTable({ model, sequelize, method: 'force' });
+initTable({ model, sequelize });
 
 export default model;

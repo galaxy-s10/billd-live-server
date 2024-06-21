@@ -142,7 +142,7 @@ async function addLive({
       ]);
       const pushRes = tencentcloudUtils.getPushUrl({
         roomId: live_room_id,
-        key: userLiveRoomInfo?.live_room?.key,
+        key: userLiveRoomInfo?.live_room?.key || '',
       });
       push_rtmp_url = pushRes.push_rtmp_url;
       push_obs_server = pushRes.push_obs_server;
@@ -157,14 +157,6 @@ async function addLive({
       hls_url = pullUrlRes.hls;
       webrtc_url = pullUrlRes.webrtc;
       await main();
-      // 这个不能省，cdn不是推流到srs的，所以不能用不了srs的onpublish回调
-      liveService.create({
-        live_room_id,
-        user_id,
-        socket_id: '-1',
-        track_audio: 1,
-        track_video: 1,
-      });
     }
   }
 

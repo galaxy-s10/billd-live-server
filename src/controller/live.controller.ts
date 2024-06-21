@@ -1,3 +1,4 @@
+import { arrayUnique } from 'billd-utils';
 import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
@@ -97,7 +98,8 @@ class LiveController {
           COMMON_HTTP_CODE.paramsError
         );
       }
-      await liveService.deleteByLiveRoomId(liveRoomId);
+      const res = await liveService.deleteByLiveRoomId(liveRoomId);
+      return res;
     },
 
     findByLiveRoomId: async (liveRoomId: number) => {
@@ -114,6 +116,31 @@ class LiveController {
   getList = async (ctx: ParameterizedContext, next) => {
     const result = await this.common.getList(ctx.request.query);
     successHandler({ ctx, data: result });
+    await next();
+  };
+
+  listDuplicateRemoval = async (ctx: ParameterizedContext, next) => {
+    const result = await this.common.getList({});
+    const map = {};
+    const delMap = {};
+    const delRoomId: number[] = [];
+    const delLiveId: number[] = [];
+    result.rows.forEach((item) => {
+      const { id, live_room_id } = item;
+      if (live_room_id && id) {
+        if (!map[live_room_id]) {
+          map[live_room_id] = true;
+        } else {
+          delMap[id] = live_room_id;
+          delRoomId.push(live_room_id);
+          delLiveId.push(id);
+        }
+      }
+    });
+    const uniDelRoomId = arrayUnique(delRoomId);
+    const uniDelLiveId = arrayUnique(delLiveId);
+    const delRes = await liveService.delete(delLiveId);
+    successHandler({ ctx, data: { uniDelRoomId, uniDelLiveId, delRes } });
     await next();
   };
 

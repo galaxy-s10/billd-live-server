@@ -267,4 +267,5 @@ export const SRS_CB_URL_PARAMS = {
   userToken: 'usertoken',
   userId: 'userid',
   randomId: 'randomid',
+  roomId: 'roomid',
 };
