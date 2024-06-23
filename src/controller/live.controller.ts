@@ -90,15 +90,15 @@ class LiveController {
       }
     },
 
-    deleteByLiveRoomId: async (liveRoomId: number) => {
-      if (!liveRoomId) {
+    deleteByLiveRoomId: async (liveRoomIds: number[]) => {
+      if (!liveRoomIds.length) {
         throw new CustomError(
-          'liveRoomId为空',
+          'liveRoomIds为空',
           COMMON_HTTP_CODE.paramsError,
           COMMON_HTTP_CODE.paramsError
         );
       }
-      const res = await liveService.deleteByLiveRoomId(liveRoomId);
+      const res = await liveService.deleteByLiveRoomId(liveRoomIds);
       return res;
     },
 

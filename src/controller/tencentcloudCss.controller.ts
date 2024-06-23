@@ -53,33 +53,34 @@ class TencentcloudCssController {
         flv_url: pullRes.flv,
         hls_url: pullRes.hls,
       }),
-      liveController.common.create({
-        live_room_id: liveRoomId,
-        user_id: authRes.userInfo.id,
-        socket_id: '-1',
-        track_audio: 1,
-        track_video: 1,
-        srs_action: '',
-        srs_app: '',
-        srs_client_id: '',
-        srs_ip: '',
-        srs_param: '',
-        srs_server_id: '',
-        srs_service_id: '',
-        srs_stream: '',
-        srs_stream_id: '',
-        srs_stream_url: '',
-        srs_tcUrl: '',
-        srs_vhost: '',
-      }),
-      liveRecordController.common.create({
-        client_id: '',
-        live_room_id: liveRoomId,
-        user_id: authRes.userInfo.id,
-        danmu: 0,
-        duration: 0,
-        view: 0,
-      }),
+      // liveController.common.create({
+      //   live_room_id: liveRoomId,
+      //   user_id: authRes.userInfo.id,
+      //   socket_id: '-1',
+      //   track_audio: 1,
+      //   track_video: 1,
+      //   srs_action: '',
+      //   srs_app: '',
+      //   srs_client_id: '',
+      //   srs_ip: '',
+      //   srs_param: '',
+      //   srs_server_id: '',
+      //   srs_service_id: '',
+      //   srs_stream: '',
+      //   srs_stream_id: '',
+      //   srs_stream_url: '',
+      //   srs_tcUrl: '',
+      //   srs_vhost: '',
+      //   is_tencentcloud_css: 1,
+      // }),
+      // liveRecordController.common.create({
+      //   client_id: '',
+      //   live_room_id: liveRoomId,
+      //   user_id: authRes.userInfo.id,
+      //   danmu: 0,
+      //   duration: 0,
+      //   view: 0,
+      // }),
     ]);
     successHandler({ ctx, data: pushRes });
     await next();
@@ -221,7 +222,7 @@ class TencentcloudCssController {
               track_video: 1,
               srs_action: '',
               srs_app: '',
-              srs_client_id: body.sequence,
+              srs_client_id: '',
               srs_ip: '',
               srs_param: '',
               srs_server_id: '',
@@ -231,6 +232,8 @@ class TencentcloudCssController {
               srs_stream_url: '',
               srs_tcUrl: '',
               srs_vhost: '',
+              is_tencentcloud_css: 1,
+              flag_id: body.sequence,
             })
           : false,
         liveRecordController.common.create({
@@ -311,7 +314,7 @@ class TencentcloudCssController {
       return;
     }
     await Promise.all([
-      liveController.common.deleteByLiveRoomId(Number(roomId)),
+      liveController.common.deleteByLiveRoomId([Number(roomId)]),
       liveRecordController.common.updateByLiveRoomIdAndUserId({
         client_id: body.sequence,
         live_room_id: Number(roomId),

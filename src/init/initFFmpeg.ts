@@ -32,9 +32,10 @@ async function addLive({
   weight,
   pull_is_should_auth,
   cover_img,
-  localFile,
   devFFmpeg,
   prodFFmpeg,
+  devFFmpegLocalFile,
+  prodFFmpegLocalFile,
 }: {
   live_room_id: number;
   user_id: number;
@@ -44,9 +45,10 @@ async function addLive({
   weight: number;
   pull_is_should_auth: LiveRoomPullIsShouldAuthEnum;
   cover_img: string;
-  localFile: string;
   devFFmpeg: boolean;
   prodFFmpeg: boolean;
+  devFFmpegLocalFile: string;
+  prodFFmpegLocalFile: string;
 }) {
   let flv_url = '';
   let hls_url = '';
@@ -84,6 +86,16 @@ async function addLive({
       // ]);
       // const { pid } = ffmpegCmd;
       // console.log(chalkWARN('ffmpeg进程pid'), pid);
+      let localFile = '';
+      if (PROJECT_ENV === PROJECT_ENV_ENUM.development && devFFmpeg) {
+        localFile = devFFmpegLocalFile;
+      } else if (PROJECT_ENV === PROJECT_ENV_ENUM.prod && prodFFmpeg) {
+        localFile = prodFFmpegLocalFile;
+      }
+      if (localFile === '') {
+        console.log(chalkERROR(`FFmpeg推流错误！`), 'localFile为空');
+        return;
+      }
       const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec copy -acodec copy -f flv '${push_rtmp_url}'`;
       // const ffmpegSyncCmd = `${ffmpegCmd} 1>/dev/null 2>&1 &`;
       try {
@@ -228,9 +240,10 @@ export const initFFmpeg = async (init = true) => {
           weight: initUser[item].live_room.weight!,
           pull_is_should_auth: initUser[item].live_room.pull_is_should_auth!,
           cover_img: initUser[item].live_room.cover_img!,
-          localFile: initUser[item].live_room.localFile,
           devFFmpeg: initUser[item].live_room.devFFmpeg,
           prodFFmpeg: initUser[item].live_room.prodFFmpeg,
+          devFFmpegLocalFile: initUser[item].live_room.devFFmpegLocalFile,
+          prodFFmpegLocalFile: initUser[item].live_room.prodFFmpegLocalFile,
         })
       );
     });

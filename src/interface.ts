@@ -109,7 +109,8 @@ export interface IInitUser extends IUser {
     devFFmpeg: boolean;
     prodFFmpeg: boolean;
     area: number[];
-    localFile: string;
+    devFFmpegLocalFile: string;
+    prodFFmpegLocalFile: string;
   };
 }
 
@@ -452,6 +453,10 @@ export interface ISrsPublishStream {
   srs_param?: string;
   srs_stream_url?: string;
   srs_stream_id?: string;
+  /** 是否是腾讯云云直播，1是，2否 */
+  is_tencentcloud_css?: number;
+  /** 标识id */
+  flag_id?: string;
 }
 
 export interface ILive extends ISrsPublishStream {

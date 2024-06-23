@@ -163,7 +163,7 @@ class UserService {
               'push_srt_url',
               'forward_bilibili_url',
               'forward_huya_url',
-              'forward_huya_url',
+              'forward_douyu_url',
               'forward_douyin_url',
               'forward_kuaishou_url',
               'forward_xiaohongshu_url',

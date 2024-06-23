@@ -73,6 +73,12 @@ const model = sequelize.define<LiveModel>(
     srs_stream_id: {
       type: DataTypes.STRING,
     },
+    is_tencentcloud_css: {
+      type: DataTypes.INTEGER,
+    },
+    flag_id: {
+      type: DataTypes.STRING,
+    },
   },
   {
     paranoid: true,

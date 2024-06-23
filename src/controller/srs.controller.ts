@@ -70,11 +70,14 @@ class SRSController {
       type: LiveRoomTypeEnum;
       key: string;
     }) => {
-      const key = `?${SRS_CB_URL_PARAMS.roomId}=${data.liveRoomId}&${SRS_CB_URL_PARAMS.publishType}=${data.type}&${SRS_CB_URL_PARAMS.publishKey}=${data.key}`;
+      const pushParams = (type: LiveRoomTypeEnum) =>
+        `?${SRS_CB_URL_PARAMS.roomId}=${data.liveRoomId}&${SRS_CB_URL_PARAMS.publishType}=${type}&${SRS_CB_URL_PARAMS.publishKey}=${data.key}`;
       return {
-        push_rtmp_url: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${data.liveRoomId}${key}`,
+        push_rtmp_url: `${SERVER_LIVE.PushDomain}/${
+          SERVER_LIVE.AppName
+        }/roomId___${data.liveRoomId}${pushParams(data.type)}`,
         push_obs_server: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${data.liveRoomId}`,
-        push_obs_stream_key: key,
+        push_obs_stream_key: pushParams(LiveRoomTypeEnum.obs),
         push_webrtc_url: ``,
         push_srt_url: ``,
       };
@@ -596,6 +599,8 @@ class SRSController {
           srs_stream_url: body.stream_url,
           srs_tcUrl: body.tcUrl,
           srs_vhost: body.vhost,
+          is_tencentcloud_css: 2,
+          flag_id: body.client_id,
         }),
         liveRecordController.common.create({
           client_id: body.client_id,
@@ -660,7 +665,7 @@ class SRSController {
       return;
     }
     await Promise.all([
-      liveController.common.deleteByLiveRoomId(Number(roomId)),
+      liveController.common.deleteByLiveRoomId([Number(roomId)]),
       liveRecordController.common.updateByLiveRoomIdAndUserId({
         client_id: body.client_id,
         live_room_id: Number(roomId),

@@ -2,8 +2,6 @@ import path from 'path';
 
 import {
   DEFAULT_ROLE_INFO,
-  PROJECT_ENV,
-  PROJECT_ENV_ENUM,
   QINIU_RESOURCE,
   SERVER_VIDEO_DIR,
   VIDEO_DIR,
@@ -30,7 +28,8 @@ export const initUser: Record<string, IInitUser> = {
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: false, // 初始化ffmpeg
-      localFile: path.resolve(SERVER_VIDEO_DIR, 'fddm_mhsw.mp4'),
+      devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_snjs.mp4'),
+      prodFFmpegLocalFile: path.resolve(SERVER_VIDEO_DIR, 'fddm_mhsw.mp4'),
     },
   },
   systemUser1: {
@@ -48,7 +47,8 @@ export const initUser: Record<string, IInitUser> = {
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
-      localFile: path.resolve(SERVER_VIDEO_DIR, 'fddm_yycy.mp4'),
+      devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_snjs.mp4'),
+      prodFFmpegLocalFile: path.resolve(SERVER_VIDEO_DIR, 'fddm_yycy.mp4'),
     },
   },
   systemUser2: {
@@ -66,10 +66,8 @@ export const initUser: Record<string, IInitUser> = {
       area: [1],
       devFFmpeg: true, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
-      localFile:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? path.resolve(SERVER_VIDEO_DIR, 'fddm_hyzdwmgl.mp4')
-          : path.resolve(VIDEO_DIR, 'fddm_hyzdwmgl.mp4'),
+      devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_hyzdwmgl.mp4'),
+      prodFFmpegLocalFile: path.resolve(SERVER_VIDEO_DIR, 'fddm_hyzdwmgl.mp4'),
     },
   },
   systemUser3: {
@@ -87,10 +85,8 @@ export const initUser: Record<string, IInitUser> = {
       area: [1],
       devFFmpeg: true, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
-      localFile:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? path.resolve(SERVER_VIDEO_DIR, 'fddm_snjs.mp4')
-          : path.resolve(VIDEO_DIR, 'fddm_snjs.mp4'),
+      devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_snjs.mp4'),
+      prodFFmpegLocalFile: path.resolve(SERVER_VIDEO_DIR, 'fddm_snjs.mp4'),
     },
   },
   systemUser4: {
@@ -108,10 +104,8 @@ export const initUser: Record<string, IInitUser> = {
       area: [1],
       devFFmpeg: true, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
-      localFile:
-        PROJECT_ENV === PROJECT_ENV_ENUM.prod
-          ? path.resolve(SERVER_VIDEO_DIR, 'fddm_xyzcsl.mp4')
-          : path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),
+      devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),
+      prodFFmpegLocalFile: path.resolve(SERVER_VIDEO_DIR, 'fddm_xyzcsl.mp4'),
     },
   },
   systemUser5: {
@@ -129,7 +123,11 @@ export const initUser: Record<string, IInitUser> = {
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
-      localFile: path.resolve(SERVER_VIDEO_DIR, 'fddm_nswwsbddja.mp4'),
+      devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),
+      prodFFmpegLocalFile: path.resolve(
+        SERVER_VIDEO_DIR,
+        'fddm_nswwsbddja.mp4'
+      ),
     },
   },
   systemUser6: {
@@ -147,7 +145,8 @@ export const initUser: Record<string, IInitUser> = {
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
-      localFile: path.resolve(SERVER_VIDEO_DIR, 'zjl_bnsdmm.mp4'),
+      devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),
+      prodFFmpegLocalFile: path.resolve(SERVER_VIDEO_DIR, 'zjl_bnsdmm.mp4'),
     },
   },
   systemUser7: {
@@ -165,7 +164,8 @@ export const initUser: Record<string, IInitUser> = {
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: false, // 初始化ffmpeg
-      localFile: path.resolve(SERVER_VIDEO_DIR, 'zjl_qt.mp4'),
+      devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),
+      prodFFmpegLocalFile: path.resolve(SERVER_VIDEO_DIR, 'zjl_qt.mp4'),
     },
   },
   systemUser8: {
@@ -183,7 +183,8 @@ export const initUser: Record<string, IInitUser> = {
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
-      localFile: path.resolve(SERVER_VIDEO_DIR, 'fddm_ycjh.mp4'),
+      devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),
+      prodFFmpegLocalFile: path.resolve(SERVER_VIDEO_DIR, 'fddm_ycjh.mp4'),
     },
   },
   systemUser9: {
@@ -201,7 +202,8 @@ export const initUser: Record<string, IInitUser> = {
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
-      localFile: path.resolve(SERVER_VIDEO_DIR, 'qlz_jjbnxy.mp4'),
+      devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),
+      prodFFmpegLocalFile: path.resolve(SERVER_VIDEO_DIR, 'qlz_jjbnxy.mp4'),
     },
   },
   systemUser10: {
@@ -219,7 +221,8 @@ export const initUser: Record<string, IInitUser> = {
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: false, // 初始化ffmpeg
-      localFile: path.resolve(SERVER_VIDEO_DIR, 'zjl_gq.mp4'),
+      devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),
+      prodFFmpegLocalFile: path.resolve(SERVER_VIDEO_DIR, 'zjl_gq.mp4'),
     },
   },
   systemUser11: {
@@ -237,7 +240,11 @@ export const initUser: Record<string, IInitUser> = {
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: true, // 初始化ffmpeg
-      localFile: path.resolve(SERVER_VIDEO_DIR, 'hss_20230707_1_30.mp4'),
+      devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),
+      prodFFmpegLocalFile: path.resolve(
+        SERVER_VIDEO_DIR,
+        'hss_20230707_1_30.mp4'
+      ),
     },
   },
   systemUser100: {
@@ -255,7 +262,8 @@ export const initUser: Record<string, IInitUser> = {
       area: [1],
       devFFmpeg: false, // 初始化ffmpeg
       prodFFmpeg: false, // 初始化ffmpeg
-      localFile: path.resolve(SERVER_VIDEO_DIR, 'zjl_ylxb.mp4'),
+      devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),
+      prodFFmpegLocalFile: path.resolve(SERVER_VIDEO_DIR, 'zjl_ylxb.mp4'),
     },
   },
 };

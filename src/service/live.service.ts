@@ -111,7 +111,7 @@ class LiveService {
               'push_srt_url',
               'forward_bilibili_url',
               'forward_huya_url',
-              'forward_huya_url',
+              'forward_douyu_url',
               'forward_douyin_url',
               'forward_kuaishou_url',
               'forward_xiaohongshu_url',
@@ -140,7 +140,7 @@ class LiveService {
           'push_srt_url',
           'forward_bilibili_url',
           'forward_huya_url',
-          'forward_huya_url',
+          'forward_douyu_url',
           'forward_douyin_url',
           'forward_kuaishou_url',
           'forward_xiaohongshu_url',
@@ -238,6 +238,8 @@ class LiveService {
     srs_stream_url,
     srs_tcUrl,
     srs_vhost,
+    is_tencentcloud_css,
+    flag_id,
   }: ILive) {
     const result = await liveModel.update(
       {
@@ -257,6 +259,8 @@ class LiveService {
         srs_stream_url,
         srs_tcUrl,
         srs_vhost,
+        is_tencentcloud_css,
+        flag_id,
       },
       { where: { live_room_id } }
     );
@@ -294,7 +298,7 @@ class LiveService {
   };
 
   /** 删除直播 */
-  deleteByLiveRoomId = async (live_room_id: number) => {
+  deleteByLiveRoomId = async (live_room_id: number | number[]) => {
     const res = await liveModel.destroy({ where: { live_room_id } });
     handleDelRedisByDbLiveList();
     return res;

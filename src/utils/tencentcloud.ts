@@ -112,6 +112,26 @@ class TencentcloudClass {
   };
 
   /**
+   * 查询直播中的流，返回正在直播中的流列表。适用于推流成功后查询在线流信息。
+   * https://cloud.tencent.com/document/product/267/20472
+   */
+  queryLiveStreamAll = async () => {
+    const params = {
+      PageNum: 1,
+      PageSize: 100,
+    };
+    try {
+      const res = await this.liveClient.DescribeLiveStreamOnlineList(params);
+      console.log(chalkSUCCESS('查询腾讯云直播中的流成功！'));
+      return { res };
+    } catch (err) {
+      console.log(err);
+      console.log(chalkERROR('查询腾讯云直播中的流错误！'));
+      return { err };
+    }
+  };
+
+  /**
    * 断开直播推流，断开推流连接，但可以重新推流。
    * https://cloud.tencent.com/document/product/267/20469
    */

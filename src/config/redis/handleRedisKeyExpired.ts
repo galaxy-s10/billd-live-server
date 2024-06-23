@@ -39,7 +39,7 @@ export const handleRedisKeyExpired = () => {
             ''
           );
           console.log('房间不直播了', liveRoomId);
-          liveController.common.deleteByLiveRoomId(+liveRoomId);
+          liveController.common.deleteByLiveRoomId([+liveRoomId]);
         }
       } catch (error) {
         console.log(error);

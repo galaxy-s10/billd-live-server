@@ -434,6 +434,7 @@ export async function handleWsStartLive(args: {
       socket_id: data.socket_id,
       track_audio: 1,
       track_video: 1,
+      is_tencentcloud_css: 2,
     });
     const roomsMap = io.of('/').adapter.rooms;
     const socketList = roomsMap.get(`${roomId}`);
