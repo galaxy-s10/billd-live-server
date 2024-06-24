@@ -143,11 +143,14 @@ class TencentcloudClass {
     };
     try {
       const res = await this.liveClient.DropLiveStream(params);
-      console.log(chalkSUCCESS('断开腾讯云直播推流成功！'), res);
+      console.log(
+        chalkSUCCESS(`断开腾讯云直播推流成功！roomId：${data.roomId}`),
+        res
+      );
       return { res };
     } catch (err) {
       console.log(err);
-      console.log(chalkERROR('断开腾讯云直播推流错误！'));
+      console.log(chalkERROR(`断开腾讯云直播推流错误！roomId：${data.roomId}`));
       return { err };
     }
   };

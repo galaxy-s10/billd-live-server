@@ -134,17 +134,18 @@ async function addLive({
     });
   }
 
-  if (
-    PROJECT_ENV === PROJECT_ENV_ENUM.prod &&
-    prodFFmpeg &&
-    cdn === LiveRoomUseCDNEnum.yes
-  ) {
+  if (cdn === LiveRoomUseCDNEnum.yes) {
+    if (PROJECT_ENV !== PROJECT_ENV_ENUM.prod) {
+      return;
+    }
     await tencentcloudUtils.dropLiveStream({
       roomId: live_room_id,
     });
     const { res, err } = await tencentcloudUtils.queryLiveStream({
       roomId: live_room_id,
     });
+    console.log('tencentcloudUtils.queryLiveStream');
+    console.log(err, res);
     if (err) return;
     if (res) {
       const [userLiveRoomInfo] = await Promise.all([
@@ -170,9 +171,7 @@ async function addLive({
       webrtc_url = pullUrlRes.webrtc;
       await main();
     }
-  }
-
-  if (cdn === LiveRoomUseCDNEnum.no) {
+  } else if (cdn === LiveRoomUseCDNEnum.no) {
     const liveRoomInfo = await liveRoomService.findKey(live_room_id);
     const key = liveRoomInfo?.key;
     if (key) {
