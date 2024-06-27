@@ -76,10 +76,10 @@ class UserService {
       ];
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType) {
+    if (rangTimeType && rangTimeStart && rangTimeEnd) {
       allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart!),
-        [Op.lt]: new Date(+rangTimeEnd!),
+        [Op.gt]: new Date(+rangTimeStart),
+        [Op.lt]: new Date(+rangTimeEnd),
       };
     }
     const orderRes: any[] = [];

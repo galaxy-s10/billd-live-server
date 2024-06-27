@@ -43,10 +43,10 @@ class WalletService {
       user_id,
       balance,
     });
-    if (rangTimeType) {
+    if (rangTimeType && rangTimeStart && rangTimeEnd) {
       allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart!),
-        [Op.lt]: new Date(+rangTimeEnd!),
+        [Op.gt]: new Date(+rangTimeStart),
+        [Op.lt]: new Date(+rangTimeEnd),
       };
     }
     // @ts-ignore

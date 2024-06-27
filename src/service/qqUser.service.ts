@@ -61,10 +61,10 @@ class QQUserService {
     if (id !== undefined && isPureNumber(`${id}`)) {
       allWhere.id = id;
     }
-    if (rangTimeType) {
+    if (rangTimeType && rangTimeStart && rangTimeEnd) {
       allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart!),
-        [Op.lt]: new Date(+rangTimeEnd!),
+        [Op.gt]: new Date(+rangTimeStart),
+        [Op.lt]: new Date(+rangTimeEnd),
       };
     }
     // if (created_at) {

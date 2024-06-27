@@ -32,6 +32,10 @@ const frontendWhiteList = [
   '/order/pay',
   '/wallet/init',
 
+  '/desk_user/login',
+  '/desk_user/create',
+  '/desk_user/update_by_uuid',
+
   '/srs/on_publish',
   '/srs/on_play',
   '/srs/on_stop',

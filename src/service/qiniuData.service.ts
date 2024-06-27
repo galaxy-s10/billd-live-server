@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 
-import { IQiniuData, IList } from '@/interface';
+import { IList, IQiniuData } from '@/interface';
 import qiniuDataModel from '@/model/qiniuData.model';
 import { handlePaging } from '@/utils';
 
@@ -67,10 +67,10 @@ class QiniuDataService {
       ];
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType) {
+    if (rangTimeType && rangTimeStart && rangTimeEnd) {
       allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart!),
-        [Op.lt]: new Date(+rangTimeEnd!),
+        [Op.gt]: new Date(+rangTimeStart),
+        [Op.lt]: new Date(+rangTimeEnd),
       };
     }
     let orderNameRes = orderName;

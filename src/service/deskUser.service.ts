@@ -1,14 +1,15 @@
 import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import { Op } from 'sequelize';
 
-import { GoodsTypeEnum, IGoods, IList } from '@/interface';
-import goodsModel from '@/model/goods.model';
+import { IList } from '@/interface';
+import deskUserModel from '@/model/deskUser.model';
+import { IDeskUser } from '@/types/IUser';
 import { handlePaging } from '@/utils';
 
-class GoodsService {
-  /** 商品是否存在 */
+class DeskUserService {
+  /** desk用户是否存在 */
   async isExist(ids: number[]) {
-    const res = await goodsModel.count({
+    const res = await deskUserModel.count({
       where: {
         id: {
           [Op.in]: ids,
@@ -18,15 +19,11 @@ class GoodsService {
     return res === ids.length;
   }
 
-  /** 获取商品列表 */
+  /** 获取desk用户列表 */
   async getList({
     id,
-    name,
-    type,
-    desc,
-    short_desc,
-    badge,
-    badge_bg,
+    uuid,
+    status,
     orderBy,
     orderName,
     nowPage,
@@ -35,7 +32,7 @@ class GoodsService {
     rangTimeType,
     rangTimeStart,
     rangTimeEnd,
-  }: IList<IGoods>) {
+  }: IList<IDeskUser>) {
     let offset;
     let limit;
     if (nowPage && pageSize) {
@@ -44,32 +41,13 @@ class GoodsService {
     }
     const allWhere: any = deleteUseLessObjectKey({
       id,
-      name,
-      type,
-      desc,
-      short_desc,
-      badge,
-      badge_bg,
+      uuid,
+      status,
     });
     if (keyWord) {
       const keyWordWhere = [
         {
-          name: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          desc: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          short_desc: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          remark: {
+          uuid: {
             [Op.like]: `%${keyWord}%`,
           },
         },
@@ -86,7 +64,9 @@ class GoodsService {
     if (orderName && orderBy) {
       orderRes.push([orderName, orderBy]);
     }
-    const result = await goodsModel.findAndCountAll({
+    // @ts-ignore
+    const result = await deskUserModel.findAndCountAll({
+      distinct: true,
       order: [...orderRes],
       limit,
       offset,
@@ -97,35 +77,50 @@ class GoodsService {
     return handlePaging(result, nowPage, pageSize);
   }
 
-  /** 查找商品 */
+  /** 查找desk用户 */
   async find(id: number) {
-    const result = await goodsModel.findOne({ where: { id } });
+    const result = await deskUserModel.findOne({
+      where: { id },
+    });
     return result;
   }
 
-  /** 查找商品 */
-  async findByType(type: GoodsTypeEnum) {
-    const result = await goodsModel.findOne({ where: { type } });
+  /** 查找desk用户 */
+  async findByUuid(uuid: string) {
+    const result = await deskUserModel.findOne({
+      where: { uuid },
+    });
     return result;
   }
 
-  /** 修改商品 */
-  async update(data: IGoods) {
+  /** 修改desk用户 */
+  async update(data: IDeskUser) {
     const { id } = data;
     const data2 = filterObj(data, ['id']);
-    const result = await goodsModel.update(data2, { where: { id } });
+    const result = await deskUserModel.update(data2, { where: { id } });
     return result;
   }
 
-  /** 创建商品 */
-  async create(data: IGoods) {
-    const result = await goodsModel.create(data);
+  /** 修改desk用户 */
+  async updateByUuid(data: IDeskUser) {
+    const { uuid } = data;
+    const data2 = filterObj(data, ['id', 'uuid']);
+    const result = await deskUserModel.update(data2, {
+      where: { uuid },
+      limit: 1,
+    });
     return result;
   }
 
-  /** 删除商品 */
+  /** 创建desk用户 */
+  async create(data: IDeskUser) {
+    const result = await deskUserModel.create(data);
+    return result;
+  }
+
+  /** 删除desk用户 */
   async delete(id: number) {
-    const result = await goodsModel.destroy({
+    const result = await deskUserModel.destroy({
       where: { id },
       individualHooks: true,
     });
@@ -133,4 +128,4 @@ class GoodsService {
   }
 }
 
-export default new GoodsService();
+export default new DeskUserService();

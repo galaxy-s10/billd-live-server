@@ -6,6 +6,8 @@ export interface IDeskUser {
   id?: number;
   uuid?: string;
   password?: string;
+  new_password?: string;
+  /** status: 1正常；2非法 */
   status?: number;
   created_at?: string;
   updated_at?: string;
