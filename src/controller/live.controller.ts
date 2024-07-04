@@ -1,17 +1,35 @@
-import { arrayUnique } from 'billd-utils';
+import { arrayUnique, getRandomString } from 'billd-utils';
+import cryptojs from 'crypto-js';
 import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import { COMMON_HTTP_CODE, REDIS_PREFIX } from '@/constant';
+import {
+  COMMON_HTTP_CODE,
+  DEFAULT_ROLE_INFO,
+  REDIS_PREFIX,
+  THIRD_PLATFORM,
+} from '@/constant';
 import srsController from '@/controller/srs.controller';
 import { IList, ILive } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveService from '@/service/live.service';
+import thirdUserService from '@/service/thirdUser.service';
 import userLiveRoomService from '@/service/userLiveRoom.service';
+import walletService from '@/service/wallet.service';
+import {
+  LiveRoomIsShowEnum,
+  LiveRoomPullIsShouldAuthEnum,
+  LiveRoomStatusEnum,
+  LiveRoomTypeEnum,
+  LiveRoomUseCDNEnum,
+} from '@/types/ILiveRoom';
 import { getForwardList, killPid } from '@/utils/process';
 
+import liveRoomController from './liveRoom.controller';
 import redisController from './redis.controller';
+import userController from './user.controller';
+import userLiveRoomController from './userLiveRoom.controller';
 
 class LiveController {
   common = {
@@ -20,6 +38,7 @@ class LiveController {
       live_room_id,
       live_room_is_show,
       live_room_status,
+      is_tencentcloud_css,
       user_id,
       orderBy = 'asc',
       orderName = 'id',
@@ -52,6 +71,7 @@ class LiveController {
         live_room_id,
         live_room_is_show,
         live_room_status,
+        is_tencentcloud_css,
         user_id,
         nowPage,
         pageSize,
@@ -141,6 +161,81 @@ class LiveController {
     const uniDelLiveId = arrayUnique(delLiveId);
     const delRes = await liveService.delete(delLiveId);
     successHandler({ ctx, data: { uniDelRoomId, uniDelLiveId, delRes } });
+    await next();
+  };
+
+  fekeLive = async (ctx: ParameterizedContext, next) => {
+    const { rtmp_url, flv_url, hls_url } = ctx.request.body;
+    async function fn() {
+      let result;
+      const username = getRandomString(6);
+      const isExist = await userController.common.isSameName(username);
+      if (isExist) {
+        // 已存在了，继续递归
+        result = await fn();
+      } else {
+        result = await userController.common.create({
+          username,
+          password: getRandomString(6),
+        });
+      }
+      return result;
+    }
+    const createUserInfo = await fn();
+    const rtmptoken = cryptojs
+      .MD5(`${+new Date()}___${getRandomString(6)}`)
+      .toString();
+    const createLiveRoomInfo = await liveRoomController.common.create({
+      name: `${createUserInfo.username!.slice(0, 10) as string}的直播间`,
+      key: rtmptoken,
+      type: LiveRoomTypeEnum.obs,
+      weight: 0,
+      cdn: LiveRoomUseCDNEnum.no,
+      pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
+      rtmp_url,
+      flv_url,
+      hls_url,
+      is_show: LiveRoomIsShowEnum.yes,
+      status: LiveRoomStatusEnum.normal,
+      is_fake: 1,
+    });
+    // @ts-ignore
+    await createLiveRoomInfo.setAreas([1]);
+    await userLiveRoomController.common.create({
+      user_id: createUserInfo.id,
+      live_room_id: createLiveRoomInfo.id,
+    });
+    // @ts-ignore
+    await createUserInfo.setRoles([DEFAULT_ROLE_INFO.VIP_USER.id]);
+    await walletService.create({ user_id: createUserInfo.id, balance: 0 });
+    await thirdUserService.create({
+      user_id: createUserInfo.id,
+      third_user_id: createUserInfo.id,
+      third_platform: THIRD_PLATFORM.website,
+    });
+    const res = await this.common.create({
+      live_room_id: createLiveRoomInfo.id,
+      user_id: createUserInfo.id,
+      socket_id: '-1',
+      track_audio: 1,
+      track_video: 1,
+      srs_action: 'fake',
+      srs_app: 'fake',
+      srs_client_id: 'fake',
+      srs_ip: 'fake',
+      srs_param: 'fake',
+      srs_server_id: 'fake',
+      srs_service_id: 'fake',
+      srs_stream: 'fake',
+      srs_stream_id: 'fake',
+      srs_stream_url: 'fake',
+      srs_tcUrl: 'fake',
+      srs_vhost: 'fake',
+      is_tencentcloud_css: 2,
+      flag_id: '',
+    });
+
+    successHandler({ ctx, data: res });
     await next();
   };
 

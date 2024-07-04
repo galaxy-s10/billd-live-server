@@ -106,6 +106,10 @@ const model = sequelize.define<LiveRoomModel>(
     forward_xiaohongshu_url: {
       type: DataTypes.STRING(500),
     },
+    is_fake: {
+      type: DataTypes.INTEGER,
+      defaultValue: 2,
+    },
   },
   {
     paranoid: true,

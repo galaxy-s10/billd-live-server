@@ -2,10 +2,12 @@ import { getRandomString } from 'billd-utils';
 import { ParameterizedContext } from 'koa';
 
 import successHandler from '@/app/handler/success-handle';
-import { COMMON_HTTP_CODE } from '@/constant';
+import { COMMON_HTTP_CODE, REDIS_PREFIX } from '@/constant';
 import { CustomError } from '@/model/customError.model';
 import deskUserService from '@/service/deskUser.service';
 import { IDeskUser } from '@/types/IUser';
+
+import redisController from './redis.controller';
 
 class DeskUserController {
   async login(ctx: ParameterizedContext, next) {
@@ -26,6 +28,22 @@ class DeskUserController {
       );
     }
     successHandler({ ctx, data: { msg: '登录成功' } });
+    await next();
+  }
+
+  async findReceiverByUuid(ctx: ParameterizedContext, next) {
+    const { uuid }: any = ctx.request.query;
+    const val = await redisController.getVal({
+      prefix: REDIS_PREFIX.deskUserUuid,
+      key: uuid,
+    });
+    let receiver = '';
+    try {
+      receiver = JSON.parse(val!).value.socket_id!;
+    } catch (error) {
+      console.log(error);
+    }
+    successHandler({ ctx, data: { receiver } });
     await next();
   }
 

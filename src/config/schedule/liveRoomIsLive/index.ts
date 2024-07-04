@@ -13,7 +13,9 @@ Object.keys(initUser).forEach((iten) => {
 });
 
 export const tencentcloudCssMain = async () => {
-  const res1 = await liveController.common.getList({ is_tencentcloud_css: 1 });
+  const res1 = await liveController.common.getList({
+    is_tencentcloud_css: 1,
+  });
   const res2 = await tencentcloudUtils.queryLiveStreamAll();
   const res1Map = {};
   res1.rows.forEach((item) => {
@@ -31,8 +33,11 @@ export const tencentcloudCssMain = async () => {
     liveController.common.deleteByLiveRoomId(delArr);
   }
 };
+
 export const srsMain = async () => {
-  const res1 = await liveController.common.getList({ is_tencentcloud_css: 2 });
+  const res1 = await liveController.common.getList({
+    is_tencentcloud_css: 2,
+  });
   const res2 = await srsController.common.getApiV1Streams({
     start: 0,
     count: 9999,

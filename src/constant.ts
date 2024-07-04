@@ -53,6 +53,7 @@ export const CORS_ALLOW_ORIGIN: string | string[] = [
 
 /** 消息最大长度 */
 export const MSG_MAX_LENGTH = 150;
+export const MAX_TOKEN_EXP = 24 * 90; // token过期时间：90天
 
 export const VIDEO_DIR =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
@@ -97,7 +98,12 @@ export const COMMON_ERROR_CODE = {
   notFound: 1002, // 返回了404的http状态码
   errStatusCode: 1003, // 返回了即不是200也不是404的http状态码
   shutdown: 1004, // 停机维护
-  balanceNotEnough: 1005, // 余额不足
+  idOrPwdError: 1005, // 账号或密码错误！
+  usernameOrPwdError: 1006, // 用户名或密码错误！
+  todayAlreadySignin: 1007, // 今天已签到过了！
+  alreadyGetRedbag: 1008, // 今天已签到过了！
+  redbagAlreadySnatched: 1009, // 红包已经被抢完！
+  balanceNotEnough: 1010, // 余额不足
 };
 
 export const COMMON_HTTP_CODE = {
@@ -112,11 +118,23 @@ export const COMMON_HTTP_CODE = {
 };
 
 export const COMMON_ERROE_MSG = {
-  paramsError: '参数错误！',
-  unauthorized: '未授权！',
-  forbidden: '权限不足！',
-  notFound: '未找到！',
-  serverError: '服务器错误！',
+  banIp: '此ip已被禁用，请联系管理员处理！', // 此ip已被禁用，请联系管理员处理！
+  jwtExpired: '登录信息过期！', // 登录信息过期！
+  invalidToken: '非法token！', // 非法token！
+  adminDisableUser: '你的账号已被管理员禁用，请联系管理员处理！', // 你的账号已被管理员禁用，请联系管理员处理！
+  shutdown: '停机维护中', // 停机维护中
+
+  noLogin: '未登录', // 未登录
+  paramsError: '参数错误！', // 参数错误！
+  unauthorized: '未授权！', // 未授权！
+  forbidden: '权限不足！', // 权限不足！
+  notFound: '未找到！', // 未找到！
+  serverError: '服务器错误！', // 服务器错误！
+  idOrPwdError: '账号或密码错误！', // 账号或密码错误！
+  usernameOrPwdError: '用户名或密码错误！', // 用户名或密码错误！
+  todayAlreadySignin: '今天已签到过了！', // 今天已签到过了！
+  alreadyGetRedbag: '你已经领取过红包', // 你已经领取过红包
+  redbagAlreadySnatched: '红包已经被抢完！', // 红包已经被抢完！
 };
 
 export const COMMON_SUCCESS_MSG = {
@@ -124,6 +142,8 @@ export const COMMON_SUCCESS_MSG = {
   POST: '新增成功！',
   PUT: '修改成功！',
   DELETE: '删除成功！',
+
+  loginSuccess: '登录成功！',
 };
 
 export const BLACKLIST_TYPE = {
@@ -164,6 +184,8 @@ export const REDIS_PREFIX = {
   livePkKey: `${REDIS_PREFIX_ENV}livePkKey___`, // 直播间打pk秘钥
   dbLiveList: `${REDIS_PREFIX_ENV}dbLiveList___`, // 直播间在线列表
   dbLiveRoomHistoryMsgList: `${REDIS_PREFIX_ENV}dbLiveRoomHistoryMsgList___`, // 直播间历史消息
+  deskUserUuid: `${REDIS_PREFIX_ENV}deskUserUuid___`,
+  deskUserSocketid: `${REDIS_PREFIX_ENV}deskUserSocketid___`,
 };
 
 export const IS_UPLOAD_SERVER = !(PROJECT_ENV === PROJECT_ENV_ENUM.prod); // 是否上传到服务器

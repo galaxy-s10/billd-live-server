@@ -10,6 +10,8 @@ import {
   handleWsMsrBlob,
   handleWsRoomNoLive,
   handleWsStartLive,
+  handleWsStartRemoteDesk,
+  handleWsUpdateDeskUser,
   handleWsUpdateJoinInfo,
   handleWsUpdateLiveRoomCoverImg,
 } from '@/config/websocket/handleMsg';
@@ -359,13 +361,13 @@ export const connectWebSocket = (server) => {
         // @ts-ignore
         roomId: data.data.roomId,
       });
-      socketEmit({
-        // @ts-ignore
-        roomId: data.data.roomId,
-        socket,
-        msgType: WsMsgTypeEnum.startRemoteDesk,
-        data,
-      });
+      console.log(data);
+      handleWsStartRemoteDesk({ io, socket, data });
+    });
+
+    // 收到updateDeskUser
+    socket.on(WsMsgTypeEnum.updateDeskUser, (data: WsStartRemoteDesk) => {
+      handleWsUpdateDeskUser({ io, socket, data });
     });
 
     // 收到srsOffer

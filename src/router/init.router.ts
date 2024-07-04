@@ -85,7 +85,7 @@ initRouter.post(
 // 删除某个用户（包括他的所有信息）
 initRouter.post(
   '/delete_user',
-  apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
+  // apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
   initController.deleteUser
 );
 

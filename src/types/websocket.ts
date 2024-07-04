@@ -86,6 +86,8 @@ export enum WsMsgTypeEnum {
   changeResolutionRatio = 'changeResolutionRatio',
   changeVideoContentHint = 'changeVideoContentHint',
   changeAudioContentHint = 'changeAudioContentHint',
+
+  updateDeskUser = 'updateDeskUser',
 }
 
 export interface IWsFormat<T> {
@@ -266,6 +268,10 @@ export type WsJoinType = IWsFormat<{
   user_info?: IUser;
   isRemoteDesk?: boolean;
   socket_list?: string[];
+  deskUserUuid?: string;
+  deskUserPassword?: string;
+  remoteDeskUserUuid?: string;
+  receiver?: string;
 }>;
 
 /** 用户离开直播间 */
@@ -296,6 +302,14 @@ export type WsStartRemoteDesk = IWsFormat<{
   sender: string;
   receiver: string;
   roomId: string;
+  maxBitrate: number;
+  maxFramerate: number;
+  resolutionRatio: number;
+  audioContentHint: string;
+  videoContentHint: string;
+  deskUserUuid?: string;
+  deskUserPassword?: string;
+  remoteDeskUserUuid?: string;
 }>;
 
 export type WsBatchSendOffer = IWsFormat<{

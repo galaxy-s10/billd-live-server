@@ -6,6 +6,7 @@ import successHandler from '@/app/handler/success-handle';
 import {
   COMMON_HTTP_CODE,
   DEFAULT_ROLE_INFO,
+  MAX_TOKEN_EXP,
   PROJECT_ENV,
   PROJECT_ENV_ENUM,
   REDIS_PREFIX,
@@ -161,11 +162,10 @@ class WechatUserController {
       );
     }
     let { exp } = ctx.request.body;
-    const maxExp = 24 * 7; // token过期时间：7天
     if (!exp) {
       exp = 24;
-    } else if (exp > maxExp) {
-      exp = maxExp;
+    } else if (exp > MAX_TOKEN_EXP) {
+      exp = MAX_TOKEN_EXP;
     }
     const accessToken = await this.getAccessToken(code);
     if (accessToken.errcode) {

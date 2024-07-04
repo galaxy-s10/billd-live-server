@@ -28,6 +28,7 @@ import { CustomError } from '@/model/customError.model';
 import goodsModel from '@/model/goods.model';
 import liveModel from '@/model/live.model';
 import liveConfigModel from '@/model/liveConfig.model';
+import liveRecordModel from '@/model/liveRecord.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import logModel from '@/model/log.model';
 import mockDayDataModel from '@/model/mockDayData.model';
@@ -43,6 +44,7 @@ import userModel from '@/model/user.model';
 import userLiveRoomModel from '@/model/userLiveRoom.model';
 import userRoleModel from '@/model/userRole.model';
 import walletModel from '@/model/wallet.model';
+import walletRecordModel from '@/model/walletRecord.model';
 import { SERVER_LIVE } from '@/secret/secret';
 import liveRoomService from '@/service/liveRoom.service';
 import userService from '@/service/user.service';
@@ -172,7 +174,13 @@ class InitController {
             token,
           });
           // @ts-ignore
-          userRes.setRoles(user.user_roles);
+          await userRes.setRoles(user.user_roles);
+          await walletService.create({ user_id: userRes.id, balance: 0 });
+          await thirdUserModel.create({
+            user_id: userRes.id,
+            third_user_id: userRes.id,
+            third_platform: THIRD_PLATFORM.website,
+          });
         } else {
           // console.log(chalkWARN(`已存在id为：${user.id}的用户！`));
           return;
@@ -472,6 +480,9 @@ class InitController {
     // 删除该用户的钱包（wallet表）
     await walletModel.destroy({ where: { user_id: userId } });
 
+    // 删除该用户的钱包记录（wallet_record表）
+    await walletRecordModel.destroy({ where: { user_id: userId } });
+
     const res2 = await userLiveRoomModel.findAndCountAll({
       where: { user_id: userId },
     });
@@ -489,8 +500,15 @@ class InitController {
 
     // 删除该用户的所有直播间（live_room表）
     await Promise.all(promise2);
-    // 删除该用户的直播间(user_live_room表）
+
+    // 删除该用户的所有直播间（user_live_room表）
     await userLiveRoomModel.destroy({ where: { user_id: userId } });
+
+    // 删除该用户的直播（live表）
+    await liveModel.destroy({ where: { user_id: userId } });
+
+    // 删除该用户的直播（live_record表）
+    await liveRecordModel.destroy({ where: { user_id: userId } });
 
     successHandler({ ctx, data: '删除用户成功！' });
     await next();

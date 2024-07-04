@@ -3,18 +3,66 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt, signJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import { COMMON_HTTP_CODE, REDIS_PREFIX, THIRD_PLATFORM } from '@/constant';
+import {
+  COMMON_ERROE_MSG,
+  COMMON_ERROR_CODE,
+  COMMON_HTTP_CODE,
+  COMMON_SUCCESS_MSG,
+  DEFAULT_ROLE_INFO,
+  MAX_TOKEN_EXP,
+  REDIS_PREFIX,
+  THIRD_PLATFORM,
+} from '@/constant';
 import authController from '@/controller/auth.controller';
 import redisController from '@/controller/redis.controller';
 import { IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import roleService from '@/service/role.service';
+import thirdUserService from '@/service/thirdUser.service';
 import userService from '@/service/user.service';
+import walletService from '@/service/wallet.service';
 import { IUser } from '@/types/IUser';
 
 class UserController {
   common = {
     list: (data) => userService.getList(data),
+    create: (data: IUser) => userService.create(data),
+    isSameName: (username: string) => userService.isSameName(username),
+  };
+
+  register = async (ctx: ParameterizedContext, next) => {
+    const { username, password }: IUser = ctx.request.body;
+    if (!username || !password) {
+      throw new CustomError(
+        `用户名或密码为空！`,
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
+      );
+    }
+    const isExistSameName = await userService.isSameName(username);
+    if (isExistSameName) {
+      throw new CustomError(
+        `已存在用户名为${username}的用户！`,
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
+      );
+    }
+
+    const createUserInfo = await this.common.create({
+      username,
+      password,
+    });
+    // @ts-ignore
+    await createUserInfo.setRoles([DEFAULT_ROLE_INFO.VIP_USER.id]);
+    await walletService.create({ user_id: createUserInfo.id, balance: 0 });
+    await thirdUserService.create({
+      user_id: createUserInfo.id,
+      third_user_id: createUserInfo.id,
+      third_platform: THIRD_PLATFORM.website,
+    });
+    successHandler({ ctx });
+
+    await next();
   };
 
   qrCodeLoginStatus = async (ctx: ParameterizedContext, next) => {
@@ -52,11 +100,10 @@ class UserController {
       );
     }
     let { exp } = ctx.request.body;
-    const maxExp = 24 * 7; // token过期时间：7天
     if (!exp) {
       exp = 24;
-    } else if (exp > maxExp) {
-      exp = maxExp;
+    } else if (exp > MAX_TOKEN_EXP) {
+      exp = MAX_TOKEN_EXP;
     }
     const createDate = {
       login_id: getRandomString(8),
@@ -79,11 +126,10 @@ class UserController {
   login = async (ctx: ParameterizedContext, next) => {
     const { id, password } = ctx.request.body;
     let { exp } = ctx.request.body;
-    const maxExp = 24 * 7; // token过期时间：7天
     if (!exp) {
       exp = 24;
-    } else if (exp > maxExp) {
-      exp = maxExp;
+    } else if (exp > MAX_TOKEN_EXP) {
+      exp = MAX_TOKEN_EXP;
     }
     const userInfo = await userService.login({ id, password });
     if (!userInfo) {
@@ -99,6 +145,45 @@ class UserController {
     });
     await userService.update({ token, id: userInfo?.id }); // 每次登录都更新token
     successHandler({ ctx, data: token, message: '登录成功！' });
+
+    /**
+     * 这个其实是最后一个中间件了，其实加不加调不调用next都没硬性，但是为了防止后面要
+     * 是扩展又加了一个中间件，这里不调用await next()的话，会导致下一个中间件出现404或其他问题，
+     * 因此还是得在这调用一次await next()
+     */
+    await next();
+  };
+
+  usernameLogin = async (ctx: ParameterizedContext, next) => {
+    const { username, password } = ctx.request.body;
+    let { exp } = ctx.request.body;
+    if (!exp) {
+      exp = 24;
+    } else if (exp > MAX_TOKEN_EXP) {
+      exp = MAX_TOKEN_EXP;
+    }
+    const userInfo = await userService.usernameLogin({ username, password });
+    if (!userInfo) {
+      throw new CustomError(
+        COMMON_ERROE_MSG.usernameOrPwdError,
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_ERROR_CODE.usernameOrPwdError
+      );
+    }
+    const token = signJwt({
+      userInfo: {
+        id: userInfo.id,
+        username: userInfo.username,
+        avatar: userInfo.avatar,
+      },
+      exp,
+    });
+    await userService.update({ token, id: userInfo?.id }); // 每次登录都更新token
+    successHandler({
+      ctx,
+      data: token,
+      message: COMMON_SUCCESS_MSG.loginSuccess,
+    });
 
     /**
      * 这个其实是最后一个中间件了，其实加不加调不调用next都没硬性，但是为了防止后面要

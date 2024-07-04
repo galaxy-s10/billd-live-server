@@ -8,6 +8,8 @@ liveRouter.get('/list', liveController.getList);
 
 liveRouter.get('/list_duplicate_removal', liveController.listDuplicateRemoval);
 
+liveRouter.post('/fake_live', liveController.fekeLive);
+
 liveRouter.post('/close_live', liveController.closeLive);
 
 liveRouter.get('/is_live', liveController.isLive);

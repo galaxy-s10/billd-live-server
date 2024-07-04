@@ -21,15 +21,23 @@ const frontendWhiteList = [
   '/init/roleAuth',
   '/init/dayData',
 
-  '/user/qrcode_login', // 登录，这个接口是post的
+  '/user/register', // 注册，这个接口是post的
   '/user/login', // 登录，这个接口是post的
+  '/user/username_login', // 登录，这个接口是post的
+  '/user/qrcode_login', // 登录，这个接口是post的
+
   '/qq_user/login', // 登录，这个接口是post的
+
   '/wechat_user/login', // 登录，这个接口是post的
+
   '/qiniu_data/upload',
   '/qiniu_data/upload_chunk',
   '/qiniu_data/merge_chunk',
 
+  '/live/fake_live',
+
   '/order/pay',
+
   '/wallet/init',
 
   '/desk_user/login',
@@ -41,6 +49,7 @@ const frontendWhiteList = [
   '/srs/on_stop',
   '/srs/on_unpublish',
   '/srs/on_dvr',
+
   '/tencentcloud_css/on_publish',
   '/tencentcloud_css/on_unpublish',
   '/tencentcloud_css/remote_auth',

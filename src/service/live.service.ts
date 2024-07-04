@@ -41,6 +41,7 @@ class LiveService {
     user_id,
     live_room_is_show,
     live_room_status,
+    is_tencentcloud_css,
     orderBy,
     orderName,
     nowPage,
@@ -56,7 +57,12 @@ class LiveService {
       offset = (+nowPage - 1) * +pageSize;
       limit = +pageSize;
     }
-    const allWhere: any = deleteUseLessObjectKey({ id, live_room_id, user_id });
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+      live_room_id,
+      user_id,
+      is_tencentcloud_css,
+    });
     if (keyWord) {
       const keyWordWhere = [
         {

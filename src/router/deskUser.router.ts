@@ -4,6 +4,11 @@ import deskUserController from '@/controller/deskUser.controller';
 
 const deskUserRouter = new Router({ prefix: '/desk_user' });
 
+deskUserRouter.get(
+  '/find_receiver_by_uuid',
+  deskUserController.findReceiverByUuid
+);
+
 deskUserRouter.post('/login', deskUserController.login);
 
 deskUserRouter.post('/create', deskUserController.create);

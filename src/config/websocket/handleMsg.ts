@@ -41,6 +41,7 @@ import {
   WsRoomLivingType,
   WsRoomNoLiveType,
   WsStartLiveType,
+  WsStartRemoteDesk,
   WsUpdateJoinInfoType,
   WsUpdateLiveRoomCoverImg,
 } from '@/types/websocket';
@@ -66,6 +67,16 @@ export async function handleWsJoin(args: {
     console.log(chalkWARN(`${socket.id}进入房间号:${roomId}`));
     const roomsMap = io.of('/').adapter.rooms;
     const socketList = roomsMap.get(`${data.data.live_room_id}`);
+    const val = await redisController.getVal({
+      prefix: REDIS_PREFIX.deskUserUuid,
+      key: `${data.data.remoteDeskUserUuid!}`,
+    });
+    let receiver = '';
+    try {
+      receiver = JSON.parse(val!).value.socket_id!;
+    } catch (error) {
+      console.log(error);
+    }
     socketEmit<WsJoinType['data']>({
       socket,
       msgType: WsMsgTypeEnum.joined,
@@ -75,6 +86,7 @@ export async function handleWsJoin(args: {
         live_room_id: roomId,
         user_info: data.user_info,
         socket_list: socketList ? [...socketList] : [],
+        receiver,
       },
     });
     return;
@@ -183,6 +195,97 @@ export function handleWsBatchSendOffer(args: {
   });
 }
 
+export async function handleWsStartRemoteDesk(args: {
+  io: Server;
+  socket: Socket;
+  data: WsStartRemoteDesk;
+}) {
+  const { io, socket, data } = args;
+  if (data.data.deskUserUuid) {
+    const val = await redisController.getVal({
+      prefix: REDIS_PREFIX.deskUserUuid,
+      key: `${data.data.remoteDeskUserUuid!}`,
+    });
+    let receiver = '';
+    try {
+      receiver = JSON.parse(val!).value.socket_id!;
+    } catch (error) {
+      console.log(error);
+    }
+    await redisController.setExVal({
+      prefix: REDIS_PREFIX.deskUserUuid,
+      exp: 10,
+      value: {
+        receiver,
+        socket_id: socket.id,
+        deskUserUuid: data.data.deskUserUuid,
+        deskUserPassword: data.data.deskUserPassword,
+        remoteDeskUserUuid: data.data.remoteDeskUserUuid,
+      },
+      key: `${data.data.deskUserUuid}`,
+      client_ip: getSocketRealIp(socket),
+    });
+    await redisController.setExVal({
+      prefix: REDIS_PREFIX.deskUserSocketid,
+      exp: 10,
+      value: {
+        receiver,
+        socket_id: socket.id,
+        deskUserUuid: data.data.deskUserUuid,
+        deskUserPassword: data.data.deskUserPassword,
+        remoteDeskUserUuid: data.data.remoteDeskUserUuid,
+      },
+      key: socket.id,
+      client_ip: getSocketRealIp(socket),
+    });
+  }
+  socketEmit({
+    // @ts-ignore
+    roomId: data.data.roomId,
+    socket,
+    msgType: WsMsgTypeEnum.startRemoteDesk,
+    data,
+  });
+}
+
+export async function handleWsUpdateDeskUser(args: {
+  io: Server;
+  socket: Socket;
+  data: WsStartRemoteDesk;
+}) {
+  try {
+    const { io, socket, data } = args;
+    if (data.data.deskUserUuid) {
+      await redisController.setExVal({
+        prefix: REDIS_PREFIX.deskUserUuid,
+        exp: 10,
+        value: {
+          socket_id: socket.id,
+          deskUserUuid: data.data.deskUserUuid,
+          deskUserPassword: data.data.deskUserPassword,
+          remoteDeskUserUuid: data.data.remoteDeskUserUuid,
+        },
+        key: `${data.data.deskUserUuid}`,
+        client_ip: getSocketRealIp(socket),
+      });
+      await redisController.setExVal({
+        prefix: REDIS_PREFIX.deskUserSocketid,
+        exp: 10,
+        value: {
+          socket_id: socket.id,
+          deskUserUuid: data.data.deskUserUuid,
+          deskUserPassword: data.data.deskUserPassword,
+          remoteDeskUserUuid: data.data.remoteDeskUserUuid,
+        },
+        key: socket.id,
+        client_ip: getSocketRealIp(socket),
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export async function handleWsMessage(args: {
   io: Server;
   socket: Socket;
@@ -289,8 +392,29 @@ export async function handleWsMsrBlob(args: { data: WsMsrBlobType }) {
   }
 }
 
-export function handleWsDisconnecting(args: { io: Server; socket: Socket }) {
+export async function handleWsDisconnecting(args: {
+  io: Server;
+  socket: Socket;
+}) {
   const { io, socket } = args;
+  const val = await redisController.getVal({
+    prefix: REDIS_PREFIX.deskUserSocketid,
+    key: socket.id,
+  });
+  let remoteDeskUserUuid = '';
+  try {
+    remoteDeskUserUuid = JSON.parse(val!).value.remoteDeskUserUuid;
+  } catch (error) {
+    console.log(error);
+  }
+  await redisController.del({
+    prefix: REDIS_PREFIX.deskUserUuid,
+    key: remoteDeskUserUuid,
+  });
+  await redisController.del({
+    prefix: REDIS_PREFIX.deskUserSocketid,
+    key: socket.id,
+  });
   socket.rooms.forEach((roomIdStr) => {
     const roomId = Number(roomIdStr);
     if (Number.isNaN(roomId)) return;

@@ -263,6 +263,9 @@ export interface ILiveRoom {
 
   hidden_cover_img?: boolean;
 
+  /** 是否假直播间，1是，2否 */
+  is_fake?: number;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;

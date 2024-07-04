@@ -39,6 +39,19 @@ class UserService {
     return result;
   }
 
+  async usernameLogin({ username, password }: IUser) {
+    const result = await userModel.findOne({
+      attributes: {
+        exclude: ['password', 'token'],
+      },
+      where: {
+        username,
+        password,
+      },
+    });
+    return result;
+  }
+
   /** 获取用户列表 */
   async getList({
     id,
@@ -142,6 +155,10 @@ class UserService {
   async findAccount(id: number) {
     const result = await userModel.findOne({
       include: [
+        {
+          model: roleModel,
+          through: { attributes: [] },
+        },
         {
           model: qqUserModel,
           through: {
@@ -251,7 +268,7 @@ class UserService {
     return result;
   }
 
-  /** 是否同名，区分大小写。同名则返回同名用户的信息,否则返回false */
+  /** 是否同名，区分大小写。同名则返回同名用户的信息,否则返回null */
   async isSameName(username: string) {
     const result = await userModel.findOne({
       attributes: {

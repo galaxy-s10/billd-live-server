@@ -7,6 +7,8 @@ import { verifyProp } from '@/middleware/user.middleware';
 
 const userRouter = new Router({ prefix: '/user' });
 
+userRouter.post('/register', userController.register);
+
 // 二维码登录
 userRouter.post('/qrcode_login', userController.qrCodeLogin);
 
@@ -15,6 +17,9 @@ userRouter.get('/qrcode_login_status', userController.qrCodeLoginStatus);
 
 // 账号密码登录
 userRouter.post('/login', verifyProp, userController.login);
+
+// 用户名密码登录
+userRouter.post('/username_login', verifyProp, userController.usernameLogin);
 
 // 用户列表
 userRouter.get('/list', userController.list);
