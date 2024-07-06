@@ -16,16 +16,11 @@ import srsController from './srs.controller';
 
 class LiveRoomController {
   common = {
-    create: (data: ILiveRoom) => liveRoomService.create(data),
-    update: (data: ILiveRoom) => liveRoomService.update(data),
-    find: (id: number) => liveRoomService.find(id),
-  };
-
-  getList = async (ctx: ParameterizedContext, next) => {
-    const {
+    getList: ({
       id,
       status,
       is_show,
+      is_fake,
       name,
       desc,
       type,
@@ -49,35 +44,44 @@ class LiveRoomController {
       rangTimeType,
       rangTimeStart,
       rangTimeEnd,
-    }: IList<ILiveRoom> = ctx.request.query;
-    const result = await liveRoomService.getList({
-      id,
-      status,
-      is_show,
-      name,
-      desc,
-      type,
-      cdn,
-      pull_is_should_auth,
-      rtmp_url,
-      flv_url,
-      hls_url,
-      webrtc_url,
-      push_rtmp_url,
-      push_obs_server,
-      push_obs_stream_key,
-      push_webrtc_url,
-      push_srt_url,
-      hidden_cover_img,
-      orderBy,
-      orderName,
-      nowPage,
-      pageSize,
-      keyWord,
-      rangTimeType,
-      rangTimeStart,
-      rangTimeEnd,
-    });
+    }: IList<ILiveRoom>) =>
+      liveRoomService.getList({
+        id,
+        status,
+        is_show,
+        is_fake,
+        name,
+        desc,
+        type,
+        cdn,
+        pull_is_should_auth,
+        rtmp_url,
+        flv_url,
+        hls_url,
+        webrtc_url,
+        push_rtmp_url,
+        push_obs_server,
+        push_obs_stream_key,
+        push_webrtc_url,
+        push_srt_url,
+        hidden_cover_img,
+        orderBy,
+        orderName,
+        nowPage,
+        pageSize,
+        keyWord,
+        rangTimeType,
+        rangTimeStart,
+        rangTimeEnd,
+      }),
+    create: (data: ILiveRoom) => liveRoomService.create(data),
+    update: (data: ILiveRoom) => liveRoomService.update(data),
+    find: (id: number) => liveRoomService.find(id),
+  };
+
+  getList = async (ctx: ParameterizedContext, next) => {
+    const params = ctx.request.query;
+    const result = await this.common.getList(params);
     successHandler({ ctx, data: result });
     await next();
   };
@@ -150,6 +154,7 @@ class LiveRoomController {
     const {
       status,
       is_show,
+      is_fake,
       remark,
       cover_img,
       bg_img,
@@ -178,6 +183,7 @@ class LiveRoomController {
     await this.common.create({
       status,
       is_show,
+      is_fake,
       remark,
       cover_img,
       bg_img,
@@ -213,6 +219,7 @@ class LiveRoomController {
     const {
       status,
       is_show,
+      is_fake,
       remark,
       cover_img,
       bg_img,
@@ -242,6 +249,7 @@ class LiveRoomController {
       id,
       status,
       is_show,
+      is_fake,
       remark,
       cover_img,
       bg_img,

@@ -28,6 +28,7 @@ class LiveRoomService {
     id,
     status,
     is_show,
+    is_fake,
     type,
     cdn,
     pull_is_should_auth,
@@ -51,6 +52,7 @@ class LiveRoomService {
       id,
       status,
       is_show,
+      is_fake,
     });
     if (type !== undefined && isPureNumber(`${type}`)) {
       allWhere.type = type;

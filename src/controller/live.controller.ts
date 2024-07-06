@@ -1,4 +1,4 @@
-import { arrayUnique, getRandomString } from 'billd-utils';
+import { arrayUnique, getArrayDifference, getRandomString } from 'billd-utils';
 import cryptojs from 'crypto-js';
 import { ParameterizedContext } from 'koa';
 
@@ -13,11 +13,14 @@ import {
 import srsController from '@/controller/srs.controller';
 import { IList, ILive } from '@/interface';
 import { CustomError } from '@/model/customError.model';
-import liveService from '@/service/live.service';
+import liveService, {
+  handleDelRedisByDbLiveList,
+} from '@/service/live.service';
 import thirdUserService from '@/service/thirdUser.service';
 import userLiveRoomService from '@/service/userLiveRoom.service';
 import walletService from '@/service/wallet.service';
 import {
+  ILiveRoom,
   LiveRoomIsShowEnum,
   LiveRoomPullIsShouldAuthEnum,
   LiveRoomStatusEnum,
@@ -40,6 +43,7 @@ class LiveController {
       live_room_status,
       is_tencentcloud_css,
       user_id,
+      is_fake,
       orderBy = 'asc',
       orderName = 'id',
       nowPage,
@@ -48,11 +52,30 @@ class LiveController {
       rangTimeType,
       rangTimeStart,
       rangTimeEnd,
-    }: IList<ILive>) => {
+    }: IList<ILive & ILiveRoom>) => {
       try {
+        const key = cryptojs.MD5(
+          JSON.stringify({
+            id,
+            live_room_id,
+            live_room_is_show,
+            live_room_status,
+            is_tencentcloud_css,
+            user_id,
+            is_fake,
+            orderBy,
+            orderName,
+            nowPage,
+            pageSize,
+            keyWord,
+            rangTimeType,
+            rangTimeStart,
+            rangTimeEnd,
+          })
+        );
         const oldCache = await redisController.getVal({
           prefix: REDIS_PREFIX.dbLiveList,
-          key: '',
+          key: key.toString(),
         });
         if (oldCache) {
           return JSON.parse(oldCache).value as {
@@ -73,6 +96,7 @@ class LiveController {
         live_room_status,
         is_tencentcloud_css,
         user_id,
+        is_fake,
         nowPage,
         pageSize,
         orderBy,
@@ -83,9 +107,28 @@ class LiveController {
         rangTimeEnd,
       });
       try {
+        const key = cryptojs.MD5(
+          JSON.stringify({
+            id,
+            live_room_id,
+            live_room_is_show,
+            live_room_status,
+            is_tencentcloud_css,
+            user_id,
+            is_fake,
+            orderBy,
+            orderName,
+            nowPage,
+            pageSize,
+            keyWord,
+            rangTimeType,
+            rangTimeStart,
+            rangTimeEnd,
+          })
+        );
         redisController.setExVal({
           prefix: REDIS_PREFIX.dbLiveList,
-          key: '',
+          key: key.toString(),
           value: result,
           exp: 60,
         });
@@ -164,7 +207,7 @@ class LiveController {
     await next();
   };
 
-  fekeLive = async (ctx: ParameterizedContext, next) => {
+  renderFakeLive = async (ctx: ParameterizedContext, next) => {
     const { rtmp_url, flv_url, hls_url } = ctx.request.body;
     async function fn() {
       let result;
@@ -234,8 +277,84 @@ class LiveController {
       is_tencentcloud_css: 2,
       flag_id: '',
     });
-
+    handleDelRedisByDbLiveList();
     successHandler({ ctx, data: res });
+    await next();
+  };
+
+  addFakeLive = async (ctx: ParameterizedContext, next) => {
+    const { is_all, num } = ctx.request.body;
+    // 查找所有fake直播间
+    const res1 = await liveRoomController.common.getList({ is_fake: 1 });
+    // 查找所有fake直播间的直播记录
+    const res2 = await this.common.getList({ is_fake: 1 });
+    // @ts-ignore
+    const arr1 = res1.rows.map((v: ILiveRoom) => v.id);
+    const arr2 = res2.rows.map((v: ILive) => v.live_room_id);
+    const res3 = getArrayDifference(arr1, arr2);
+    let code = 0;
+    const queue: any[] = [];
+    if (res3[0]) {
+      // @ts-ignore
+      res1.rows.forEach((item: ILiveRoom) => {
+        let addArr: any[] = [];
+        if (is_all) {
+          addArr = res3;
+        } else if (num > 0) {
+          addArr = res3.slice(0, num);
+        }
+        if (addArr.includes(item.id)) {
+          queue.push(
+            this.common.create({
+              live_room_id: item.id,
+              user_id: item?.user?.id,
+              socket_id: '-1',
+              track_audio: 1,
+              track_video: 1,
+              srs_action: 'fake',
+              srs_app: 'fake',
+              srs_client_id: 'fake',
+              srs_ip: 'fake',
+              srs_param: 'fake',
+              srs_server_id: 'fake',
+              srs_service_id: 'fake',
+              srs_stream: 'fake',
+              srs_stream_id: 'fake',
+              srs_stream_url: 'fake',
+              srs_tcUrl: 'fake',
+              srs_vhost: 'fake',
+              is_tencentcloud_css: 2,
+              flag_id: '',
+            })
+          );
+        }
+      });
+      await Promise.all(queue);
+      code = 1;
+    }
+    handleDelRedisByDbLiveList();
+    successHandler({ ctx, data: { code } });
+    await next();
+  };
+
+  delFakeLive = async (ctx: ParameterizedContext, next) => {
+    const { is_all, num } = ctx.request.body;
+    // 查找所有fake直播间的直播记录
+    const res1 = await this.common.getList({ is_fake: 1 });
+    const arr1 = res1.rows.map((v: ILiveRoom) => v.id!);
+    let code = 0;
+    if (arr1[0]) {
+      let delArr: any[] = [];
+      if (is_all === 1) {
+        delArr = arr1;
+      } else if (num > 0) {
+        delArr = arr1.slice(0, num);
+      }
+      await liveService.delete(delArr);
+      code = 1;
+    }
+    handleDelRedisByDbLiveList();
+    successHandler({ ctx, data: { code } });
     await next();
   };
 

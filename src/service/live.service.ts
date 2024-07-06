@@ -1,5 +1,5 @@
 import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
-import { Op, literal } from 'sequelize';
+import { Op, col, literal } from 'sequelize';
 
 import { REDIS_PREFIX } from '@/constant';
 import redisController from '@/controller/redis.controller';
@@ -8,13 +8,13 @@ import areaModel from '@/model/area.model';
 import liveModel from '@/model/live.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
+import { ILiveRoom } from '@/types/ILiveRoom';
 import { handlePaging } from '@/utils';
 
-async function handleDelRedisByDbLiveList() {
+export async function handleDelRedisByDbLiveList() {
   try {
-    await redisController.del({
+    await redisController.delByPrefix({
       prefix: REDIS_PREFIX.dbLiveList,
-      key: '',
     });
   } catch (error) {
     console.log(error);
@@ -42,6 +42,7 @@ class LiveService {
     live_room_is_show,
     live_room_status,
     is_tencentcloud_css,
+    is_fake,
     orderBy,
     orderName,
     nowPage,
@@ -50,7 +51,7 @@ class LiveService {
     rangTimeType,
     rangTimeStart,
     rangTimeEnd,
-  }: IList<ILive>) {
+  }: IList<ILive & ILiveRoom>) {
     let offset;
     let limit;
     if (nowPage && pageSize) {
@@ -92,6 +93,7 @@ class LiveService {
     const subWhere = deleteUseLessObjectKey({
       is_show: live_room_is_show,
       status: live_room_status,
+      is_fake,
     });
     const orderRes: any[] = [];
     if (orderName && orderBy) {
@@ -152,13 +154,15 @@ class LiveService {
           'forward_xiaohongshu_url',
         ],
         include: [
-          [
-            literal(
-              `(select weight from ${liveRoomModel.tableName}
-                where ${liveRoomModel.tableName}.id = ${liveModel.tableName}.live_room_id)`
-            ),
-            'live_room_weight',
-          ],
+          // [
+          //   literal(
+          //     `(select weight from ${liveRoomModel.tableName}
+          //       where ${liveRoomModel.tableName}.id = ${liveModel.tableName}.live_room_id)`
+          //   ),
+          //   'live_room_weight',
+          // ],
+          [col(`${liveRoomModel.tableName}.weight`), 'live_room_weight'],
+          [col(`${liveRoomModel.tableName}.is_fake`), 'live_room_is_fake'],
         ],
       },
       order: [[literal('live_room_weight'), 'desc'], ...orderRes],

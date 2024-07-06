@@ -16,6 +16,21 @@ class RedisController {
     return res;
   };
 
+  findByPrefix = async (data: { prefix: string }) => {
+    const res = await redisClient.keys(`${data.prefix}*`);
+    return res;
+  };
+
+  delByPrefix = async (data: { prefix: string }) => {
+    const res = await redisClient.keys(`${data.prefix}*`);
+    const queue: Promise<any>[] = [];
+    res.forEach((key) => {
+      queue.push(redisClient.del(key));
+    });
+    await Promise.all(queue);
+    return res;
+  };
+
   getVal = async (data: { prefix: string; key: string }) => {
     const res = await redisClient.get(`${data.prefix}${data.key}`);
     return res;

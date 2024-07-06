@@ -34,7 +34,9 @@ const frontendWhiteList = [
   '/qiniu_data/upload_chunk',
   '/qiniu_data/merge_chunk',
 
-  '/live/fake_live',
+  '/live/render_fake_live',
+  '/live/add_fake_live',
+  '/live/del_fake_live',
 
   '/order/pay',
 

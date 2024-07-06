@@ -8,7 +8,14 @@ liveRouter.get('/list', liveController.getList);
 
 liveRouter.get('/list_duplicate_removal', liveController.listDuplicateRemoval);
 
-liveRouter.post('/fake_live', liveController.fekeLive);
+// 生成一个全新的假直播
+liveRouter.post('/render_fake_live', liveController.renderFakeLive);
+
+// 添加一个假直播开播
+liveRouter.post('/add_fake_live', liveController.addFakeLive);
+
+// 删除一个假直播开播
+liveRouter.post('/del_fake_live', liveController.delFakeLive);
 
 liveRouter.post('/close_live', liveController.closeLive);
 
