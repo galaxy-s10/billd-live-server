@@ -298,7 +298,7 @@ class LiveController {
       // @ts-ignore
       res1.rows.forEach((item: ILiveRoom) => {
         let addArr: any[] = [];
-        if (is_all) {
+        if (is_all === 1) {
           addArr = res3;
         } else if (num > 0) {
           addArr = res3.slice(0, num);
