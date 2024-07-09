@@ -529,10 +529,12 @@ export async function handleWsStartLive(args: {
     )
   ) {
     pullRes = tencentcloudUtils.getPullUrl({
-      roomId,
+      liveRoomId: roomId,
     });
   } else {
-    pullRes = srsController.common.getPullUrl(roomId);
+    pullRes = srsController.common.getPullUrl({
+      liveRoomId: roomId,
+    });
   }
 
   liveRoomService.update({

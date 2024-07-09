@@ -4,6 +4,7 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
+import liveRedisController from '@/config/websocket/live-redis.controller';
 import {
   COMMON_HTTP_CODE,
   DEFAULT_ROLE_INFO,
@@ -182,6 +183,15 @@ class LiveController {
     await next();
   };
 
+  getLiveUser = async (ctx: ParameterizedContext, next) => {
+    const { live_room_id } = ctx.request.query;
+    const liveUser = await liveRedisController.getLiveRoomOnlineUser(
+      Number(live_room_id)
+    );
+    successHandler({ ctx, data: liveUser });
+    await next();
+  };
+
   listDuplicateRemoval = async (ctx: ParameterizedContext, next) => {
     const result = await this.common.getList({});
     const map = {};
@@ -238,6 +248,11 @@ class LiveController {
       rtmp_url,
       flv_url,
       hls_url,
+      cdn_push_obs_server: '',
+      cdn_push_obs_stream_key: '',
+      cdn_push_rtmp_url: '',
+      cdn_push_srt_url: '',
+      cdn_push_webrtc_url: '',
       is_show: LiveRoomIsShowEnum.yes,
       status: LiveRoomStatusEnum.normal,
       is_fake: 1,

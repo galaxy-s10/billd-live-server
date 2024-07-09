@@ -8,6 +8,8 @@ import {
   COMMON_ERROR_CODE,
   COMMON_ERR_MSG,
   COMMON_HTTP_CODE,
+  PROJECT_ENV,
+  PROJECT_ENV_ENUM,
 } from '@/constant';
 import authController from '@/controller/auth.controller';
 import blacklistController from '@/controller/blacklist.controller';
@@ -180,6 +182,19 @@ export const apiVerifyAuth = (shouldAuthArr: string[]) => {
     if (!res.flag) {
       throw new CustomError(
         `缺少${res.diffArr.join()}权限！`,
+        COMMON_HTTP_CODE.forbidden,
+        COMMON_HTTP_CODE.forbidden
+      );
+    } else {
+      await next();
+    }
+  };
+};
+export const apiVerifyEnv = (env: PROJECT_ENV_ENUM[]) => {
+  return async (ctx: ParameterizedContext, next) => {
+    if (!env.includes(PROJECT_ENV)) {
+      throw new CustomError(
+        `只允许${env.join()}环境调用！`,
         COMMON_HTTP_CODE.forbidden,
         COMMON_HTTP_CODE.forbidden
       );

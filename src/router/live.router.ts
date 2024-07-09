@@ -6,6 +6,8 @@ const liveRouter = new Router({ prefix: '/live' });
 
 liveRouter.get('/list', liveController.getList);
 
+liveRouter.get('/live_room_online_user', liveController.getLiveUser);
+
 liveRouter.get('/list_duplicate_removal', liveController.listDuplicateRemoval);
 
 // 生成一个全新的假直播

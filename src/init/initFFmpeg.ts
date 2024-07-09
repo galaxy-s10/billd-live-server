@@ -154,7 +154,8 @@ async function addLive({
         ),
       ]);
       const pushRes = tencentcloudUtils.getPushUrl({
-        roomId: live_room_id,
+        liveRoomId: live_room_id,
+        type: userLiveRoomInfo?.live_room?.type || LiveRoomTypeEnum.tencent_css,
         key: userLiveRoomInfo?.live_room?.key || '',
       });
       push_rtmp_url = pushRes.push_rtmp_url;
@@ -163,7 +164,7 @@ async function addLive({
       push_webrtc_url = pushRes.push_webrtc_url;
       push_srt_url = pushRes.push_srt_url;
       const pullUrlRes = tencentcloudUtils.getPullUrl({
-        roomId: live_room_id,
+        liveRoomId: live_room_id,
       });
       rtmp_url = pullUrlRes.rtmp;
       flv_url = pullUrlRes.flv;
@@ -185,7 +186,9 @@ async function addLive({
       push_obs_stream_key = pushRes.push_obs_stream_key;
       push_webrtc_url = pushRes.push_webrtc_url;
       push_srt_url = pushRes.push_srt_url;
-      const pullRes = srsController.common.getPullUrl(live_room_id);
+      const pullRes = srsController.common.getPullUrl({
+        liveRoomId: live_room_id,
+      });
       rtmp_url = pullRes.rtmp;
       flv_url = pullRes.flv;
       hls_url = pullRes.hls;

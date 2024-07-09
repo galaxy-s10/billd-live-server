@@ -32,7 +32,6 @@ class LiveRoomService {
     type,
     cdn,
     pull_is_should_auth,
-    hidden_cover_img,
     orderBy,
     orderName,
     nowPage,
@@ -127,42 +126,141 @@ class LiveRoomService {
         },
       ],
       attributes: {
-        exclude: hidden_cover_img
-          ? [
-              'key',
-              'push_rtmp_url',
-              'push_obs_server',
-              'push_obs_stream_key',
-              'push_webrtc_url',
-              'push_srt_url',
-              'forward_bilibili_url',
-              'forward_huya_url',
-              'forward_douyu_url',
-              'forward_douyin_url',
-              'forward_kuaishou_url',
-              'forward_xiaohongshu_url',
-              'cover_img',
-            ]
-          : [
-              'key',
-              'push_rtmp_url',
-              'push_obs_server',
-              'push_obs_stream_key',
-              'push_webrtc_url',
-              'push_srt_url',
-              'forward_bilibili_url',
-              'forward_huya_url',
-              'forward_douyu_url',
-              'forward_douyin_url',
-              'forward_kuaishou_url',
-              'forward_xiaohongshu_url',
-            ],
+        exclude: [
+          'key',
+          'push_rtmp_url',
+          'push_obs_server',
+          'push_obs_stream_key',
+          'push_webrtc_url',
+          'push_srt_url',
+          'cdn_push_rtmp_url',
+          'cdn_push_obs_server',
+          'cdn_push_obs_stream_key',
+          'cdn_push_webrtc_url',
+          'cdn_push_srt_url',
+          'forward_bilibili_url',
+          'forward_huya_url',
+          'forward_douyu_url',
+          'forward_douyin_url',
+          'forward_kuaishou_url',
+          'forward_xiaohongshu_url',
+        ],
         // include: [
         //   [col('user_live_room.id'), 'idd'],
         //   [col('user_live_room.user.id'), 'user_id'],
         //   [col('user_live_room.user.username'), 'user_username'],
         //   [col('user_live_room.user.avatar'), 'user_avatar'],
         // ],
+      },
+      distinct: true,
+      order: [...orderRes],
+      limit,
+      offset,
+      where: {
+        ...allWhere,
+      },
+    });
+    return handlePaging(result, nowPage, pageSize);
+  }
+
+  /** 获取直播间列表 */
+  async getListPure({
+    id,
+    status,
+    is_show,
+    is_fake,
+    type,
+    cdn,
+    pull_is_should_auth,
+    exclude_key,
+    orderBy,
+    orderName,
+    nowPage,
+    pageSize,
+    keyWord,
+    rangTimeType,
+    rangTimeStart,
+    rangTimeEnd,
+  }: IList<ILiveRoom>) {
+    let offset;
+    let limit;
+    if (nowPage && pageSize) {
+      offset = (+nowPage - 1) * +pageSize;
+      limit = +pageSize;
+    }
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+      status,
+      is_show,
+      is_fake,
+    });
+    if (type !== undefined && isPureNumber(`${type}`)) {
+      allWhere.type = type;
+    }
+    if (cdn !== undefined && isPureNumber(`${cdn}`)) {
+      allWhere.cdn = cdn;
+    }
+    if (
+      pull_is_should_auth !== undefined &&
+      isPureNumber(`${pull_is_should_auth}`)
+    ) {
+      allWhere.pull_is_should_auth = pull_is_should_auth;
+    }
+    if (keyWord) {
+      const keyWordWhere = [
+        {
+          name: {
+            [Op.like]: `%${keyWord}%`,
+          },
+        },
+        {
+          desc: {
+            [Op.like]: `%${keyWord}%`,
+          },
+        },
+        {
+          remark: {
+            [Op.like]: `%${keyWord}%`,
+          },
+        },
+      ];
+      allWhere[Op.or] = keyWordWhere;
+    }
+    if (rangTimeType && rangTimeStart && rangTimeEnd) {
+      allWhere[rangTimeType] = {
+        [Op.gt]: new Date(+rangTimeStart),
+        [Op.lt]: new Date(+rangTimeEnd),
+      };
+    }
+    const orderRes: any[] = [];
+    if (orderName && orderBy) {
+      orderRes.push([orderName, orderBy]);
+    }
+
+    const excludeArr = [
+      'push_rtmp_url',
+      'push_obs_server',
+      'push_obs_stream_key',
+      'push_webrtc_url',
+      'push_srt_url',
+      'cdn_push_rtmp_url',
+      'cdn_push_obs_server',
+      'cdn_push_obs_stream_key',
+      'cdn_push_webrtc_url',
+      'cdn_push_srt_url',
+      'forward_bilibili_url',
+      'forward_huya_url',
+      'forward_douyu_url',
+      'forward_douyin_url',
+      'forward_kuaishou_url',
+      'forward_xiaohongshu_url',
+    ];
+    if (exclude_key) {
+      excludeArr.push('key');
+    }
+    const result = await liveRoomModel.findAndCountAll({
+      attributes: {
+        exclude: excludeArr,
       },
       distinct: true,
       order: [...orderRes],
@@ -209,6 +307,11 @@ class LiveRoomService {
           'push_obs_stream_key',
           'push_webrtc_url',
           'push_srt_url',
+          'cdn_push_rtmp_url',
+          'cdn_push_obs_server',
+          'cdn_push_obs_stream_key',
+          'cdn_push_webrtc_url',
+          'cdn_push_srt_url',
           'forward_bilibili_url',
           'forward_huya_url',
           'forward_douyu_url',
@@ -236,6 +339,11 @@ class LiveRoomService {
         'push_obs_stream_key',
         'push_webrtc_url',
         'push_srt_url',
+        'cdn_push_rtmp_url',
+        'cdn_push_obs_server',
+        'cdn_push_obs_stream_key',
+        'cdn_push_webrtc_url',
+        'cdn_push_srt_url',
         'forward_bilibili_url',
         'forward_huya_url',
         'forward_douyu_url',

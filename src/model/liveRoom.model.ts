@@ -88,6 +88,33 @@ const model = sequelize.define<LiveRoomModel>(
     push_srt_url: {
       type: DataTypes.STRING(500),
     },
+    cdn_rtmp_url: {
+      type: DataTypes.STRING(500),
+    },
+    cdn_flv_url: {
+      type: DataTypes.STRING(500),
+    },
+    cdn_hls_url: {
+      type: DataTypes.STRING(500),
+    },
+    cdn_webrtc_url: {
+      type: DataTypes.STRING(500),
+    },
+    cdn_push_rtmp_url: {
+      type: DataTypes.STRING(500),
+    },
+    cdn_push_obs_server: {
+      type: DataTypes.STRING(500),
+    },
+    cdn_push_obs_stream_key: {
+      type: DataTypes.STRING(500),
+    },
+    cdn_push_webrtc_url: {
+      type: DataTypes.STRING(500),
+    },
+    cdn_push_srt_url: {
+      type: DataTypes.STRING(500),
+    },
     forward_bilibili_url: {
       type: DataTypes.STRING(500),
     },

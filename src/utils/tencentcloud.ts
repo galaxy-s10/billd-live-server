@@ -10,6 +10,7 @@ import {
   TENCENTCLOUD_SECRETID,
   TENCENTCLOUD_SECRETKEY,
 } from '@/secret/secret';
+import { LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
 
 function getSignFn({ endpoint, params }) {
@@ -158,8 +159,8 @@ class TencentcloudClass {
   /**
    * 获取拉流地址。
    */
-  getPullUrl = (data: { roomId: number }) => {
-    const url = `${TENCENTCLOUD_LIVE.PullDomain}/${TENCENTCLOUD_LIVE.AppName}/roomId___${data.roomId}`;
+  getPullUrl = (data: { liveRoomId: number }) => {
+    const url = `${TENCENTCLOUD_LIVE.PullDomain}/${TENCENTCLOUD_LIVE.AppName}/roomId___${data.liveRoomId}`;
     return {
       rtmp: `rtmp://${url}`,
       flv: `https://${url}.flv`,
@@ -172,11 +173,15 @@ class TencentcloudClass {
    * 拼装推流 URL
    * https://cloud.tencent.com/document/product/267/32720
    */
-  getPushUrl = (data: { roomId: number; key: string }) => {
+  getPushUrl = (data: {
+    liveRoomId: number;
+    key: string;
+    type: LiveRoomTypeEnum;
+  }) => {
     // 推流鉴权方式：静态鉴权(static)，https://developer.qiniu.com/pili/6678/push-the-current-authentication
     // 推流地址格式：rtmp://<Domain>/<AppName>/<StreamName>?txSecret=xxx&txTime=xxxx
     // https://cloud.tencent.com/document/product/267/32720
-    const StreamName = `roomId___${data.roomId}`;
+    const StreamName = `roomId___${data.liveRoomId}`;
     const Hex = (num: number) => num.toString(16).toUpperCase();
     const txTime = Math.floor(Date.now() / 1000) + 60 * 60; // txTime（地址有效期） 表示何时该 URL 会过期，格式支持十六进制的 UNIX 时间戳（时间单位：秒）。
     const txSecret = cryptojs
@@ -184,7 +189,9 @@ class TencentcloudClass {
       .toString();
     const key = `${StreamName}?txSecret=${txSecret}&txTime=${Hex(txTime)}&${
       SRS_CB_URL_PARAMS.roomId
-    }=${data.roomId}&${SRS_CB_URL_PARAMS.publishKey}=${data.key}`;
+    }=${data.liveRoomId}&${SRS_CB_URL_PARAMS.publishType}=${data.type}&${
+      SRS_CB_URL_PARAMS.publishKey
+    }=${data.key}`;
     return {
       push_rtmp_url: `rtmp://${TENCENTCLOUD_LIVE.PushDomain}/${TENCENTCLOUD_LIVE.AppName}/${key}`,
       push_obs_server: `rtmp://${TENCENTCLOUD_LIVE.PushDomain}/${TENCENTCLOUD_LIVE.AppName}/`,

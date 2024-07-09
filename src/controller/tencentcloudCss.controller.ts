@@ -13,6 +13,7 @@ import liveRecordController from '@/controller/liveRecord.controller';
 import userLiveRoomController from '@/controller/userLiveRoom.controller';
 import { CustomError } from '@/model/customError.model';
 import liveRoomService from '@/service/liveRoom.service';
+import { LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import {
   ITencentcloudCssPublishCb,
   ITencentcloudCssUnPublishCb,
@@ -39,11 +40,12 @@ class TencentcloudCssController {
       userLiveRoomController.common.findByLiveRoomIdAndKey(Number(liveRoomId)),
     ]);
     const pushRes = tencentcloudUtils.getPushUrl({
-      roomId: liveRoomId,
+      liveRoomId,
+      type: userLiveRoomInfo?.live_room?.type || LiveRoomTypeEnum.tencent_css,
       key: userLiveRoomInfo?.live_room?.key || '',
     });
     const pullRes = tencentcloudUtils.getPullUrl({
-      roomId: liveRoomId,
+      liveRoomId,
     });
 
     await Promise.all([

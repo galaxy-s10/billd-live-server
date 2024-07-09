@@ -4,12 +4,7 @@ import { ParameterizedContext } from 'koa';
 
 import { signJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import {
-  COMMON_HTTP_CODE,
-  PROJECT_ENV,
-  PROJECT_ENV_ENUM,
-  THIRD_PLATFORM,
-} from '@/constant';
+import { COMMON_HTTP_CODE, THIRD_PLATFORM } from '@/constant';
 import {
   bulkCreateArea,
   bulkCreateAuth,
@@ -50,6 +45,7 @@ import liveRoomService from '@/service/liveRoom.service';
 import userService from '@/service/user.service';
 import walletService from '@/service/wallet.service';
 import {
+  ILiveRoom,
   LiveRoomIsShowEnum,
   LiveRoomStatusEnum,
   LiveRoomTypeEnum,
@@ -58,6 +54,9 @@ import {
 import { IUser } from '@/types/IUser';
 import { chalkWARN } from '@/utils/chalkTip';
 import { tencentcloudUtils } from '@/utils/tencentcloud';
+
+import liveRoomController from './liveRoom.controller';
+import srsController from './srs.controller';
 
 class InitController {
   common = {
@@ -205,7 +204,7 @@ class InitController {
           } else if (user.live_room.cdn === LiveRoomUseCDNEnum.yes) {
             liveUrl = (live_room_id: number) => {
               const res = tencentcloudUtils.getPullUrl({
-                roomId: live_room_id,
+                liveRoomId: live_room_id,
               });
               return {
                 rtmp_url: res.rtmp,
@@ -316,6 +315,58 @@ class InitController {
     },
   };
 
+  // 更新直播间url
+  updateLiveRoomUrl = async (ctx: ParameterizedContext, next) => {
+    const res1 = await liveRoomController.common.getListPure({
+      exclude_key: false,
+    });
+    const queue: any[] = [];
+    // @ts-ignore
+    res1.rows.forEach((item: ILiveRoom) => {
+      const srsPullRes = srsController.common.getPullUrl({
+        liveRoomId: item.id!,
+      });
+      const srsPushRes = srsController.common.getPushUrl({
+        liveRoomId: item.id!,
+        type: item.type!,
+        key: item.key!,
+      });
+      const cdnPullRes = tencentcloudUtils.getPullUrl({ liveRoomId: item.id! });
+      const cdnPushRes = tencentcloudUtils.getPushUrl({
+        liveRoomId: item.id!,
+        type: item.type!,
+        key: item.key!,
+      });
+      queue.push(
+        liveRoomController.common.update({
+          id: item.id,
+          rtmp_url: srsPullRes.rtmp,
+          flv_url: srsPullRes.flv,
+          hls_url: srsPullRes.hls,
+          webrtc_url: srsPullRes.webrtc,
+          push_obs_server: srsPushRes.push_obs_server,
+          push_obs_stream_key: srsPushRes.push_obs_stream_key,
+          push_rtmp_url: srsPushRes.push_rtmp_url,
+          push_srt_url: srsPushRes.push_srt_url,
+          push_webrtc_url: srsPushRes.push_webrtc_url,
+          cdn_flv_url: cdnPullRes.flv,
+          cdn_hls_url: cdnPullRes.hls,
+          cdn_push_rtmp_url: cdnPullRes.rtmp,
+          cdn_webrtc_url: cdnPullRes.webrtc,
+          cdn_push_obs_server: cdnPushRes.push_obs_server,
+          cdn_push_obs_stream_key: cdnPushRes.push_obs_stream_key,
+          cdn_push_srt_url: cdnPushRes.push_srt_url,
+          cdn_push_webrtc_url: cdnPushRes.push_webrtc_url,
+          cdn_rtmp_url: cdnPushRes.push_rtmp_url,
+        })
+      );
+    });
+
+    await Promise.all(queue);
+    successHandler({ ctx, message: '更新直播间url成功！' });
+    await next();
+  };
+
   // 添加用户
   addUser = async (ctx: ParameterizedContext, next) => {
     await this.common.initRole();
@@ -353,13 +404,6 @@ class InitController {
 
   // 初始化用户
   initUser = async (ctx: ParameterizedContext, next) => {
-    // if (PROJECT_ENV !== PROJECT_ENV_ENUM.development) {
-    //   throw new CustomError(
-    //     '非开发环境，不能初始化用户！',
-    //     COMMON_HTTP_CODE.paramsError,
-    //     COMMON_HTTP_CODE.paramsError
-    //   );
-    // }
     await this.common.initUser();
     successHandler({ ctx, data: '初始化用户成功！' });
     await next();
@@ -412,13 +456,6 @@ class InitController {
 
   // 重建表
   forceTable = async (ctx: ParameterizedContext, next) => {
-    if (PROJECT_ENV !== PROJECT_ENV_ENUM.development) {
-      throw new CustomError(
-        '非开发环境，不能重建表！',
-        COMMON_HTTP_CODE.paramsError,
-        COMMON_HTTP_CODE.paramsError
-      );
-    }
     await Promise.all([
       logModel.sync({ force: true }),
       roleModel.sync({ force: true }),
@@ -440,13 +477,6 @@ class InitController {
   };
 
   deleteUser = async (ctx: ParameterizedContext, next) => {
-    if (PROJECT_ENV !== PROJECT_ENV_ENUM.development) {
-      throw new CustomError(
-        '非开发环境，不能删除用户！',
-        COMMON_HTTP_CODE.paramsError,
-        COMMON_HTTP_CODE.paramsError
-      );
-    }
     const { userId } = ctx.request.body;
     const res1 = await thirdUserModel.findAndCountAll({
       where: { user_id: userId },

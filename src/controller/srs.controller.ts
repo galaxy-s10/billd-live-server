@@ -57,11 +57,11 @@ class SRSController {
       myaxios.delete(
         `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port[1985]}/api/v1/clients/${clientId}`
       ),
-    getPullUrl: (liveRoomId: number) => {
+    getPullUrl: (data: { liveRoomId: number }) => {
       return {
-        rtmp: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${liveRoomId}`,
-        flv: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${liveRoomId}.flv`,
-        hls: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${liveRoomId}.m3u8`,
+        rtmp: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${data.liveRoomId}`,
+        flv: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${data.liveRoomId}.flv`,
+        hls: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${data.liveRoomId}.m3u8`,
         webrtc: ``,
       };
     },
