@@ -50,15 +50,33 @@ async function addLive({
   devFFmpegLocalFile: string;
   prodFFmpegLocalFile: string;
 }) {
-  let flv_url = '';
-  let hls_url = '';
-  let rtmp_url = '';
-  let webrtc_url = '';
-  let push_rtmp_url = '';
-  let push_obs_server = '';
-  let push_obs_stream_key = '';
-  let push_webrtc_url = '';
-  let push_srt_url = '';
+  const srsPullRes = {
+    flv: '',
+    hls: '',
+    webrtc: '',
+    rtmp: '',
+  };
+  const srsPushRes = {
+    push_rtmp_url: '',
+    push_obs_server: '',
+    push_obs_stream_key: '',
+    push_webrtc_url: '',
+    push_srt_url: '',
+  };
+  const cdnPullRes = {
+    flv: '',
+    hls: '',
+    webrtc: '',
+    rtmp: '',
+  };
+  const cdnPushRes = {
+    push_rtmp_url: '',
+    push_obs_server: '',
+    push_obs_stream_key: '',
+    push_webrtc_url: '',
+    push_srt_url: '',
+  };
+
   async function main() {
     await liveService.deleteByLiveRoomId(live_room_id);
     // 开发环境时判断devFFmpeg，是true的才初始化ffmpeg
@@ -96,7 +114,11 @@ async function addLive({
         console.log(chalkERROR(`FFmpeg推流错误！`), 'localFile为空');
         return;
       }
-      const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec copy -acodec copy -f flv '${push_rtmp_url}'`;
+      const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec copy -acodec copy -f flv '${
+        cdn === LiveRoomUseCDNEnum.yes
+          ? cdnPushRes.push_rtmp_url
+          : srsPushRes.push_rtmp_url
+      }'`;
       // const ffmpegSyncCmd = `${ffmpegCmd} 1>/dev/null 2>&1 &`;
       try {
         // WARN 使用execSync的话，命令最后需要添加：1>/dev/null 2>&1 &，否则会自动退出进程；
@@ -121,15 +143,24 @@ async function addLive({
       pull_is_should_auth,
       weight,
       cover_img,
-      rtmp_url,
-      flv_url,
-      hls_url,
-      webrtc_url,
-      push_rtmp_url,
-      push_obs_server,
-      push_obs_stream_key,
-      push_webrtc_url,
-      push_srt_url,
+      rtmp_url: srsPullRes.rtmp,
+      flv_url: srsPullRes.flv,
+      hls_url: srsPullRes.hls,
+      webrtc_url: srsPullRes.webrtc,
+      push_rtmp_url: srsPushRes.push_rtmp_url,
+      push_obs_server: srsPushRes.push_obs_server,
+      push_obs_stream_key: srsPushRes.push_obs_stream_key,
+      push_webrtc_url: srsPushRes.push_webrtc_url,
+      push_srt_url: srsPushRes.push_srt_url,
+      cdn_rtmp_url: cdnPullRes.rtmp,
+      cdn_flv_url: cdnPullRes.flv,
+      cdn_hls_url: cdnPullRes.hls,
+      cdn_webrtc_url: cdnPullRes.webrtc,
+      cdn_push_rtmp_url: cdnPushRes.push_rtmp_url,
+      cdn_push_obs_server: cdnPushRes.push_obs_server,
+      cdn_push_obs_stream_key: cdnPushRes.push_obs_stream_key,
+      cdn_push_webrtc_url: cdnPushRes.push_webrtc_url,
+      cdn_push_srt_url: cdnPushRes.push_srt_url,
       type: LiveRoomTypeEnum.system,
     });
   }
@@ -158,18 +189,18 @@ async function addLive({
         type: userLiveRoomInfo?.live_room?.type || LiveRoomTypeEnum.tencent_css,
         key: userLiveRoomInfo?.live_room?.key || '',
       });
-      push_rtmp_url = pushRes.push_rtmp_url;
-      push_obs_server = pushRes.push_obs_server;
-      push_obs_stream_key = pushRes.push_obs_stream_key;
-      push_webrtc_url = pushRes.push_webrtc_url;
-      push_srt_url = pushRes.push_srt_url;
+      cdnPushRes.push_rtmp_url = pushRes.push_rtmp_url;
+      cdnPushRes.push_obs_server = pushRes.push_obs_server;
+      cdnPushRes.push_obs_stream_key = pushRes.push_obs_stream_key;
+      cdnPushRes.push_webrtc_url = pushRes.push_webrtc_url;
+      cdnPushRes.push_srt_url = pushRes.push_srt_url;
       const pullUrlRes = tencentcloudUtils.getPullUrl({
         liveRoomId: live_room_id,
       });
-      rtmp_url = pullUrlRes.rtmp;
-      flv_url = pullUrlRes.flv;
-      hls_url = pullUrlRes.hls;
-      webrtc_url = pullUrlRes.webrtc;
+      cdnPullRes.rtmp = pullUrlRes.rtmp;
+      cdnPullRes.flv = pullUrlRes.flv;
+      cdnPullRes.hls = pullUrlRes.hls;
+      cdnPullRes.webrtc = pullUrlRes.webrtc;
       await main();
     }
   } else if (cdn === LiveRoomUseCDNEnum.no) {
@@ -181,18 +212,18 @@ async function addLive({
         type: LiveRoomTypeEnum.system,
         key,
       });
-      push_rtmp_url = pushRes.push_rtmp_url;
-      push_obs_server = pushRes.push_obs_server;
-      push_obs_stream_key = pushRes.push_obs_stream_key;
-      push_webrtc_url = pushRes.push_webrtc_url;
-      push_srt_url = pushRes.push_srt_url;
+      srsPushRes.push_rtmp_url = pushRes.push_rtmp_url;
+      srsPushRes.push_obs_server = pushRes.push_obs_server;
+      srsPushRes.push_obs_stream_key = pushRes.push_obs_stream_key;
+      srsPushRes.push_webrtc_url = pushRes.push_webrtc_url;
+      srsPushRes.push_srt_url = pushRes.push_srt_url;
       const pullRes = srsController.common.getPullUrl({
         liveRoomId: live_room_id,
       });
-      rtmp_url = pullRes.rtmp;
-      flv_url = pullRes.flv;
-      hls_url = pullRes.hls;
-      webrtc_url = pullRes.webrtc;
+      srsPullRes.rtmp = pullRes.rtmp;
+      srsPullRes.flv = pullRes.flv;
+      srsPullRes.hls = pullRes.hls;
+      srsPullRes.webrtc = pullRes.webrtc;
       await main();
     }
   }
