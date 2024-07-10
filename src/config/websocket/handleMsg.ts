@@ -423,7 +423,7 @@ export async function handleWsDisconnecting(args: {
         socketId: socket.id,
         joinRoomId: roomId,
       })
-      .then(async (res1) => {
+      .then((res1) => {
         if (res1) {
           const { joinRoomId, userInfo } = res1.value;
           try {
@@ -443,20 +443,6 @@ export async function handleWsDisconnecting(args: {
               user_info: userInfo,
             },
           });
-          const userId = userInfo?.id;
-          if (!userId) {
-            console.log(chalkERROR('userId为空'));
-            return;
-          }
-          const userLiveRoomInfo = await userLiveRoomService.findByUserId(
-            userId
-          );
-          if (userLiveRoomInfo) {
-            liveService.deleteByLiveRoomIdAndSocketId({
-              live_room_id: userLiveRoomInfo.live_room_id!,
-              socket_id: socket.id,
-            });
-          }
         }
       })
       .catch((error) => {

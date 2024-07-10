@@ -13,7 +13,7 @@ import liveRecordController from '@/controller/liveRecord.controller';
 import userLiveRoomController from '@/controller/userLiveRoom.controller';
 import { CustomError } from '@/model/customError.model';
 import liveRoomService from '@/service/liveRoom.service';
-import { LiveRoomTypeEnum } from '@/types/ILiveRoom';
+import { LiveRoomTypeEnum, LiveRoomUseCDNEnum } from '@/types/ILiveRoom';
 import {
   ITencentcloudCssPublishCb,
   ITencentcloudCssUnPublishCb,
@@ -21,6 +21,8 @@ import {
 import { WsMsgTypeEnum } from '@/types/websocket';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 import { tencentcloudUtils } from '@/utils/tencentcloud';
+
+import liveRoomController from './liveRoom.controller';
 
 class TencentcloudCssController {
   async push(ctx: ParameterizedContext, next) {
@@ -91,6 +93,37 @@ class TencentcloudCssController {
   remoteAuth = async (ctx: ParameterizedContext, next) => {
     const roomId = ctx.query[SRS_CB_URL_PARAMS.roomId] as string;
     const paramsPublishKey = ctx.query[SRS_CB_URL_PARAMS.publishKey] as string;
+    // const paramsUserToken = ctx.query[SRS_CB_URL_PARAMS.userToken] as string;
+    // const { userInfo } = await jwtVerify(paramsUserToken);
+    // if (!userInfo?.id) {
+    //   console.log(chalkERROR(`[tencentcloud_css_remoteAuth] 用户token 错误！`));
+    //   successHandler({
+    //     httpStatusCode: 403,
+    //     ctx,
+    //     data: '[tencentcloud_css_remoteAuth] fail, user token is error',
+    //   });
+    //   await next();
+    //   return;
+    // }
+    // const auth = await authController.common.getUserAuth(userInfo.id);
+    // if (
+    //   !auth.find(
+    //     (item) => item.auth_value === DEFAULT_AUTH_INFO.LIVE_PUSH_CDN.auth_value
+    //   )
+    // ) {
+    //   console.log(
+    //     chalkERROR(
+    //       '[tencentcloud_css_remoteAuth] 该用户没有cdn推流权限，不允许推流'
+    //     )
+    //   );
+    //   successHandler({
+    //     httpStatusCode: 403,
+    //     ctx,
+    //     data: '[tencentcloud_css_remoteAuth] fail, user is not cdn push auth',
+    //   });
+    //   await next();
+    //   return;
+    // }
     if (!roomId) {
       console.log(chalkERROR(`[tencentcloud_css_remoteAuth] 房间id不存在！`));
       successHandler({
@@ -144,6 +177,11 @@ class TencentcloudCssController {
       await next();
       return;
     }
+    await liveRoomController.common.update({
+      id: Number(roomId),
+      cdn: LiveRoomUseCDNEnum.yes,
+    });
+
     console.log(
       chalkSUCCESS(
         `[tencentcloud_css_remoteAuth] 房间id：${roomId}，所有验证通过，允许推流`

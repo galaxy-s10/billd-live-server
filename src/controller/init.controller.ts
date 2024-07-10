@@ -402,6 +402,20 @@ class InitController {
     await next();
   };
 
+  // 初始化角色、权限、角色权限
+  rbacMode = async (ctx: ParameterizedContext, next) => {
+    await Promise.all([
+      roleModel.sync({ force: true }),
+      authModel.sync({ force: true }),
+      roleAuthModel.sync({ force: true }),
+    ]);
+    await this.common.initRole();
+    await this.common.initAuth();
+    await this.common.initRoleAuth();
+    successHandler({ ctx, message: '初始化角色、权限、角色权限成功！' });
+    await next();
+  };
+
   // 初始化用户
   initUser = async (ctx: ParameterizedContext, next) => {
     await this.common.initUser();

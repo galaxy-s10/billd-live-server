@@ -111,6 +111,14 @@ const initAuth = () => {
       priority: 99,
       p_id: DEFAULT_AUTH_INFO.LIVE_MANAGE.id,
     },
+    {
+      id: DEFAULT_AUTH_INFO.LIVE_PUSH_CDN.id,
+      auth_name: '直播推流（CDN）',
+      auth_value: DEFAULT_AUTH_INFO.LIVE_PUSH_CDN.auth_value,
+      type: 1,
+      priority: 99,
+      p_id: DEFAULT_AUTH_INFO.LIVE_MANAGE.id,
+    },
   ];
 
   return deafultAuth;
@@ -210,6 +218,7 @@ const initRoleAuth = () => {
     DEFAULT_AUTH_INFO.LIVE_PUSH,
     DEFAULT_AUTH_INFO.LIVE_PULL,
     DEFAULT_AUTH_INFO.LIVE_PULL_SVIP,
+    DEFAULT_AUTH_INFO.LIVE_PUSH_CDN,
   ].forEach((item) => {
     id += 1;
     roleAuth.push({

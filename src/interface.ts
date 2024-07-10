@@ -365,6 +365,17 @@ export interface IGoods {
   deleted_at?: string;
 }
 
+export interface ISettings {
+  id?: number;
+  key?: string;
+  value?: string;
+  desc?: string;
+  type?: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
 export enum GiftRecordIsRecvEnum {
   yew,
   no,

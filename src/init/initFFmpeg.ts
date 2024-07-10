@@ -2,7 +2,6 @@ import { exec, spawnSync } from 'child_process';
 
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import srsController from '@/controller/srs.controller';
-import userLiveRoomController from '@/controller/userLiveRoom.controller';
 import { initUser } from '@/init/initUser';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
@@ -25,7 +24,6 @@ function ffmpegIsInstalled() {
 
 async function addLive({
   live_room_id,
-  user_id,
   name,
   desc,
   cdn,
@@ -50,32 +48,24 @@ async function addLive({
   devFFmpegLocalFile: string;
   prodFFmpegLocalFile: string;
 }) {
-  const srsPullRes = {
-    flv: '',
-    hls: '',
-    webrtc: '',
-    rtmp: '',
-  };
-  const srsPushRes = {
-    push_rtmp_url: '',
-    push_obs_server: '',
-    push_obs_stream_key: '',
-    push_webrtc_url: '',
-    push_srt_url: '',
-  };
-  const cdnPullRes = {
-    flv: '',
-    hls: '',
-    webrtc: '',
-    rtmp: '',
-  };
-  const cdnPushRes = {
-    push_rtmp_url: '',
-    push_obs_server: '',
-    push_obs_stream_key: '',
-    push_webrtc_url: '',
-    push_srt_url: '',
-  };
+  const liveRoomInfo = await liveRoomService.findKey(live_room_id);
+  const key = liveRoomInfo?.key;
+  const srsPullRes = srsController.common.getPullUrl({
+    liveRoomId: live_room_id,
+  });
+  const srsPushRes = srsController.common.getPushUrl({
+    liveRoomId: live_room_id,
+    type: LiveRoomTypeEnum.system,
+    key: key!,
+  });
+  const cdnPullRes = tencentcloudUtils.getPullUrl({
+    liveRoomId: live_room_id,
+  });
+  const cdnPushRes = tencentcloudUtils.getPushUrl({
+    liveRoomId: live_room_id,
+    type: LiveRoomTypeEnum.tencent_css,
+    key: key!,
+  });
 
   async function main() {
     await liveService.deleteByLiveRoomId(live_room_id);
@@ -179,53 +169,10 @@ async function addLive({
     console.log(err, res);
     if (err) return;
     if (res) {
-      const [userLiveRoomInfo] = await Promise.all([
-        userLiveRoomController.common.findByLiveRoomIdAndKey(
-          Number(live_room_id)
-        ),
-      ]);
-      const pushRes = tencentcloudUtils.getPushUrl({
-        liveRoomId: live_room_id,
-        type: userLiveRoomInfo?.live_room?.type || LiveRoomTypeEnum.tencent_css,
-        key: userLiveRoomInfo?.live_room?.key || '',
-      });
-      cdnPushRes.push_rtmp_url = pushRes.push_rtmp_url;
-      cdnPushRes.push_obs_server = pushRes.push_obs_server;
-      cdnPushRes.push_obs_stream_key = pushRes.push_obs_stream_key;
-      cdnPushRes.push_webrtc_url = pushRes.push_webrtc_url;
-      cdnPushRes.push_srt_url = pushRes.push_srt_url;
-      const pullUrlRes = tencentcloudUtils.getPullUrl({
-        liveRoomId: live_room_id,
-      });
-      cdnPullRes.rtmp = pullUrlRes.rtmp;
-      cdnPullRes.flv = pullUrlRes.flv;
-      cdnPullRes.hls = pullUrlRes.hls;
-      cdnPullRes.webrtc = pullUrlRes.webrtc;
       await main();
     }
-  } else if (cdn === LiveRoomUseCDNEnum.no) {
-    const liveRoomInfo = await liveRoomService.findKey(live_room_id);
-    const key = liveRoomInfo?.key;
-    if (key) {
-      const pushRes = srsController.common.getPushUrl({
-        liveRoomId: live_room_id,
-        type: LiveRoomTypeEnum.system,
-        key,
-      });
-      srsPushRes.push_rtmp_url = pushRes.push_rtmp_url;
-      srsPushRes.push_obs_server = pushRes.push_obs_server;
-      srsPushRes.push_obs_stream_key = pushRes.push_obs_stream_key;
-      srsPushRes.push_webrtc_url = pushRes.push_webrtc_url;
-      srsPushRes.push_srt_url = pushRes.push_srt_url;
-      const pullRes = srsController.common.getPullUrl({
-        liveRoomId: live_room_id,
-      });
-      srsPullRes.rtmp = pullRes.rtmp;
-      srsPullRes.flv = pullRes.flv;
-      srsPullRes.hls = pullRes.hls;
-      srsPullRes.webrtc = pullRes.webrtc;
-      await main();
-    }
+  } else {
+    await main();
   }
 }
 

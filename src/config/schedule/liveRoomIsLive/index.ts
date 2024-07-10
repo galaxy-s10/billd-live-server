@@ -30,6 +30,9 @@ export const tencentcloudCssMain = async () => {
       delArr.push(Number(roomId));
     }
   });
+  console.log('res2', res2);
+  console.log('res1Map', res1Map);
+  console.log('定时任务删除cdn直播记录', delArr);
   if (delArr.length) {
     liveController.common.deleteByLiveRoomId(delArr);
   }
@@ -56,6 +59,7 @@ export const srsMain = async () => {
       delArr.push(Number(roomId));
     }
   });
+  console.log('定时任务删除srs直播记录', delArr);
   if (delArr.length) {
     liveController.common.deleteByLiveRoomId(delArr);
   }
@@ -90,12 +94,12 @@ for (let i = 0; i < allSecond; i += 1) {
 // rule.second = 0;
 
 // 每3分钟执行
-rule.minute = allMinuteArr.filter((v) => v % 3 === 0);
-rule.second = 0;
+// rule.minute = allMinuteArr.filter((v) => v % 3 === 0);
+// rule.second = 0;
 
 // 每5秒执行
-// rule.minute = allMinuteArr.filter((v) => v % 1 === 0);
-// rule.second = allSecondArr.filter((v) => v % 5 === 0);
+rule.minute = allMinuteArr.filter((v) => v % 1 === 0);
+rule.second = allSecondArr.filter((v) => v % 5 === 0);
 
 export const startLiveRoomIsLiveSchedule = () => {
   if (PROJECT_ENV === 'prod') {

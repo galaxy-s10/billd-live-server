@@ -246,6 +246,10 @@ export const DEFAULT_AUTH_INFO = {
     id: 12,
     auth_value: 'LIVE_PULL_SVIP',
   },
+  LIVE_PUSH_CDN: {
+    id: 13,
+    auth_value: 'LIVE_PUSH_CDN',
+  },
 };
 
 export const DEFAULT_ROLE_INFO = {
