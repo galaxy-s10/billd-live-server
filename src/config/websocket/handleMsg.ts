@@ -121,6 +121,10 @@ export async function handleWsJoin(args: {
     userInfo: data.user_info,
     client_ip: getSocketRealIp(socket),
   });
+  liveRedisController.setSocketIdJoinLiveRoom({
+    socketId: data.socket_id,
+    joinRoomId: roomId,
+  });
   if (liveInfo) {
     if (liveRoomInfo.type === LiveRoomTypeEnum.system) {
       socketEmit<WsRoomLivingType['data']>({
@@ -415,6 +419,7 @@ export async function handleWsDisconnecting(args: {
     prefix: REDIS_PREFIX.deskUserSocketid,
     key: socket.id,
   });
+  console.log('socket.rooms', socket.rooms);
   socket.rooms.forEach((roomIdStr) => {
     const roomId = Number(roomIdStr);
     if (Number.isNaN(roomId)) return;
@@ -722,6 +727,10 @@ export async function handleWsUpdateJoinInfo(args: {
       joinRoomId: data.data.live_room_id,
       userInfo: data.user_info,
       client_ip: getSocketRealIp(socket),
+    });
+    liveRedisController.setSocketIdJoinLiveRoom({
+      socketId: data.socket_id,
+      joinRoomId: data.data.live_room_id,
     });
   }
 }

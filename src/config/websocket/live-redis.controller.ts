@@ -70,6 +70,21 @@ class WSController {
     });
   };
 
+  setSocketIdJoinLiveRoom = async (data: {
+    socketId: string;
+    joinRoomId: number;
+  }) => {
+    await redisController.setHashVal({
+      key: `${REDIS_PREFIX.socketIdJoinLiveRoom}`,
+      field: data.socketId,
+      value: data,
+    });
+    redisController.setExpire({
+      key: `${REDIS_PREFIX.socketIdJoinLiveRoom}`,
+      seconds: 30,
+    });
+  };
+
   /** 删除直播间直播 */
   delLiveRoomLiving = async (data: { liveRoomId: number }) => {
     const res = await redisController.del({

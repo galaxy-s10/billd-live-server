@@ -181,6 +181,7 @@ export const REDIS_PREFIX = {
   disableSpeaking: `${REDIS_PREFIX_ENV}disableSpeaking___`, // 禁言用户
   kick: `${REDIS_PREFIX_ENV}kick___`, // 踢掉用户
   liveRoomOnlineUser: `${REDIS_PREFIX_ENV}liveRoomOnlineUser___`, // 直播间在线用户
+  socketIdJoinLiveRoom: `${REDIS_PREFIX_ENV}socketIdJoinLiveRoom___`,
   livePkKey: `${REDIS_PREFIX_ENV}livePkKey___`, // 直播间打pk秘钥
   dbLiveList: `${REDIS_PREFIX_ENV}dbLiveList___`, // 直播间在线列表
   dbLiveRoomHistoryMsgList: `${REDIS_PREFIX_ENV}dbLiveRoomHistoryMsgList___`, // 直播间历史消息

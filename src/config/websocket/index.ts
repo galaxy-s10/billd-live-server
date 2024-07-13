@@ -185,6 +185,7 @@ export const connectWebSocket = (server) => {
   // 每个客户端socket连接时都会触发 connection 事件
   io.on(WsConnectStatusEnum.connection, (socket: Socket) => {
     prettierInfoLog({ msg: 'connection', socket });
+    console.log('socket.roomss', socket.rooms);
 
     // 收到用户进入房间
     socket.on(WsMsgTypeEnum.join, (data: WsJoinType) => {
