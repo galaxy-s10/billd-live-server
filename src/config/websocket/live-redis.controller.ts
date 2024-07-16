@@ -70,6 +70,21 @@ class WSController {
     });
   };
 
+  getSocketIdJoinLiveRoom = async () => {
+    const res = await redisController.getAllHashVal(
+      `${REDIS_PREFIX.socketIdJoinLiveRoom}`
+    );
+    return res;
+  };
+
+  getSocketIdJoinLiveRoomOne = async (data: { socketId: string }) => {
+    const res = await redisController.getHashVal({
+      key: `${REDIS_PREFIX.socketIdJoinLiveRoom}`,
+      field: data.socketId,
+    });
+    return res;
+  };
+
   setSocketIdJoinLiveRoom = async (data: {
     socketId: string;
     joinRoomId: number;
@@ -79,7 +94,17 @@ class WSController {
       field: data.socketId,
       value: data,
     });
-    redisController.setExpire({
+  };
+
+  delSocketIdJoinLiveRoom = async (data: { socketId: string }) => {
+    await redisController.delHashVal({
+      key: `${REDIS_PREFIX.socketIdJoinLiveRoom}`,
+      field: data.socketId,
+    });
+  };
+
+  updateSocketIdJoinLiveRoomExpire = async () => {
+    await redisController.setExpire({
       key: `${REDIS_PREFIX.socketIdJoinLiveRoom}`,
       seconds: 30,
     });

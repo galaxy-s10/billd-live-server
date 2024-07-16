@@ -411,49 +411,75 @@ export async function handleWsDisconnecting(args: {
   } catch (error) {
     console.log(error);
   }
-  await redisController.del({
-    prefix: REDIS_PREFIX.deskUserUuid,
-    key: remoteDeskUserUuid,
+  await Promise.all([
+    redisController.del({
+      prefix: REDIS_PREFIX.deskUserUuid,
+      key: remoteDeskUserUuid,
+    }),
+    redisController.del({
+      prefix: REDIS_PREFIX.deskUserSocketid,
+      key: socket.id,
+    }),
+  ]);
+  const res2 = await liveRedisController.getSocketIdJoinLiveRoom();
+  res2.forEach((item) => {
+    try {
+      const res3 = JSON.parse(item);
+      if (res3.value.socketId === socket.id) {
+        liveRedisController.delUserJoinedRoom({
+          socketId: socket.id,
+          joinRoomId: res3.value.joinRoomId,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   });
-  await redisController.del({
-    prefix: REDIS_PREFIX.deskUserSocketid,
-    key: socket.id,
+  const res = await liveRedisController.getSocketIdJoinLiveRoomOne({
+    socketId: socket.id,
   });
-  console.log('socket.rooms', socket.rooms);
-  socket.rooms.forEach((roomIdStr) => {
-    const roomId = Number(roomIdStr);
-    if (Number.isNaN(roomId)) return;
-    liveRedisController
-      .getUserJoinedRoom({
-        socketId: socket.id,
-        joinRoomId: roomId,
-      })
-      .then((res1) => {
-        if (res1) {
-          const { joinRoomId, userInfo } = res1.value;
-          try {
-            liveRedisController.delUserJoinedRoom({
-              socketId: socket.id,
-              joinRoomId,
-            });
-          } catch (error) {
-            console.log(error);
-          }
-          ioEmit<WsLeavedType['data']>({
-            io,
-            roomId: joinRoomId,
-            msgType: WsMsgTypeEnum.leaved,
-            data: {
-              socket_id: socket.id,
-              user_info: userInfo,
-            },
-          });
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  try {
+    const res4 = JSON.parse(res || '{}');
+    ioEmit<WsLeavedType['data']>({
+      io,
+      roomId: res4.data.joinRoomId,
+      msgType: WsMsgTypeEnum.leaved,
+      data: {
+        socket_id: socket.id,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+  await liveRedisController.delSocketIdJoinLiveRoom({
+    socketId: socket.id,
   });
+  // console.log('socket.rooms', socket.rooms);
+  // socket.rooms.forEach((roomIdStr) => {
+  //   const roomId = Number(roomIdStr);
+  //   if (Number.isNaN(roomId)) return;
+  //   liveRedisController
+  //     .getUserJoinedRoom({
+  //       socketId: socket.id,
+  //       joinRoomId: roomId,
+  //     })
+  //     .then((res1) => {
+  //       if (res1) {
+  //         const { joinRoomId, userInfo } = res1.value;
+  //         try {
+  //           liveRedisController.delUserJoinedRoom({
+  //             socketId: socket.id,
+  //             joinRoomId,
+  //           });
+  //         } catch (error) {
+  //           console.log(error);
+  //         }
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // });
 }
 
 export async function handleWsRoomNoLive(args: {
