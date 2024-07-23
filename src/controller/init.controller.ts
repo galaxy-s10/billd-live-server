@@ -12,6 +12,7 @@ import {
   bulkCreateLiveConfig,
   bulkCreateRole,
   bulkCreateRoleAuth,
+  bulkCreateSettings,
 } from '@/init/initData';
 import { mockTimeBatchInsert } from '@/init/initDb';
 import { initUser } from '@/init/initUser';
@@ -34,6 +35,7 @@ import orderModel from '@/model/order.model';
 import qqUserModel from '@/model/qqUser.model';
 import roleModel from '@/model/role.model';
 import roleAuthModel from '@/model/roleAuth.model';
+import settingsModel from '@/model/settings.model';
 import thirdUserModel from '@/model/thirdUser.model';
 import userModel from '@/model/user.model';
 import userLiveRoomModel from '@/model/userLiveRoom.model';
@@ -136,6 +138,18 @@ class InitController {
       } else {
         throw new CustomError(
           '已经初始化过商品了，不能再初始化了！',
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
+        );
+      }
+    },
+    initSettings: async () => {
+      const count = await settingsModel.count();
+      if (count === 0) {
+        await settingsModel.bulkCreate(bulkCreateSettings);
+      } else {
+        throw new CustomError(
+          '已经初始化过设置了，不能再初始化了！',
           COMMON_HTTP_CODE.paramsError,
           COMMON_HTTP_CODE.paramsError
         );
@@ -370,21 +384,21 @@ class InitController {
   // 添加用户
   addUser = async (ctx: ParameterizedContext, next) => {
     await this.common.initRole();
-    successHandler({ ctx, message: '初始化角色成功！' });
+    successHandler({ ctx, message: '初始化角色表成功！' });
     await next();
   };
 
   // 初始化角色
   initRole = async (ctx: ParameterizedContext, next) => {
     await this.common.initRole();
-    successHandler({ ctx, message: '初始化角色成功！' });
+    successHandler({ ctx, message: '初始化角色表成功！' });
     await next();
   };
 
   // 初始化权限
   initAuth = async (ctx: ParameterizedContext, next) => {
     await this.common.initAuth();
-    successHandler({ ctx, message: '初始化权限成功！' });
+    successHandler({ ctx, message: '初始化权限表成功！' });
     await next();
   };
 
@@ -395,10 +409,17 @@ class InitController {
     await next();
   };
 
+  // 初始化设置
+  initSettings = async (ctx: ParameterizedContext, next) => {
+    await this.common.initSettings();
+    successHandler({ ctx, message: '初始化设置表成功！' });
+    await next();
+  };
+
   // 初始化角色权限
   initRoleAuth = async (ctx: ParameterizedContext, next) => {
     await this.common.initRoleAuth();
-    successHandler({ ctx, message: '初始化角色权限成功！' });
+    successHandler({ ctx, message: '初始化角色权限表成功！' });
     await next();
   };
 

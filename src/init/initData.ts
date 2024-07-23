@@ -11,6 +11,7 @@ import {
   IGoods,
   ILiveConfig,
   IRole,
+  ISettings,
 } from '@/interface';
 
 const initAuth = () => {
@@ -512,6 +513,22 @@ export const bulkCreateGoods: IGoods[] = [
   },
 ];
 
+const initSettings = (): ISettings[] => [
+  {
+    key: 'allow_home_modal',
+    value: '2',
+    desc: "是否开启首页弹窗（'1'开启；'2'关闭）",
+    type: 'switch',
+  },
+  {
+    key: 'home_modal_content',
+    value: '持续更新中...',
+    desc: '首页弹窗内容',
+    type: 'markdown',
+  },
+];
+
+export const bulkCreateSettings = initSettings();
 export const bulkCreateRole = initRole();
 export const bulkCreateAuth = initAuth();
 export const bulkCreateRoleAuth = initRoleAuth();

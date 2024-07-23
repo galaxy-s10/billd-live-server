@@ -32,7 +32,7 @@ initRouter.post(
 // 初始化角色权限
 initRouter.post(
   '/role_auth',
-  // apiVerifyEnv([PROJECT_ENV_ENUM.development]),
+  apiVerifyEnv([PROJECT_ENV_ENUM.development]),
   // apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
   initController.initRoleAuth
 );
@@ -40,7 +40,7 @@ initRouter.post(
 // 初始化角色、权限、角色权限
 initRouter.post(
   '/rbac',
-  // apiVerifyEnv([PROJECT_ENV_ENUM.development]),
+  apiVerifyEnv([PROJECT_ENV_ENUM.development]),
   // apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
   initController.rbacMode
 );
@@ -51,6 +51,14 @@ initRouter.post(
   apiVerifyEnv([PROJECT_ENV_ENUM.development]),
   apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
   initController.initGoods
+);
+
+// 初始化设置
+initRouter.post(
+  '/settings',
+  apiVerifyEnv([PROJECT_ENV_ENUM.development]),
+  // apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
+  initController.initSettings
 );
 
 // 初始化时间表
