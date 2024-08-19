@@ -9,6 +9,7 @@ import {
 import { IInitUser } from '@/interface';
 import {
   LiveRoomPullIsShouldAuthEnum,
+  LiveRoomTypeEnum,
   LiveRoomUseCDNEnum,
 } from '@/types/ILiveRoom';
 
@@ -42,6 +43,7 @@ export const initUser: Record<string, IInitUser> = {
       name: '房东的猫-云烟成雨',
       desc: '房东的猫livehouse合集',
       weight: 10,
+      type: LiveRoomTypeEnum.tencent_css,
       cdn: LiveRoomUseCDNEnum.yes,
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       area: [1],
@@ -245,6 +247,25 @@ export const initUser: Record<string, IInitUser> = {
         SERVER_VIDEO_DIR,
         'hss_20230707_1_30.mp4'
       ),
+    },
+  },
+  systemUserBilibili: {
+    id: 13,
+    username: 'user-bilibili',
+    avatar: '',
+    user_roles: [DEFAULT_ROLE_INFO.VIP_USER.id],
+    live_room: {
+      id: 13,
+      name: '哔哩哔哩直播间',
+      desc: '转播哔哩哔哩直播间',
+      weight: 10,
+      cdn: LiveRoomUseCDNEnum.no,
+      pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
+      area: [1],
+      devFFmpeg: false, // 初始化ffmpeg
+      prodFFmpeg: false, // 初始化ffmpeg
+      devFFmpegLocalFile: path.resolve(VIDEO_DIR, ''),
+      prodFFmpegLocalFile: path.resolve(SERVER_VIDEO_DIR, ''),
     },
   },
   systemUser100: {

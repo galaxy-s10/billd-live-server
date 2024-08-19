@@ -39,6 +39,20 @@ class UserController {
         COMMON_HTTP_CODE.paramsError
       );
     }
+    if (username.length < 3 || username.length > 12) {
+      throw new CustomError(
+        `用户名长度要求3-12位！`,
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
+      );
+    }
+    if (password.length < 6 || password.length > 18) {
+      throw new CustomError(
+        `密码长度要求6-18位！`,
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
+      );
+    }
     const isExistSameName = await userService.isSameName(username);
     if (isExistSameName) {
       throw new CustomError(
@@ -268,6 +282,7 @@ class UserController {
     await userService.updatePwd({
       id: userInfo.id,
       password: newpwd,
+      token: '',
     });
     successHandler({ ctx, message: '修改密码成功！' });
     await next();

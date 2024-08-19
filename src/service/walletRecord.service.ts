@@ -93,7 +93,10 @@ class WalletRecordService {
   async update(data: IWalletRecord) {
     const { id } = data;
     const data2 = filterObj(data, ['id']);
-    const result = await walletRecordModel.update(data2, { where: { id } });
+    const result = await walletRecordModel.update(data2, {
+      where: { id },
+      limit: 1,
+    });
     return result;
   }
 
@@ -107,6 +110,7 @@ class WalletRecordService {
   async delete(id: number) {
     const result = await walletRecordModel.destroy({
       where: { id },
+      limit: 1,
       individualHooks: true,
     });
     return result;

@@ -6,10 +6,10 @@ import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import { COMMON_HTTP_CODE, REDIS_PREFIX } from '@/constant';
 import redisController from '@/controller/redis.controller';
+import userLiveRoomController from '@/controller/userLiveRoom.controller';
 import { IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveRoomService from '@/service/liveRoom.service';
-import userLiveRoomService from '@/service/userLiveRoom.service';
 import { ILiveRoom } from '@/types/ILiveRoom';
 import { tencentcloudUtils } from '@/utils/tencentcloud';
 
@@ -213,7 +213,9 @@ class LiveRoomController {
     if (code !== COMMON_HTTP_CODE.success || !userInfo) {
       throw new CustomError(message, code, code);
     }
-    const liveRoom = await userLiveRoomService.findByUserId(userInfo.id || -1);
+    const liveRoom = await userLiveRoomController.common.findByUserId(
+      userInfo.id || -1
+    );
     if (!liveRoom) {
       throw new CustomError(
         `你还没有开通直播间！`,
@@ -407,6 +409,54 @@ class LiveRoomController {
       cdn_push_rtmp_url,
       cdn_push_srt_url,
       cdn_push_webrtc_url,
+      forward_bilibili_url,
+      forward_douyin_url,
+      forward_douyu_url,
+      forward_huya_url,
+      forward_kuaishou_url,
+      forward_xiaohongshu_url,
+    });
+    successHandler({ ctx });
+    await next();
+  };
+
+  updateMyLiveRoom = async (ctx: ParameterizedContext, next) => {
+    const { code, userInfo, message } = await authJwt(ctx);
+    if (code !== COMMON_HTTP_CODE.success || !userInfo) {
+      throw new CustomError(message, code, code);
+    }
+    const liveRoom = await userLiveRoomController.common.findByUserId(
+      userInfo.id || -1
+    );
+    if (!liveRoom) {
+      throw new CustomError(
+        `你还没有开通直播间！`,
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
+      );
+    }
+    const {
+      cover_img,
+      bg_img,
+      name,
+      desc,
+      type,
+      weight,
+      forward_bilibili_url,
+      forward_douyin_url,
+      forward_douyu_url,
+      forward_huya_url,
+      forward_kuaishou_url,
+      forward_xiaohongshu_url,
+    }: ILiveRoom = ctx.request.body;
+    await this.common.update({
+      id: liveRoom.live_room?.id,
+      cover_img,
+      bg_img,
+      name,
+      desc,
+      type,
+      weight,
       forward_bilibili_url,
       forward_douyin_url,
       forward_douyu_url,

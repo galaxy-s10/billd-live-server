@@ -147,11 +147,14 @@ class WsMessageService {
     return result;
   }
 
-  /** 创建消息 */
+  /** 更新消息 */
   async update(data: IWsMessage) {
     const { id } = data;
     const data2 = filterObj(data, ['id']);
-    const result = await wsMessageModel.update(data2, { where: { id } });
+    const result = await wsMessageModel.update(data2, {
+      where: { id },
+      limit: 1,
+    });
     return result;
   }
 
@@ -159,6 +162,7 @@ class WsMessageService {
   async delete(id: number) {
     const result = await wsMessageModel.destroy({
       where: { id },
+      limit: 1,
       individualHooks: true,
     });
     return result;

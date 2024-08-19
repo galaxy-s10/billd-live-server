@@ -8,7 +8,6 @@ import { COMMON_HTTP_CODE } from '@/constant';
 import liveRoomController from '@/controller/liveRoom.controller';
 import { IList, IUserLiveRoom } from '@/interface';
 import { CustomError } from '@/model/customError.model';
-import { SERVER_LIVE } from '@/secret/secret';
 import liveRoomService from '@/service/liveRoom.service';
 import userLiveRoomService from '@/service/userLiveRoom.service';
 import {
@@ -18,6 +17,8 @@ import {
   LiveRoomTypeEnum,
   LiveRoomUseCDNEnum,
 } from '@/types/ILiveRoom';
+
+import srsController from './srs.controller';
 
 class UserLiveRoomController {
   common = {
@@ -108,12 +109,12 @@ class UserLiveRoomController {
       );
     }
 
-    const rtmptoken = cryptojs
+    const pushKey = cryptojs
       .MD5(`${+new Date()}___${getRandomString(6)}`)
       .toString();
     const liveRoom = await liveRoomController.common.create({
       name: `${userInfo.username!.slice(0, 10)}的直播间`,
-      key: rtmptoken,
+      key: pushKey,
       type: LiveRoomTypeEnum.obs,
       weight: 21,
       cdn: LiveRoomUseCDNEnum.no,
@@ -123,24 +124,23 @@ class UserLiveRoomController {
     });
     // @ts-ignore
     await liveRoom.setAreas([1]);
-    const liveUrl = (live_room_id: number) => ({
-      rtmp_url: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}`,
-      flv_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.flv`,
-      hls_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.m3u8`,
+    const pullUrlRes = srsController.common.getPullUrl({
+      liveRoomId: liveRoom.id!,
     });
-    // liveUrl = (live_room_id: number) => {
-    //   const res = tencentcloudUtils.getPullUrl({ roomId: live_room_id });
-    //   return {
-    //     rtmp_url: res.rtmp,
-    //     flv_url: res.flv,
-    //     hls_url: res.hls,
-    //   };
-    // };
-    const { rtmp_url, flv_url, hls_url } = liveUrl(liveRoom.id!);
+    const pushUrlRes = srsController.common.getPushUrl({
+      liveRoomId: liveRoom.id!,
+      type: LiveRoomTypeEnum.srs,
+      key: pushKey,
+    });
     await liveRoomService.update({
-      rtmp_url,
-      flv_url,
-      hls_url,
+      rtmp_url: pullUrlRes.rtmp,
+      flv_url: pullUrlRes.flv,
+      hls_url: pullUrlRes.hls,
+      push_rtmp_url: pushUrlRes.push_rtmp_url,
+      push_obs_server: pushUrlRes.push_obs_server,
+      push_obs_stream_key: pushUrlRes.push_obs_stream_key,
+      push_webrtc_url: pushUrlRes.push_webrtc_url,
+      push_srt_url: pushUrlRes.push_srt_url,
       id: liveRoom.id,
     });
     const result = await this.common.create({

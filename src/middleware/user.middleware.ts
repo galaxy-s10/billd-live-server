@@ -5,21 +5,26 @@ import { COMMON_HTTP_CODE } from '@/constant';
 import { CustomError } from '@/model/customError.model';
 
 const schema = Joi.object({
-  id: Joi.number(),
-  username: Joi.string().min(3).max(12),
-  password: Joi.string().min(6).max(18),
+  id: Joi.number().error(new Error('id要求是数字！')),
+  username: Joi.string()
+    .min(3)
+    .max(12)
+    .error(new Error('用户名长度要求3-12！')),
+  password: Joi.string().min(6).max(18).error(new Error('密码长度要求6-18！')),
   // username: Joi.string()
   //   .pattern(/[0-9a-zA-Z_]{6,12}$/)
   //   .required(),
   // password: Joi.string()
   //   .pattern(/(?![0-9]+$)(?![a-zA-Z]+$)(?![_]+$)[0-9a-zA-A_]{8,16}/)
   //   .required(),
-  desc: Joi.string().min(3).max(50),
-  avatar: Joi.string().min(3).max(100),
-  code: Joi.string(),
-  status: [1, 2],
-  exp: Joi.number(),
-  user_roles: Joi.array().items(Joi.number()),
+  desc: Joi.string().min(3).max(50).error(new Error('描述长度要求3-50！')),
+  avatar: Joi.string().min(3).max(100).error(new Error('头像长度要求3-100！')),
+  status: Joi.array().items(1, 2).error(new Error('状态要求1或2！')),
+  code: Joi.string().error(new Error('code角色格式错误！')),
+  exp: Joi.number().error(new Error('exp格式错误！')),
+  user_roles: Joi.array()
+    .items(Joi.number())
+    .error(new Error('用户角色格式错误！')),
 });
 
 export const verifyProp = async (ctx: ParameterizedContext, next) => {

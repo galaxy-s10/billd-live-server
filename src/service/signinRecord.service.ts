@@ -125,7 +125,10 @@ class SigninRecordService {
   async update(data: ISigninRecord) {
     const { id } = data;
     const data2 = filterObj(data, ['id']);
-    const result = await signinRecordModel.update(data2, { where: { id } });
+    const result = await signinRecordModel.update(data2, {
+      where: { id },
+      limit: 1,
+    });
     return result;
   }
 
@@ -145,6 +148,7 @@ class SigninRecordService {
   async delete(id: number) {
     const result = await signinRecordModel.destroy({
       where: { id },
+      limit: 1,
       individualHooks: true,
     });
     return result;

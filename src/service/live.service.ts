@@ -234,7 +234,7 @@ class LiveService {
   async update(data: ILive) {
     const { id } = data;
     const data2 = filterObj(data, ['id']);
-    const result = await liveModel.update(data2, { where: { id } });
+    const result = await liveModel.update(data2, { where: { id }, limit: 1 });
     handleDelRedisByDbLiveList();
     return result;
   }
@@ -299,6 +299,7 @@ class LiveService {
   async delete(id: number | number[]) {
     const result = await liveModel.destroy({
       where: { id },
+      limit: 1,
       individualHooks: true,
     });
     handleDelRedisByDbLiveList();

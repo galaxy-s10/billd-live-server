@@ -133,7 +133,10 @@ class SigninStatisticsService {
   async update(data: ISigninStatistics) {
     const { id } = data;
     const data2 = filterObj(data, ['id']);
-    const result = await signinStatisticsModel.update(data2, { where: { id } });
+    const result = await signinStatisticsModel.update(data2, {
+      where: { id },
+      limit: 1,
+    });
     return result;
   }
 
@@ -147,6 +150,7 @@ class SigninStatisticsService {
   async delete(id: number) {
     const result = await signinStatisticsModel.destroy({
       where: { id },
+      limit: 1,
       individualHooks: true,
     });
     return result;

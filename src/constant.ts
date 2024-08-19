@@ -251,6 +251,30 @@ export const DEFAULT_AUTH_INFO = {
     id: 13,
     auth_value: 'LIVE_PUSH_CDN',
   },
+  LIVE_PUSH_FORWARD_BILIBILI: {
+    id: 14,
+    auth_value: 'LIVE_PUSH_FORWARD_BILIBILI',
+  },
+  LIVE_PUSH_FORWARD_HUYA: {
+    id: 15,
+    auth_value: 'LIVE_PUSH_FORWARD_HUYA',
+  },
+  LIVE_PUSH_FORWARD_DOUYU: {
+    id: 16,
+    auth_value: 'LIVE_PUSH_FORWARD_DOUYU',
+  },
+  LIVE_PUSH_FORWARD_DOUYIN: {
+    id: 17,
+    auth_value: 'LIVE_PUSH_FORWARD_DOUYIN',
+  },
+  LIVE_PUSH_FORWARD_KUAISHOU: {
+    id: 18,
+    auth_value: 'LIVE_PUSH_FORWARD_KUAISHOU',
+  },
+  LIVE_PUSH_FORWARD_XIAOHONGSHU: {
+    id: 19,
+    auth_value: 'LIVE_PUSH_FORWARD_XIAOHONGSHU',
+  },
 };
 
 export const DEFAULT_ROLE_INFO = {

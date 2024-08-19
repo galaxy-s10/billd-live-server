@@ -62,7 +62,7 @@ export function forwardToOtherPlatform({
 
 export function getForwardList() {
   return new Promise((resolve) => {
-    const cmd = `ps aux | grep  ?forwardToOtherPlatform= | grep -v grep`;
+    const cmd = `ps aux | grep '?forwardToOtherPlatform=' | grep -v grep`;
     exec(cmd, (err, stdout, stderr) => {
       resolve({ cmd, err, stdout, stderr });
     });

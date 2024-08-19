@@ -198,7 +198,10 @@ class LivePlayService {
   async update(data: ILivePlay) {
     const { id } = data;
     const data2 = filterObj(data, ['id']);
-    const result = await livePlayModel.update(data2, { where: { id } });
+    const result = await livePlayModel.update(data2, {
+      where: { id },
+      limit: 1,
+    });
     return result;
   }
 
@@ -212,6 +215,7 @@ class LivePlayService {
   async delete(id: number) {
     const result = await livePlayModel.destroy({
       where: { id },
+      limit: 1,
       individualHooks: true,
     });
     return result;

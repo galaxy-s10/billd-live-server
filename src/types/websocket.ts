@@ -201,6 +201,7 @@ export interface IDanmu {
   live_room_id: number;
   redbag_send_id?: number;
   msg_id?: number;
+  isBilibili?: boolean;
 
   socket_id: string;
   request_id?: string;
@@ -272,6 +273,7 @@ export type WsJoinType = IWsFormat<{
   deskUserPassword?: string;
   remoteDeskUserUuid?: string;
   receiver?: string;
+  isBilibili?: boolean;
 }>;
 
 /** 用户离开直播间 */

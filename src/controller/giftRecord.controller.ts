@@ -193,8 +193,12 @@ class GiftRecordController {
     if (code !== COMMON_HTTP_CODE.success || !userInfo) {
       throw new CustomError(message, code, code);
     }
-    const { live_room_id, goods_id, goods_nums }: IGiftRecord =
-      ctx.request.body;
+    const {
+      live_room_id,
+      goods_id,
+      goods_nums,
+      is_bilibili,
+    }: IGiftRecord & { is_bilibili: boolean } = ctx.request.body;
     if (!live_room_id || !goods_id || !goods_nums) {
       throw new CustomError(
         `参数缺失！`,
@@ -210,13 +214,16 @@ class GiftRecordController {
         COMMON_HTTP_CODE.paramsError
       );
     }
-    const liveRoomRes = await liveRoomController.common.find(live_room_id);
-    if (!liveRoomRes) {
-      throw new CustomError(
-        `不存在id为${live_room_id}的直播间！`,
-        COMMON_HTTP_CODE.paramsError,
-        COMMON_HTTP_CODE.paramsError
-      );
+    let liveRoomRes;
+    if (!is_bilibili) {
+      liveRoomRes = await liveRoomController.common.find(live_room_id);
+      if (!liveRoomRes) {
+        throw new CustomError(
+          `不存在id为${live_room_id}的直播间！`,
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
+        );
+      }
     }
     const goodsRes = await goodsController.common.find(goods_id);
     if (!goodsRes) {
@@ -241,7 +248,7 @@ class GiftRecordController {
       goods_nums,
       goods_snapshot: JSON.stringify(goodsRes),
       send_user_id: userInfo.id!,
-      recv_user_id: liveRoomRes.user_live_room?.user.id,
+      recv_user_id: liveRoomRes?.user_live_room?.user?.id || -1,
       is_recv: GiftRecordIsRecvEnum.no,
     });
     try {

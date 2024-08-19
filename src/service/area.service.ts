@@ -320,17 +320,17 @@ class AreaService {
     return result;
   }
 
+  /** 创建分区 */
+  async create(data: IArea) {
+    const result = await areaModel.create(data);
+    return result;
+  }
+
   /** 修改分区 */
   async update(data: IArea) {
     const { id } = data;
     const data2 = filterObj(data, ['id']);
-    const result = await areaModel.update(data2, { where: { id } });
-    return result;
-  }
-
-  /** 创建分区 */
-  async create(data: IArea) {
-    const result = await areaModel.create(data);
+    const result = await areaModel.update(data2, { where: { id }, limit: 1 });
     return result;
   }
 
@@ -338,6 +338,7 @@ class AreaService {
   async delete(id: number) {
     const result = await areaModel.destroy({
       where: { id },
+      limit: 1,
       individualHooks: true,
     });
     return result;

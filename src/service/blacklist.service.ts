@@ -97,7 +97,10 @@ class BlackListService {
   async update(data: IBlacklist) {
     const { id } = data;
     const data2 = filterObj(data, ['id']);
-    const result = await blacklistModel.update(data2, { where: { id } });
+    const result = await blacklistModel.update(data2, {
+      where: { id },
+      limit: 1,
+    });
     return result;
   }
 
@@ -111,6 +114,7 @@ class BlackListService {
   async delete(id: number) {
     const result = await blacklistModel.destroy({
       where: { id },
+      limit: 1,
       individualHooks: true,
     });
     return result;

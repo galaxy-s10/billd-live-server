@@ -159,6 +159,7 @@ class WechatUserService {
   async delete(id: number) {
     const result = await wechatUserModel.destroy({
       where: { id },
+      limit: 1,
       individualHooks: true,
     });
     return result;

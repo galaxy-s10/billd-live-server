@@ -100,7 +100,10 @@ class ThirdUserService {
   async update(data: IThirdUser) {
     const { id } = data;
     const data2 = filterObj(data, ['id']);
-    const result = await thirdUserModel.update(data2, { where: { id } });
+    const result = await thirdUserModel.update(data2, {
+      where: { id },
+      limit: 1,
+    });
     return result;
   }
 
@@ -114,6 +117,7 @@ class ThirdUserService {
   async delete(id: number) {
     const result = await thirdUserModel.destroy({
       where: { id },
+      limit: 1,
       individualHooks: true,
     });
     return result;

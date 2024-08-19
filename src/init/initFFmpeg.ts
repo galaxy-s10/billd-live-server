@@ -27,6 +27,7 @@ async function addLive({
   name,
   desc,
   cdn,
+  type,
   weight,
   pull_is_should_auth,
   cover_img,
@@ -39,6 +40,7 @@ async function addLive({
   user_id: number;
   name: string;
   desc: string;
+  type: LiveRoomTypeEnum;
   cdn: LiveRoomUseCDNEnum;
   weight: number;
   pull_is_should_auth: LiveRoomPullIsShouldAuthEnum;
@@ -151,7 +153,7 @@ async function addLive({
       cdn_push_obs_stream_key: cdnPushRes.push_obs_stream_key,
       cdn_push_webrtc_url: cdnPushRes.push_webrtc_url,
       cdn_push_srt_url: cdnPushRes.push_srt_url,
-      type: LiveRoomTypeEnum.system,
+      type,
     });
   }
 
@@ -217,6 +219,10 @@ export const initFFmpeg = async (init = true) => {
           name: initUser[item].live_room.name!,
           desc: initUser[item].live_room.desc!,
           cdn: initUser[item].live_room.cdn!,
+          type:
+            initUser[item].live_room.type === undefined
+              ? LiveRoomTypeEnum.system
+              : initUser[item].live_room.type,
           weight: initUser[item].live_room.weight!,
           pull_is_should_auth: initUser[item].live_room.pull_is_should_auth!,
           cover_img: initUser[item].live_room.cover_img!,

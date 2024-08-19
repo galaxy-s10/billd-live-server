@@ -20,4 +20,6 @@ liveRoomRouter.put(
   liveRoomController.update
 );
 
+liveRoomRouter.put('/update_my_live_room', liveRoomController.updateMyLiveRoom);
+
 export default liveRoomRouter;

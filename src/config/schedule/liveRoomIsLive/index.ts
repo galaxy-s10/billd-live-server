@@ -19,19 +19,27 @@ export const tencentcloudCssMain = async () => {
   });
   const res2 = await tencentcloudUtils.queryLiveStreamAll();
   const res1Map = {};
-  res1.rows.forEach((item) => {
-    res1Map[`${item.live_room_id!}`] = 1;
-  });
+  const tencentcloudCssMap = {};
   const delArr: number[] = [];
+
+  // 直播记录表里有，但腾讯云直播记录没有，就需要删除直播记录表里的记录
+  // 直播记录表里没有，如果腾讯云直播记录也没有，不需要处理；如果腾讯云直播记录有记录，则需要添加一条记录给直播记录表
   res2.res?.OnlineInfo?.forEach((item) => {
     const reg = /^roomId___(\d+)$/g;
     const roomId = reg.exec(item.StreamName)?.[1];
-    if (!res1Map[`${roomId!}`]) {
-      delArr.push(Number(roomId));
+    tencentcloudCssMap[roomId!] = 1;
+  });
+
+  res1.rows.forEach((item) => {
+    res1Map[`${item.live_room_id!}`] = 1;
+    if (!tencentcloudCssMap[`${item.live_room_id!}`]) {
+      delArr.push(Number(item.live_room_id!));
     }
   });
+
   console.log('res2', res2);
   console.log('res1Map', res1Map);
+  console.log('tencentcloudCssMap', tencentcloudCssMap);
   console.log('定时任务删除cdn直播记录', delArr);
   if (delArr.length) {
     liveController.common.deleteByLiveRoomId(delArr);
@@ -94,12 +102,12 @@ for (let i = 0; i < allSecond; i += 1) {
 // rule.second = 0;
 
 // 每3分钟执行
-// rule.minute = allMinuteArr.filter((v) => v % 3 === 0);
-// rule.second = 0;
+rule.minute = allMinuteArr.filter((v) => v % 3 === 0);
+rule.second = 0;
 
 // 每5秒执行
-rule.minute = allMinuteArr.filter((v) => v % 1 === 0);
-rule.second = allSecondArr.filter((v) => v % 5 === 0);
+// rule.minute = allMinuteArr.filter((v) => v % 1 === 0);
+// rule.second = allSecondArr.filter((v) => v % 5 === 0);
 
 export const startLiveRoomIsLiveSchedule = () => {
   if (PROJECT_ENV === 'prod') {

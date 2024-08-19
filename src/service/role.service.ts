@@ -219,7 +219,7 @@ class RoleService {
   async update(data: IRole) {
     const { id } = data;
     const data2 = filterObj(data, ['id']);
-    const result = await roleModel.update(data2, { where: { id } });
+    const result = await roleModel.update(data2, { where: { id }, limit: 1 });
     return result;
   }
 

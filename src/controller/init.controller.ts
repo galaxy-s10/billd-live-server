@@ -205,7 +205,7 @@ class InitController {
         ]);
         if (!liveRoomIsExist) {
           let liveUrl;
-          const rtmptoken = cryptojs
+          const pushKey = cryptojs
             .MD5(`${+new Date()}___${getRandomString(6)}`)
             .toString();
           if (user.live_room.cdn === LiveRoomUseCDNEnum.no) {
@@ -233,7 +233,7 @@ class InitController {
             id: user.live_room?.id,
             name: user.live_room?.name,
             desc: user.live_room?.desc,
-            key: rtmptoken,
+            key: pushKey,
             type: LiveRoomTypeEnum.system,
             weight: user.live_room?.weight,
             cdn: user.live_room?.cdn,

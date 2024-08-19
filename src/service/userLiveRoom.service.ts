@@ -219,7 +219,10 @@ class UserLiveRoomService {
   async update(data: IUserLiveRoom) {
     const { id } = data;
     const data2 = filterObj(data, ['id']);
-    const result = await userLiveRoomModel.update(data2, { where: { id } });
+    const result = await userLiveRoomModel.update(data2, {
+      where: { id },
+      limit: 1,
+    });
     return result;
   }
 
@@ -233,6 +236,7 @@ class UserLiveRoomService {
   async delete(id: number) {
     const result = await userLiveRoomModel.destroy({
       where: { id },
+      limit: 1,
       individualHooks: true,
     });
     return result;

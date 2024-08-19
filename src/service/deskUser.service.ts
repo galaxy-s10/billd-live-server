@@ -97,7 +97,10 @@ class DeskUserService {
   async update(data: IDeskUser) {
     const { id } = data;
     const data2 = filterObj(data, ['id']);
-    const result = await deskUserModel.update(data2, { where: { id } });
+    const result = await deskUserModel.update(data2, {
+      where: { id },
+      limit: 1,
+    });
     return result;
   }
 
@@ -122,6 +125,7 @@ class DeskUserService {
   async delete(id: number) {
     const result = await deskUserModel.destroy({
       where: { id },
+      limit: 1,
       individualHooks: true,
     });
     return result;

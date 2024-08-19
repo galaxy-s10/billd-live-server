@@ -86,13 +86,17 @@ class SettingsService {
   async update(data: ISettings) {
     const { id } = data;
     const data2 = filterObj(data, ['id']);
-    const result = await settingsModel.update(data2, { where: { id } });
+    const result = await settingsModel.update(data2, {
+      where: { id },
+      limit: 1,
+    });
     return result;
   }
 
   async delete(id: number) {
     const result = await settingsModel.destroy({
       where: { id },
+      limit: 1,
       individualHooks: true,
     });
     return result;

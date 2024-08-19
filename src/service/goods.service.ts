@@ -113,7 +113,7 @@ class GoodsService {
   async update(data: IGoods) {
     const { id } = data;
     const data2 = filterObj(data, ['id']);
-    const result = await goodsModel.update(data2, { where: { id } });
+    const result = await goodsModel.update(data2, { where: { id }, limit: 1 });
     return result;
   }
 
@@ -127,6 +127,7 @@ class GoodsService {
   async delete(id: number) {
     const result = await goodsModel.destroy({
       where: { id },
+      limit: 1,
       individualHooks: true,
     });
     return result;

@@ -197,6 +197,7 @@ class QQUserService {
   async delete(id: number) {
     const result = await qqUserModel.destroy({
       where: { id },
+      limit: 1,
       individualHooks: true,
     });
     return result;

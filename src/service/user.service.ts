@@ -146,8 +146,11 @@ class UserService {
   }
 
   /** 根据id修改用户密码 */
-  async updatePwd({ id, password }: IUser) {
-    const result = await userModel.update({ password }, { where: { id } });
+  async updatePwd({ id, password, token }: IUser) {
+    const result = await userModel.update(
+      { password, token },
+      { where: { id }, limit: 1 }
+    );
     return result;
   }
 
@@ -291,7 +294,7 @@ class UserService {
   async update({ id, username, desc, status, avatar, token }: IUser) {
     const result = await userModel.update(
       { username, desc, status, avatar, token },
-      { where: { id } }
+      { where: { id }, limit: 1 }
     );
     return result;
   }
@@ -306,6 +309,7 @@ class UserService {
   async delete(id: number) {
     const result = await userModel.destroy({
       where: { id },
+      limit: 1,
       individualHooks: true,
     });
     return result;

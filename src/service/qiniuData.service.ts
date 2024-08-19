@@ -131,7 +131,7 @@ class QiniuDataService {
         qiniu_status,
         qiniu_type,
       },
-      { where: { id } }
+      { where: { id }, limit: 1 }
     );
     return result;
   }
@@ -179,6 +179,7 @@ class QiniuDataService {
   async delete(id: number) {
     const result = await qiniuDataModel.destroy({
       where: { id },
+      limit: 1,
       individualHooks: true,
     });
     return result;

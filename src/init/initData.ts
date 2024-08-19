@@ -120,6 +120,54 @@ const initAuth = () => {
       priority: 99,
       p_id: DEFAULT_AUTH_INFO.LIVE_MANAGE.id,
     },
+    {
+      id: DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_BILIBILI.id,
+      auth_name: '直播转推（bilibili）',
+      auth_value: DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_BILIBILI.auth_value,
+      type: 1,
+      priority: 99,
+      p_id: DEFAULT_AUTH_INFO.LIVE_MANAGE.id,
+    },
+    {
+      id: DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_HUYA.id,
+      auth_name: '直播转推（虎牙）',
+      auth_value: DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_HUYA.auth_value,
+      type: 1,
+      priority: 99,
+      p_id: DEFAULT_AUTH_INFO.LIVE_MANAGE.id,
+    },
+    {
+      id: DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_DOUYU.id,
+      auth_name: '直播转推（斗鱼）',
+      auth_value: DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_DOUYU.auth_value,
+      type: 1,
+      priority: 99,
+      p_id: DEFAULT_AUTH_INFO.LIVE_MANAGE.id,
+    },
+    {
+      id: DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_DOUYIN.id,
+      auth_name: '直播转推（抖音）',
+      auth_value: DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_DOUYIN.auth_value,
+      type: 1,
+      priority: 99,
+      p_id: DEFAULT_AUTH_INFO.LIVE_MANAGE.id,
+    },
+    {
+      id: DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_KUAISHOU.id,
+      auth_name: '直播转推（快手）',
+      auth_value: DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_KUAISHOU.auth_value,
+      type: 1,
+      priority: 99,
+      p_id: DEFAULT_AUTH_INFO.LIVE_MANAGE.id,
+    },
+    {
+      id: DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_XIAOHONGSHU.id,
+      auth_name: '直播转推（小红书）',
+      auth_value: DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_XIAOHONGSHU.auth_value,
+      type: 1,
+      priority: 99,
+      p_id: DEFAULT_AUTH_INFO.LIVE_MANAGE.id,
+    },
   ];
 
   return deafultAuth;
@@ -220,6 +268,12 @@ const initRoleAuth = () => {
     DEFAULT_AUTH_INFO.LIVE_PULL,
     DEFAULT_AUTH_INFO.LIVE_PULL_SVIP,
     DEFAULT_AUTH_INFO.LIVE_PUSH_CDN,
+    DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_BILIBILI,
+    DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_DOUYIN,
+    DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_DOUYU,
+    DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_HUYA,
+    DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_XIAOHONGSHU,
+    DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_KUAISHOU,
   ].forEach((item) => {
     id += 1;
     roleAuth.push({

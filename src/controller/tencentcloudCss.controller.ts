@@ -53,6 +53,7 @@ class TencentcloudCssController {
     await Promise.all([
       liveRoomService.update({
         id: liveRoomId,
+        cdn: LiveRoomUseCDNEnum.yes,
         rtmp_url: pullRes.rtmp,
         flv_url: pullRes.flv,
         hls_url: pullRes.hls,
@@ -146,8 +147,8 @@ class TencentcloudCssController {
       return;
     }
     const result = await liveRoomService.findKey(Number(roomId));
-    const rtmptoken = result?.key;
-    if (rtmptoken !== paramsPublishKey) {
+    const pushKey = result?.key;
+    if (pushKey !== paramsPublishKey) {
       console.log(
         chalkERROR(`[tencentcloud_css_remoteAuth] 房间id：${roomId}，鉴权失败`)
       );
@@ -223,8 +224,8 @@ class TencentcloudCssController {
       return;
     }
     const result = await liveRoomService.findKey(Number(roomId));
-    const rtmptoken = result?.key;
-    if (rtmptoken !== paramsPublishKey) {
+    const pushKey = result?.key;
+    if (pushKey !== paramsPublishKey) {
       console.log(
         chalkERROR(`[tencentcloud_css onPublish] 房间id：${roomId}，鉴权失败`)
       );
@@ -328,8 +329,8 @@ class TencentcloudCssController {
       return;
     }
     const result = await liveRoomService.findKey(Number(roomId));
-    const rtmptoken = result?.key;
-    if (rtmptoken !== paramsPublishKey) {
+    const pushKey = result?.key;
+    if (pushKey !== paramsPublishKey) {
       console.log(
         chalkERROR(`[tencentcloud_css onUnpublish] 房间id：${roomId}，鉴权失败`)
       );
@@ -353,23 +354,41 @@ class TencentcloudCssController {
       await next();
       return;
     }
-    await Promise.all([
-      liveController.common.deleteByLiveRoomId([Number(roomId)]),
-      liveRecordController.common.updateByLiveRoomIdAndUserId({
-        client_id: body.sequence,
-        live_room_id: Number(roomId),
-        user_id: userLiveRoomInfo.user_id,
-        end_time: `${+new Date()}`,
-      }),
-    ]);
-    wsSocket.io?.to(roomId).emit(WsMsgTypeEnum.roomNoLive);
-    console.log(
-      chalkSUCCESS(`[tencentcloud_css onUnpublish] 房间id：${roomId}，成功`)
-    );
-    successHandler({
-      ctx,
-      data: '[tencentcloud_css onUnpublish] success',
+    // TODO 判断这个流是否在推流，在推流的话不要删除记录。
+
+    const { res } = await tencentcloudUtils.queryLiveStream({
+      roomId: Number(roomId),
     });
+    if (!res?.OnlineInfo.length) {
+      await Promise.all([
+        liveController.common.deleteByLiveRoomId([Number(roomId)]),
+        liveRecordController.common.updateByLiveRoomIdAndUserId({
+          client_id: body.sequence,
+          live_room_id: Number(roomId),
+          user_id: userLiveRoomInfo.user_id,
+          end_time: `${+new Date()}`,
+        }),
+      ]);
+      wsSocket.io?.to(roomId).emit(WsMsgTypeEnum.roomNoLive);
+      console.log(
+        chalkSUCCESS(`[tencentcloud_css onUnpublish] 房间id：${roomId}，成功`)
+      );
+      successHandler({
+        ctx,
+        data: '[tencentcloud_css onUnpublish] success',
+      });
+    } else {
+      console.log(
+        chalkSUCCESS(
+          `[tencentcloud_css onUnpublish] 房间id：${roomId}，还在推流，失败`
+        )
+      );
+      successHandler({
+        ctx,
+        data: '[tencentcloud_css onUnpublish] in push, error',
+      });
+    }
+
     await next();
   };
 }

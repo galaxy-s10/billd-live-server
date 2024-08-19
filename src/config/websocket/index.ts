@@ -183,10 +183,9 @@ export const connectWebSocket = (server) => {
   // io.emit会将消息发送给所有人，包括发件人
 
   // 每个客户端socket连接时都会触发 connection 事件
-  io.on(WsConnectStatusEnum.connection, (socket: Socket) => {
+  io.of('/').on(WsConnectStatusEnum.connection, (socket: Socket) => {
     prettierInfoLog({ msg: 'connection', socket });
-    console.log('socket.roomss', socket.rooms);
-
+    console.log('主-ws');
     // 收到用户进入房间
     socket.on(WsMsgTypeEnum.join, (data: WsJoinType) => {
       try {
@@ -497,5 +496,9 @@ export const connectWebSocket = (server) => {
         console.log(error);
       }
     });
+  });
+
+  io.of('/live').on(WsConnectStatusEnum.connection, () => {
+    console.log('live-ws');
   });
 };

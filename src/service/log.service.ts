@@ -149,7 +149,7 @@ class LogService {
         api_err_msg,
         api_duration,
       },
-      { where: { id } }
+      { where: { id }, limit: 1 }
     );
     return result;
   }
@@ -213,6 +213,7 @@ class LogService {
   async delete(id: number) {
     const result = await logModel.destroy({
       where: { id },
+      limit: 1,
       individualHooks: true,
     });
     return result;

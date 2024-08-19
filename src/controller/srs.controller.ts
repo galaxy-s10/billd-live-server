@@ -28,6 +28,7 @@ import userService from '@/service/user.service';
 import {
   LiveRoomPullIsShouldAuthEnum,
   LiveRoomTypeEnum,
+  LiveRoomUseCDNEnum,
 } from '@/types/ILiveRoom';
 import { IApiV1Clients, IApiV1Streams, ISrsCb, ISrsRTC } from '@/types/srs';
 import { WsMsgTypeEnum } from '@/types/websocket';
@@ -476,8 +477,8 @@ class SRSController {
         return;
       }
       const result = await liveRoomService.findKey(Number(roomId));
-      const rtmptoken = result?.key;
-      if (rtmptoken !== paramsPublishKey) {
+      const pushKey = result?.key;
+      if (pushKey !== paramsPublishKey) {
         console.log(chalkERROR(`[on_publish] 房间id：${roomId}，鉴权失败`));
         ctx.body = { code: 1, msg: '[on_publish] fail, auth fail' };
         await next();
@@ -486,6 +487,7 @@ class SRSController {
       if (paramsPublishType) {
         await liveRoomService.update({
           id: Number(roomId),
+          cdn: LiveRoomUseCDNEnum.no,
           type: Number(paramsPublishType),
         });
         if (result) {
@@ -522,7 +524,7 @@ class SRSController {
                       LiveRoomTypeEnum.forward_huya
                     ) {
                       forwardToOtherPlatform({
-                        platform: 'douyu',
+                        platform: 'huya',
                         localFlv: result.flv_url!,
                         remoteRtmp: result.forward_huya_url!,
                       });
@@ -535,7 +537,7 @@ class SRSController {
                         remoteRtmp: result.forward_bilibili_url!,
                       });
                       forwardToOtherPlatform({
-                        platform: 'douyu',
+                        platform: 'huya',
                         localFlv: result.flv_url!,
                         remoteRtmp: result.forward_huya_url!,
                       });
@@ -646,8 +648,8 @@ class SRSController {
       return;
     }
     const result = await liveRoomService.findKey(Number(roomId));
-    const rtmptoken = result?.key;
-    if (rtmptoken !== paramsPublishKey) {
+    const pushKey = result?.key;
+    if (pushKey !== paramsPublishKey) {
       console.log(chalkERROR(`[on_unpublish] 房间id：${roomId}，鉴权失败`));
       ctx.body = { code: 1, msg: '[on_unpublish] fail, auth fail' };
       await next();

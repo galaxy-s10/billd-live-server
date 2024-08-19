@@ -7,7 +7,7 @@ import { verifyProp } from '@/middleware/user.middleware';
 
 const userRouter = new Router({ prefix: '/user' });
 
-userRouter.post('/register', userController.register);
+userRouter.post('/register', verifyProp, userController.register);
 
 // 二维码登录
 userRouter.post('/qrcode_login', userController.qrCodeLogin);
