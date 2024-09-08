@@ -559,8 +559,10 @@ export interface IEmail {
 export interface ILog {
   id?: number;
   user_id?: number;
+  status?: number;
   api_user_agent?: string;
   api_duration?: number;
+  api_from?: number;
   api_forwarded_for?: string;
   api_referer?: string;
   api_real_ip?: string;

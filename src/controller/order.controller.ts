@@ -17,6 +17,7 @@ import {
 import { CustomError } from '@/model/customError.model';
 import orderService from '@/service/order.service';
 import walletService from '@/service/wallet.service';
+import { strSlice } from '@/utils';
 import { aliPaySdk } from '@/utils/alipaySdk';
 import { chalkERROR } from '@/utils/chalkTip';
 
@@ -103,7 +104,7 @@ class OrderController {
   async create(ctx: ParameterizedContext, next) {
     const { userInfo } = await authJwt(ctx);
     const { goodsId, liveRoomId, money } = ctx.request.body;
-    const client_ip = ctx.request.headers['x-real-ip'] as string;
+    const client_ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
     const goodsInfo = await goodsControllerfrom.common.find(goodsId);
     if (!goodsInfo) {
       throw new CustomError(

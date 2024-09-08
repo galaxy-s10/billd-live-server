@@ -9,6 +9,7 @@ import {
 } from '@/constant';
 import logController from '@/controller/log.controller';
 import { CustomError } from '@/model/customError.model';
+import { strSlice } from '@/utils';
 import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 
 // 全局错误处理中间件
@@ -22,25 +23,43 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
   }) => {
     try {
       if (PROJECT_ENV !== 'beta') {
+        if ([200, 304].includes(info.httpStatusCode)) {
+          return;
+        }
         // 将请求写入日志表
         const { userInfo } = await authJwt(ctx);
+
+        const api_user_agent = strSlice(
+          String(ctx.request.headers['user-agent']),
+          490
+        );
+        const api_body = strSlice(String(ctx.request.body || {}), 2000);
+        const api_query = strSlice(String(ctx.query || {}), 2000);
+        const api_real_ip = strSlice(
+          String(ctx.request.headers['x-real-ip']),
+          490
+        );
+        const api_forwarded_for = strSlice(
+          String(ctx.request.headers['x-forwarded-for']),
+          490
+        );
+        const api_referer = strSlice(String(ctx.request.headers.referer), 490);
+        const api_path = strSlice(String(ctx.request.path), 490);
+
         logController.common.create({
           user_id: userInfo?.id || -1,
-          api_user_agent: ctx.request.headers['user-agent']?.slice(0, 250),
-          api_body: JSON.stringify(ctx.request.body || {}).slice(0, 250),
-          api_query: JSON.stringify(ctx.query).slice(0, 250),
-          api_real_ip:
-            (ctx.request.headers['x-real-ip'] as string) || '127.0.0.1',
-          api_forwarded_for: JSON.stringify(
-            ctx.request.headers['x-forwarded-for'] || {}
-          ).slice(0, 250),
-          api_referer: ctx.request.headers.referer?.slice(0, 250),
+          api_user_agent,
+          api_body,
+          api_query,
+          api_real_ip,
+          api_forwarded_for,
+          api_referer,
+          api_path,
           api_method: ctx.request.method,
           // ctx.request.host存在时获取主机（hostname:port）。当 app.proxy 是 true 时支持 X-Forwarded-Host，否则使用 Host。
           api_host: ctx.request.host, // ctx.request.hostname不带端口号;ctx.request.host带端口号
           // ctx.request.hostname存在时获取主机名。当 app.proxy 是 true 时支持 X-Forwarded-Host，否则使用 Host。
           api_hostname: ctx.request.hostname, // ctx.request.hostname不带端口号;ctx.request.host带端口号
-          api_path: ctx.request.path,
           api_status_code: info.httpStatusCode,
           api_error: info.error,
           api_err_msg: info.message,
@@ -56,8 +75,7 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
   try {
     const startTime = performance.now();
     const url = ctx.request.path;
-    const ip = (ctx.request.headers['x-real-ip'] as string) || '127.0.0.1';
-
+    const ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
     const consoleEnd = () => {
       duration = Math.floor(performance.now() - startTime);
       console.log(
@@ -109,10 +127,8 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
           message: msg,
           duration,
         };
-        // 服务端返回http状态码200、304、404、405，写入日志表
-        console.log(
-          chalkINFO(`服务端返回http状态码200、304、404、405，写入日志表`)
-        );
+        // 服务端返回http状态码404、405，写入日志表
+        console.log(chalkINFO(`服务端返回http状态码404、405，写入日志表`));
         insertLog(defaultSuccess);
       } else {
         const defaultSuccess = {
@@ -122,24 +138,23 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
           message: msg,
           duration,
         };
-        // 服务端返回http状态码不是200、304、404、405，写入日志表
+        // 服务端返回http状态码不是404、405，写入日志表
         console.log(
-          chalkINFO(`服务端返回http状态码不是200、304、404、405，写入日志表，`)
+          chalkINFO(`服务端返回http状态码不是404、405，写入日志表，`)
         );
         insertLog(defaultSuccess);
       }
       throw new CustomError(msg, httpStatusCode, httpStatusCode);
-    } else {
-      const defaultSuccess = {
-        httpStatusCode,
-        errorCode: httpStatusCode,
-        error: '请求成功！',
-        message: '请求成功！',
-        duration,
-      };
-      // 请求成功写入日志表
-      insertLog(defaultSuccess);
     }
+    // const defaultSuccess = {
+    //   httpStatusCode,
+    //   errorCode: httpStatusCode,
+    //   error: '请求成功！',
+    //   message: '请求成功！',
+    //   duration,
+    // };
+    // // 请求成功不写入日志表
+    // insertLog(defaultSuccess);
   } catch (error: any) {
     console.log(chalkERROR(`===== catchErrorMiddle中间件捕获到错误 =====`));
     if (ctx.request.path.indexOf('/socket.io/') !== -1) {

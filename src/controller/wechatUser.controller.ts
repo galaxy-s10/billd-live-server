@@ -20,6 +20,7 @@ import userService from '@/service/user.service';
 import walletService from '@/service/wallet.service';
 import wechatUserService from '@/service/wechatUser.service';
 import { IWechatUser } from '@/types/IUser';
+import { strSlice } from '@/utils';
 import { myaxios } from '@/utils/request';
 
 interface IAccessTokenOk {
@@ -252,7 +253,7 @@ class WechatUserController {
         token,
       };
       const redisExp = 10;
-      const client_ip = ctx.request.headers['x-real-ip'] as string;
+      const client_ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
       await redisController.setExVal({
         prefix: REDIS_PREFIX.qrCodeLogin,
         key: `${platform}___${login_id}`,
@@ -318,7 +319,7 @@ class WechatUserController {
         token,
       };
       const redisExp = 10;
-      const client_ip = ctx.request.headers['x-real-ip'] as string;
+      const client_ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
       await redisController.setExVal({
         prefix: REDIS_PREFIX.qrCodeLogin,
         key: `${platform}___${login_id}`,

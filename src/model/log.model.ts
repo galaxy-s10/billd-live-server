@@ -24,37 +24,41 @@ const model = sequelize.define<LogModel>(
     },
     user_id: {
       type: DataTypes.INTEGER,
-      defaultValue: -1, // -1:游客 非-1:用户
+      defaultValue: -1, // -1:游客；非-1:用户
+    },
+    status: {
+      type: DataTypes.INTEGER,
+      defaultValue: 1, // 1:正常；2:禁止删除
     },
     api_duration: {
       type: DataTypes.INTEGER,
     },
     api_user_agent: {
-      type: DataTypes.TEXT, // qq浏览器的user_agent能达到四百多字符。。。。
+      type: DataTypes.STRING(500), // qq浏览器的user_agent能达到四百多字符
     },
     api_forwarded_for: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(500),
     },
     api_referer: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(500),
     },
     api_real_ip: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.STRING(500),
     },
     api_host: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(500),
     },
     api_hostname: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(500),
     },
     api_method: {
-      type: DataTypes.STRING(20),
+      type: DataTypes.STRING(50),
     },
     api_path: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(500),
     },
     api_query: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
     },
     api_body: {
       type: DataTypes.TEXT,
@@ -66,7 +70,7 @@ const model = sequelize.define<LogModel>(
       type: DataTypes.TEXT,
     },
     api_err_msg: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
     },
     api_err_code: {
       type: DataTypes.INTEGER,

@@ -22,7 +22,7 @@ class DeskUserController {
     const res = await deskUserService.findByUuid(uuid);
     if (res?.password !== password) {
       throw new CustomError(
-        `登录错误`,
+        `密码错误！`,
         COMMON_HTTP_CODE.paramsError,
         COMMON_HTTP_CODE.paramsError
       );

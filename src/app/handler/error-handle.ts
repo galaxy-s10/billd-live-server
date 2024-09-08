@@ -6,11 +6,12 @@ import {
   COMMON_HTTP_CODE,
 } from '@/constant';
 import { CustomError } from '@/model/customError.model';
+import { strSlice } from '@/utils';
 import { chalk, chalkERROR } from '@/utils/chalkTip';
 
 const errorHandler = (error, ctx: ParameterizedContext) => {
   const { path, method } = ctx.request;
-  const ip = (ctx.request.headers['x-real-ip'] as string) || '127.0.0.1';
+  const ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
   // eslint-disable-next-line
   const errorLog = (error) => {
     console.log(chalk.redBright('httpStatusCode:'), error.httpStatusCode);

@@ -62,7 +62,8 @@ export async function handleWsJoin(args: {
   roomId: number;
   data: WsJoinType;
 }) {
-  const { socket, io, data } = args;
+  const { io, socket, data } = args;
+  console.log(data);
   let { roomId } = args;
   const redisRoomId = roomId;
   if (!roomId) {
@@ -190,7 +191,7 @@ export function handleWsBatchSendOffer(args: {
   roomId: number;
   data: WsBatchSendOffer;
 }) {
-  const { socket, io, roomId, data } = args;
+  const { io, socket, roomId, data } = args;
   if (!roomId) {
     console.log(chalkERROR('roomId为空'));
     return;
@@ -214,7 +215,7 @@ export async function handleWsStartRemoteDesk(args: {
   socket: Socket;
   data: WsStartRemoteDesk;
 }) {
-  const { io, socket, data } = args;
+  const { socket, data } = args;
   if (data.data.deskUserUuid) {
     const val = await redisController.getVal({
       prefix: REDIS_PREFIX.deskUserUuid,
@@ -268,7 +269,7 @@ export async function handleWsUpdateDeskUser(args: {
   data: WsStartRemoteDesk;
 }) {
   try {
-    const { io, socket, data } = args;
+    const { socket, data } = args;
     if (data.data.deskUserUuid) {
       await redisController.setExVal({
         prefix: REDIS_PREFIX.deskUserUuid,
@@ -306,14 +307,19 @@ export async function handleWsMessage(args: {
   data: WsMessageType;
 }) {
   const { io, socket, data } = args;
+  console.log(data);
   let liveRoomId = data.data.live_room_id;
-  if (data.data.isBilibili) {
-    liveRoomId = initUser.systemUserBilibili.live_room.id || -1;
+  if (data.data.isBilibili && initUser.systemUserBilibili.live_room.id) {
+    liveRoomId = initUser.systemUserBilibili.live_room.id;
+  }
+  if (!liveRoomId) {
+    return;
   }
   const res = await liveRedisController.getDisableSpeaking({
     liveRoomId,
     userId: data.user_info?.id || -1,
   });
+  console.log(res, liveRoomId, 'resss');
   if (!res) {
     const liveRoomInfo = await liveRoomController.common.find(liveRoomId);
     const origin_username = data.user_info!.username!;

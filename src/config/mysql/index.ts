@@ -48,6 +48,8 @@ async function handleMysqlInit() {
     await initSequelize.query(`USE ${dbName}`, { logging: false });
     // await initDb('alert', sequelize);
   } catch (error: any) {
+    console.log(chalkERROR(`USE ${dbName}失败！`));
+    console.log(error);
     if (error.message.indexOf('Access') !== -1) {
       console.log(chalkERROR(msg(false)));
       await initSequelize.close();

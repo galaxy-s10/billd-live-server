@@ -2,6 +2,17 @@ import { spawnSync } from 'child_process';
 import os from 'os';
 import path from 'path';
 
+/** 字符串截取 */
+export function strSlice(str: string, length: number) {
+  let res = '';
+  try {
+    res = str.slice(0, length);
+  } catch (error) {
+    console.log(error);
+  }
+  return res;
+}
+
 /**
  * 获取日期当天的开始时间到结束时间
  */
