@@ -17,20 +17,16 @@ import {
   WEBM_DIR,
 } from '@/constant';
 import authController from '@/controller/auth.controller';
+import liveController from '@/controller/live.controller';
 import liveRoomController from '@/controller/liveRoom.controller';
 import redisController from '@/controller/redis.controller';
-import srsController from '@/controller/srs.controller';
 import userLiveRoomController from '@/controller/userLiveRoom.controller';
 import wsMessageController from '@/controller/wsMessage.controller';
 import { initUser } from '@/init/initUser';
 import { WsMessageMsgIsVerifyEnum } from '@/interface';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
-import {
-  LiveRoomMsgVerifyEnum,
-  LiveRoomTypeEnum,
-  LiveRoomUseCDNEnum,
-} from '@/types/ILiveRoom';
+import { LiveRoomMsgVerifyEnum, LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import {
   WsBatchSendOffer,
   WsDisableSpeakingType,
@@ -545,53 +541,14 @@ export async function handleWsStartLive(args: {
 }) {
   const { io, socket, data } = args;
   const userId = data.user_info?.id;
-  if (!userId) {
-    console.log(chalkERROR('userId为空'));
-    return;
-  }
-  const userLiveRoomInfo = await userLiveRoomController.common.findByUserId(
-    userId
-  );
-  if (!userLiveRoomInfo) {
-    console.log(chalkERROR('userLiveRoomInfo为空'));
-    return;
-  }
-  const roomId = userLiveRoomInfo.live_room_id!;
-  const liveRoomInfo = await liveRoomService.findKey(roomId);
-  let pullRes: {
-    rtmp: string;
-    flv: string;
-    hls: string;
-    webrtc: string;
-  };
-  if (
-    [LiveRoomTypeEnum.tencent_css, LiveRoomTypeEnum.tencent_css_pk].includes(
-      data.data.type
-    )
-  ) {
-    pullRes = tencentcloudUtils.getPullUrl({
-      liveRoomId: roomId,
+  const {
+    roomId,
+    userLiveRoomInfo,
+  }: { roomId: number; userLiveRoomInfo: any } =
+    await liveController.common.startLiveUpdateMyLiveRoomInfo({
+      userId,
+      liveRoomType: data.data.type,
     });
-  } else {
-    pullRes = srsController.common.getPullUrl({
-      liveRoomId: roomId,
-    });
-  }
-
-  liveRoomService.update({
-    id: roomId,
-    name: data.data.name,
-    type: data.data.type,
-    cdn: [
-      LiveRoomTypeEnum.tencent_css,
-      LiveRoomTypeEnum.tencent_css_pk,
-    ].includes(data.data.type)
-      ? LiveRoomUseCDNEnum.yes
-      : LiveRoomUseCDNEnum.no,
-    rtmp_url: pullRes.rtmp,
-    flv_url: pullRes.flv,
-    hls_url: pullRes.hls,
-  });
   liveRedisController.setLiveRoomIsLiving({
     socketId: data.socket_id,
     liveRoomId: Number(roomId),
@@ -679,6 +636,7 @@ export async function handleWsStartLive(args: {
     }
 
     fs.writeFileSync(txtFile, str);
+    const liveRoomInfo = await liveRoomService.findKey(roomId);
     setTimeout(() => {
       startBlobIsExistSchedule({
         roomId,

@@ -30,6 +30,11 @@ liveRouter.post('/del_fake_live', liveController.delFakeLive);
 
 liveRouter.post('/close_live', liveController.closeLive);
 
+liveRouter.post(
+  '/update_my_live_room_info',
+  liveController.startLiveUpdateMyLiveRoomInfo
+);
+
 liveRouter.get('/is_live', liveController.isLive);
 
 liveRouter.get('/forward_list', liveController.getForwardList);

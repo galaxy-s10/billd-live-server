@@ -18,6 +18,7 @@ import { CustomError } from '@/model/customError.model';
 import liveService, {
   handleDelRedisByDbLiveList,
 } from '@/service/live.service';
+import liveRoomService from '@/service/liveRoom.service';
 import thirdUserService from '@/service/thirdUser.service';
 import walletService from '@/service/wallet.service';
 import {
@@ -28,7 +29,9 @@ import {
   LiveRoomTypeEnum,
   LiveRoomUseCDNEnum,
 } from '@/types/ILiveRoom';
+import { chalkERROR } from '@/utils/chalkTip';
 import { getForwardList, killPid } from '@/utils/process';
+import { tencentcloudUtils } from '@/utils/tencentcloud';
 
 import liveRoomController from './liveRoom.controller';
 import redisController from './redis.controller';
@@ -36,6 +39,63 @@ import userController from './user.controller';
 
 class LiveController {
   common = {
+    async startLiveUpdateMyLiveRoomInfo(data: {
+      userId?: number;
+      liveRoomType: number;
+    }) {
+      const { userId, liveRoomType } = data;
+      const res: any = { roomId: undefined, userLiveRoomInfo: undefined };
+
+      if (!userId) {
+        console.log(chalkERROR('userId为空'));
+        return res;
+      }
+      const userLiveRoomInfo = await userLiveRoomController.common.findByUserId(
+        userId
+      );
+      if (!userLiveRoomInfo) {
+        console.log(chalkERROR('userLiveRoomInfo为空'));
+        return res;
+      }
+      res.userLiveRoomInfo = userLiveRoomInfo;
+      const roomId = userLiveRoomInfo.live_room_id!;
+      res.roomId = roomId;
+      let pullRes: {
+        rtmp: string;
+        flv: string;
+        hls: string;
+        webrtc: string;
+      };
+      if (
+        [
+          LiveRoomTypeEnum.tencent_css,
+          LiveRoomTypeEnum.tencent_css_pk,
+        ].includes(liveRoomType)
+      ) {
+        pullRes = tencentcloudUtils.getPullUrl({
+          liveRoomId: roomId,
+        });
+      } else {
+        pullRes = srsController.common.getPullUrl({
+          liveRoomId: roomId,
+        });
+      }
+
+      await liveRoomService.update({
+        id: roomId,
+        type: liveRoomType,
+        cdn: [
+          LiveRoomTypeEnum.tencent_css,
+          LiveRoomTypeEnum.tencent_css_pk,
+        ].includes(liveRoomType)
+          ? LiveRoomUseCDNEnum.yes
+          : LiveRoomUseCDNEnum.no,
+        rtmp_url: pullRes.rtmp,
+        flv_url: pullRes.flv,
+        hls_url: pullRes.hls,
+      });
+      return res;
+    },
     getList: async ({
       id,
       live_room_id,
@@ -174,6 +234,20 @@ class LiveController {
       const res = await liveService.create(data);
       return res;
     },
+  };
+
+  startLiveUpdateMyLiveRoomInfo = async (ctx: ParameterizedContext, next) => {
+    const { code, userInfo, message } = await authJwt(ctx);
+    if (code !== COMMON_HTTP_CODE.success || !userInfo) {
+      throw new CustomError(message, code, code);
+    }
+    const { type } = ctx.request.body;
+    const result = await this.common.startLiveUpdateMyLiveRoomInfo({
+      userId: userInfo.id,
+      liveRoomType: type,
+    });
+    successHandler({ ctx, data: result });
+    await next();
   };
 
   getList = async (ctx: ParameterizedContext, next) => {
