@@ -7,7 +7,12 @@ import { performance } from 'perf_hooks';
 import { connectMysql } from '@/config/mysql';
 import { connectRedis } from '@/config/redis';
 import { createRedisPubSub } from '@/config/redis/pub';
-import { PROJECT_ENV, PROJECT_NAME, PROJECT_PORT } from '@/constant';
+import {
+  PROJECT_ENV,
+  PROJECT_INIT_MYSQL,
+  PROJECT_NAME,
+  PROJECT_PORT,
+} from '@/constant';
 import { MYSQL_CONFIG } from '@/secret/secret';
 import { getIpAddress } from '@/utils';
 import {
@@ -21,14 +26,25 @@ const start = performance.now();
 async function main() {
   function adLog() {
     console.log();
-    console.log(chalkINFO(`作者微信: shuisheng9905`));
-    console.log(chalkINFO(`付费课程: https://www.hsslive.cn/article/151`));
+
+    console.log(chalkINFO(`作者微信:    shuisheng9905`));
+    console.log(chalkINFO(`付费课程:    https://www.hsslive.cn/article/151`));
+    console.log(
+      chalkINFO(`私有化部署:   https://live.hsslive.cn/privatizationDeployment`)
+    );
     console.log(
       chalkINFO(
-        `欢迎PR:   billd-live目前只有作者一人开发，难免有不足的地方，欢迎提PR或Issue`
+        `欢迎PR:      billd-live目前只有作者一人开发，难免有不足的地方，欢迎提PR或Issue`
       )
     );
     console.log();
+  }
+  if (PROJECT_INIT_MYSQL === 'true') {
+    await connectMysql(true); // 连接mysql
+    await (
+      await import('./controller/init.controller')
+    ).default.common.initDefault();
+    return;
   }
   try {
     await Promise.all([
@@ -36,9 +52,14 @@ async function main() {
       connectRedis(), // 连接redis
       createRedisPubSub(), // 创建redis的发布订阅
     ]);
-    await (
-      await import('./controller/init.controller')
-    ).default.common.initDefault();
+  } catch (error) {
+    console.log(chalkERROR('mysql或redis初始化失败！'));
+    console.log(error);
+    // 触发pm2的重启进程
+    process.exit(1);
+  }
+
+  try {
     const port = +PROJECT_PORT;
     await (await import('./setup')).setupKoa({ port });
     console.log();
@@ -55,7 +76,6 @@ async function main() {
         `项目启动成功！耗时：${Math.floor(performance.now() - start)}ms`
       )
     );
-
     adLog();
   } catch (error) {
     console.log(error);

@@ -14,6 +14,7 @@ export const PROJECT_ENV = process.env
   .NODE_APP_RELEASE_PROJECT_ENV as PROJECT_ENV_ENUM;
 export const PROJECT_PORT = process.env.NODE_APP_RELEASE_PROJECT_PORT as string;
 export const PROJECT_NODE_ENV = process.env.NODE_ENV as string;
+export const PROJECT_INIT_MYSQL = process.env.NODE_APP_INIT_MYSQL as string;
 
 // 七牛云文件上传进度类型
 export enum QINIU_UPLOAD_PROGRESS_TYPE {

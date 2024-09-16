@@ -25,18 +25,12 @@ export const connectRedis = async () => {
     console.log(err);
   });
 
-  try {
-    console.log(
-      chalkINFO(
-        `开始连接${REDIS_CONFIG.socket.host}:${REDIS_CONFIG.socket.port}服务器的redis数据库...`
-      )
-    );
-    await redisClient.connect();
-    console.log(chalkSUCCESS(msg(true)));
-    return redisClient;
-  } catch (error) {
-    console.log(chalkERROR(msg(false)));
-    console.log(error);
-    throw new Error(msg(false));
-  }
+  console.log(
+    chalkINFO(
+      `开始连接${REDIS_CONFIG.socket.host}:${REDIS_CONFIG.socket.port}服务器的redis数据库...`
+    )
+  );
+  await redisClient.connect();
+  console.log(chalkSUCCESS(msg(true)));
+  return redisClient;
 };

@@ -15,6 +15,7 @@ import { initFFmpeg } from '@/init/initFFmpeg';
 import { CustomError } from '@/model/customError.model';
 import { loadAllRoutes } from '@/router';
 
+import { countdown } from './utils';
 import { pushToBilibili } from './utils/process';
 
 export async function setupKoa({ port }) {
@@ -73,7 +74,11 @@ export async function setupKoa({ port }) {
   initSchedule();
   pushToBilibili(false);
   setTimeout(() => {
-    // 初始化FFmpeg推流
-    initFFmpeg(true);
-  }, 1000);
+    const countdownInitFFmpegDelay = 3;
+    countdown({ seconds: countdownInitFFmpegDelay });
+    setTimeout(() => {
+      // 初始化FFmpeg推流
+      initFFmpeg(true);
+    }, 1000 * (countdownInitFFmpegDelay + 1));
+  }, 500);
 }

@@ -543,10 +543,15 @@ class LiveController {
     }
     const roomId = userLiveRoomInfo.live_room_id!;
     const res1 = await liveService.findAllLiveByRoomId(roomId);
+    const arr: any[] = [];
     res1.forEach((item) => {
-      srsController.common.deleteApiV1Clients(item.srs_client_id!);
+      arr.push(srsController.common.deleteApiV1Clients(item.srs_client_id!));
     });
-    await liveService.deleteByLiveRoomId(roomId);
+    await Promise.all([
+      ...arr,
+      tencentcloudUtils.dropLiveStream({ roomId }),
+      liveService.deleteByLiveRoomId(roomId),
+    ]);
     successHandler({ ctx, data: userLiveRoomInfo });
     await next();
   };

@@ -64,9 +64,8 @@ class InitController {
   common = {
     initDefault: async () => {
       try {
-        await this.common.initUser();
-        await this.common.initGoods(); // 如果商品表报错，就代表已经初始化过了
         await Promise.all([
+          this.common.initGoods(),
           this.common.initDayData(365 * 3),
           this.common.initHourData(365 * 3 * 24),
           this.common.initMinuteTenData(365 * 3 * 24 * 6),
@@ -75,12 +74,13 @@ class InitController {
           this.common.initRole(),
           this.common.initAuth(),
           this.common.initRoleAuth(),
-          // this.common.initUser(),
           this.common.initUserWallet(),
           this.common.initArea(),
         ]);
+        await this.common.initUser();
       } catch (error) {
         console.log(chalkWARN('已初始化数据库，不能在初始化了'));
+        console.log(error);
       }
     },
     initArea: async () => {

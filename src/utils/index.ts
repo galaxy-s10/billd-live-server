@@ -2,6 +2,23 @@ import { spawnSync } from 'child_process';
 import os from 'os';
 import path from 'path';
 
+export function countdown(data: { seconds: number }) {
+  const { seconds } = data;
+  let remainingTime = seconds;
+  function main() {
+    process.stdout.write(`\r${remainingTime}秒后开始初始化推流...`);
+    remainingTime -= 1;
+  }
+  main();
+  const intervalId = setInterval(() => {
+    // 清空当前行并打印剩余时间
+    main();
+    if (remainingTime < 0) {
+      clearInterval(intervalId);
+    }
+  }, 1000); // 每秒打印一次
+}
+
 /** 字符串截取 */
 export function strSlice(str: string, length: number) {
   let res = '';

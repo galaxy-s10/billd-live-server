@@ -219,7 +219,10 @@ pnpm i billd-utils@latest billd-scss@latest billd-html-webpack-plugin@latest
 # 1.初始化docker容器
 pnpm run docker:dev
 
-# 2.运行（4300端口）
+# 2.初始化数据库（可选，只需要执行一次）
+pnpm run mysql:dev
+
+# 3.运行（4300端口）
 pnpm run dev
 ```
 

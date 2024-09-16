@@ -2,12 +2,7 @@ import { Sequelize } from 'sequelize';
 
 import { initDb } from '@/init/initDb';
 import { MYSQL_CONFIG } from '@/secret/secret';
-import {
-  chalkERROR,
-  chalkINFO,
-  chalkSUCCESS,
-  chalkWARN,
-} from '@/utils/chalkTip';
+import { chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 
 export const dbName = MYSQL_CONFIG.database;
 
@@ -42,43 +37,28 @@ const msg = (flag: boolean) =>
 
 const sequelize = newSequelize(dbName);
 
-async function handleMysqlInit() {
+async function createDb() {
   const initSequelize = newSequelize();
-  try {
-    await initSequelize.query(`USE ${dbName}`, { logging: false });
-    // await initDb('alert', sequelize);
-  } catch (error: any) {
-    console.log(chalkERROR(`USE ${dbName}失败！`));
-    console.log(error);
-    if (error.message.indexOf('Access') !== -1) {
-      console.log(chalkERROR(msg(false)));
-      await initSequelize.close();
-      return;
-    }
-    if (error.message.indexOf('ECONNREFUSED') !== -1) {
-      console.log(chalkERROR(msg(false)));
-      await initSequelize.close();
-      return;
-    }
-    console.log(chalkWARN(`${dbName}数据库不存在，开始新建${dbName}数据库！`));
-    await initSequelize.query(
-      `CREATE DATABASE ${dbName} CHARACTER SET = 'utf8mb4';`,
-      { logging: false }
-    );
-    console.log(chalkSUCCESS(`新建${dbName}数据库成功！`));
-    await initDb('force', sequelize);
-  }
+  await initSequelize.query(
+    `CREATE DATABASE ${dbName} CHARACTER SET = 'utf8mb4';`,
+    { logging: false }
+  );
+  console.log(chalkSUCCESS(`新建${dbName}数据库成功！`));
+  await initDb('load', sequelize);
   await initSequelize.close();
 }
 
 /** 连接数据库 */
-export const connectMysql = async () => {
+export const connectMysql = async (init = false) => {
   console.log(
     chalkINFO(
       `开始连接${MYSQL_CONFIG.host}:${MYSQL_CONFIG.port}服务器的${dbName}数据库...`
     )
   );
-  await handleMysqlInit();
+  if (init) {
+    await createDb();
+    return;
+  }
   await sequelize.authenticate({ logging: false });
   await initDb('load', sequelize);
   console.log(chalkSUCCESS(msg(true)));
