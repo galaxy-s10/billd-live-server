@@ -33,7 +33,7 @@ const model = sequelize.define<VisitorLogModel>(
       type: DataTypes.INTEGER,
     },
     ip: {
-      type: DataTypes.STRING(200),
+      type: DataTypes.STRING(500),
     },
     user_agent: {
       type: DataTypes.STRING(500),

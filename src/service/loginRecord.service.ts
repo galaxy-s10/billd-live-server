@@ -1,27 +1,15 @@
 import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import { Op } from 'sequelize';
 
-import { IList, IWsMessage } from '@/interface';
-import roleModel from '@/model/role.model';
+import { IList, ILoginRecord } from '@/interface';
+import loginRecordModel from '@/model/loginRecord.model';
 import userModel from '@/model/user.model';
-import wsMessageModel from '@/model/wsMessage.model';
 import { handlePaging } from '@/utils';
 
-// async function handleDelRedisByDbLiveRoomHistoryMsgList() {
-//   try {
-//     await redisController.del({
-//       prefix: REDIS_PREFIX.dbLiveRoomHistoryMsgList,
-//       key: '',
-//     });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
-
-class WsMessageService {
-  /** 消息是否存在 */
+class LoginRecordService {
+  /** 登录记录是否存在 */
   async isExist(ids: number[]) {
-    const res = await wsMessageModel.count({
+    const res = await loginRecordModel.count({
       where: {
         id: {
           [Op.in]: ids,
@@ -31,16 +19,11 @@ class WsMessageService {
     return res === ids.length;
   }
 
-  /** 获取消息列表 */
+  /** 获取登录记录列表 */
   async getList({
-    msg_type,
-    redbag_send_id,
-    live_room_id,
+    id,
     user_id,
-    content_type,
-    ip,
-    is_show,
-    is_verify,
+    type,
     orderBy,
     orderName,
     nowPage,
@@ -49,7 +32,7 @@ class WsMessageService {
     rangTimeType,
     rangTimeStart,
     rangTimeEnd,
-  }: IList<IWsMessage>) {
+  }: IList<ILoginRecord>) {
     let offset;
     let limit;
     if (nowPage && pageSize) {
@@ -57,39 +40,24 @@ class WsMessageService {
       limit = +pageSize;
     }
     const allWhere: any = deleteUseLessObjectKey({
-      msg_type,
+      id,
       user_id,
-      live_room_id,
-      ip,
-      redbag_send_id,
-      is_show,
-      is_verify,
-      content_type,
+      type,
     });
     if (keyWord) {
       const keyWordWhere = [
         {
-          content: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          origin_content: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          username: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          origin_username: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
           user_agent: {
+            [Op.like]: `%${keyWord}%`,
+          },
+        },
+        {
+          ip: {
+            [Op.like]: `%${keyWord}%`,
+          },
+        },
+        {
+          remark: {
             [Op.like]: `%${keyWord}%`,
           },
         },
@@ -106,19 +74,13 @@ class WsMessageService {
     if (orderName && orderBy) {
       orderRes.push([orderName, orderBy]);
     }
-    const userWhere = deleteUseLessObjectKey({});
-
-    const result = await wsMessageModel.findAndCountAll({
+    const result = await loginRecordModel.findAndCountAll({
       include: [
         {
           model: userModel,
           attributes: {
             exclude: ['password', 'token'],
           },
-          where: {
-            ...userWhere,
-          },
-          include: [{ model: roleModel }],
         },
       ],
       order: [...orderRes],
@@ -127,38 +89,36 @@ class WsMessageService {
       where: {
         ...allWhere,
       },
-      distinct: true,
     });
-
     return handlePaging(result, nowPage, pageSize);
   }
 
-  /** 查找消息 */
+  /** 查找登录记录 */
   async find(id: number) {
-    const result = await wsMessageModel.findOne({ where: { id } });
+    const result = await loginRecordModel.findOne({ where: { id } });
     return result;
   }
 
-  /** 创建消息 */
-  async create(data: IWsMessage) {
-    const result = await wsMessageModel.create(data);
-    return result;
-  }
-
-  /** 更新消息 */
-  async update(data: IWsMessage) {
+  /** 修改登录记录 */
+  async update(data: ILoginRecord) {
     const { id } = data;
     const data2 = filterObj(data, ['id']);
-    const result = await wsMessageModel.update(data2, {
+    const result = await loginRecordModel.update(data2, {
       where: { id },
       limit: 1,
     });
     return result;
   }
 
-  /** 删除消息 */
+  /** 创建登录记录 */
+  async create(data: ILoginRecord) {
+    const result = await loginRecordModel.create(data);
+    return result;
+  }
+
+  /** 删除登录记录 */
   async delete(id: number) {
-    const result = await wsMessageModel.destroy({
+    const result = await loginRecordModel.destroy({
       where: { id },
       limit: 1,
       individualHooks: true,
@@ -167,4 +127,4 @@ class WsMessageService {
   }
 }
 
-export default new WsMessageService();
+export default new LoginRecordService();

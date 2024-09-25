@@ -77,12 +77,32 @@ class WSController {
     return res;
   };
 
+  /**
+   * "created_at":1726139448310,
+   * "format_created_at":"2024/9/12 19:10:48",
+   * "value":{"socketId":"UmydF6sYvM4supgAAABj","joinRoomId":102}
+   */
   getSocketIdJoinLiveRoomOne = async (data: { socketId: string }) => {
-    const res = await redisController.getHashVal({
-      key: `${REDIS_PREFIX.socketIdJoinLiveRoom}`,
-      field: data.socketId,
-    });
-    return res;
+    try {
+      const res1 = await redisController.getHashVal({
+        key: `${REDIS_PREFIX.socketIdJoinLiveRoom}`,
+        field: data.socketId,
+      });
+      if (res1) {
+        const obj = JSON.parse(res1) as {
+          created_at: number;
+          format_created_at: string;
+          value: {
+            socketId: string;
+            joinRoomId: number;
+          };
+        };
+        return obj;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    return null;
   };
 
   setSocketIdJoinLiveRoom = async (data: {

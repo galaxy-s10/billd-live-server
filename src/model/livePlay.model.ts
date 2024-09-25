@@ -50,7 +50,7 @@ const model = sequelize.define<LivePlayModel>(
       type: DataTypes.STRING,
     },
     srs_ip: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(500),
     },
     srs_vhost: {
       type: DataTypes.STRING,

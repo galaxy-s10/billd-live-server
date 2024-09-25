@@ -7,17 +7,17 @@ import {
 
 import sequelize from '@/config/mysql';
 import { initTable } from '@/init/initDb';
-import { IBlacklist } from '@/interface';
+import { IGlobalMsg } from '@/interface';
 
-interface BlacklistModel
+interface GlobalMsgModel
   extends Model<
-      InferAttributes<BlacklistModel>,
-      InferCreationAttributes<BlacklistModel>
+      InferAttributes<GlobalMsgModel>,
+      InferCreationAttributes<GlobalMsgModel>
     >,
-    IBlacklist {}
+    IGlobalMsg {}
 
-const model = sequelize.define<BlacklistModel>(
-  'blacklist',
+const model = sequelize.define<GlobalMsgModel>(
+  'global_msg',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -25,20 +25,26 @@ const model = sequelize.define<BlacklistModel>(
       allowNull: false,
       autoIncrement: true,
     },
-    ip: {
-      type: DataTypes.STRING(500),
-    },
     user_id: {
       type: DataTypes.INTEGER,
     },
     type: {
-      type: DataTypes.INTEGER, // 禁用类型,1:频繁操作；2:管理员手动禁用
+      type: DataTypes.INTEGER,
     },
-    msg: {
-      type: DataTypes.STRING(100),
+    content: {
+      type: DataTypes.STRING(500),
+    },
+    remark: {
+      type: DataTypes.STRING(500),
     },
   },
   {
+    indexes: [
+      {
+        name: 'user_id',
+        fields: ['user_id'],
+      },
+    ],
     paranoid: true,
     freezeTableName: true,
     createdAt: 'created_at',

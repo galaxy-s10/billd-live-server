@@ -230,6 +230,20 @@ class LiveController {
       return res;
     },
 
+    findAllLiveByRoomId: async (liveRoomId: number) => {
+      const res = await liveService.findAllLiveByRoomId(liveRoomId);
+      return res;
+    },
+
+    closeLive: async (liveRoomId: number) => {
+      const res = await Promise.all([
+        srsController.common.closeLiveByLiveRoomId(liveRoomId),
+        tencentcloudUtils.dropLiveStream({ roomId: liveRoomId }),
+        this.common.deleteByLiveRoomId([liveRoomId]),
+      ]);
+      return res;
+    },
+
     create: async (data: ILive) => {
       const res = await liveService.create(data);
       return res;
@@ -541,18 +555,22 @@ class LiveController {
         COMMON_HTTP_CODE.paramsError
       );
     }
-    const roomId = userLiveRoomInfo.live_room_id!;
-    const res1 = await liveService.findAllLiveByRoomId(roomId);
-    const arr: any[] = [];
-    res1.forEach((item) => {
-      arr.push(srsController.common.deleteApiV1Clients(item.srs_client_id!));
-    });
-    await Promise.all([
-      ...arr,
-      tencentcloudUtils.dropLiveStream({ roomId }),
-      liveService.deleteByLiveRoomId(roomId),
-    ]);
+    await this.common.closeLive(userLiveRoomInfo.live_room_id!);
     successHandler({ ctx, data: userLiveRoomInfo });
+    await next();
+  };
+
+  closeLiveByLiveRoomId = async (ctx: ParameterizedContext, next) => {
+    const { live_room_id } = ctx.params;
+    if (!live_room_id) {
+      throw new CustomError(
+        'live_room_id为空',
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
+      );
+    }
+    await this.common.closeLive(live_room_id);
+    successHandler({ ctx });
     await next();
   };
 

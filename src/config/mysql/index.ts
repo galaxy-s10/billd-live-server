@@ -44,7 +44,7 @@ async function createDb() {
     { logging: false }
   );
   console.log(chalkSUCCESS(`新建${dbName}数据库成功！`));
-  await initDb('load', sequelize);
+  await initDb('alert', sequelize);
   await initSequelize.close();
 }
 

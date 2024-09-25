@@ -83,6 +83,15 @@ class SRSController {
         push_srt_url: ``,
       };
     },
+    closeLiveByLiveRoomId: async (liveRoomId: number) => {
+      const res1 = await liveController.common.findAllLiveByRoomId(liveRoomId);
+      const arr: any[] = [];
+      res1.forEach((item) => {
+        arr.push(this.common.deleteApiV1Clients(item.srs_client_id!));
+      });
+      const res = await Promise.all(arr);
+      return res;
+    },
   };
 
   rtcV1Publish = async (ctx: ParameterizedContext, next) => {
@@ -131,6 +140,7 @@ class SRSController {
     await next();
   };
 
+  /** 踢掉观众 */
   deleteAudience = async (ctx: ParameterizedContext, next) => {
     const id = +ctx.params.id;
     const livePlayInfo = await livePlayController.common.find(id);

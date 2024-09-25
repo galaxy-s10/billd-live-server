@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { getRandomString } from 'billd-utils';
+import { filterObj, getRandomString } from 'billd-utils';
 import nodeSchedule from 'node-schedule';
 import { rimrafSync } from 'rimraf';
 import { Server, Socket } from 'socket.io';
@@ -46,6 +46,7 @@ import {
   WsUpdateJoinInfoType,
   WsUpdateLiveRoomCoverImg,
 } from '@/types/websocket';
+import { strSlice } from '@/utils';
 import { chalkERROR, chalkWARN } from '@/utils/chalkTip';
 import { mp4PushRtmp, webmToMp4 } from '@/utils/process';
 import { tencentcloudUtils } from '@/utils/tencentcloud';
@@ -59,7 +60,6 @@ export async function handleWsJoin(args: {
   data: WsJoinType;
 }) {
   const { io, socket, data } = args;
-  console.log(data);
   let { roomId } = args;
   const redisRoomId = roomId;
   if (!roomId) {
@@ -315,16 +315,15 @@ export async function handleWsMessage(args: {
     liveRoomId,
     userId: data.user_info?.id || -1,
   });
-  console.log(res, liveRoomId, 'resss');
   if (!res) {
     const liveRoomInfo = await liveRoomController.common.find(liveRoomId);
     const origin_username = data.user_info!.username!;
-    const origin_content = data.data.msg;
+    const origin_content = data.data.content;
     const content = origin_content;
     const username = origin_username;
     const msgVerify = liveRoomInfo?.msg_verify;
     const msgRes = await wsMessageController.common.create({
-      msg_type: data.data.msgType,
+      msg_type: data.data.msg_type,
       user_id: data.user_info?.id,
       live_room_id: liveRoomId,
       ip: getSocketRealIp(socket),
@@ -332,19 +331,18 @@ export async function handleWsMessage(args: {
       origin_content,
       username,
       origin_username,
-      msg_is_file: data.data.msgIsFile,
-      user_agent: data.data.user_agent,
-      send_msg_time: data.data.send_msg_time,
+      user_agent: strSlice(data.user_agent, 490),
+      send_msg_time: data.time,
       redbag_send_id: data.data.redbag_send_id,
       is_verify:
         msgVerify === LiveRoomMsgVerifyEnum.yes
           ? WsMessageMsgIsVerifyEnum.no
           : WsMessageMsgIsVerifyEnum.yes,
     });
-    const data2 = { ...data };
-    data2.data.msg = content.slice(0, MSG_MAX_LENGTH);
-    data2.data.username = username;
+    const data2 = filterObj(data, ['user_token', 'request_id']);
+    data2.data.content = content.slice(0, MSG_MAX_LENGTH);
     data2.data.msg_id = msgRes.id;
+
     ioEmit<any>({
       io,
       roomId: liveRoomId,
@@ -422,21 +420,25 @@ export async function handleWsDisconnecting(args: {
     key: socket.id,
   });
   let remoteDeskUserUuid = '';
-  try {
-    remoteDeskUserUuid = JSON.parse(val!).value.remoteDeskUserUuid;
-  } catch (error) {
-    console.log(error);
+  if (val) {
+    try {
+      remoteDeskUserUuid = JSON.parse(val).value.remoteDeskUserUuid;
+    } catch (error) {
+      console.log(error);
+    }
   }
-  await Promise.all([
-    redisController.del({
-      prefix: REDIS_PREFIX.deskUserUuid,
-      key: remoteDeskUserUuid,
-    }),
-    redisController.del({
-      prefix: REDIS_PREFIX.deskUserSocketid,
-      key: socket.id,
-    }),
-  ]);
+  if (remoteDeskUserUuid !== '') {
+    await Promise.all([
+      redisController.del({
+        prefix: REDIS_PREFIX.deskUserUuid,
+        key: remoteDeskUserUuid,
+      }),
+      redisController.del({
+        prefix: REDIS_PREFIX.deskUserSocketid,
+        key: socket.id,
+      }),
+    ]);
+  }
   const res2 = await liveRedisController.getSocketIdJoinLiveRoom();
   res2.forEach((item) => {
     try {
@@ -455,15 +457,16 @@ export async function handleWsDisconnecting(args: {
     socketId: socket.id,
   });
   try {
-    const res4 = JSON.parse(res || '{}');
-    ioEmit<WsLeavedType['data']>({
-      io,
-      roomId: res4.data.joinRoomId,
-      msgType: WsMsgTypeEnum.leaved,
-      data: {
-        socket_id: socket.id,
-      },
-    });
+    if (res) {
+      ioEmit<WsLeavedType['data']>({
+        io,
+        roomId: res.value.joinRoomId,
+        msgType: WsMsgTypeEnum.leaved,
+        data: {
+          socket_id: socket.id,
+        },
+      });
+    }
   } catch (error) {
     console.log(error);
   }

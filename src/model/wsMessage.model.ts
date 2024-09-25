@@ -10,7 +10,7 @@ import { initTable } from '@/init/initDb';
 import {
   DanmuMsgTypeEnum,
   IWsMessage,
-  WsMessageMsgIsFileEnum,
+  WsMessageContentTypeEnum,
   WsMessageMsgIsShowEnum,
   WsMessageMsgIsVerifyEnum,
 } from '@/interface';
@@ -41,7 +41,11 @@ const model = sequelize.define<WsMessageModel>(
       type: DataTypes.INTEGER,
     },
     ip: {
-      type: DataTypes.STRING(200),
+      type: DataTypes.STRING(500),
+    },
+    content_type: {
+      type: DataTypes.INTEGER,
+      defaultValue: WsMessageContentTypeEnum.txt,
     },
     content: {
       type: DataTypes.STRING(500),
@@ -55,10 +59,6 @@ const model = sequelize.define<WsMessageModel>(
     origin_username: {
       type: DataTypes.STRING(50),
     },
-    msg_is_file: {
-      type: DataTypes.INTEGER,
-      defaultValue: WsMessageMsgIsFileEnum.no,
-    },
     msg_type: {
       type: DataTypes.INTEGER,
       defaultValue: DanmuMsgTypeEnum.danmu,
@@ -67,15 +67,18 @@ const model = sequelize.define<WsMessageModel>(
       type: DataTypes.STRING(500),
     },
     send_msg_time: {
-      type: DataTypes.STRING,
+      type: DataTypes.DATE,
     },
     is_show: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       defaultValue: WsMessageMsgIsShowEnum.yes,
     },
     is_verify: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       defaultValue: WsMessageMsgIsVerifyEnum.yes,
+    },
+    remark: {
+      type: DataTypes.STRING(500),
     },
   },
   {

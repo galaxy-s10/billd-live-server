@@ -31,6 +31,12 @@ liveRouter.post('/del_fake_live', liveController.delFakeLive);
 liveRouter.post('/close_live', liveController.closeLive);
 
 liveRouter.post(
+  '/close_live_by_live_room_id/:live_room_id',
+  apiVerifyAuth([DEFAULT_AUTH_INFO.LIVE_MANAGE.auth_value]),
+  liveController.closeLiveByLiveRoomId
+);
+
+liveRouter.post(
   '/update_my_live_room_info',
   liveController.startLiveUpdateMyLiveRoomInfo
 );

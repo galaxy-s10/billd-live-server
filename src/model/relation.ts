@@ -2,11 +2,13 @@ import { loadAllModel } from '@/init/initDb';
 import Area from '@/model/area.model';
 import AreaLiveRoom from '@/model/areaLiveRoom.model';
 import Auth from '@/model/auth.model';
+import GlobalMsg from '@/model/globalMsg.model';
 import Live from '@/model/live.model';
 import LivePlay from '@/model/livePlay.model';
 import LiveRecord from '@/model/liveRecord.model';
 import LiveRoom from '@/model/liveRoom.model';
 import Log from '@/model/log.model';
+import loginRecord from '@/model/loginRecord.model';
 import Order from '@/model/order.model';
 import QqUser from '@/model/qqUser.model';
 import Role from '@/model/role.model';
@@ -21,6 +23,16 @@ import WechatUser from '@/model/wechatUser.model';
 import WsMessage from '@/model/wsMessage.model';
 
 loadAllModel();
+
+loginRecord.belongsTo(User, {
+  foreignKey: 'user_id',
+  constraints: false,
+});
+
+GlobalMsg.belongsTo(User, {
+  foreignKey: 'user_id',
+  constraints: false,
+});
 
 WsMessage.belongsTo(User, { foreignKey: 'user_id', constraints: false });
 

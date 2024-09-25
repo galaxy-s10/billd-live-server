@@ -15,13 +15,16 @@ import {
 } from '@/constant';
 import authController from '@/controller/auth.controller';
 import redisController from '@/controller/redis.controller';
-import { IList } from '@/interface';
+import { IList, LoginRecordEnum } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import roleService from '@/service/role.service';
 import thirdUserService from '@/service/thirdUser.service';
 import userService from '@/service/user.service';
 import walletService from '@/service/wallet.service';
 import { IUser } from '@/types/IUser';
+import { strSlice } from '@/utils';
+
+import loginRecordController from './loginRecord.controller';
 
 class UserController {
   common = {
@@ -31,7 +34,10 @@ class UserController {
   };
 
   register = async (ctx: ParameterizedContext, next) => {
-    const { username, password }: IUser = ctx.request.body;
+    const data: IUser = ctx.request.body;
+    const username = data.username?.trim();
+    const password = data.password?.trim();
+
     if (!username || !password) {
       throw new CustomError(
         `用户名或密码为空！`,
@@ -157,7 +163,16 @@ class UserController {
       userInfo,
       exp,
     });
-    await userService.update({ token, id: userInfo?.id }); // 每次登录都更新token
+    // 每次登录都更新token
+    await userService.update({ token, id });
+    const user_agent = strSlice(String(ctx.request.headers['user-agent']), 490);
+    const ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
+    await loginRecordController.common.create({
+      user_id: id,
+      type: LoginRecordEnum.loginId,
+      user_agent,
+      ip,
+    });
     successHandler({ ctx, data: token, message: '登录成功！' });
 
     /**
@@ -192,7 +207,16 @@ class UserController {
       },
       exp,
     });
-    await userService.update({ token, id: userInfo?.id }); // 每次登录都更新token
+    // 每次登录都更新token
+    await userService.update({ token, id: userInfo?.id });
+    const user_agent = strSlice(String(ctx.request.headers['user-agent']), 490);
+    const ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
+    await loginRecordController.common.create({
+      user_id: userInfo?.id,
+      type: LoginRecordEnum.loginUsername,
+      user_agent,
+      ip,
+    });
     successHandler({
       ctx,
       data: token,

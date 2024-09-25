@@ -37,9 +37,6 @@ export const tencentcloudCssMain = async () => {
     }
   });
 
-  console.log('res2', res2);
-  console.log('res1Map', res1Map);
-  console.log('tencentcloudCssMap', tencentcloudCssMap);
   console.log('定时任务删除cdn直播记录', delArr);
   if (delArr.length) {
     liveController.common.deleteByLiveRoomId(delArr);

@@ -53,7 +53,7 @@ export const CORS_ALLOW_ORIGIN: string | string[] = [
 ];
 
 /** 消息最大长度 */
-export const MSG_MAX_LENGTH = 150;
+export const MSG_MAX_LENGTH = 200;
 export const MAX_TOKEN_EXP = 24 * 90; // token过期时间：90天
 
 export const VIDEO_DIR =

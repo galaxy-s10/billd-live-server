@@ -7,17 +7,17 @@ import {
 
 import sequelize from '@/config/mysql';
 import { initTable } from '@/init/initDb';
-import { IBlacklist } from '@/interface';
+import { ILoginRecord } from '@/interface';
 
-interface BlacklistModel
+interface LoginRecordModel
   extends Model<
-      InferAttributes<BlacklistModel>,
-      InferCreationAttributes<BlacklistModel>
+      InferAttributes<LoginRecordModel>,
+      InferCreationAttributes<LoginRecordModel>
     >,
-    IBlacklist {}
+    ILoginRecord {}
 
-const model = sequelize.define<BlacklistModel>(
-  'blacklist',
+const model = sequelize.define<LoginRecordModel>(
+  'login_record',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -25,20 +25,29 @@ const model = sequelize.define<BlacklistModel>(
       allowNull: false,
       autoIncrement: true,
     },
-    ip: {
-      type: DataTypes.STRING(500),
-    },
     user_id: {
       type: DataTypes.INTEGER,
     },
     type: {
-      type: DataTypes.INTEGER, // 禁用类型,1:频繁操作；2:管理员手动禁用
+      type: DataTypes.INTEGER,
     },
-    msg: {
-      type: DataTypes.STRING(100),
+    ip: {
+      type: DataTypes.STRING(500),
+    },
+    user_agent: {
+      type: DataTypes.STRING(500),
+    },
+    remark: {
+      type: DataTypes.STRING(500),
     },
   },
   {
+    indexes: [
+      {
+        name: 'user_id',
+        fields: ['user_id'],
+      },
+    ],
     paranoid: true,
     freezeTableName: true,
     createdAt: 'created_at',
