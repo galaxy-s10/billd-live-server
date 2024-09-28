@@ -5,8 +5,8 @@ import { ParameterizedContext } from 'koa';
 import { authJwt } from '@/app/auth/authJwt';
 import {
   BLACKLIST_TYPE,
+  COMMON_ERROE_MSG,
   COMMON_ERROR_CODE,
-  COMMON_ERR_MSG,
   COMMON_HTTP_CODE,
   PROJECT_ENV,
   PROJECT_ENV_ENUM,
@@ -93,16 +93,16 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
   if (inBlacklist?.type === BLACKLIST_TYPE.banIp) {
     // 频繁操作
     throw new CustomError(
-      `当前ip:${ip}调用api频繁,${COMMON_ERR_MSG.banIp}`,
+      `当前ip:${ip}调用api频繁,${COMMON_ERROE_MSG.banIp}`,
       COMMON_HTTP_CODE.forbidden,
       COMMON_ERROR_CODE.banIp
     );
   } else if (inBlacklist?.type === BLACKLIST_TYPE.adminDisableUser) {
     // 管理员手动禁用
     throw new CustomError(
-      COMMON_ERR_MSG.adminDisableUser,
+      COMMON_ERROE_MSG.userStatusIsDisable,
       COMMON_HTTP_CODE.forbidden,
-      COMMON_ERROR_CODE.adminDisableUser
+      COMMON_ERROR_CODE.userStatusIsDisable
     );
   }
 
@@ -117,10 +117,10 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
         user_id: userInfo?.id,
         ip,
         type: BLACKLIST_TYPE.banIp,
-        msg: COMMON_ERR_MSG.banIp,
+        msg: COMMON_ERROE_MSG.banIp,
       });
       throw new CustomError(
-        `当前ip:${ip}调用api频繁,${COMMON_ERR_MSG.banIp}`,
+        `当前ip:${ip}调用api频繁,${COMMON_ERROE_MSG.banIp}`,
         COMMON_HTTP_CODE.forbidden,
         COMMON_ERROR_CODE.banIp
       );

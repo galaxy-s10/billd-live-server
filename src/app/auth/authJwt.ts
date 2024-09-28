@@ -1,14 +1,11 @@
 import { filterObj } from 'billd-utils';
 import jwt from 'jsonwebtoken';
 
-import {
-  COMMON_ERROR_CODE,
-  COMMON_ERR_MSG,
-  COMMON_HTTP_CODE,
-} from '@/constant';
+import { COMMON_ERROE_MSG, COMMON_HTTP_CODE } from '@/constant';
 import { JWT_SECRET } from '@/secret/secret';
 import userService from '@/service/user.service';
 import { IUser, UserStatusEnum } from '@/types/IUser';
+import { judgeUserStatus } from '@/utils';
 
 /**
  * 验证jwt
@@ -25,10 +22,10 @@ export const jwtVerify = (token: string) => {
       if (err) {
         let { message } = err;
         if (err.message.indexOf('expired') !== -1) {
-          message = COMMON_ERR_MSG.jwtExpired;
+          message = COMMON_ERROE_MSG.jwtExpired;
         }
         if (err.message.indexOf('invalid') !== -1) {
-          message = COMMON_ERR_MSG.invalidToken;
+          message = COMMON_ERROE_MSG.invalidToken;
         }
         resolve({ code: COMMON_HTTP_CODE.unauthorized, message });
         return;
@@ -51,16 +48,16 @@ export const jwtVerify = (token: string) => {
             // 异地登录（防止修改密码后，原本的token还能用）
             resolve({
               code: COMMON_HTTP_CODE.unauthorized,
-              message: COMMON_ERR_MSG.jwtExpired,
+              message: COMMON_ERROE_MSG.jwtExpired,
             });
             return;
           }
-          if (userResult.status === UserStatusEnum.disable) {
-            // 账号被禁用了
+          const userStatusRes = judgeUserStatus(userResult.status!);
+          if (userStatusRes.status !== UserStatusEnum.normal) {
             resolve({
               code: COMMON_HTTP_CODE.unauthorized,
-              errorCode: COMMON_ERROR_CODE.adminDisableUser,
-              message: COMMON_ERR_MSG.adminDisableUser,
+              errorCode: userStatusRes.errorCode,
+              message: userStatusRes.message,
             });
             return;
           }

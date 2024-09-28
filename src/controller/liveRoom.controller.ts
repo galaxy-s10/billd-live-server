@@ -6,14 +6,13 @@ import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import { COMMON_HTTP_CODE, REDIS_PREFIX } from '@/constant';
 import redisController from '@/controller/redis.controller';
+import srsController from '@/controller/srs.controller';
 import userLiveRoomController from '@/controller/userLiveRoom.controller';
 import { IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveRoomService from '@/service/liveRoom.service';
 import { ILiveRoom } from '@/types/ILiveRoom';
 import { tencentcloudUtils } from '@/utils/tencentcloud';
-
-import srsController from './srs.controller';
 
 class LiveRoomController {
   common = {
@@ -170,6 +169,7 @@ class LiveRoomController {
     create: (data: ILiveRoom) => liveRoomService.create(data),
     update: (data: ILiveRoom) => liveRoomService.update(data),
     find: (id: number) => liveRoomService.find(id),
+    findPure: (id: number) => liveRoomService.findPure(id),
   };
 
   getList = async (ctx: ParameterizedContext, next) => {
@@ -180,6 +180,13 @@ class LiveRoomController {
   };
 
   find = async (ctx: ParameterizedContext, next) => {
+    const id = +ctx.params.id;
+    const result = await this.common.find(id);
+    successHandler({ ctx, data: result });
+    await next();
+  };
+
+  findAndLive = async (ctx: ParameterizedContext, next) => {
     const id = +ctx.params.id;
     const result = await this.common.find(id);
     successHandler({ ctx, data: result });

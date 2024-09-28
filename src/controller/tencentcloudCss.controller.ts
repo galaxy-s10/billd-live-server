@@ -10,6 +10,7 @@ import {
 } from '@/constant';
 import liveController from '@/controller/live.controller';
 import liveRecordController from '@/controller/liveRecord.controller';
+import liveRoomController from '@/controller/liveRoom.controller';
 import userLiveRoomController from '@/controller/userLiveRoom.controller';
 import { CustomError } from '@/model/customError.model';
 import liveRoomService from '@/service/liveRoom.service';
@@ -21,8 +22,6 @@ import {
 import { WsMsgTypeEnum } from '@/types/websocket';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 import { tencentcloudUtils } from '@/utils/tencentcloud';
-
-import liveRoomController from './liveRoom.controller';
 
 class TencentcloudCssController {
   async push(ctx: ParameterizedContext, next) {
@@ -287,10 +286,9 @@ class TencentcloudCssController {
         }),
       ].filter((v) => v !== false),
     ]);
-    wsSocket.io?.to(roomId).emit(WsMsgTypeEnum.roomLiving, {
-      live_room: userLiveRoomInfo.live_room!,
-      anchor_socket_id: '',
-    });
+    wsSocket.io
+      ?.to(roomId)
+      .emit(WsMsgTypeEnum.roomLiving, { live_room_id: roomId });
     console.log(
       chalkSUCCESS(`[tencentcloud_css onPublish] 房间id：${roomId}，成功`)
     );

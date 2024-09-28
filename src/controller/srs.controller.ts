@@ -623,10 +623,9 @@ class SRSController {
           view: 0,
         }),
       ]);
-      wsSocket.io?.to(roomId).emit(WsMsgTypeEnum.roomLiving, {
-        live_room: userLiveRoomInfo.live_room!,
-        anchor_socket_id: '',
-      });
+      wsSocket.io
+        ?.to(roomId)
+        .emit(WsMsgTypeEnum.roomLiving, { live_room_id: roomId });
       await next();
     }
   };

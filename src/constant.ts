@@ -95,7 +95,7 @@ export const DOMAIN_URL = 'localhost'; // 本地地址，一般是localhost或�
 export const COMMON_ERROR_CODE = {
   serverError: 10000, // 服务器错误
   banIp: 1000, // 黑名单禁用了ip
-  adminDisableUser: 1001, // 管理员禁用了用户
+  userStatusIsDisable: 1001, // 你的账号已被禁用，请联系管理员处理！
   notFound: 1002, // 返回了404的http状态码
   errStatusCode: 1003, // 返回了即不是200也不是404的http状态码
   shutdown: 1004, // 停机维护
@@ -105,6 +105,7 @@ export const COMMON_ERROR_CODE = {
   alreadyGetRedbag: 1008, // 今天已签到过了！
   redbagAlreadySnatched: 1009, // 红包已经被抢完！
   balanceNotEnough: 1010, // 余额不足
+  userStatusNoNormal: 1011, // 用户状态非正常
 };
 
 export const COMMON_HTTP_CODE = {
@@ -122,7 +123,8 @@ export const COMMON_ERROE_MSG = {
   banIp: '此ip已被禁用，请联系管理员处理！', // 此ip已被禁用，请联系管理员处理！
   jwtExpired: '登录信息过期！', // 登录信息过期！
   invalidToken: '非法token！', // 非法token！
-  adminDisableUser: '你的账号已被管理员禁用，请联系管理员处理！', // 你的账号已被管理员禁用，请联系管理员处理！
+  userStatusIsDisable: '你的账号已被禁用，请联系管理员处理！', // 你的账号已被禁用，请联系管理员处理！
+  userStatusNoNormal: '用户状态非正常', // 你的账号已被管理员禁用，请联系管理员处理！
   shutdown: '停机维护中', // 停机维护中
 
   noLogin: '未登录', // 未登录
@@ -156,14 +158,6 @@ export const SCHEDULE_TYPE = {
   verifyStream: 'handleVerifyStream',
   blobIsExist: 'blobIsExist',
   liveRoomIsLive: 'liveRoomIsLive',
-};
-
-export const COMMON_ERR_MSG = {
-  banIp: '此ip已被禁用，请联系管理员处理！',
-  jwtExpired: '登录信息过期！',
-  invalidToken: '非法token！',
-  adminDisableUser: '你的账号已被管理员禁用，请联系管理员处理！',
-  shutdown: '停机维护中~',
 };
 
 export const REDIS_PREFIX_ENV = `${PROJECT_NAME}-${PROJECT_ENV}-`;

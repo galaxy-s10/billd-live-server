@@ -43,6 +43,11 @@ liveRouter.post(
 
 liveRouter.get('/is_live', liveController.isLive);
 
+liveRouter.get(
+  '/live_room_is_live/:live_room_id',
+  liveController.liveRoomisLive
+);
+
 liveRouter.get('/forward_list', liveController.getForwardList);
 
 liveRouter.post(

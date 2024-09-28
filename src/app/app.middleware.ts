@@ -176,9 +176,10 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
     }
     // 是CustomError，判断errorCode，非法的错误（频繁请求和被禁用）不写入日志
     if (
-      ![COMMON_ERROR_CODE.banIp, COMMON_ERROR_CODE.adminDisableUser].includes(
-        error.errorCode
-      )
+      ![
+        COMMON_ERROR_CODE.banIp,
+        COMMON_ERROR_CODE.userStatusIsDisable,
+      ].includes(error.errorCode)
     ) {
       insertLog({
         httpStatusCode: error.httpStatusCode,

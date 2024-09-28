@@ -1,6 +1,11 @@
+import fs from 'fs';
+import path from 'path';
+
 import { arrayUnique, getArrayDifference, getRandomString } from 'billd-utils';
 import cryptojs from 'crypto-js';
 import { ParameterizedContext } from 'koa';
+import nodeSchedule from 'node-schedule';
+import { rimrafSync } from 'rimraf';
 
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
@@ -9,9 +14,14 @@ import {
   COMMON_HTTP_CODE,
   DEFAULT_ROLE_INFO,
   REDIS_PREFIX,
+  SCHEDULE_TYPE,
   THIRD_PLATFORM,
+  WEBM_DIR,
 } from '@/constant';
+import liveRoomController from '@/controller/liveRoom.controller';
+import redisController from '@/controller/redis.controller';
 import srsController from '@/controller/srs.controller';
+import userController from '@/controller/user.controller';
 import userLiveRoomController from '@/controller/userLiveRoom.controller';
 import { IList, ILive } from '@/interface';
 import { CustomError } from '@/model/customError.model';
@@ -32,10 +42,6 @@ import {
 import { chalkERROR } from '@/utils/chalkTip';
 import { getForwardList, killPid } from '@/utils/process';
 import { tencentcloudUtils } from '@/utils/tencentcloud';
-
-import liveRoomController from './liveRoom.controller';
-import redisController from './redis.controller';
-import userController from './user.controller';
 
 class LiveController {
   common = {
@@ -230,6 +236,11 @@ class LiveController {
       return res;
     },
 
+    liveRoomisLive: async (liveRoomId: number) => {
+      const res = await liveService.liveRoomisLive(liveRoomId);
+      return res;
+    },
+
     findAllLiveByRoomId: async (liveRoomId: number) => {
       const res = await liveService.findAllLiveByRoomId(liveRoomId);
       return res;
@@ -241,6 +252,11 @@ class LiveController {
         tencentcloudUtils.dropLiveStream({ roomId: liveRoomId }),
         this.common.deleteByLiveRoomId([liveRoomId]),
       ]);
+      nodeSchedule.cancelJob(`${SCHEDULE_TYPE.blobIsExist}___${liveRoomId}`);
+      const roomDir = path.resolve(WEBM_DIR, `roomId_${liveRoomId}`);
+      if (fs.existsSync(roomDir)) {
+        rimrafSync(roomDir);
+      }
       return res;
     },
 
@@ -594,6 +610,20 @@ class LiveController {
     successHandler({ ctx, data: res });
     await next();
   }
+
+  liveRoomisLive = async (ctx: ParameterizedContext, next) => {
+    const live_room_id = +ctx.params.live_room_id;
+    if (!live_room_id) {
+      throw new CustomError(
+        'live_room_id为空',
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
+      );
+    }
+    const res = await this.common.liveRoomisLive(live_room_id);
+    successHandler({ ctx, data: res });
+    await next();
+  };
 
   async getForwardList(ctx: ParameterizedContext, next) {
     const res: any = await getForwardList();

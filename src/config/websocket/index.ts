@@ -40,11 +40,12 @@ import {
 import { chalkINFO, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 
 export function getSocketRealIp(socket: Socket) {
-  if (!socket) {
-    return '-1';
-  }
-  const realIp = socket.handshake.headers['x-real-ip'] as string;
-  return realIp || '-1';
+  const realIp = (socket?.handshake?.headers?.['x-real-ip'] as string) || '';
+  return realIp || '';
+}
+export function getSocketUserAgent(socket: Socket) {
+  const ua = (socket?.handshake?.headers?.['user-agent'] as string) || '';
+  return ua || '';
 }
 
 // 获取所有连接的socket客户端
@@ -299,9 +300,8 @@ export const connectWebSocket = (server) => {
       // console.log('收到心跳', data);
       try {
         updateUserJoinedRoom({
-          socketId: data.data.socket_id,
+          socketId: data.socket_id,
           liveRoomId: data.data.live_room_id,
-          roomLiving: data.data.roomLiving,
           clientIp: getSocketRealIp(socket),
         });
       } catch (error) {

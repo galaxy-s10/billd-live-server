@@ -3,6 +3,10 @@ import { ParameterizedContext } from 'koa';
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import { COMMON_ERROR_CODE, COMMON_HTTP_CODE } from '@/constant';
+import goodsController from '@/controller/goods.controller';
+import liveRoomController from '@/controller/liveRoom.controller';
+import walletController from '@/controller/wallet.controller';
+import walletRecordController from '@/controller/walletRecord.controller';
 import {
   GiftRecordIsRecvEnum,
   GiftRecordStatusEnum,
@@ -13,11 +17,6 @@ import {
 } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import giftRecordService from '@/service/giftRecord.service';
-
-import goodsController from './goods.controller';
-import liveRoomController from './liveRoom.controller';
-import walletController from './wallet.controller';
-import walletRecordController from './walletRecord.controller';
 
 class GiftRecordController {
   common = {

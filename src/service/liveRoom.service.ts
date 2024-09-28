@@ -326,6 +326,35 @@ class LiveRoomService {
   }
 
   /** 查找直播间 */
+  async findPure(id: number) {
+    const result = await liveRoomModel.findOne({
+      attributes: {
+        exclude: [
+          'key',
+          'push_rtmp_url',
+          'push_obs_server',
+          'push_obs_stream_key',
+          'push_webrtc_url',
+          'push_srt_url',
+          'cdn_push_rtmp_url',
+          'cdn_push_obs_server',
+          'cdn_push_obs_stream_key',
+          'cdn_push_webrtc_url',
+          'cdn_push_srt_url',
+          'forward_bilibili_url',
+          'forward_huya_url',
+          'forward_douyu_url',
+          'forward_douyin_url',
+          'forward_kuaishou_url',
+          'forward_xiaohongshu_url',
+        ],
+      },
+      where: { id },
+    });
+    return result;
+  }
+
+  /** 查找直播间 */
   async findByName(name: string) {
     const result = await liveRoomModel.findOne({
       include: [

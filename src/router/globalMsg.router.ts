@@ -20,4 +20,8 @@ globalMsgRouter.post(
 
 globalMsgRouter.get('/my_list', globalMsgController.getMyList);
 
+globalMsgRouter.get('/find/:id', globalMsgController.find);
+
+globalMsgRouter.post('/update/:id', globalMsgController.update);
+
 export default globalMsgRouter;

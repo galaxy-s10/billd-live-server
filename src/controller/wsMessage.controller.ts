@@ -2,11 +2,10 @@ import { ParameterizedContext } from 'koa';
 
 import successHandler from '@/app/handler/success-handle';
 import { COMMON_HTTP_CODE, MSG_MAX_LENGTH, REDIS_PREFIX } from '@/constant';
+import redisController from '@/controller/redis.controller';
 import { IList, IWsMessage } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import wsMessageService from '@/service/wsMessage.service';
-
-import redisController from './redis.controller';
 
 class WsMessageController {
   common = {
@@ -51,6 +50,40 @@ class WsMessageController {
       });
     },
     find: (id: number) => wsMessageService.find(id),
+    update: ({
+      id,
+      msg_type,
+      live_room_id,
+      user_id,
+      ip,
+      content_type,
+      content,
+      origin_content,
+      username,
+      origin_username,
+      user_agent,
+      send_msg_time,
+      redbag_send_id,
+      is_show,
+      is_verify,
+    }) =>
+      wsMessageService.update({
+        id,
+        msg_type,
+        live_room_id,
+        user_id,
+        ip,
+        content_type,
+        content,
+        origin_content,
+        username,
+        origin_username,
+        user_agent,
+        send_msg_time,
+        redbag_send_id,
+        is_show,
+        is_verify,
+      }),
     updateIsShow: ({ id, is_show }: IWsMessage) =>
       wsMessageService.update({ id, is_show }),
     getList: async ({
@@ -112,45 +145,12 @@ class WsMessageController {
     },
   };
 
-  async update(ctx: ParameterizedContext, next) {
-    const {
-      id,
-      msg_type,
-      live_room_id,
-      user_id,
-      ip,
-      content_type,
-      content,
-      origin_content,
-      username,
-      origin_username,
-      user_agent,
-      send_msg_time,
-      redbag_send_id,
-      is_show,
-      is_verify,
-    }: IWsMessage = ctx.request.body;
-
-    const res = await wsMessageService.update({
-      id,
-      msg_type,
-      live_room_id,
-      user_id,
-      ip,
-      content_type,
-      content,
-      origin_content,
-      username,
-      origin_username,
-      user_agent,
-      send_msg_time,
-      redbag_send_id,
-      is_show,
-      is_verify,
-    });
+  update = async (ctx: ParameterizedContext, next) => {
+    const data = ctx.request.body;
+    const res = await this.common.update(data);
     successHandler({ ctx, data: res });
     await next();
-  }
+  };
 
   getList = async (ctx: ParameterizedContext, next) => {
     const data = ctx.request.query;

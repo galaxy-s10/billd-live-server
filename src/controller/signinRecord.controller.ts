@@ -5,6 +5,8 @@ import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import { COMMON_HTTP_CODE } from '@/constant';
 import signinStatisticsController from '@/controller/signinStatistics.controller';
+import walletController from '@/controller/wallet.controller';
+import walletRecordController from '@/controller/walletRecord.controller';
 import {
   IList,
   ISigninRecord,
@@ -14,9 +16,6 @@ import {
 import { CustomError } from '@/model/customError.model';
 import signinRecordService from '@/service/signinRecord.service';
 import { dateStartAndEnd } from '@/utils';
-
-import walletController from './wallet.controller';
-import walletRecordController from './walletRecord.controller';
 
 class SigninRecordController {
   common = {

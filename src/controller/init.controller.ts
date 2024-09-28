@@ -5,6 +5,8 @@ import { ParameterizedContext } from 'koa';
 import { signJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import { COMMON_HTTP_CODE, THIRD_PLATFORM } from '@/constant';
+import liveRoomController from '@/controller/liveRoom.controller';
+import srsController from '@/controller/srs.controller';
 import {
   bulkCreateArea,
   bulkCreateAuth,
@@ -56,9 +58,6 @@ import {
 import { IUser } from '@/types/IUser';
 import { chalkWARN } from '@/utils/chalkTip';
 import { tencentcloudUtils } from '@/utils/tencentcloud';
-
-import liveRoomController from './liveRoom.controller';
-import srsController from './srs.controller';
 
 class InitController {
   common = {

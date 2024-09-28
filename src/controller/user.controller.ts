@@ -14,6 +14,7 @@ import {
   THIRD_PLATFORM,
 } from '@/constant';
 import authController from '@/controller/auth.controller';
+import loginRecordController from '@/controller/loginRecord.controller';
 import redisController from '@/controller/redis.controller';
 import { IList, LoginRecordEnum } from '@/interface';
 import { CustomError } from '@/model/customError.model';
@@ -21,10 +22,8 @@ import roleService from '@/service/role.service';
 import thirdUserService from '@/service/thirdUser.service';
 import userService from '@/service/user.service';
 import walletService from '@/service/wallet.service';
-import { IUser } from '@/types/IUser';
-import { strSlice } from '@/utils';
-
-import loginRecordController from './loginRecord.controller';
+import { IUser, UserStatusEnum } from '@/types/IUser';
+import { judgeUserStatus, strSlice } from '@/utils';
 
 class UserController {
   common = {
@@ -80,8 +79,15 @@ class UserController {
       third_user_id: createUserInfo.id,
       third_platform: THIRD_PLATFORM.website,
     });
+    const user_agent = strSlice(String(ctx.request.headers['user-agent']), 490);
+    const ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
+    await loginRecordController.common.create({
+      user_id: createUserInfo.id,
+      type: LoginRecordEnum.registerUsername,
+      user_agent,
+      ip,
+    });
     successHandler({ ctx });
-
     await next();
   };
 
@@ -159,6 +165,14 @@ class UserController {
         COMMON_HTTP_CODE.paramsError
       );
     }
+    const userStatusRes = judgeUserStatus(userInfo.status!);
+    if (userStatusRes.status !== UserStatusEnum.normal) {
+      throw new CustomError(
+        userStatusRes.message,
+        COMMON_HTTP_CODE.unauthorized,
+        COMMON_HTTP_CODE.unauthorized
+      );
+    }
     const token = signJwt({
       userInfo,
       exp,
@@ -197,6 +211,14 @@ class UserController {
         COMMON_ERROE_MSG.usernameOrPwdError,
         COMMON_HTTP_CODE.paramsError,
         COMMON_ERROR_CODE.usernameOrPwdError
+      );
+    }
+    const userStatusRes = judgeUserStatus(userInfo.status!);
+    if (userStatusRes.status !== UserStatusEnum.normal) {
+      throw new CustomError(
+        userStatusRes.message,
+        COMMON_HTTP_CODE.unauthorized,
+        COMMON_HTTP_CODE.unauthorized
       );
     }
     const token = signJwt({

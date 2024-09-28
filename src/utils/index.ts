@@ -1,6 +1,29 @@
+// WARN 这个文件不能用路径别名！
 import { spawnSync } from 'child_process';
 import os from 'os';
 import path from 'path';
+
+import { COMMON_ERROE_MSG, COMMON_ERROR_CODE } from '../constant';
+import { UserStatusEnum } from '../types/IUser';
+
+export function judgeUserStatus(status: UserStatusEnum) {
+  const res = {
+    status,
+    errorCode: COMMON_ERROR_CODE.userStatusIsDisable,
+    message: COMMON_ERROE_MSG.userStatusIsDisable,
+  };
+  switch (status) {
+    case UserStatusEnum.disable:
+      res.errorCode = COMMON_ERROR_CODE.userStatusIsDisable;
+      res.message = COMMON_ERROE_MSG.userStatusIsDisable;
+      break;
+    default:
+      res.errorCode = COMMON_ERROR_CODE.userStatusNoNormal;
+      res.message = COMMON_ERROE_MSG.userStatusNoNormal;
+      break;
+  }
+  return res;
+}
 
 export function countdown(data: { seconds: number }) {
   const { seconds } = data;

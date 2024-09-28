@@ -3,11 +3,10 @@ import { ParameterizedContext } from 'koa';
 
 import successHandler from '@/app/handler/success-handle';
 import { COMMON_HTTP_CODE, REDIS_PREFIX } from '@/constant';
+import redisController from '@/controller/redis.controller';
 import { CustomError } from '@/model/customError.model';
 import deskUserService from '@/service/deskUser.service';
 import { IDeskUser } from '@/types/IUser';
-
-import redisController from './redis.controller';
 
 class DeskUserController {
   async login(ctx: ParameterizedContext, next) {

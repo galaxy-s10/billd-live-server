@@ -6,6 +6,7 @@ import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import { COMMON_HTTP_CODE } from '@/constant';
 import liveRoomController from '@/controller/liveRoom.controller';
+import srsController from '@/controller/srs.controller';
 import { IList, IUserLiveRoom } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveRoomService from '@/service/liveRoom.service';
@@ -17,8 +18,6 @@ import {
   LiveRoomTypeEnum,
   LiveRoomUseCDNEnum,
 } from '@/types/ILiveRoom';
-
-import srsController from './srs.controller';
 
 class UserLiveRoomController {
   common = {

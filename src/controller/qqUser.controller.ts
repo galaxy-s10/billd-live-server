@@ -9,7 +9,8 @@ import {
   MAX_TOKEN_EXP,
   THIRD_PLATFORM,
 } from '@/constant';
-import { IList } from '@/interface';
+import loginRecordController from '@/controller/loginRecord.controller';
+import { IList, LoginRecordEnum } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import thirdUserModel from '@/model/thirdUser.model';
 import {
@@ -22,7 +23,8 @@ import thirdUserService from '@/service/thirdUser.service';
 import userService from '@/service/user.service';
 import walletService from '@/service/wallet.service';
 import { prodDomain } from '@/spec-config';
-import { IQqUser } from '@/types/IUser';
+import { IQqUser, UserStatusEnum } from '@/types/IUser';
+import { judgeUserStatus, strSlice } from '@/utils';
 import { myaxios } from '@/utils/request';
 
 // WARN 有时候qq登录的回调会是这样的：https://admin.xxx.cn/oauth/qq_login?error=100070&error_description=the+account+has+security+exception&state=99
@@ -188,6 +190,10 @@ class QqUserController {
       openid: OauthInfo.openid,
     };
     const isExist = await qqUserService.isExistUnionid(OauthInfo.unionid);
+    let userId;
+    let token;
+    const user_agent = strSlice(String(ctx.request.headers['user-agent']), 490);
+    const ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
     if (!isExist) {
       console.log('不存在qq账号');
       const qqUser = await qqUserService.create(qqUserInfo);
@@ -196,22 +202,22 @@ class QqUserController {
         password: getRandomString(8),
         avatar: qqUserInfo.figureurl_2,
       });
-      // if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
-      // 生产环境注册用户权限就是VIP用户
+      userId = userInfo.id;
+      await loginRecordController.common.create({
+        user_id: userId,
+        type: LoginRecordEnum.registerQq,
+        user_agent,
+        ip,
+      });
       // @ts-ignore
       await userInfo.setRoles([DEFAULT_ROLE_INFO.VIP_USER.id]);
-      // } else {
-      //   // 非生产环境注册用户权限就是SUPER_ADMIN管理员
-      //   // @ts-ignore
-      //   await userInfo.setRoles([DEFAULT_ROLE_INFO.SUPER_ADMIN.id]);
-      // }
       await walletService.create({ user_id: userInfo.id, balance: 0 });
       await thirdUserModel.create({
         user_id: userInfo.id,
         third_user_id: qqUser.id,
         third_platform: THIRD_PLATFORM.qq,
       });
-      const token = signJwt({
+      token = signJwt({
         userInfo: {
           id: userInfo.id,
           username: userInfo.username,
@@ -267,7 +273,6 @@ class QqUserController {
               : `${prodDomain}`,
         });
       }
-      successHandler({ ctx, data: token, message: 'qq登录成功！' });
     } else {
       console.log('已存在qq账号');
       await qqUserService.update(qqUserInfo);
@@ -291,6 +296,7 @@ class QqUserController {
         );
       }
       const userInfo = await userService.find(thirdUserInfo.user_id!);
+      userId = userInfo?.id;
       if (!userInfo) {
         throw new CustomError(
           `qq登录userInfo错误`,
@@ -298,7 +304,15 @@ class QqUserController {
           COMMON_HTTP_CODE.paramsError
         );
       }
-      const token = signJwt({
+      const userStatusRes = judgeUserStatus(userInfo.status!);
+      if (userStatusRes.status !== UserStatusEnum.normal) {
+        throw new CustomError(
+          userStatusRes.message,
+          COMMON_HTTP_CODE.unauthorized,
+          COMMON_HTTP_CODE.unauthorized
+        );
+      }
+      token = signJwt({
         userInfo: {
           id: userInfo.id,
           username: userInfo.username,
@@ -354,8 +368,14 @@ class QqUserController {
               : `${prodDomain}`,
         });
       }
-      successHandler({ ctx, data: token, message: 'qq登录成功！' });
     }
+    await loginRecordController.common.create({
+      user_id: userId,
+      type: LoginRecordEnum.loginQq,
+      user_agent,
+      ip,
+    });
+    successHandler({ ctx, data: token, message: 'qq登录成功！' });
 
     /**
      * 这个其实是最后一个中间件了，其实加不加调不调用next都没硬性，但是为了防止后面要

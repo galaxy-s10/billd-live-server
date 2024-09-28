@@ -6,6 +6,7 @@ import successHandler from '@/app/handler/success-handle';
 import { COMMON_HTTP_CODE, REDIS_PREFIX } from '@/constant';
 import goodsControllerfrom from '@/controller/goods.controller';
 import redisController from '@/controller/redis.controller';
+import walletRecordController from '@/controller/walletRecord.controller';
 import {
   GoodsTypeEnum,
   IList,
@@ -20,8 +21,6 @@ import walletService from '@/service/wallet.service';
 import { strSlice } from '@/utils';
 import { aliPaySdk } from '@/utils/alipaySdk';
 import { chalkERROR } from '@/utils/chalkTip';
-
-import walletRecordController from './walletRecord.controller';
 
 class OrderController {
   common = {

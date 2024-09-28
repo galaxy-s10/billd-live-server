@@ -90,7 +90,8 @@ export enum WsMsgTypeEnum {
   updateDeskUser = 'updateDeskUser',
 }
 
-export interface IWsFormat<T> {
+/** 发送消息统一格式 */
+export interface IReqWsFormat<T> {
   /** 消息id */
   request_id: string;
   /** 用户socket_id */
@@ -101,67 +102,69 @@ export interface IWsFormat<T> {
   user_token?: string;
   /** 消息时间戳 */
   time: number;
-  user_agent: string;
   data: T;
 }
 
-export type WsChangeMaxBitrateType = IWsFormat<{
+/** 接收消息统一格式 */
+export interface IResWsFormat<T> {
+  /** 消息id */
+  request_id: string;
+  /** 消息时间戳 */
+  time: number;
+  data: T;
+}
+
+export type WsChangeMaxBitrateType = IReqWsFormat<{
   live_room_id: number;
   val: number;
 }>;
 
-export type WsChangeMaxFramerateType = IWsFormat<{
+export type WsChangeMaxFramerateType = IReqWsFormat<{
   live_room_id: number;
   val: number;
 }>;
 
-export type WsChangeResolutionRatioType = IWsFormat<{
+export type WsChangeResolutionRatioType = IReqWsFormat<{
   live_room_id: number;
   val: number;
 }>;
 
-export type WsChangeVideoContentHintType = IWsFormat<{
+export type WsChangeVideoContentHintType = IReqWsFormat<{
   live_room_id: number;
   val: string;
 }>;
 
-export type WsChangeAudioContentHintType = IWsFormat<{
+export type WsChangeAudioContentHintType = IReqWsFormat<{
   live_room_id: number;
   val: string;
 }>;
 
-export type WsUpdateJoinInfoType = IWsFormat<{
+export type WsUpdateJoinInfoType = IReqWsFormat<{
   live_room_id: number;
   track?: { audio: number; video: number };
 }>;
 
 /** 直播pk秘钥 */
-export type WsLivePkKeyType = IWsFormat<{
+export type WsLivePkKeyType = IReqWsFormat<{
   live_room_id: number;
   key: string;
 }>;
 
 /** 获取在线用户 */
-export type WsGetRoomAllUserType = IWsFormat<{
+export type WsGetRoomAllUserType = IReqWsFormat<{
   liveUser: ILiveUser[];
 }>;
 
 /** 获取在线用户 */
-export type WsGetLiveUserType = IWsFormat<{
+export type WsGetLiveUserType = IReqWsFormat<{
   live_room_id: number;
 }>;
 
 /** 直播间正在直播 */
-export type WsRoomLivingType = IWsFormat<{
-  live_room: ILiveRoom;
-  anchor_socket_id: string;
-  socket_list?: string[];
-}>;
+export type WsRoomLivingType = IResWsFormat<{ live_room_id: number }>;
 
 /** 直播间没在直播 */
-export type WsRoomNoLiveType = IWsFormat<{
-  live_room: ILiveRoom;
-}>;
+export type WsRoomNoLiveType = IResWsFormat<{ live_room_id: number }>;
 
 export enum RemoteDeskBehaviorEnum {
   move,
@@ -182,7 +185,7 @@ export enum RemoteDeskBehaviorEnum {
   keyboardType,
 }
 
-export type WsRemoteDeskBehaviorType = IWsFormat<{
+export type WsRemoteDeskBehaviorType = IReqWsFormat<{
   roomId: string;
   sender: string;
   receiver: string;
@@ -207,10 +210,10 @@ export interface IDanmu {
 }
 
 /** ws消息 */
-export type WsMessageType = IWsFormat<IDanmu>;
+export type WsMessageType = IReqWsFormat<IDanmu>;
 
 /** 禁言用户 */
-export type WsDisableSpeakingType = IWsFormat<{
+export type WsDisableSpeakingType = IReqWsFormat<{
   request_id?: string;
   /** 被禁言用户socket_id */
   socket_id: string;
@@ -235,16 +238,15 @@ export type WsDisableSpeakingType = IWsFormat<{
 }>;
 
 /** 其他用户加入直播间 */
-export type WsOtherJoinType = IWsFormat<{
-  live_room: ILiveRoom;
-  live_room_user_info: IUser;
+export type WsOtherJoinType = IResWsFormat<{
+  live_room_id: number;
   join_user_info?: IUser;
   join_socket_id: string;
   socket_list: string[];
 }>;
 
 /** 开始直播 */
-export type WsStartLiveType = IWsFormat<{
+export type WsStartLiveType = IReqWsFormat<{
   name: string;
   type: LiveRoomTypeEnum;
   /** 单位：毫秒 */
@@ -254,17 +256,15 @@ export type WsStartLiveType = IWsFormat<{
 }>;
 
 /** 更新直播间预览图 */
-export type WsUpdateLiveRoomCoverImg = IWsFormat<{
+export type WsUpdateLiveRoomCoverImg = IReqWsFormat<{
   cover_img: string;
 }>;
 
 /** 用户加入直播间 */
-export type WsJoinType = IWsFormat<{
-  socket_id: string;
+export type WsJoinType = IReqWsFormat<{
   live_room_id: number;
   live_room?: ILiveRoom;
   anchor_info?: IUser;
-  user_info?: IUser;
   isRemoteDesk?: boolean;
   socket_list?: string[];
   deskUserUuid?: string;
@@ -274,21 +274,24 @@ export type WsJoinType = IWsFormat<{
   isBilibili?: boolean;
 }>;
 
+/** 用户加入直播间 */
+export type WsJoinedType = IResWsFormat<{
+  live_room_id?: number;
+}>;
+
 /** 用户离开直播间 */
-export type WsLeavedType = IWsFormat<{
+export type WsLeavedType = IResWsFormat<{
   socket_id: string;
   user_info?: IUser;
 }>;
 
 /** 心跳检测 */
-export type WsHeartbeatType = IWsFormat<{
-  socket_id: string;
+export type WsHeartbeatType = IReqWsFormat<{
   live_room_id: number;
-  roomLiving?: boolean;
 }>;
 
 /** msr直播发送blob */
-export type WsMsrBlobType = IWsFormat<{
+export type WsMsrBlobType = IReqWsFormat<{
   live_room_id: number;
   blob: any;
   blob_id: string;
@@ -298,7 +301,7 @@ export type WsMsrBlobType = IWsFormat<{
   max_delay: number;
 }>;
 
-export type WsStartRemoteDesk = IWsFormat<{
+export type WsStartRemoteDesk = IReqWsFormat<{
   sender: string;
   receiver: string;
   roomId: string;
@@ -312,12 +315,12 @@ export type WsStartRemoteDesk = IWsFormat<{
   remoteDeskUserUuid?: string;
 }>;
 
-export type WsBatchSendOffer = IWsFormat<{
+export type WsBatchSendOffer = IReqWsFormat<{
   roomId: string;
   socket_list?: string[];
 }>;
 
-export type WsOfferType = IWsFormat<{
+export type WsOfferType = IReqWsFormat<{
   live_room: ILiveRoom;
   sdp: any;
   sender: string;
@@ -326,14 +329,14 @@ export type WsOfferType = IWsFormat<{
   isRemoteDesk?: boolean;
 }>;
 
-export type WsAnswerType = IWsFormat<{
+export type WsAnswerType = IReqWsFormat<{
   sdp: any;
   sender: string;
   receiver: string;
   live_room_id: number;
 }>;
 
-export type WsCandidateType = IWsFormat<{
+export type WsCandidateType = IReqWsFormat<{
   live_room_id: number;
   candidate: RTCIceCandidate;
   receiver: string;

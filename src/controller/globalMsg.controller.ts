@@ -52,7 +52,7 @@ class GlobalMsgController {
       throw new CustomError(message, code, code);
     }
     const data: IList<IGlobalMsg> = ctx.request.query;
-    const result = await this.common.getList(data);
+    const result = await this.common.getList({ ...data, user_id: userInfo.id });
     successHandler({ ctx, data: result });
     await next();
   };
