@@ -26,6 +26,7 @@ export function newSequelize(db?) {
       idle: 10000,
     },
     timezone: '+08:00',
+    // logging: true,
     logging: false,
   });
 }
@@ -60,6 +61,7 @@ export const connectMysql = async (init = false) => {
     return;
   }
   await sequelize.authenticate({ logging: false });
+  // await initDb('alert', sequelize);
   await initDb('load', sequelize);
   console.log(chalkSUCCESS(msg(true)));
 };

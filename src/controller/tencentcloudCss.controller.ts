@@ -91,9 +91,11 @@ class TencentcloudCssController {
   }
 
   remoteAuth = async (ctx: ParameterizedContext, next) => {
-    const roomId = ctx.query[SRS_CB_URL_PARAMS.roomId] as string;
-    const paramsPublishKey = ctx.query[SRS_CB_URL_PARAMS.publishKey] as string;
-    // const paramsUserToken = ctx.query[SRS_CB_URL_PARAMS.userToken] as string;
+    const roomId = ctx.request.query[SRS_CB_URL_PARAMS.roomId] as string;
+    const paramsPublishKey = ctx.request.query[
+      SRS_CB_URL_PARAMS.publishKey
+    ] as string;
+    // const paramsUserToken = ctx.request.query[SRS_CB_URL_PARAMS.userToken] as string;
     // const { userInfo } = await jwtVerify(paramsUserToken);
     // if (!userInfo?.id) {
     //   console.log(chalkERROR(`[tencentcloud_css_remoteAuth] 用户token 错误！`));

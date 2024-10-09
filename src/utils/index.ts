@@ -3,8 +3,42 @@ import { spawnSync } from 'child_process';
 import os from 'os';
 import path from 'path';
 
+import { ParameterizedContext } from 'koa';
+
 import { COMMON_ERROE_MSG, COMMON_ERROR_CODE } from '../constant';
 import { UserStatusEnum } from '../types/IUser';
+
+/** 字符串截取 */
+export function strSlice(str: string, length: number) {
+  let res = '';
+  try {
+    res = str.slice(0, length);
+  } catch (error) {
+    console.log(error);
+  }
+  return res;
+}
+
+export function handleCtxRequestHeaders(ctx: ParameterizedContext) {
+  const { headers } = ctx.request;
+  const body = strSlice(JSON.stringify(ctx.request.body), 2000);
+  const query = strSlice(JSON.stringify(ctx.request.query), 2000);
+  const user_agent = strSlice(String(headers['user-agent']), 490);
+  const real_ip = strSlice(String(headers['x-real-ip']), 490);
+  const forwarded_for = strSlice(String(headers['x-forwarded-for']), 490);
+  const referer = strSlice(String(headers.referer), 490);
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  const path = strSlice(String(headers.path), 490);
+  return {
+    user_agent,
+    real_ip,
+    forwarded_for,
+    referer,
+    path,
+    body,
+    query,
+  };
+}
 
 export function judgeUserStatus(status: UserStatusEnum) {
   const res = {
@@ -40,17 +74,6 @@ export function countdown(data: { seconds: number }) {
       clearInterval(intervalId);
     }
   }, 1000); // 每秒打印一次
-}
-
-/** 字符串截取 */
-export function strSlice(str: string, length: number) {
-  let res = '';
-  try {
-    res = str.slice(0, length);
-  } catch (error) {
-    console.log(error);
-  }
-  return res;
 }
 
 /**

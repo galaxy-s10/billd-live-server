@@ -13,6 +13,7 @@ import Order from '@/model/order.model';
 import QqUser from '@/model/qqUser.model';
 import Role from '@/model/role.model';
 import RoleAuth from '@/model/roleAuth.model';
+import SigninRecord from '@/model/signinRecord.model';
 import SigninStatistics from '@/model/signinStatistics.model';
 import ThirdUser from '@/model/thirdUser.model';
 import User from '@/model/user.model';
@@ -84,6 +85,21 @@ User.belongsToMany(LiveRoom, {
     model: UserLiveRoom,
     unique: false, // 不生成唯一索引
   },
+});
+
+SigninStatistics.belongsTo(LiveRoom, {
+  foreignKey: 'live_room_id',
+  constraints: false,
+});
+
+SigninRecord.belongsTo(LiveRoom, {
+  foreignKey: 'live_room_id',
+  constraints: false,
+});
+
+SigninRecord.belongsTo(User, {
+  foreignKey: 'user_id',
+  constraints: false,
 });
 
 SigninStatistics.belongsTo(User, {

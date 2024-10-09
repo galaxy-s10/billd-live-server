@@ -62,7 +62,7 @@ class GoodsController {
   };
 
   findByType = async (ctx: ParameterizedContext, next) => {
-    const { type } = ctx.query;
+    const { type } = ctx.request.query;
     const result = await this.common.findByType(type);
     successHandler({ ctx, data: result });
     await next();

@@ -27,6 +27,7 @@ const model = sequelize.define<SigninRecordModel>(
     },
     live_room_id: {
       type: DataTypes.INTEGER,
+      defaultValue: -1,
     },
     user_id: {
       type: DataTypes.INTEGER,

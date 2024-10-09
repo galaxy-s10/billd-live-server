@@ -1,5 +1,5 @@
 import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
-import { Op, literal } from 'sequelize';
+import { literal, Op } from 'sequelize';
 
 import { IArea, IList } from '@/interface';
 import areaModel from '@/model/area.model';
@@ -218,7 +218,7 @@ class AreaService {
       include: [
         {
           model: areaLiveRoomModel,
-          limit: 4,
+          limit: 2,
           include: [
             {
               model: liveRoomModel,
@@ -257,17 +257,18 @@ class AreaService {
                   },
                 },
               ],
-              where: { ...subWhere },
+              // where: { ...subWhere },
+              where: Object.keys(subWhere).length ? subWhere : undefined,
             },
           ],
+          subQuery: true,
           // https://www.sequelize.cn/other-topics/sub-queries#%E4%BD%BF%E7%94%A8%E5%AD%90%E6%9F%A5%E8%AF%A2%E8%BF%9B%E8%A1%8C%E5%A4%8D%E6%9D%82%E6%8E%92%E5%BA%8F
-
           attributes: {
             include: [
               [
                 literal(
                   `(select weight from ${liveRoomModel.tableName}
-                    where ${liveRoomModel.tableName}.id = ${areaLiveRoomModel.tableName}.live_room_id)`
+                  where ${liveRoomModel.tableName}.id = ${areaLiveRoomModel.tableName}.live_room_id)`
                 ),
                 'live_room_weight',
               ],

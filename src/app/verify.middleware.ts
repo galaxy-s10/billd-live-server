@@ -82,7 +82,7 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
 
   console.log(chalk.blueBright('query:'), { ...ctx.request.query });
   console.log(chalk.blueBright('params:'), ctx.params);
-  console.log(chalk.blueBright('body:'), ctx.request.body);
+  console.log(chalk.blueBright('body:'), { ...ctx.request.body });
   console.log(chalk.blueBright('referer:'), ctx.request.header.referer);
   console.log(chalk.blueBright('cookie:'), ctx.request.header.cookie);
   console.log(chalk.blueBright('token:'), ctx.request.headers.authorization);

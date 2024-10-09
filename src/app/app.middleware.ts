@@ -9,7 +9,7 @@ import {
 } from '@/constant';
 import logController from '@/controller/log.controller';
 import { CustomError } from '@/model/customError.model';
-import { strSlice } from '@/utils';
+import { handleCtxRequestHeaders, strSlice } from '@/utils';
 import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 
 // 全局错误处理中间件
@@ -28,24 +28,14 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
         }
         // 将请求写入日志表
         const { userInfo } = await authJwt(ctx);
-
-        const api_user_agent = strSlice(
-          String(ctx.request.headers['user-agent']),
-          490
-        );
-        const api_body = strSlice(String(ctx.request.body || {}), 2000);
-        const api_query = strSlice(String(ctx.query || {}), 2000);
-        const api_real_ip = strSlice(
-          String(ctx.request.headers['x-real-ip']),
-          490
-        );
-        const api_forwarded_for = strSlice(
-          String(ctx.request.headers['x-forwarded-for']),
-          490
-        );
-        const api_referer = strSlice(String(ctx.request.headers.referer), 490);
-        const api_path = strSlice(String(ctx.request.path), 490);
-
+        const api_body = strSlice(JSON.stringify(ctx.request.body), 2000);
+        const api_query = strSlice(JSON.stringify(ctx.request.query), 2000);
+        const headers = handleCtxRequestHeaders(ctx);
+        const api_user_agent = headers.user_agent;
+        const api_real_ip = headers.real_ip;
+        const api_forwarded_for = headers.forwarded_for;
+        const api_referer = headers.referer;
+        const api_path = headers.path;
         logController.common.create({
           user_id: userInfo?.id || -1,
           api_user_agent,
