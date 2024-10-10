@@ -25,7 +25,7 @@ const model = sequelize.define<AreaModel>(
     name: {
       type: DataTypes.STRING(100),
     },
-    weight: {
+    priority: {
       type: DataTypes.INTEGER,
     },
     remark: {

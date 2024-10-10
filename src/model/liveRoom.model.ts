@@ -52,7 +52,7 @@ const model = sequelize.define<LiveRoomModel>(
     cdn: {
       type: DataTypes.INTEGER,
     },
-    weight: {
+    priority: {
       type: DataTypes.INTEGER,
     },
     cover_img: {

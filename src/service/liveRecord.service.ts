@@ -133,14 +133,14 @@ class LivePlayService {
         include: [
           [
             literal(
-              `(select weight from ${liveRoomModel.tableName}
+              `(select priority from ${liveRoomModel.tableName}
                 where ${liveRoomModel.tableName}.id = ${liveRecordModel.tableName}.live_room_id)`
             ),
-            'live_room_weight',
+            'live_room_priority',
           ],
         ],
       },
-      order: [[literal('live_room_weight'), 'desc'], ...orderRes],
+      order: [[literal('live_room_priority'), 'desc'], ...orderRes],
       limit,
       offset,
       where: {

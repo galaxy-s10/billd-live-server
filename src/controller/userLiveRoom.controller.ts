@@ -115,7 +115,7 @@ class UserLiveRoomController {
       name: `${userInfo.username!.slice(0, 10)}的直播间`,
       key: pushKey,
       type: LiveRoomTypeEnum.obs,
-      weight: 21,
+      priority: 21,
       cdn: LiveRoomUseCDNEnum.no,
       pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
       is_show: LiveRoomIsShowEnum.yes,

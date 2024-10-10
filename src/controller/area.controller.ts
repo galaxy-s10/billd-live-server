@@ -13,7 +13,7 @@ class AreaController {
         id,
         name,
         remark,
-        weight,
+        priority,
         orderBy = 'asc',
         orderName = 'id',
         nowPage,
@@ -27,7 +27,7 @@ class AreaController {
         id,
         name,
         remark,
-        weight,
+        priority,
         nowPage,
         pageSize,
         orderBy,
@@ -46,7 +46,12 @@ class AreaController {
         live_room_is_show,
         name,
         remark,
-        weight,
+        priority,
+        childNowPage,
+        childPageSize,
+        childOrderName,
+        childOrderBy,
+        childKeyWord,
         orderBy = 'asc',
         orderName = 'id',
         nowPage,
@@ -62,7 +67,12 @@ class AreaController {
         live_room_is_show,
         name,
         remark,
-        weight,
+        priority,
+        childNowPage,
+        childPageSize,
+        childOrderName,
+        childOrderBy,
+        childKeyWord,
         nowPage,
         pageSize,
         orderBy,
@@ -134,11 +144,11 @@ class AreaController {
   }
 
   async create(ctx: ParameterizedContext, next) {
-    const { name, remark, weight }: IArea = ctx.request.body;
+    const { name, remark, priority }: IArea = ctx.request.body;
     await areaService.create({
       name,
       remark,
-      weight,
+      priority,
     });
     successHandler({ ctx });
 

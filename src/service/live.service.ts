@@ -166,16 +166,16 @@ class LiveService {
         include: [
           // [
           //   literal(
-          //     `(select weight from ${liveRoomModel.tableName}
+          //     `(select priority from ${liveRoomModel.tableName}
           //       where ${liveRoomModel.tableName}.id = ${liveModel.tableName}.live_room_id)`
           //   ),
-          //   'live_room_weight',
+          //   'live_room_priority',
           // ],
-          [col(`${liveRoomModel.tableName}.weight`), 'live_room_weight'],
+          [col(`${liveRoomModel.tableName}.priority`), 'live_room_priority'],
           [col(`${liveRoomModel.tableName}.is_fake`), 'live_room_is_fake'],
         ],
       },
-      order: [[literal('live_room_weight'), 'desc'], ...orderRes],
+      order: [[literal('live_room_priority'), 'desc'], ...orderRes],
       limit,
       offset,
       where: {

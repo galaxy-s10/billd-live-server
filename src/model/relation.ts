@@ -1,6 +1,6 @@
 import { loadAllModel } from '@/init/initDb';
 import Area from '@/model/area.model';
-import AreaLiveRoom from '@/model/areaLiveRoom.model';
+import AreaLiveRoomModel from '@/model/areaLiveRoom.model';
 import Auth from '@/model/auth.model';
 import GlobalMsg from '@/model/globalMsg.model';
 import Live from '@/model/live.model';
@@ -42,7 +42,7 @@ LiveRoom.belongsToMany(Area, {
   otherKey: 'area_id',
   constraints: false,
   through: {
-    model: AreaLiveRoom,
+    model: AreaLiveRoomModel,
     unique: false, // 不生成唯一索引
   },
 });
@@ -52,20 +52,31 @@ Area.belongsToMany(LiveRoom, {
   otherKey: 'live_room_id',
   constraints: false,
   through: {
-    model: AreaLiveRoom,
+    model: AreaLiveRoomModel,
     unique: false, // 不生成唯一索引
   },
 });
 
-Area.hasMany(AreaLiveRoom, {
+Area.hasMany(AreaLiveRoomModel, {
   foreignKey: 'area_id',
   constraints: false,
 });
 
-AreaLiveRoom.belongsTo(LiveRoom, {
+AreaLiveRoomModel.belongsTo(Area, {
   foreignKey: 'live_room_id',
   constraints: false,
 });
+
+AreaLiveRoomModel.belongsTo(LiveRoom, {
+  foreignKey: 'live_room_id',
+  constraints: false,
+});
+
+// AreaLiveRoomModel.hasMany(LiveRoom, {
+//   foreignKey: 'id',
+//   constraints: false,
+//   // as: 'ddd',
+// });
 
 LiveRoom.belongsToMany(User, {
   foreignKey: 'live_room_id',

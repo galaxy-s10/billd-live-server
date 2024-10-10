@@ -234,7 +234,7 @@ class InitController {
             desc: user.live_room?.desc,
             key: pushKey,
             type: LiveRoomTypeEnum.system,
-            weight: user.live_room?.weight,
+            priority: user.live_room?.priority,
             cdn: user.live_room?.cdn,
             cover_img: user.live_room.cover_img,
             pull_is_should_auth: user.live_room.pull_is_should_auth,

@@ -1,5 +1,5 @@
 import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
-import { literal, Op } from 'sequelize';
+import { Op } from 'sequelize';
 
 import { IArea, IList } from '@/interface';
 import areaModel from '@/model/area.model';
@@ -7,6 +7,7 @@ import areaLiveRoomModel from '@/model/areaLiveRoom.model';
 import liveModel from '@/model/live.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
+import userLiveRoomModel from '@/model/userLiveRoom.model';
 import { handlePaging } from '@/utils';
 
 class AreaService {
@@ -27,7 +28,7 @@ class AreaService {
     id,
     name,
     remark,
-    weight,
+    priority,
     orderBy,
     orderName,
     nowPage,
@@ -47,7 +48,7 @@ class AreaService {
       id,
       name,
       remark,
-      weight,
+      priority,
     });
     if (keyWord) {
       const keyWordWhere = [
@@ -101,7 +102,7 @@ class AreaService {
       offset = (+nowPage - 1) * +pageSize;
       limit = +pageSize;
     }
-    const subWhere = deleteUseLessObjectKey({
+    const childWhere = deleteUseLessObjectKey({
       is_show: live_room_is_show,
       status: live_room_status,
     });
@@ -150,7 +151,7 @@ class AreaService {
           'forward_xiaohongshu_url',
         ],
       },
-      where: { ...subWhere },
+      where: { ...childWhere },
     });
     return handlePaging(result, nowPage, pageSize);
   }
@@ -162,7 +163,12 @@ class AreaService {
     live_room_is_show,
     name,
     remark,
-    weight,
+    priority,
+    childNowPage,
+    childPageSize,
+    childOrderName,
+    childOrderBy,
+    childKeyWord,
     orderBy,
     orderName,
     nowPage,
@@ -178,11 +184,17 @@ class AreaService {
       offset = (+nowPage - 1) * +pageSize;
       limit = +pageSize;
     }
+    let childOffset;
+    let childLimit;
+    if (childNowPage && childPageSize) {
+      childOffset = (+childNowPage - 1) * +childPageSize;
+      childLimit = +childPageSize;
+    }
     const allWhere: any = deleteUseLessObjectKey({
       id,
       name,
       remark,
-      weight,
+      priority,
     });
     if (keyWord) {
       const keyWordWhere = [
@@ -205,20 +217,53 @@ class AreaService {
         [Op.lt]: new Date(+rangTimeEnd),
       };
     }
-    const subWhere = deleteUseLessObjectKey({
+    const childWhere = deleteUseLessObjectKey({
       is_show: live_room_is_show,
       status: live_room_status,
     });
+    if (childKeyWord) {
+      const keyWordWhere = [
+        {
+          name: {
+            [Op.like]: `%${childKeyWord}%`,
+          },
+        },
+        {
+          desc: {
+            [Op.like]: `%${childKeyWord}%`,
+          },
+        },
+        {
+          remark: {
+            [Op.like]: `%${childKeyWord}%`,
+          },
+        },
+      ];
+      childWhere[Op.or] = keyWordWhere;
+    }
     const orderRes: any[] = [];
     if (orderName && orderBy) {
       orderRes.push([orderName, orderBy]);
     }
-    // @ts-ignore
+    const childOrderRes: any[] = [];
+    if (childOrderName && childOrderBy) {
+      childOrderRes.push([liveRoomModel, childOrderName, childOrderBy]);
+      // childOrderRes.push([
+      //   literal(`${liveRoomModel.name}.${childOrderName}`),
+      //   childOrderBy,
+      // ]);
+    }
     const result = await areaModel.findAndCountAll({
-      include: [
-        {
-          model: areaLiveRoomModel,
-          limit: 2,
+      limit,
+      offset,
+      order: [...orderRes],
+    });
+    const queue: any[] = [];
+    result.rows.forEach((item) => {
+      queue.push(
+        areaLiveRoomModel.findAll({
+          limit: childLimit,
+          offset: childOffset,
           include: [
             {
               model: liveRoomModel,
@@ -245,46 +290,52 @@ class AreaService {
               },
               include: [
                 {
-                  model: liveModel,
+                  model: userLiveRoomModel,
+                  include: [
+                    {
+                      model: userModel,
+                      attributes: {
+                        exclude: ['password', 'token'],
+                      },
+                    },
+                  ],
+                  attributes: ['id'],
                 },
                 {
-                  model: userModel,
-                  attributes: {
-                    exclude: ['password', 'token'],
-                  },
-                  through: {
-                    attributes: [],
-                  },
+                  model: liveModel,
+                  attributes: ['id'],
                 },
               ],
-              // where: { ...subWhere },
-              where: Object.keys(subWhere).length ? subWhere : undefined,
+              where: { ...childWhere },
             },
           ],
-          subQuery: true,
-          // https://www.sequelize.cn/other-topics/sub-queries#%E4%BD%BF%E7%94%A8%E5%AD%90%E6%9F%A5%E8%AF%A2%E8%BF%9B%E8%A1%8C%E5%A4%8D%E6%9D%82%E6%8E%92%E5%BA%8F
-          attributes: {
-            include: [
-              [
-                literal(
-                  `(select weight from ${liveRoomModel.tableName}
-                  where ${liveRoomModel.tableName}.id = ${areaLiveRoomModel.tableName}.live_room_id)`
-                ),
-                'live_room_weight',
-              ],
-            ],
+          attributes: [],
+          order: [...childOrderRes],
+          where: {
+            area_id: item.id,
           },
-          order: [['live_room_weight', 'desc']],
-        },
-      ],
-      order: [...orderRes],
-      limit,
-      offset,
-      where: {
-        ...allWhere,
-      },
+        })
+      );
     });
-    return handlePaging(result, nowPage, pageSize);
+    const result2 = await Promise.all(queue);
+    const result3 = result.rows.map((item, index) => {
+      return {
+        ...item.get(),
+        live_rooms: result2[index].map((vv) => {
+          const res = {
+            ...vv.live_room.get(),
+            user: vv.live_room.user_live_room.user,
+          };
+          delete res.user_live_room;
+          return res;
+        }),
+      };
+    });
+    return handlePaging(
+      { count: result.count, rows: result3 },
+      nowPage,
+      pageSize
+    );
   }
 
   /** 查找分区 */
