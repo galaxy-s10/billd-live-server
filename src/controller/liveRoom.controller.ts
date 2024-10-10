@@ -8,6 +8,7 @@ import { COMMON_HTTP_CODE, REDIS_PREFIX } from '@/constant';
 import redisController from '@/controller/redis.controller';
 import srsController from '@/controller/srs.controller';
 import userLiveRoomController from '@/controller/userLiveRoom.controller';
+import { initUser } from '@/init/initUser';
 import { IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveRoomService from '@/service/liveRoom.service';
@@ -175,6 +176,13 @@ class LiveRoomController {
   getList = async (ctx: ParameterizedContext, next) => {
     const params = ctx.request.query;
     const result = await this.common.getList(params);
+    successHandler({ ctx, data: result });
+    await next();
+  };
+
+  getBilibili = async (ctx: ParameterizedContext, next) => {
+    const roomId = initUser.systemUserBilibili.live_room.id || -1;
+    const result = await this.common.find(roomId);
     successHandler({ ctx, data: result });
     await next();
   };

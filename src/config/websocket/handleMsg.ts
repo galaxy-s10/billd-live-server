@@ -63,14 +63,11 @@ export async function handleWsJoin(args: {
   data: WsJoinType;
 }) {
   const { io, socket, data } = args;
-  let { roomId } = args;
+  const { roomId } = args;
   const redisRoomId = roomId;
   if (!roomId) {
     console.log(chalkERROR('roomId为空'));
     return;
-  }
-  if (data.data.isBilibili) {
-    roomId = initUser.systemUserBilibili.live_room.id || -1;
   }
   if (data.data.isRemoteDesk) {
     socket.join(`${roomId}`);
@@ -326,7 +323,11 @@ export async function handleWsMessage(args: {
     const data2 = filterObj(data, ['user_token', 'request_id']);
     data2.data.content = content.slice(0, MSG_MAX_LENGTH);
     data2.data.msg_id = msgRes.id;
-
+    console.log('emi', {
+      roomId: liveRoomId,
+      msgType: WsMsgTypeEnum.message,
+      data: data2,
+    });
     ioEmit<any>({
       io,
       roomId: liveRoomId,
