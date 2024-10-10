@@ -227,8 +227,8 @@ export const getFileExt = (name: string) => {
 /** 处理返回的分页数据 */
 export const handlePaging = <T>(
   result: any,
-  nowPage?: string,
-  pageSize?: string
+  nowPage?: number,
+  pageSize?: number
 ) => {
   // @ts-ignore
   const obj: {
@@ -238,8 +238,8 @@ export const handlePaging = <T>(
     total: number;
     rows: T[];
   } = {};
-  obj.nowPage = nowPage ? +nowPage : 1;
-  obj.pageSize = pageSize ? +pageSize : result.count;
+  obj.nowPage = nowPage || 1;
+  obj.pageSize = pageSize || result.count;
   obj.hasMore = obj.nowPage * obj.pageSize - result.count < 0;
   obj.total = result.count;
   obj.rows = result.rows;

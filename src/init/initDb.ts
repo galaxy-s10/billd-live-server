@@ -216,8 +216,9 @@ export const deleteAllTable = async (sequelizeInst: Sequelize) => {
     loadAllModel();
     await sequelizeInst.drop();
     console.log(chalkSUCCESS('删除所有表成功！'));
-  } catch (err) {
+  } catch (error) {
     console.log(chalkERROR('删除所有表失败！'));
+    console.log(error);
   }
 };
 
