@@ -247,6 +247,9 @@ class UserService {
               },
             },
           ],
+          through: {
+            attributes: [],
+          },
         },
         {
           model: roleModel,

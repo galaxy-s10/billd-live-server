@@ -84,7 +84,16 @@ class AreaController {
       });
       return result;
     },
-
+    isExist: async (ids: number[]) => {
+      const isExist = await areaService.isExist(ids);
+      if (!isExist) {
+        throw new CustomError(
+          `不存在id为${ids.join()}的分区！`,
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
+        );
+      }
+    },
     delete: async (id: number, isRoute?: boolean) => {
       const isExist = await areaService.isExist([id]);
       if (!isExist) {

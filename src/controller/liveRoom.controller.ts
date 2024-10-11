@@ -15,6 +15,8 @@ import liveRoomService from '@/service/liveRoom.service';
 import { ILiveRoom } from '@/types/ILiveRoom';
 import { tencentcloudUtils } from '@/utils/tencentcloud';
 
+import areaController from './area.controller';
+
 class LiveRoomController {
   common = {
     getList: ({
@@ -463,6 +465,7 @@ class LiveRoomController {
       forward_huya_url,
       forward_kuaishou_url,
       forward_xiaohongshu_url,
+      areas,
     }: ILiveRoom = ctx.request.body;
     await this.common.update({
       id: liveRoom.live_room?.id,
@@ -479,6 +482,11 @@ class LiveRoomController {
       forward_kuaishou_url,
       forward_xiaohongshu_url,
     });
+    if (areas) {
+      await areaController.common.isExist(areas as number[]);
+      // @ts-ignore
+      await liveRoom.live_room.setAreas(areas);
+    }
     successHandler({ ctx });
     await next();
   };
