@@ -1,4 +1,4 @@
-import { filterObj, isPureNumber } from 'billd-utils';
+import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import { Op } from 'sequelize';
 
 import { IAuth, IList } from '@/interface';
@@ -37,10 +37,9 @@ class AuthService {
     rangTimeEnd,
   }: IList<IAuth>) {
     const { offset, limit } = handlePage({ nowPage, pageSize });
-    const allWhere: any = {};
-    if (id !== undefined && isPureNumber(`${id}`)) {
-      allWhere.id = id;
-    }
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+    });
     const keyWordWhere = handleKeyWord({
       keyWord,
       arr: ['auth_name', 'auth_value'],

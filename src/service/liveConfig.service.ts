@@ -1,4 +1,4 @@
-import { filterObj } from 'billd-utils';
+import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import Sequelize from 'sequelize';
 
 import { IList, ILiveConfig } from '@/interface';
@@ -47,10 +47,9 @@ class LiveConfigService {
     rangTimeEnd,
   }: IList<ILiveConfig>) {
     const { offset, limit } = handlePage({ nowPage, pageSize });
-    const allWhere: any = {};
-    if (id) {
-      allWhere.id = +id;
-    }
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+    });
     const keyWordWhere = handleKeyWord({
       keyWord,
       arr: ['key', 'value', 'desc'],

@@ -1,4 +1,4 @@
-import { deleteUseLessObjectKey, filterObj, isPureNumber } from 'billd-utils';
+import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import { Op, literal } from 'sequelize';
 
 import { IList, ILivePlay } from '@/interface';
@@ -43,19 +43,12 @@ class LivePlayService {
     rangTimeEnd,
   }: IList<ILivePlay>) {
     const { offset, limit } = handlePage({ nowPage, pageSize });
-    const allWhere: any = {};
-    if (id !== undefined && isPureNumber(`${id}`)) {
-      allWhere.id = id;
-    }
-    if (random_id !== undefined) {
-      allWhere.random_id = random_id;
-    }
-    if (user_id !== undefined && isPureNumber(`${user_id}`)) {
-      allWhere.user_id = user_id;
-    }
-    if (live_room_id !== undefined && isPureNumber(`${live_room_id}`)) {
-      allWhere.live_room_id = live_room_id;
-    }
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+      random_id,
+      user_id,
+      live_room_id,
+    });
     const keyWordWhere = handleKeyWord({
       keyWord,
       arr: ['srs_client_id', 'srs_stream', 'srs_stream_url'],

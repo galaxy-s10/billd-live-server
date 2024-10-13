@@ -33,9 +33,6 @@ class AreaService {
   /** 获取分区列表 */
   async getList({
     id,
-    name,
-    remark,
-    priority,
     orderBy,
     orderName,
     nowPage,
@@ -48,9 +45,6 @@ class AreaService {
     const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = deleteUseLessObjectKey({
       id,
-      name,
-      remark,
-      priority,
     });
     const keyWordWhere = handleKeyWord({ keyWord, arr: ['name', 'remark'] });
     if (keyWordWhere) {
@@ -65,7 +59,6 @@ class AreaService {
       allWhere[rangTimeType!] = rangTimeWhere;
     }
     const orderRes = handleOrder({ orderName, orderBy });
-    // @ts-ignore
     const result = await areaModel.findAndCountAll({
       distinct: true,
       order: [...orderRes],
@@ -79,17 +72,11 @@ class AreaService {
   }
 
   /** 获取分区直播间列表 */
-  async getLiveRoomList({
-    area_id,
-    live_room_is_show,
-    live_room_status,
-    nowPage,
-    pageSize,
-  }) {
+  async getLiveRoomList({ area_id, is_show, status, nowPage, pageSize }) {
     const { offset, limit } = handlePage({ nowPage, pageSize });
     const childWhere = deleteUseLessObjectKey({
-      is_show: live_room_is_show,
-      status: live_room_status,
+      is_show,
+      status,
     });
     const result = await liveRoomModel.findAndCountAll({
       limit,

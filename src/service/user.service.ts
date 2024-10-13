@@ -1,4 +1,4 @@
-import { isPureNumber } from 'billd-utils';
+import { deleteUseLessObjectKey } from 'billd-utils';
 import { Op, literal, where } from 'sequelize';
 
 import { THIRD_PLATFORM } from '@/constant';
@@ -71,10 +71,9 @@ class UserService {
     rangTimeEnd,
   }: IList<IUser>) {
     const { offset, limit } = handlePage({ nowPage, pageSize });
-    const allWhere: any = {};
-    if (id !== undefined && isPureNumber(`${id}`)) {
-      allWhere.id = id;
-    }
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+    });
     const keyWordWhere = handleKeyWord({
       keyWord,
       arr: ['username', 'desc'],

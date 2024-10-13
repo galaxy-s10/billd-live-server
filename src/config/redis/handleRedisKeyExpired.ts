@@ -1,10 +1,9 @@
 import { pubClient } from '@/config/redis/pub';
+import liveRedisController from '@/config/websocket/live-redis.controller';
 import { REDIS_PREFIX } from '@/constant';
 import liveController from '@/controller/live.controller';
 import orderController from '@/controller/order.controller';
 import { REDIS_CONFIG } from '@/secret/secret';
-
-import liveRedisController from '../websocket/live-redis.controller';
 
 export const handleRedisKeyExpired = () => {
   pubClient.subscribe(

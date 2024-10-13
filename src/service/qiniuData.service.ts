@@ -1,3 +1,4 @@
+import { deleteUseLessObjectKey } from 'billd-utils';
 import Sequelize from 'sequelize';
 
 import { IList, IQiniuData } from '@/interface';
@@ -47,16 +48,11 @@ class QiniuDataService {
     rangTimeEnd,
   }: IList<IQiniuData>) {
     const { offset, limit } = handlePage({ nowPage, pageSize });
-    const allWhere: any = {};
-    if (id) {
-      allWhere.id = id;
-    }
-    if (user_id) {
-      allWhere.user_id = user_id;
-    }
-    if (prefix) {
-      allWhere.prefix = prefix;
-    }
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+      user_id,
+      prefix,
+    });
     const keyWordWhere = handleKeyWord({
       keyWord,
       arr: ['qiniu_key'],

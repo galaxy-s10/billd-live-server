@@ -1,4 +1,4 @@
-import { isPureNumber } from 'billd-utils';
+import { deleteUseLessObjectKey } from 'billd-utils';
 import { Op } from 'sequelize';
 
 import { IList } from '@/interface';
@@ -58,10 +58,9 @@ class WechatUserService {
     rangTimeEnd,
   }: IList<IWechatUser>) {
     const { offset, limit } = handlePage({ nowPage, pageSize });
-    const allWhere: any = {};
-    if (id !== undefined && isPureNumber(`${id}`)) {
-      allWhere.id = id;
-    }
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+    });
     const rangTimeWhere = handleRangTime({
       rangTimeType,
       rangTimeStart,
@@ -70,16 +69,6 @@ class WechatUserService {
     if (rangTimeWhere) {
       allWhere[rangTimeType!] = rangTimeWhere;
     }
-    // if (created_at) {
-    //   allWhere.created_at = {
-    //     [Op.between]: [created_at, `${created_at} 23:59:59`],
-    //   };
-    // }
-    // if (updated_at) {
-    //   allWhere.updated_at = {
-    //     [Op.between]: [updated_at, `${updated_at} 23:59:59`],
-    //   };
-    // }
     const keyWordWhere = handleKeyWord({
       keyWord,
       arr: ['nickname'],

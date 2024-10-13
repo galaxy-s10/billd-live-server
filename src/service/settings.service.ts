@@ -1,4 +1,4 @@
-import { filterObj } from 'billd-utils';
+import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import Sequelize from 'sequelize';
 
 import { IList, ISettings } from '@/interface';
@@ -42,10 +42,9 @@ class SettingsService {
     rangTimeEnd,
   }: IList<ISettings>) {
     const { offset, limit } = handlePage({ nowPage, pageSize });
-    const allWhere: any = {};
-    if (id) {
-      allWhere.id = +id;
-    }
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+    });
     const keyWordWhere = handleKeyWord({
       keyWord,
       arr: ['email'],
@@ -62,7 +61,6 @@ class SettingsService {
       allWhere[rangTimeType!] = rangTimeWhere;
     }
     const orderRes = handleOrder({ orderName, orderBy });
-    // @ts-ignore
     const result = await settingsModel.findAndCountAll({
       order: [...orderRes],
       limit,

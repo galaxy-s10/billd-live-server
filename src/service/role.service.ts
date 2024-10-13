@@ -1,4 +1,4 @@
-import { filterObj } from 'billd-utils';
+import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import { Op } from 'sequelize';
 
 import { IList, IRole } from '@/interface';
@@ -39,13 +39,10 @@ class RoleService {
     rangTimeEnd,
   }: IList<IRole>) {
     const { offset, limit } = handlePage({ nowPage, pageSize });
-    const allWhere: any = {};
-    if (id) {
-      allWhere.id = id;
-    }
-    if (type) {
-      allWhere.type = type;
-    }
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+      type,
+    });
     const keyWordWhere = handleKeyWord({
       keyWord,
       arr: ['role_name', 'role_value'],
@@ -85,13 +82,10 @@ class RoleService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<IRole>) {
-    const allWhere: any = {};
-    if (id) {
-      allWhere.id = id;
-    }
-    if (type) {
-      allWhere.type = type;
-    }
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+      type,
+    });
     const keyWordWhere = handleKeyWord({
       keyWord,
       arr: ['role_name', 'role_value'],

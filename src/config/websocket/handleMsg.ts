@@ -6,6 +6,7 @@ import { rimrafSync } from 'rimraf';
 import { Server, Socket } from 'socket.io';
 
 import { jwtVerify } from '@/app/auth/authJwt';
+import { startBlobIsExistSchedule } from '@/config/schedule/blobIsExist';
 import {
   getSocketRealIp,
   getSocketUserAgent,
@@ -48,13 +49,10 @@ import {
   WsStartLiveType,
   WsStartRemoteDesk,
   WsUpdateJoinInfoType,
-  WsUpdateLiveRoomCoverImg,
 } from '@/types/websocket';
 import { strSlice } from '@/utils';
 import { chalkERROR, chalkWARN } from '@/utils/chalkTip';
 import { mp4PushRtmp, webmToMp4 } from '@/utils/process';
-
-import { startBlobIsExistSchedule } from '../schedule/blobIsExist';
 
 export async function handleWsJoin(args: {
   io: Server;
@@ -638,28 +636,6 @@ export async function handleWsStartLive(args: {
       console.error(error);
     }
   }
-}
-
-export async function handleWsUpdateLiveRoomCoverImg(
-  data: WsUpdateLiveRoomCoverImg
-) {
-  const userId = data.user_info?.id;
-  if (!userId) {
-    console.log(chalkERROR('userId为空'));
-    return;
-  }
-  const userLiveRoomInfo = await userLiveRoomController.common.findByUserId(
-    userId
-  );
-  if (!userLiveRoomInfo) {
-    console.log(chalkERROR('userLiveRoomInfo为空'));
-    return;
-  }
-  const roomId = userLiveRoomInfo.live_room_id!;
-  liveRoomService.update({
-    id: roomId,
-    cover_img: data.data.cover_img,
-  });
 }
 
 export async function handleWsGetLiveUser(args: {

@@ -1,4 +1,4 @@
-import { filterObj } from 'billd-utils';
+import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import { Op } from 'sequelize';
 
 import { IList } from '@/interface';
@@ -38,10 +38,9 @@ class ThirdUserService {
     rangTimeEnd,
   }: IList<IThirdUser>) {
     const { offset, limit } = handlePage({ nowPage, pageSize });
-    const allWhere: any = {};
-    if (id) {
-      allWhere.id = id;
-    }
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+    });
     const keyWordWhere = handleKeyWord({
       keyWord,
       arr: [],

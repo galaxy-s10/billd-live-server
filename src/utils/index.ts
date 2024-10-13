@@ -6,9 +6,8 @@ import path from 'path';
 import { ParameterizedContext } from 'koa';
 import { Op } from 'sequelize';
 
-import { IListBase } from '@/interface';
-
 import { COMMON_ERROE_MSG, COMMON_ERROR_CODE } from '../constant';
+import { IListBase } from '../interface';
 import { UserStatusEnum } from '../types/IUser';
 
 export function handleKeyWord({

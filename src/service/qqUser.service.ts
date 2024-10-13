@@ -1,4 +1,4 @@
-import { isPureNumber } from 'billd-utils';
+import { deleteUseLessObjectKey } from 'billd-utils';
 import { Op } from 'sequelize';
 
 import { IList } from '@/interface';
@@ -58,10 +58,9 @@ class QQUserService {
     rangTimeEnd,
   }: IList<IQqUser>) {
     const { offset, limit } = handlePage({ nowPage, pageSize });
-    const allWhere: any = {};
-    if (id !== undefined && isPureNumber(`${id}`)) {
-      allWhere.id = id;
-    }
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+    });
     const rangTimeWhere = handleRangTime({
       rangTimeType,
       rangTimeStart,

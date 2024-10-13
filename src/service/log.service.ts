@@ -1,4 +1,4 @@
-import { isPureNumber } from 'billd-utils';
+import { deleteUseLessObjectKey } from 'billd-utils';
 import { Op } from 'sequelize';
 
 import { IList, ILog } from '@/interface';
@@ -37,10 +37,9 @@ class LogService {
     rangTimeEnd,
   }: IList<ILog>) {
     const { offset, limit } = handlePage({ nowPage, pageSize });
-    const allWhere: any = {};
-    if (id !== undefined && isPureNumber(`${id}`)) {
-      allWhere.id = id;
-    }
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+    });
     const keyWordWhere = handleKeyWord({
       keyWord,
       arr: [

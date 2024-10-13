@@ -1,4 +1,4 @@
-import { filterObj, isPureNumber } from 'billd-utils';
+import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import { Op } from 'sequelize';
 
 import { IBlacklist, IList } from '@/interface';
@@ -27,6 +27,7 @@ class BlackListService {
   /** 获取黑名单列表 */
   async getList({
     id,
+    user_id,
     orderBy,
     orderName,
     nowPage,
@@ -37,13 +38,13 @@ class BlackListService {
     rangTimeEnd,
   }: IList<IBlacklist>) {
     const { offset, limit } = handlePage({ nowPage, pageSize });
-    const allWhere: any = {};
-    if (id !== undefined && isPureNumber(`${id}`)) {
-      allWhere.id = id;
-    }
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+      user_id,
+    });
     const keyWordWhere = handleKeyWord({
       keyWord,
-      arr: ['ip', 'user_id', 'msg'],
+      arr: ['ip', 'msg'],
     });
     if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;

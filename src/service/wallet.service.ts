@@ -4,7 +4,7 @@ import { Op, cast, col, literal } from 'sequelize';
 import { IList, IWallet } from '@/interface';
 import userModel from '@/model/user.model';
 import walletModel from '@/model/wallet.model';
-import { handlePage, handlePaging, handleRangTime } from '@/utils';
+import { handleOrder, handlePage, handlePaging, handleRangTime } from '@/utils';
 
 class WalletService {
   /** 钱包是否存在 */
@@ -46,7 +46,13 @@ class WalletService {
     if (rangTimeWhere) {
       allWhere[rangTimeType!] = rangTimeWhere;
     }
-    // @ts-ignore
+    const orderRes = handleOrder({ orderName, orderBy });
+    orderRes.forEach((item) => {
+      if (item[0] === 'balance') {
+        // eslint-disable-next-line
+        item[0] = cast(col('balance'), 'INTEGER');
+      }
+    });
     const result = await walletModel.findAndCountAll({
       include: [
         {
@@ -56,18 +62,9 @@ class WalletService {
           },
         },
       ],
-      order:
-        orderName && orderBy && orderName !== 'balance'
-          ? [
-              [cast(col('balance'), 'INTEGER'), 'DESC'],
-              [orderName, orderBy],
-            ]
-          : [[cast(col('balance'), 'INTEGER'), 'DESC']],
+      order: [...orderRes],
       limit,
       offset,
-      // attributes: {
-      //   include: [[cast(col('balance'), 'float'), 'aaa']],
-      // },
       where: {
         ...allWhere,
       },

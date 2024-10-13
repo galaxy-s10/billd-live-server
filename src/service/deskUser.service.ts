@@ -61,7 +61,6 @@ class DeskUserService {
       allWhere[rangTimeType!] = rangTimeWhere;
     }
     const orderRes = handleOrder({ orderName, orderBy });
-    // @ts-ignore
     const result = await deskUserModel.findAndCountAll({
       distinct: true,
       order: [...orderRes],
