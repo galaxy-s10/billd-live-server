@@ -96,6 +96,7 @@ class LiveService {
   /** 获取直播列表 */
   async getList({
     id,
+    is_tencentcloud_css,
     live_room_id,
     cdn,
     is_fake,
@@ -115,6 +116,7 @@ class LiveService {
     const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = deleteUseLessObjectKey({
       id,
+      is_tencentcloud_css,
       live_room_id,
     });
     const keyWordWhere = handleKeyWord({
@@ -143,8 +145,6 @@ class LiveService {
       { orderName: childOrderName, orderBy: childOrderBy },
       liveRoomModel
     );
-    console.log('orderRes', orderRes);
-    console.log('childOrderRes', childOrderRes);
     const result = await liveModel.findAndCountAll({
       include: [
         {

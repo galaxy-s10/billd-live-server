@@ -31,9 +31,11 @@ export const tencentcloudCssMain = async () => {
   });
 
   res1.rows.forEach((item) => {
-    res1Map[`${item.live_room_id!}`] = 1;
-    if (!tencentcloudCssMap[`${item.live_room_id!}`]) {
-      delArr.push(Number(item.live_room_id!));
+    if (item.live_room) {
+      res1Map[`${item.live_room.id!}`] = 1;
+      if (!tencentcloudCssMap[`${item.live_room_id!}`]) {
+        delArr.push(Number(item.live_room_id!));
+      }
     }
   });
 
@@ -54,12 +56,14 @@ export const srsMain = async () => {
   });
   const res1Map = {};
   res1.rows.forEach((item) => {
-    res1Map[`${item.live_room_id!}`] = 1;
+    if (item.live_room) {
+      res1Map[`${item.live_room.id!}`] = 1;
+    }
   });
   const delArr: number[] = [];
   res2.streams?.forEach((item) => {
     const reg = /^roomId___(\d+)$/g;
-    const roomId = reg.exec(item.name)?.[1];
+    const roomId = reg.exec(item.name.replace('.m3u8', ''))?.[1];
     if (!res1Map[`${roomId!}`]) {
       delArr.push(Number(roomId));
     }

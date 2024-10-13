@@ -102,6 +102,7 @@ class LiveController {
     },
     getList: async ({
       id,
+      is_tencentcloud_css,
       live_room_id,
       cdn,
       is_fake,
@@ -155,6 +156,7 @@ class LiveController {
       // }
       const result = await liveService.getList({
         id,
+        is_tencentcloud_css,
         live_room_id,
         cdn,
         is_fake,

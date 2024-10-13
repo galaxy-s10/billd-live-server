@@ -297,7 +297,6 @@ export const handlePaging = <T>(
     total: number;
     rows: T[];
   } = {};
-  console.log('handlePaging', nowPage, pageSize);
   obj.nowPage = nowPage ? +nowPage : 1;
   obj.pageSize = pageSize ? +pageSize : result.count;
   obj.hasMore = obj.nowPage * obj.pageSize - result.count < 0;
