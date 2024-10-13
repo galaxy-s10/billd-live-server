@@ -54,8 +54,8 @@ class RoleController {
     const {
       id,
       type,
-      orderBy = 'asc',
-      orderName = 'id',
+      orderBy,
+      orderName,
       keyWord,
       rangTimeType,
       rangTimeStart,
@@ -80,8 +80,8 @@ class RoleController {
     const {
       id,
       type,
-      orderBy = 'asc',
-      orderName = 'id',
+      orderBy,
+      orderName,
       nowPage,
       pageSize,
       keyWord,
@@ -110,8 +110,8 @@ class RoleController {
   async getTreeRole(ctx: ParameterizedContext, next) {
     const {
       id = 0,
-      orderBy = 'asc',
-      orderName = 'id',
+      orderBy,
+      orderName,
       rangTimeType,
       rangTimeStart,
       rangTimeEnd,

@@ -1,5 +1,5 @@
 import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
-import { Op, col, literal } from 'sequelize';
+import { Op } from 'sequelize';
 
 import { REDIS_PREFIX } from '@/constant';
 import redisController from '@/controller/redis.controller';
@@ -9,7 +9,13 @@ import liveModel from '@/model/live.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
 import { ILiveRoom } from '@/types/ILiveRoom';
-import { handlePaging } from '@/utils';
+import {
+  handleKeyWord,
+  handleOrder,
+  handlePage,
+  handlePaging,
+  handleRangTime,
+} from '@/utils';
 
 export async function handleDelRedisByDbLiveList() {
   try {
@@ -35,14 +41,68 @@ class LiveService {
   }
 
   /** 获取直播列表 */
+  async getPureList({
+    id,
+    live_room_id,
+    socket_id,
+    track_audio,
+    track_video,
+    flag_id,
+    orderBy,
+    orderName,
+    nowPage,
+    pageSize,
+    keyWord,
+    rangTimeType,
+    rangTimeStart,
+    rangTimeEnd,
+  }: IList<ILive>) {
+    const { offset, limit } = handlePage({ nowPage, pageSize });
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+      live_room_id,
+      socket_id,
+      track_audio,
+      track_video,
+      flag_id,
+    });
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['srs_client_id', 'srs_stream', 'srs_stream_url'],
+    });
+    if (keyWordWhere) {
+      allWhere[Op.or] = keyWordWhere;
+    }
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
+    }
+    const orderRes = handleOrder({ orderName, orderBy });
+    const result = await liveModel.findAndCountAll({
+      order: [...orderRes],
+      limit,
+      offset,
+      where: {
+        ...allWhere,
+      },
+    });
+    return handlePaging<ILive>(result, nowPage, pageSize);
+  }
+
+  /** 获取直播列表 */
   async getList({
     id,
     live_room_id,
-    user_id,
-    live_room_is_show,
-    live_room_status,
-    is_tencentcloud_css,
+    cdn,
     is_fake,
+    is_show,
+    status,
+    childOrderName,
+    childOrderBy,
     orderBy,
     orderName,
     nowPage,
@@ -52,61 +112,41 @@ class LiveService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<ILive & ILiveRoom>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = deleteUseLessObjectKey({
       id,
       live_room_id,
-      user_id,
-      is_tencentcloud_css,
     });
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          srs_client_id: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          srs_stream: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          srs_stream_url: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['srs_client_id', 'srs_stream', 'srs_stream_url'],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
     const subWhere = deleteUseLessObjectKey({
-      is_show: live_room_is_show,
-      status: live_room_status,
+      cdn,
       is_fake,
+      is_show,
+      status,
     });
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
+    const childOrderRes = handleOrder(
+      { orderName: childOrderName, orderBy: childOrderBy },
+      liveRoomModel
+    );
+    console.log('orderRes', orderRes);
+    console.log('childOrderRes', childOrderRes);
     const result = await liveModel.findAndCountAll({
       include: [
-        {
-          model: userModel,
-          attributes: {
-            exclude: ['password', 'token'],
-          },
-        },
         {
           model: liveRoomModel,
           attributes: {
@@ -132,50 +172,30 @@ class LiveService {
           },
           include: [
             {
+              model: userModel,
+              attributes: {
+                exclude: ['password', 'token'],
+              },
+              through: {
+                attributes: [],
+              },
+            },
+            {
               model: areaModel,
               through: {
                 attributes: [],
               },
             },
           ],
-          where: {
-            ...subWhere,
-          },
+          // where: {
+          //   ...subWhere,
+          // },
         },
       ],
-      attributes: {
-        exclude: [
-          'key',
-          'push_rtmp_url',
-          'push_obs_server',
-          'push_obs_stream_key',
-          'push_webrtc_url',
-          'push_srt_url',
-          'cdn_push_rtmp_url',
-          'cdn_push_obs_server',
-          'cdn_push_obs_stream_key',
-          'cdn_push_webrtc_url',
-          'cdn_push_srt_url',
-          'forward_bilibili_url',
-          'forward_huya_url',
-          'forward_douyu_url',
-          'forward_douyin_url',
-          'forward_kuaishou_url',
-          'forward_xiaohongshu_url',
-        ],
-        include: [
-          // [
-          //   literal(
-          //     `(select priority from ${liveRoomModel.tableName}
-          //       where ${liveRoomModel.tableName}.id = ${liveModel.tableName}.live_room_id)`
-          //   ),
-          //   'live_room_priority',
-          // ],
-          [col(`${liveRoomModel.tableName}.priority`), 'live_room_priority'],
-          [col(`${liveRoomModel.tableName}.is_fake`), 'live_room_is_fake'],
-        ],
-      },
-      order: [[literal('live_room_priority'), 'desc'], ...orderRes],
+      // 不能设置attributes: [],否则orderRes排序的时候，没有order字段就会报错
+      // attributes: ['created_at'],
+      // attributes: [],
+      order: [...orderRes, ...childOrderRes],
       limit,
       offset,
       where: {
@@ -208,12 +228,6 @@ class LiveService {
     const res = await liveModel.findOne({
       include: [
         {
-          model: userModel,
-          attributes: {
-            exclude: ['password', 'token'],
-          },
-        },
-        {
           model: liveRoomModel,
           include: [
             {
@@ -233,12 +247,6 @@ class LiveService {
   liveRoomisLive = async (live_room_id: number) => {
     const res = await liveModel.findOne({
       include: [
-        {
-          model: userModel,
-          attributes: {
-            exclude: ['password', 'token'],
-          },
-        },
         {
           model: liveRoomModel,
           attributes: {
@@ -290,7 +298,6 @@ class LiveService {
   async updateByRoomId({
     socket_id,
     live_room_id,
-    user_id,
     track_audio,
     track_video,
     srs_action,
@@ -311,7 +318,6 @@ class LiveService {
     const result = await liveModel.update(
       {
         socket_id,
-        user_id,
         track_audio,
         track_video,
         srs_action,

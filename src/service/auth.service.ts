@@ -3,7 +3,13 @@ import { Op } from 'sequelize';
 
 import { IAuth, IList } from '@/interface';
 import authModel from '@/model/auth.model';
-import { handlePaging } from '@/utils';
+import {
+  handleKeyWord,
+  handleOrder,
+  handlePage,
+  handlePaging,
+  handleRangTime,
+} from '@/utils';
 
 class AuthService {
   /** 权限是否存在 */
@@ -30,41 +36,27 @@ class AuthService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<IAuth>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = {};
     if (id !== undefined && isPureNumber(`${id}`)) {
       allWhere.id = id;
     }
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          auth_name: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          auth_value: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['auth_name', 'auth_value'],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
     const result = await authModel.findAndCountAll({
       order: [...orderRes],
       limit,

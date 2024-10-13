@@ -58,7 +58,6 @@ async function main() {
     // 触发pm2的重启进程
     process.exit(1);
   }
-
   try {
     const port = +PROJECT_PORT;
     await (await import('./setup')).setupKoa({ port });

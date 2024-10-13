@@ -47,8 +47,8 @@ class LiveRoomController {
       cdn_push_rtmp_url,
       cdn_push_srt_url,
       cdn_push_webrtc_url,
-      orderBy = 'asc',
-      orderName = 'id',
+      orderBy,
+      orderName,
       nowPage,
       pageSize,
       keyWord,
@@ -93,7 +93,7 @@ class LiveRoomController {
         rangTimeStart,
         rangTimeEnd,
       }),
-    getListPure: ({
+    getPureList: ({
       id,
       status,
       is_show,
@@ -122,8 +122,8 @@ class LiveRoomController {
       cdn_push_srt_url,
       cdn_push_webrtc_url,
       exclude_key,
-      orderBy = 'asc',
-      orderName = 'id',
+      orderBy,
+      orderName,
       nowPage,
       pageSize,
       keyWord,
@@ -131,7 +131,7 @@ class LiveRoomController {
       rangTimeStart,
       rangTimeEnd,
     }: IList<ILiveRoom>) =>
-      liveRoomService.getListPure({
+      liveRoomService.getPureList({
         id,
         status,
         is_show,

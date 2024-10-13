@@ -257,8 +257,8 @@ class UserController {
     // @ts-ignore
     const {
       id,
-      orderBy = 'asc',
-      orderName = 'id',
+      orderBy,
+      orderName,
       nowPage,
       pageSize,
       keyWord,

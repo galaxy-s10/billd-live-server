@@ -5,6 +5,7 @@ import { COMMON_HTTP_CODE } from '@/constant';
 import { IArea, IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import areaService from '@/service/area.service';
+import { ILiveRoom } from '@/types/ILiveRoom';
 
 class AreaController {
   common = {
@@ -14,8 +15,8 @@ class AreaController {
         name,
         remark,
         priority,
-        orderBy = 'asc',
-        orderName = 'id',
+        orderBy,
+        orderName,
         nowPage,
         pageSize,
         keyWord,
@@ -42,32 +43,30 @@ class AreaController {
     getAreaLiveRoomList: async (data) => {
       const {
         id,
-        live_room_status,
-        live_room_is_show,
-        name,
-        remark,
-        priority,
+        cdn,
+        is_fake,
+        is_show,
+        status,
         childNowPage,
         childPageSize,
         childOrderName,
         childOrderBy,
         childKeyWord,
-        orderBy = 'asc',
-        orderName = 'id',
+        orderBy,
+        orderName,
         nowPage,
         pageSize,
         keyWord,
         rangTimeType,
         rangTimeStart,
         rangTimeEnd,
-      }: IList<IArea> = data;
+      }: IList<IArea & ILiveRoom> = data;
       const result = await areaService.getAreaLiveRoomList({
         id,
-        live_room_status,
-        live_room_is_show,
-        name,
-        remark,
-        priority,
+        cdn,
+        is_fake,
+        is_show,
+        status,
         childNowPage,
         childPageSize,
         childOrderName,

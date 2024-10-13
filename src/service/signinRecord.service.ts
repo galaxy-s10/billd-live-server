@@ -7,7 +7,13 @@ import liveRoomModel from '@/model/liveRoom.model';
 import roleModel from '@/model/role.model';
 import signinRecordModel from '@/model/signinRecord.model';
 import userModel from '@/model/user.model';
-import { handlePaging } from '@/utils';
+import {
+  handleKeyWord,
+  handleOrder,
+  handlePage,
+  handlePaging,
+  handleRangTime,
+} from '@/utils';
 
 class SigninRecordService {
   /** 签到记录是否存在 */
@@ -37,31 +43,28 @@ class SigninRecordService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<ISigninRecord>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = deleteUseLessObjectKey({
       id,
       user_id,
       live_room_id,
     });
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
-    if (keyWord) {
-      const keyWordWhere = [];
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: [],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
     const userWhere = deleteUseLessObjectKey({
       id: user_id,
     });
@@ -85,7 +88,12 @@ class SigninRecordService {
           where: {
             ...userWhere,
           },
-          include: [{ model: roleModel, through: { attributes: [] } }],
+          include: [
+            {
+              model: roleModel,
+              through: { attributes: [] },
+            },
+          ],
         },
         {
           model: liveRoomModel,

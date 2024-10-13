@@ -4,7 +4,13 @@ import { Op } from 'sequelize';
 import { IGlobalMsg, IList } from '@/interface';
 import globalMsgModel from '@/model/globalMsg.model';
 import userModel from '@/model/user.model';
-import { handlePaging } from '@/utils';
+import {
+  handleKeyWord,
+  handleOrder,
+  handlePage,
+  handlePaging,
+  handleRangTime,
+} from '@/utils';
 
 class GlobalMsgService {
   /** 全局消息是否存在 */
@@ -33,42 +39,28 @@ class GlobalMsgService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<IGlobalMsg>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = deleteUseLessObjectKey({
       id,
       user_id,
       type,
     });
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          content: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          remark: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['content', 'remark'],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
     const result = await globalMsgModel.findAndCountAll({
       include: [
         {

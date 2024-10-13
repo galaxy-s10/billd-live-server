@@ -50,7 +50,7 @@ export async function mockTimeBatchInsert({
   const queue: any[] = [];
   for (let x = 0; x < group.length; x += 1) {
     // eslint-disable-next-line
-    const sql = `INSERT INTO ${model.name} ( ${field}, created_at, updated_at ) VALUES`;
+    const sql = `INSERT INTO ${model.tableName} ( ${field}, created_at, updated_at ) VALUES`;
     let str = '';
     if (group[x]) {
       for (initIndex; initIndex < group[x]; initIndex += 1) {
@@ -77,8 +77,8 @@ export const deleteForeignKeys = async (data: {
     let allTables: string[] = [];
     if (model === undefined) {
       allTables = await queryInterface.showAllTables();
-    } else if (model && allTables.find((v) => v === model.name)) {
-      allTables = [model.name];
+    } else if (model && allTables.find((v) => v === model.tableName)) {
+      allTables = [model.tableName];
     }
     console.log(chalkWARN(`需要删除外键的表:${allTables.toString()}`));
     if (allTables.length) {
@@ -121,8 +121,8 @@ export const deleteIndexs = async (data: {
     let allTables: string[] = [];
     if (model === undefined) {
       allTables = await queryInterface.showAllTables();
-    } else if (model && allTables.find((v) => v === model.name)) {
-      allTables = [model.name];
+    } else if (model && allTables.find((v) => v === model.tableName)) {
+      allTables = [model.tableName];
     }
     console.log(chalkWARN(`需要删除索引的表:${allTables.toString()}`));
     if (allTables.length) {
@@ -213,7 +213,6 @@ export const loadAllModel = () => {
 /** 删除所有表 */
 export const deleteAllTable = async (sequelizeInst: Sequelize) => {
   try {
-    loadAllModel();
     await sequelizeInst.drop();
     console.log(chalkSUCCESS('删除所有表成功！'));
   } catch (error) {
@@ -229,7 +228,7 @@ export const deleteAllTable = async (sequelizeInst: Sequelize) => {
  * load:加载数据库表
  */
 export const initDb = async (
-  type: 'force' | 'alert' | 'load',
+  type: 'force' | 'alert',
   sequelizeInst: Sequelize
 ) => {
   switch (type) {
@@ -243,12 +242,8 @@ export const initDb = async (
       break;
     case 'alert':
       console.log(chalkWARN('开始校正数据库所有表'));
-      require('@/model/relation');
       await sequelizeInst.sync({ alter: true }); // 这将检查数据库中表的当前状态(它具有哪些列,它们的数据类型等),然后在表中进行必要的更改以使其与模型匹配.
       console.log(chalkSUCCESS('校正数据库所有表完成！'));
-      break;
-    case 'load':
-      require('@/model/relation');
       break;
     default:
       throw new Error('initDb参数不正确！');

@@ -3,7 +3,14 @@ import { Op, literal } from 'sequelize';
 
 import { IGiftRecord, IList } from '@/interface';
 import giftModel from '@/model/giftRecord.model';
-import { handleGroupPaging, handlePaging } from '@/utils';
+import {
+  handleGroupPaging,
+  handleKeyWord,
+  handleOrder,
+  handlePage,
+  handlePaging,
+  handleRangTime,
+} from '@/utils';
 
 class GiftRecordService {
   /** 礼物记录是否存在 */
@@ -38,12 +45,7 @@ class GiftRecordService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<IGiftRecord>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = deleteUseLessObjectKey({
       id,
       is_recv,
@@ -55,31 +57,22 @@ class GiftRecordService {
       recv_user_id,
       status,
     });
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          goods_snapshot: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          remark: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['goods_snapshot', 'remark'],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
     const result = await giftModel.findAndCountAll({
       order: [...orderRes],
       limit,
@@ -111,12 +104,7 @@ class GiftRecordService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<IGiftRecord>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = deleteUseLessObjectKey({
       id,
       is_recv,
@@ -128,31 +116,22 @@ class GiftRecordService {
       recv_user_id,
       status,
     });
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          goods_snapshot: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          remark: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['goods_snapshot', 'remark'],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
     const result = await giftModel.findAndCountAll({
       attributes: [
         'live_room_id',

@@ -388,8 +388,8 @@ class QqUserController {
   async list(ctx: ParameterizedContext, next) {
     const {
       id,
-      orderBy = 'asc',
-      orderName = 'id',
+      orderBy,
+      orderName,
       nowPage,
       pageSize,
       keyWord,

@@ -11,7 +11,13 @@ import userModel from '@/model/user.model';
 import walletModel from '@/model/wallet.model';
 import wechatUserModel from '@/model/wechatUser.model';
 import { IUser } from '@/types/IUser';
-import { handlePaging } from '@/utils';
+import {
+  handleKeyWord,
+  handleOrder,
+  handlePage,
+  handlePaging,
+  handleRangTime,
+} from '@/utils';
 
 class UserService {
   /** 用户是否存在 */
@@ -64,41 +70,27 @@ class UserService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<IUser>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = {};
     if (id !== undefined && isPureNumber(`${id}`)) {
       allWhere.id = id;
     }
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          username: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          desc: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['username', 'desc'],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
     const result = await userModel.findAndCountAll({
       attributes: {
         exclude: ['password', 'token'],

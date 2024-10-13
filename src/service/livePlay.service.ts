@@ -6,7 +6,13 @@ import areaModel from '@/model/area.model';
 import livePlayModel from '@/model/livePlay.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
-import { handlePaging } from '@/utils';
+import {
+  handleKeyWord,
+  handleOrder,
+  handlePage,
+  handlePaging,
+  handleRangTime,
+} from '@/utils';
 
 class LivePlayService {
   /** 直播是否存在 */
@@ -36,12 +42,7 @@ class LivePlayService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<ILivePlay>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = {};
     if (id !== undefined && isPureNumber(`${id}`)) {
       allWhere.id = id;
@@ -55,36 +56,22 @@ class LivePlayService {
     if (live_room_id !== undefined && isPureNumber(`${live_room_id}`)) {
       allWhere.live_room_id = live_room_id;
     }
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          srs_client_id: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          srs_stream: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          srs_stream_url: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['srs_client_id', 'srs_stream', 'srs_stream_url'],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
     const result = await livePlayModel.findAndCountAll({
       include: [
         {
@@ -180,15 +167,23 @@ class LivePlayService {
     rangTimeStart,
     rangTimeEnd,
   }) {
+    const allWhere: any = deleteUseLessObjectKey({
+      live_room_id,
+      user_id,
+      random_id,
+    });
+    const rangTimeType = 'created_at';
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType] = rangTimeWhere;
+    }
     const result = await livePlayModel.findAll({
       where: {
-        live_room_id,
-        user_id,
-        random_id,
-        created_at: {
-          [Op.gt]: new Date(+rangTimeStart),
-          [Op.lt]: new Date(+rangTimeEnd),
-        },
+        ...allWhere,
       },
     });
     return result;

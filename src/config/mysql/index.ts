@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize';
 
-import { initDb } from '@/init/initDb';
+import { initDb, loadAllModel } from '@/init/initDb';
 import { MYSQL_CONFIG } from '@/secret/secret';
 import { chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 
@@ -61,8 +61,9 @@ export const connectMysql = async (init = false) => {
     return;
   }
   await sequelize.authenticate({ logging: false });
+  loadAllModel();
+  require('@/model/relation');
   // await initDb('alert', sequelize);
-  await initDb('load', sequelize);
   console.log(chalkSUCCESS(msg(true)));
 };
 

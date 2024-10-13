@@ -4,7 +4,7 @@ import { Op, cast, col, literal } from 'sequelize';
 import { IList, IWallet } from '@/interface';
 import userModel from '@/model/user.model';
 import walletModel from '@/model/wallet.model';
-import { handlePaging } from '@/utils';
+import { handlePage, handlePaging, handleRangTime } from '@/utils';
 
 class WalletService {
   /** 钱包是否存在 */
@@ -32,22 +32,19 @@ class WalletService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<IWallet>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = deleteUseLessObjectKey({
       id,
       user_id,
       balance,
     });
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
     // @ts-ignore
     const result = await walletModel.findAndCountAll({

@@ -24,7 +24,7 @@ export const batchCreateDaySql = ({
     REPEAT
 
         SET @x = @x + 1;
-      INSERT INTO ${mockDayDataModel.name} ( day, created_at, updated_at )
+      INSERT INTO ${mockDayDataModel.tableName} ( day, created_at, updated_at )
       VALUES
         ( @date, NOW(), NOW() );
 
@@ -53,7 +53,7 @@ export const batchCreateHourSql = ({
     REPEAT
 
         SET @x = @x + 1;
-      INSERT INTO ${mockHourDataModel.name} ( hour, created_at, updated_at )
+      INSERT INTO ${mockHourDataModel.tableName} ( hour, created_at, updated_at )
       VALUES
         ( @date, NOW(), NOW() );
 
@@ -82,7 +82,7 @@ export const batchCreateMinuteTenSql = ({
     REPEAT
 
         SET @x = @x + 1;
-      INSERT INTO ${mockMinuteTenDataModel.name} ( minute, created_at, updated_at )
+      INSERT INTO ${mockMinuteTenDataModel.tableName} ( minute, created_at, updated_at )
       VALUES
         ( @date, NOW(), NOW() );
 
@@ -113,7 +113,7 @@ export const batchCreateMinuteThirtySql = ({
     REPEAT
 
         SET @x = @x + 1;
-      INSERT INTO ${mockMinuteThirtyDataModel.name} ( minute, created_at, updated_at )
+      INSERT INTO ${mockMinuteThirtyDataModel.tableName} ( minute, created_at, updated_at )
       VALUES
         ( @date, NOW(), NOW() );
 

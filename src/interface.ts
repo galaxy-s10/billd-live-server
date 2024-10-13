@@ -1,8 +1,4 @@
-import {
-  ILiveRoom,
-  LiveRoomIsShowEnum,
-  LiveRoomStatusEnum,
-} from '@/types/ILiveRoom';
+import { ILiveRoom } from '@/types/ILiveRoom';
 import { IUser } from '@/types/IUser';
 
 export interface IVisitorLog {
@@ -296,8 +292,6 @@ export interface IArea {
   /** 权重 */
   priority?: number;
   area_live_rooms?: IAreaLiveRoom[];
-  live_room_is_show?: LiveRoomIsShowEnum;
-  live_room_status?: LiveRoomStatusEnum;
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -477,18 +471,11 @@ export interface ISrsPublishStream {
   flag_id?: string;
 }
 
-export interface ILive extends ISrsPublishStream {
+export type ILive = {
   id?: number;
-  /** 用户信息 */
-  user?: IUser;
-  /** 直播间信息 */
-  live_room?: ILiveRoom;
 
   socket_id?: string;
-  user_id?: number;
   live_room_id?: number;
-  live_room_is_show?: LiveRoomIsShowEnum;
-  live_room_status?: LiveRoomStatusEnum;
   /** 1开启;2关闭 */
   track_video?: number;
   /** 1开启;2关闭 */
@@ -497,7 +484,10 @@ export interface ILive extends ISrsPublishStream {
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
-}
+} & ISrsPublishStream & {
+    /** 直播间信息 */
+    live_room?: ILiveRoom;
+  };
 
 export interface ILivePlay extends ISrsPublishStream {
   id?: number;
@@ -664,21 +654,23 @@ export interface IRoleAuth {
   deleted_at?: string;
 }
 
-export type IList<T> = {
-  nowPage?: number;
-  pageSize?: number;
+export type IListBase = {
+  nowPage?: number | string;
+  pageSize?: number | string;
   orderBy?: string;
   orderName?: string;
   keyWord?: string;
-  childNowPage?: string;
-  childPageSize?: string;
+  childNowPage?: number | string;
+  childPageSize?: number | string;
   childOrderBy?: string;
   childOrderName?: string;
   childKeyWord?: string;
   rangTimeType?: 'created_at' | 'updated_at' | 'deleted_at';
-  rangTimeStart?: string;
-  rangTimeEnd?: string;
-} & T;
+  rangTimeStart?: number | string;
+  rangTimeEnd?: number | string;
+};
+
+export type IList<T> = IListBase & T;
 
 export interface IUserRole {
   id?: number;

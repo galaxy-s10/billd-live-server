@@ -8,6 +8,8 @@ const liveRouter = new Router({ prefix: '/live' });
 
 liveRouter.get('/list', liveController.getList);
 
+liveRouter.get('/pure_list', liveController.getPureList);
+
 liveRouter.get('/live_room_online_user', liveController.getLiveUser);
 
 // 删除在线列表的重复直播间

@@ -25,12 +25,12 @@ FROM
 		user_id,
 		live_room_id,
 		duration,
-		DATE_FORMAT( ${visitorLogModel.name}.created_at, '%Y-%m-%d 00:00:00' ) AS format_created_at
+		DATE_FORMAT( ${visitorLogModel.tableName}.created_at, '%Y-%m-%d 00:00:00' ) AS format_created_at
 	FROM
-		${visitorLogModel.name} AS ${visitorLogModel.name}
+		${visitorLogModel.tableName} AS ${visitorLogModel.tableName}
 	WHERE
-	( ${visitorLogModel.name}.deleted_at IS NULL AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}')) AS t2
-	RIGHT JOIN ${mockDayDataModel.name} AS t3 ON t2.format_created_at = t3.day
+	( ${visitorLogModel.tableName}.deleted_at IS NULL AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}')) AS t2
+	RIGHT JOIN ${mockDayDataModel.tableName} AS t3 ON t2.format_created_at = t3.day
 WHERE
 	t3.day >= '${data.rangTimeStart}'
 	AND t3.day <= '${data.rangTimeEnd}'
@@ -61,12 +61,12 @@ FROM
 		user_id,
 		live_room_id,
 		duration,
-		DATE_FORMAT( ${visitorLogModel.name}.created_at, '%Y-%m-%d %H:00:00' ) AS format_created_at
+		DATE_FORMAT( ${visitorLogModel.tableName}.created_at, '%Y-%m-%d %H:00:00' ) AS format_created_at
 	FROM
-		${visitorLogModel.name} AS ${visitorLogModel.name}
+		${visitorLogModel.tableName} AS ${visitorLogModel.tableName}
 	WHERE
-	( ${visitorLogModel.name}.deleted_at IS NULL AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}')) AS t2
-	RIGHT JOIN ${mockHourDataModel.name} AS t3 ON t2.format_created_at = t3.hour
+	( ${visitorLogModel.tableName}.deleted_at IS NULL AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}')) AS t2
+	RIGHT JOIN ${mockHourDataModel.tableName} AS t3 ON t2.format_created_at = t3.hour
 WHERE
 	t3.hour >= '${data.rangTimeStart}'
 	AND t3.hour <= '${data.rangTimeEnd}'
@@ -97,12 +97,12 @@ FROM
 		user_id,
 		live_room_id,
 		duration,
-		DATE_FORMAT( ${visitorLogModel.name}.created_at, '%Y-%m-%d %H:%M:00' ) AS format_created_at
+		DATE_FORMAT( ${visitorLogModel.tableName}.created_at, '%Y-%m-%d %H:%M:00' ) AS format_created_at
 	FROM
-		${visitorLogModel.name} AS ${visitorLogModel.name}
+		${visitorLogModel.tableName} AS ${visitorLogModel.tableName}
 	WHERE
-	( ${visitorLogModel.name}.deleted_at IS NULL AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}')) AS t2
-	RIGHT JOIN ${mockMinuteTenDataModel.name} AS t3 ON t2.format_created_at = t3.minute
+	( ${visitorLogModel.tableName}.deleted_at IS NULL AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}')) AS t2
+	RIGHT JOIN ${mockMinuteTenDataModel.tableName} AS t3 ON t2.format_created_at = t3.minute
 WHERE
 	t3.minute >= '${data.rangTimeStart}'
 	AND t3.minute <= '${data.rangTimeEnd}'
@@ -137,8 +137,8 @@ export const getUserVisitRecordSql = (data: {
     COALESCE ( GROUP_CONCAT( DISTINCT live_room_id SEPARATOR ', ' ), '' ) AS live_room_id_str,
     COALESCE ( GROUP_CONCAT( duration SEPARATOR ', ' ), '' ) AS duration_str
   FROM
-    ( SELECT user_id, duration, live_room_id, DATE_FORMAT( created_at, '%Y-%m-%d' ) AS format_date FROM ${visitorLogModel.name} WHERE deleted_at IS NULL AND user_id = ${data.userId} AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}' ) AS subquery
-    RIGHT JOIN ${mockDayDataModel.name} AS t3 ON t3.day = subquery.format_date
+    ( SELECT user_id, duration, live_room_id, DATE_FORMAT( created_at, '%Y-%m-%d' ) AS format_date FROM ${visitorLogModel.tableName} WHERE deleted_at IS NULL AND user_id = ${data.userId} AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}' ) AS subquery
+    RIGHT JOIN ${mockDayDataModel.tableName} AS t3 ON t3.day = subquery.format_date
     LEFT JOIN user AS t4 ON t4.id = ${data.userId}
     LEFT JOIN user_child AS t5 ON t5.child_user_id = ${data.userId}
     LEFT JOIN user AS t6 ON t6.id = t5.user_id
@@ -173,8 +173,8 @@ export const getIpVisitRecordSql = (data: {
     COALESCE ( GROUP_CONCAT( DISTINCT live_room_id SEPARATOR ', ' ), '' ) AS live_room_id_str,
     COALESCE ( GROUP_CONCAT( duration SEPARATOR ', ' ), '' ) AS duration_str
   FROM
-    ( SELECT ip, duration, live_room_id, DATE_FORMAT( created_at, '%Y-%m-%d' ) AS format_date FROM ${visitorLogModel.name} WHERE deleted_at IS NULL AND ip = '${data.ip}' AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}' ) AS subquery
-    RIGHT JOIN ${mockDayDataModel.name} AS t3 ON t3.day = subquery.format_date
+    ( SELECT ip, duration, live_room_id, DATE_FORMAT( created_at, '%Y-%m-%d' ) AS format_date FROM ${visitorLogModel.tableName} WHERE deleted_at IS NULL AND ip = '${data.ip}' AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}' ) AS subquery
+    RIGHT JOIN ${mockDayDataModel.tableName} AS t3 ON t3.day = subquery.format_date
   WHERE
     t3.day >= '${data.rangTimeStart}'
     AND t3.day <= '${data.rangTimeEnd}'

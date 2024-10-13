@@ -67,8 +67,8 @@ class AuthController {
   async getList(ctx: ParameterizedContext, next) {
     const {
       id,
-      orderBy = 'asc',
-      orderName = 'id',
+      orderBy,
+      orderName,
       nowPage,
       pageSize,
       keyWord,

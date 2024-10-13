@@ -1,4 +1,4 @@
-import { filterObj, isPureNumber } from 'billd-utils';
+import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import { Op, literal } from 'sequelize';
 
 import { IList, ILiveRecord } from '@/interface';
@@ -6,7 +6,13 @@ import areaModel from '@/model/area.model';
 import liveRecordModel from '@/model/liveRecord.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
-import { handlePaging } from '@/utils';
+import {
+  handleKeyWord,
+  handleOrder,
+  handlePage,
+  handlePaging,
+  handleRangTime,
+} from '@/utils';
 
 class LivePlayService {
   /** 直播记录是否存在 */
@@ -27,6 +33,8 @@ class LivePlayService {
     client_id,
     live_room_id,
     user_id,
+    childOrderName,
+    childOrderBy,
     orderBy,
     orderName,
     nowPage,
@@ -36,38 +44,32 @@ class LivePlayService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<ILiveRecord>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
-    const allWhere: any = {};
-    if (id !== undefined && isPureNumber(`${id}`)) {
-      allWhere.id = id;
-    }
-    if (client_id !== undefined && isPureNumber(`${client_id}`)) {
-      allWhere.client_id = client_id;
-    }
-    if (live_room_id !== undefined && isPureNumber(`${live_room_id}`)) {
-      allWhere.live_room_id = live_room_id;
-    }
-    if (user_id !== undefined && isPureNumber(`${user_id}`)) {
-      allWhere.user_id = user_id;
-    }
-    if (keyWord) {
-      const keyWordWhere = [];
+    const { offset, limit } = handlePage({ nowPage, pageSize });
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+      client_id,
+      live_room_id,
+      user_id,
+    });
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: [],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
+    const orderRes = handleOrder({ orderName, orderBy });
+    const childOrderRes: any[] = [];
+    if (childOrderName && childOrderBy) {
+      childOrderRes.push([liveRoomModel, childOrderName, childOrderBy]);
     }
     const result = await liveRecordModel.findAndCountAll({
       include: [
@@ -130,17 +132,8 @@ class LivePlayService {
           'forward_kuaishou_url',
           'forward_xiaohongshu_url',
         ],
-        include: [
-          [
-            literal(
-              `(select priority from ${liveRoomModel.tableName}
-                where ${liveRoomModel.tableName}.id = ${liveRecordModel.tableName}.live_room_id)`
-            ),
-            'live_room_priority',
-          ],
-        ],
       },
-      order: [[literal('live_room_priority'), 'desc'], ...orderRes],
+      order: [...orderRes, ...childOrderRes],
       limit,
       offset,
       where: {

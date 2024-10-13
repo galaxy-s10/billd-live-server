@@ -5,7 +5,13 @@ import { IList, IWsMessage } from '@/interface';
 import roleModel from '@/model/role.model';
 import userModel from '@/model/user.model';
 import wsMessageModel from '@/model/wsMessage.model';
-import { handlePaging } from '@/utils';
+import {
+  handleKeyWord,
+  handleOrder,
+  handlePage,
+  handlePaging,
+  handleRangTime,
+} from '@/utils';
 
 // async function handleDelRedisByDbLiveRoomHistoryMsgList() {
 //   try {
@@ -50,12 +56,7 @@ class WsMessageService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<IWsMessage>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = deleteUseLessObjectKey({
       msg_type,
       user_id,
@@ -66,46 +67,28 @@ class WsMessageService {
       is_verify,
       content_type,
     });
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          content: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          origin_content: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          username: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          origin_username: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          user_agent: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: [
+        'content',
+        'origin_content',
+        'username',
+        'origin_username',
+        'user_agent',
+      ],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
     const userWhere = deleteUseLessObjectKey({});
 
     const result = await wsMessageModel.findAndCountAll({
@@ -118,7 +101,14 @@ class WsMessageService {
           where: {
             ...userWhere,
           },
-          include: [{ model: roleModel }],
+          include: [
+            {
+              model: roleModel,
+              through: {
+                attributes: [],
+              },
+            },
+          ],
         },
       ],
       order: [...orderRes],

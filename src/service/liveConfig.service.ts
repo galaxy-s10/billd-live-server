@@ -3,7 +3,13 @@ import Sequelize from 'sequelize';
 
 import { IList, ILiveConfig } from '@/interface';
 import liveConfigModel from '@/model/liveConfig.model';
-import { handlePaging } from '@/utils';
+import {
+  handleKeyWord,
+  handleOrder,
+  handlePage,
+  handlePaging,
+  handleRangTime,
+} from '@/utils';
 
 const { Op } = Sequelize;
 
@@ -40,46 +46,27 @@ class LiveConfigService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<ILiveConfig>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = {};
     if (id) {
       allWhere.id = +id;
     }
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          key: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          value: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          desc: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['key', 'value', 'desc'],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
     const result = await liveConfigModel.findAndCountAll({
       order: [...orderRes],
       limit,

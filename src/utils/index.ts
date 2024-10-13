@@ -4,9 +4,69 @@ import os from 'os';
 import path from 'path';
 
 import { ParameterizedContext } from 'koa';
+import { Op } from 'sequelize';
+
+import { IListBase } from '@/interface';
 
 import { COMMON_ERROE_MSG, COMMON_ERROR_CODE } from '../constant';
 import { UserStatusEnum } from '../types/IUser';
+
+export function handleKeyWord({
+  keyWord,
+  arr,
+}: {
+  keyWord?: string;
+  arr?: string[];
+}) {
+  if (keyWord && arr?.length) {
+    const keyWordWhere: any[] = [];
+    arr.forEach((item) => {
+      keyWordWhere.push({
+        [item]: {
+          [Op.like]: `%${keyWord}%`,
+        },
+      });
+    });
+    return keyWordWhere;
+  }
+  return undefined;
+}
+
+export function handleRangTime({
+  rangTimeType,
+  rangTimeStart,
+  rangTimeEnd,
+}: IListBase) {
+  if (rangTimeType && rangTimeStart && rangTimeEnd) {
+    return {
+      [Op.gt]: new Date(+rangTimeStart),
+      [Op.lt]: new Date(+rangTimeEnd),
+    };
+  }
+  return undefined;
+}
+
+export function handlePage({ nowPage, pageSize }: IListBase) {
+  let offset: number | undefined;
+  let limit: number | undefined;
+  if (nowPage && pageSize) {
+    offset = (+nowPage - 1) * +pageSize;
+    limit = +pageSize;
+  }
+  return { offset, limit };
+}
+
+export function handleOrder({ orderName, orderBy }: IListBase, model?: any) {
+  const res: any[] = [];
+  if (orderName && orderBy) {
+    const name = orderName.split(',');
+    const by = orderBy.split(',');
+    name.forEach((item, index) => {
+      res.push(model ? [model, item, by[index]] : [item, by[index]]);
+    });
+  }
+  return res;
+}
 
 /** 字符串截取 */
 export function strSlice(str: string, length: number) {
@@ -227,8 +287,8 @@ export const getFileExt = (name: string) => {
 /** 处理返回的分页数据 */
 export const handlePaging = <T>(
   result: any,
-  nowPage?: number,
-  pageSize?: number
+  nowPage?: number | string,
+  pageSize?: number | string
 ) => {
   // @ts-ignore
   const obj: {
@@ -238,8 +298,9 @@ export const handlePaging = <T>(
     total: number;
     rows: T[];
   } = {};
-  obj.nowPage = nowPage || 1;
-  obj.pageSize = pageSize || result.count;
+  console.log('handlePaging', nowPage, pageSize);
+  obj.nowPage = nowPage ? +nowPage : 1;
+  obj.pageSize = pageSize ? +pageSize : result.count;
   obj.hasMore = obj.nowPage * obj.pageSize - result.count < 0;
   obj.total = result.count;
   obj.rows = result.rows;
@@ -249,8 +310,8 @@ export const handlePaging = <T>(
 /** 处理返回的分页数据 */
 export const handleGroupPaging = <T>(
   result: { count: any[]; rows: any[] },
-  nowPage?: string,
-  pageSize?: string
+  nowPage?: number | string,
+  pageSize?: number | string
 ) => {
   // @ts-ignore
   const obj: {

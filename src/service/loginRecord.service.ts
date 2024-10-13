@@ -4,7 +4,13 @@ import { Op } from 'sequelize';
 import { IList, ILoginRecord } from '@/interface';
 import loginRecordModel from '@/model/loginRecord.model';
 import userModel from '@/model/user.model';
-import { handlePaging } from '@/utils';
+import {
+  handleKeyWord,
+  handleOrder,
+  handlePage,
+  handlePaging,
+  handleRangTime,
+} from '@/utils';
 
 class LoginRecordService {
   /** 登录记录是否存在 */
@@ -33,47 +39,28 @@ class LoginRecordService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<ILoginRecord>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = deleteUseLessObjectKey({
       id,
       user_id,
       type,
     });
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          user_agent: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          ip: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          remark: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['user_agent', 'ip', 'remark'],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
     const result = await loginRecordModel.findAndCountAll({
       include: [
         {

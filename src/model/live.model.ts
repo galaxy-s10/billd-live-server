@@ -28,9 +28,6 @@ const model = sequelize.define<LiveModel>(
     live_room_id: {
       type: DataTypes.INTEGER,
     },
-    user_id: {
-      type: DataTypes.INTEGER,
-    },
     track_video: {
       type: DataTypes.INTEGER,
     },
@@ -79,6 +76,9 @@ const model = sequelize.define<LiveModel>(
     flag_id: {
       type: DataTypes.STRING,
     },
+    // ddd: {
+    //   type: DataTypes.STRING,
+    // },
   },
   {
     paranoid: true,

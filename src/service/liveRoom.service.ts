@@ -8,7 +8,13 @@ import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
 import userLiveRoomModel from '@/model/userLiveRoom.model';
 import { ILiveRoom } from '@/types/ILiveRoom';
-import { handlePaging } from '@/utils';
+import {
+  handleKeyWord,
+  handleOrder,
+  handlePage,
+  handlePaging,
+  handleRangTime,
+} from '@/utils';
 
 class LiveRoomService {
   /** 直播间是否存在 */
@@ -41,12 +47,7 @@ class LiveRoomService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<ILiveRoom>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = deleteUseLessObjectKey({
       id,
       status,
@@ -65,51 +66,24 @@ class LiveRoomService {
     ) {
       allWhere.pull_is_should_auth = pull_is_should_auth;
     }
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          name: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          desc: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          remark: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['name', 'desc', 'remark'],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
     const result = await liveRoomModel.findAndCountAll({
       include: [
-        // {
-        //   model: userLiveRoomModel,
-        //   include: [
-        //     {
-        //       model: userModel,
-        //       attributes: {
-        //         exclude: ['password', 'token'],
-        //       },
-        //     },
-        //   ],
-        //   required: true,
-        //   // attributes: [],
-        // },
         {
           model: userModel,
           attributes: {
@@ -164,7 +138,7 @@ class LiveRoomService {
   }
 
   /** 获取直播间列表 */
-  async getListPure({
+  async getPureList({
     id,
     status,
     is_show,
@@ -182,12 +156,7 @@ class LiveRoomService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<ILiveRoom>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = deleteUseLessObjectKey({
       id,
       status,
@@ -206,37 +175,22 @@ class LiveRoomService {
     ) {
       allWhere.pull_is_should_auth = pull_is_should_auth;
     }
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          name: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          desc: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          remark: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['name', 'desc', 'remark'],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
-
+    const orderRes = handleOrder({ orderName, orderBy });
     const excludeArr = [
       'push_rtmp_url',
       'push_obs_server',
@@ -278,16 +232,13 @@ class LiveRoomService {
     const result = await liveRoomModel.findOne({
       include: [
         {
-          model: userLiveRoomModel,
-          include: [
-            {
-              model: userModel,
-              attributes: {
-                exclude: ['password', 'token'],
-              },
-            },
-          ],
-          required: true,
+          model: userModel,
+          attributes: {
+            exclude: ['password', 'token'],
+          },
+          through: {
+            attributes: [],
+          },
         },
         {
           model: liveModel,

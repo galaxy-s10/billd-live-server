@@ -290,7 +290,7 @@ class InitController {
       });
       // } else {
       //   throw new CustomError(
-      //     `已经初始化过${mockDayDataModel.name}表了，不能再初始化了！`,
+      //     `已经初始化过${mockDayDataModel.tableName}表了，不能再初始化了！`,
       //     COMMON_HTTP_CODE.paramsError,
       //     COMMON_HTTP_CODE.paramsError
       //   );
@@ -330,7 +330,7 @@ class InitController {
 
   // 更新直播间url
   updateLiveRoomUrl = async (ctx: ParameterizedContext, next) => {
-    const res1 = await liveRoomController.common.getListPure({
+    const res1 = await liveRoomController.common.getPureList({
       exclude_key: false,
     });
     const queue: any[] = [];
@@ -454,7 +454,10 @@ class InitController {
   initDayData = async (ctx: ParameterizedContext, next) => {
     await mockDayDataModel.sync({ alter: true });
     await this.common.initDayData(365 * 3);
-    successHandler({ ctx, data: `初始化${mockDayDataModel.name}表成功！` });
+    successHandler({
+      ctx,
+      data: `初始化${mockDayDataModel.tableName}表成功！`,
+    });
     await next();
   };
 
@@ -462,7 +465,10 @@ class InitController {
   initHourData = async (ctx: ParameterizedContext, next) => {
     await mockHourDataModel.sync({ alter: true });
     await this.common.initHourData(365 * 3 * 24);
-    successHandler({ ctx, data: `初始化${mockHourDataModel.name}表成功！` });
+    successHandler({
+      ctx,
+      data: `初始化${mockHourDataModel.tableName}表成功！`,
+    });
     await next();
   };
 
@@ -472,7 +478,7 @@ class InitController {
     await this.common.initMinuteTenData(365 * 3 * 24 * 6);
     successHandler({
       ctx,
-      data: `初始化${mockMinuteTenDataModel.name}表成功！`,
+      data: `初始化${mockMinuteTenDataModel.tableName}表成功！`,
     });
     await next();
   };
@@ -483,7 +489,7 @@ class InitController {
     await this.common.initMinuteThirtyData(365 * 3 * 24 * 2);
     successHandler({
       ctx,
-      data: `初始化${mockMinuteThirtyDataModel.name}表成功！`,
+      data: `初始化${mockMinuteThirtyDataModel.tableName}表成功！`,
     });
     await next();
   };

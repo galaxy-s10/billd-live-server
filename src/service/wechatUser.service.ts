@@ -4,7 +4,13 @@ import { Op } from 'sequelize';
 import { IList } from '@/interface';
 import wechatUserModel from '@/model/wechatUser.model';
 import { IWechatUser } from '@/types/IUser';
-import { handlePaging } from '@/utils';
+import {
+  handleKeyWord,
+  handleOrder,
+  handlePage,
+  handlePaging,
+  handleRangTime,
+} from '@/utils';
 
 class WechatUserService {
   /** 所有应用里面是否存在wechat用户 */
@@ -51,21 +57,18 @@ class WechatUserService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<IWechatUser>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = {};
     if (id !== undefined && isPureNumber(`${id}`)) {
       allWhere.id = id;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
     // if (created_at) {
     //   allWhere.created_at = {
@@ -77,20 +80,14 @@ class WechatUserService {
     //     [Op.between]: [updated_at, `${updated_at} 23:59:59`],
     //   };
     // }
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          nickname: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['nickname'],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
     const result = await wechatUserModel.findAndCountAll({
       attributes: {
         exclude: ['password', 'token'],

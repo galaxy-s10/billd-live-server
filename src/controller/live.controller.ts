@@ -13,13 +13,11 @@ import liveRedisController from '@/config/websocket/live-redis.controller';
 import {
   COMMON_HTTP_CODE,
   DEFAULT_ROLE_INFO,
-  REDIS_PREFIX,
   SCHEDULE_TYPE,
   THIRD_PLATFORM,
   WEBM_DIR,
 } from '@/constant';
 import liveRoomController from '@/controller/liveRoom.controller';
-import redisController from '@/controller/redis.controller';
 import srsController from '@/controller/srs.controller';
 import userController from '@/controller/user.controller';
 import userLiveRoomController from '@/controller/userLiveRoom.controller';
@@ -105,13 +103,14 @@ class LiveController {
     getList: async ({
       id,
       live_room_id,
-      live_room_is_show,
-      live_room_status,
-      is_tencentcloud_css,
-      user_id,
+      cdn,
       is_fake,
-      orderBy = 'asc',
-      orderName = 'id',
+      is_show,
+      status,
+      childOrderName,
+      childOrderBy,
+      orderBy,
+      orderName,
       nowPage,
       pageSize,
       keyWord,
@@ -119,50 +118,113 @@ class LiveController {
       rangTimeStart,
       rangTimeEnd,
     }: IList<ILive & ILiveRoom>) => {
-      try {
-        const key = cryptojs.MD5(
-          JSON.stringify({
-            id,
-            live_room_id,
-            live_room_is_show,
-            live_room_status,
-            is_tencentcloud_css,
-            user_id,
-            is_fake,
-            orderBy,
-            orderName,
-            nowPage,
-            pageSize,
-            keyWord,
-            rangTimeType,
-            rangTimeStart,
-            rangTimeEnd,
-          })
-        );
-        const oldCache = await redisController.getVal({
-          prefix: REDIS_PREFIX.dbLiveList,
-          key: key.toString(),
-        });
-        if (oldCache) {
-          return JSON.parse(oldCache).value as {
-            nowPage: number;
-            pageSize: number;
-            hasMore: boolean;
-            total: number;
-            rows: ILive[];
-          };
-        }
-      } catch (error) {
-        console.log(error);
-      }
+      // try {
+      //   const key = cryptojs.MD5(
+      //     JSON.stringify({
+      //       id,
+      //       live_room_id,
+      //       live_room_is_show,
+      //       live_room_status,
+      //       cdn,
+      //       is_fake,
+      //       orderBy,
+      //       orderName,
+      //       nowPage,
+      //       pageSize,
+      //       keyWord,
+      //       rangTimeType,
+      //       rangTimeStart,
+      //       rangTimeEnd,
+      //     })
+      //   );
+      //   const oldCache = await redisController.getVal({
+      //     prefix: REDIS_PREFIX.dbLiveList,
+      //     key: key.toString(),
+      //   });
+      //   if (oldCache) {
+      //     return JSON.parse(oldCache).value as {
+      //       nowPage: number;
+      //       pageSize: number;
+      //       hasMore: boolean;
+      //       total: number;
+      //       rows: ILive[];
+      //     };
+      //   }
+      // } catch (error) {
+      //   console.log(error);
+      // }
       const result = await liveService.getList({
         id,
         live_room_id,
-        live_room_is_show,
-        live_room_status,
-        is_tencentcloud_css,
-        user_id,
+        cdn,
         is_fake,
+        is_show,
+        status,
+        childOrderName,
+        childOrderBy,
+        orderBy,
+        orderName,
+        nowPage,
+        pageSize,
+        keyWord,
+        rangTimeType,
+        rangTimeStart,
+        rangTimeEnd,
+      });
+      // try {
+      //   const key = cryptojs.MD5(
+      //     JSON.stringify({
+      //       id,
+      //       live_room_id,
+      //       cdn,
+      //       is_fake,
+      //       is_show,
+      //       status,
+      //       orderBy,
+      //       orderName,
+      //       nowPage,
+      //       pageSize,
+      //       keyWord,
+      //       rangTimeType,
+      //       rangTimeStart,
+      //       rangTimeEnd,
+      //     })
+      //   );
+      //   redisController.setExVal({
+      //     prefix: REDIS_PREFIX.dbLiveList,
+      //     key: key.toString(),
+      //     value: result,
+      //     exp: 3,
+      //   });
+      // } catch (error) {
+      //   console.log(error);
+      // }
+      return result;
+    },
+
+    getPureList: async ({
+      id,
+      live_room_id,
+      socket_id,
+      track_audio,
+      track_video,
+      flag_id,
+      orderBy,
+      orderName,
+      nowPage,
+      pageSize,
+      keyWord,
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    }: IList<ILive>) => {
+      const result = await liveService.getPureList({
+        id,
+        live_room_id,
+        socket_id,
+        track_audio,
+        track_video,
+        flag_id,
         nowPage,
         pageSize,
         orderBy,
@@ -172,35 +234,6 @@ class LiveController {
         rangTimeStart,
         rangTimeEnd,
       });
-      try {
-        const key = cryptojs.MD5(
-          JSON.stringify({
-            id,
-            live_room_id,
-            live_room_is_show,
-            live_room_status,
-            is_tencentcloud_css,
-            user_id,
-            is_fake,
-            orderBy,
-            orderName,
-            nowPage,
-            pageSize,
-            keyWord,
-            rangTimeType,
-            rangTimeStart,
-            rangTimeEnd,
-          })
-        );
-        redisController.setExVal({
-          prefix: REDIS_PREFIX.dbLiveList,
-          key: key.toString(),
-          value: result,
-          exp: 60,
-        });
-      } catch (error) {
-        console.log(error);
-      }
       return result;
     },
 
@@ -282,6 +315,12 @@ class LiveController {
 
   getList = async (ctx: ParameterizedContext, next) => {
     const result = await this.common.getList(ctx.request.query);
+    successHandler({ ctx, data: result });
+    await next();
+  };
+
+  getPureList = async (ctx: ParameterizedContext, next) => {
+    const result = await this.common.getPureList(ctx.request.query);
     successHandler({ ctx, data: result });
     await next();
   };
@@ -376,7 +415,6 @@ class LiveController {
     });
     const res = await this.common.create({
       live_room_id: createLiveRoomInfo.id,
-      user_id: createUserInfo.id,
       socket_id: '-1',
       track_audio: 1,
       track_video: 1,
@@ -456,7 +494,6 @@ class LiveController {
     });
     const res = await this.common.create({
       live_room_id: createLiveRoomInfo.id,
-      user_id: createUserInfo.id,
       socket_id: '-1',
       track_audio: 1,
       track_video: 1,
@@ -505,7 +542,6 @@ class LiveController {
           queue.push(
             this.common.create({
               live_room_id: item.id,
-              user_id: item?.user?.id,
               socket_id: '-1',
               track_audio: 1,
               track_video: 1,

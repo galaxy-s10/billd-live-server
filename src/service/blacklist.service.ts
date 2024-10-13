@@ -3,7 +3,13 @@ import { Op } from 'sequelize';
 
 import { IBlacklist, IList } from '@/interface';
 import blacklistModel from '@/model/blacklist.model';
-import { handlePaging } from '@/utils';
+import {
+  handleKeyWord,
+  handleOrder,
+  handlePage,
+  handlePaging,
+  handleRangTime,
+} from '@/utils';
 
 class BlackListService {
   /** 黑名单是否存在 */
@@ -30,46 +36,27 @@ class BlackListService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<IBlacklist>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = {};
     if (id !== undefined && isPureNumber(`${id}`)) {
       allWhere.id = id;
     }
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          ip: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          user_id: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          msg: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['ip', 'user_id', 'msg'],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
     const result = await blacklistModel.findAndCountAll({
       order: [...orderRes],
       limit,

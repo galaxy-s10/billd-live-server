@@ -3,7 +3,13 @@ import { Op } from 'sequelize';
 
 import { GoodsTypeEnum, IGoods, IList } from '@/interface';
 import goodsModel from '@/model/goods.model';
-import { handlePaging } from '@/utils';
+import {
+  handleKeyWord,
+  handleOrder,
+  handlePage,
+  handlePaging,
+  handleRangTime,
+} from '@/utils';
 
 class GoodsService {
   /** 商品是否存在 */
@@ -36,12 +42,7 @@ class GoodsService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<IGoods>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = deleteUseLessObjectKey({
       id,
       name,
@@ -51,41 +52,22 @@ class GoodsService {
       badge,
       badge_bg,
     });
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          name: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          desc: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          short_desc: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          remark: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['name', 'desc', 'short_desc', 'remark'],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
     const result = await goodsModel.findAndCountAll({
       order: [...orderRes],
       limit,

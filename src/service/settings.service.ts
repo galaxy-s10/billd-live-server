@@ -3,7 +3,13 @@ import Sequelize from 'sequelize';
 
 import { IList, ISettings } from '@/interface';
 import settingsModel from '@/model/settings.model';
-import { handlePaging } from '@/utils';
+import {
+  handleKeyWord,
+  handleOrder,
+  handlePage,
+  handlePaging,
+  handleRangTime,
+} from '@/utils';
 
 const { Op } = Sequelize;
 
@@ -35,35 +41,30 @@ class SettingsService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<ISettings>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = {};
     if (id) {
       allWhere.id = +id;
     }
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          email: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['email'],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
+    const orderRes = handleOrder({ orderName, orderBy });
     // @ts-ignore
     const result = await settingsModel.findAndCountAll({
-      order: [[orderName, orderBy]],
+      order: [...orderRes],
       limit,
       offset,
       where: {

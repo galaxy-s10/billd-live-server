@@ -4,7 +4,13 @@ import { Op } from 'sequelize';
 import { IList, IRole } from '@/interface';
 import roleModel from '@/model/role.model';
 import userModel from '@/model/user.model';
-import { handlePaging } from '@/utils';
+import {
+  handleKeyWord,
+  handleOrder,
+  handlePage,
+  handlePaging,
+  handleRangTime,
+} from '@/utils';
 
 class RoleService {
   /** 角色是否存在 */
@@ -32,12 +38,7 @@ class RoleService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<IRole>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = {};
     if (id) {
       allWhere.id = id;
@@ -45,31 +46,22 @@ class RoleService {
     if (type) {
       allWhere.type = type;
     }
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          role_name: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          role_value: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['role_name', 'role_value'],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
     const result = await roleModel.findAndCountAll({
       order: [...orderRes],
       limit,
@@ -100,31 +92,22 @@ class RoleService {
     if (type) {
       allWhere.type = type;
     }
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          role_name: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          role_value: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['role_name', 'role_value'],
+    });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
     const result = await roleModel.findAndCountAll({
       order: [...orderRes],
       distinct: true,

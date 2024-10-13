@@ -1,43 +1,43 @@
-import { loadAllModel } from '@/init/initDb';
-import Area from '@/model/area.model';
+import AreaModel from '@/model/area.model';
 import AreaLiveRoomModel from '@/model/areaLiveRoom.model';
-import Auth from '@/model/auth.model';
-import GlobalMsg from '@/model/globalMsg.model';
-import Live from '@/model/live.model';
-import LivePlay from '@/model/livePlay.model';
-import LiveRecord from '@/model/liveRecord.model';
-import LiveRoom from '@/model/liveRoom.model';
-import Log from '@/model/log.model';
-import loginRecord from '@/model/loginRecord.model';
-import Order from '@/model/order.model';
-import QqUser from '@/model/qqUser.model';
-import Role from '@/model/role.model';
-import RoleAuth from '@/model/roleAuth.model';
-import SigninRecord from '@/model/signinRecord.model';
-import SigninStatistics from '@/model/signinStatistics.model';
-import ThirdUser from '@/model/thirdUser.model';
-import User from '@/model/user.model';
-import UserLiveRoom from '@/model/userLiveRoom.model';
-import UserRole from '@/model/userRole.model';
-import Wallet from '@/model/wallet.model';
-import WechatUser from '@/model/wechatUser.model';
-import WsMessage from '@/model/wsMessage.model';
+import AuthModel from '@/model/auth.model';
+import GlobalMsgModel from '@/model/globalMsg.model';
+import LiveModel from '@/model/live.model';
+import LivePlayModel from '@/model/livePlay.model';
+import LiveRecordModel from '@/model/liveRecord.model';
+import LiveRoomModel from '@/model/liveRoom.model';
+import LogModel from '@/model/log.model';
+import LoginRecordModel from '@/model/loginRecord.model';
+import OrderModel from '@/model/order.model';
+import QqUserModel from '@/model/qqUser.model';
+import RoleModel from '@/model/role.model';
+import RoleAuthModel from '@/model/roleAuth.model';
+import SigninRecordModel from '@/model/signinRecord.model';
+import SigninStatisticsModel from '@/model/signinStatistics.model';
+import ThirdUserModel from '@/model/thirdUser.model';
+import UserModel from '@/model/user.model';
+import UserLiveRoomModel from '@/model/userLiveRoom.model';
+import UserRoleModel from '@/model/userRole.model';
+import WalletModel from '@/model/wallet.model';
+import WechatUserModel from '@/model/wechatUser.model';
+import WsMessageModel from '@/model/wsMessage.model';
 
-loadAllModel();
-
-loginRecord.belongsTo(User, {
+LoginRecordModel.belongsTo(UserModel, {
   foreignKey: 'user_id',
   constraints: false,
 });
 
-GlobalMsg.belongsTo(User, {
+GlobalMsgModel.belongsTo(UserModel, {
   foreignKey: 'user_id',
   constraints: false,
 });
 
-WsMessage.belongsTo(User, { foreignKey: 'user_id', constraints: false });
+WsMessageModel.belongsTo(UserModel, {
+  foreignKey: 'user_id',
+  constraints: false,
+});
 
-LiveRoom.belongsToMany(Area, {
+LiveRoomModel.belongsToMany(AreaModel, {
   foreignKey: 'live_room_id',
   otherKey: 'area_id',
   constraints: false,
@@ -47,7 +47,7 @@ LiveRoom.belongsToMany(Area, {
   },
 });
 
-Area.belongsToMany(LiveRoom, {
+AreaModel.belongsToMany(LiveRoomModel, {
   foreignKey: 'area_id',
   otherKey: 'live_room_id',
   constraints: false,
@@ -57,261 +57,256 @@ Area.belongsToMany(LiveRoom, {
   },
 });
 
-Area.hasMany(AreaLiveRoomModel, {
+AreaModel.hasMany(AreaLiveRoomModel, {
   foreignKey: 'area_id',
   constraints: false,
 });
 
-AreaLiveRoomModel.belongsTo(Area, {
+AreaLiveRoomModel.belongsTo(AreaModel, {
   foreignKey: 'live_room_id',
   constraints: false,
 });
 
-AreaLiveRoomModel.belongsTo(LiveRoom, {
+AreaLiveRoomModel.belongsTo(LiveRoomModel, {
   foreignKey: 'live_room_id',
   constraints: false,
 });
 
-// AreaLiveRoomModel.hasMany(LiveRoom, {
+// AreaLiveRoomModel.hasMany(LiveRoomModel, {
 //   foreignKey: 'id',
 //   constraints: false,
 //   // as: 'ddd',
 // });
 
-LiveRoom.belongsToMany(User, {
+LiveRoomModel.belongsToMany(UserModel, {
   foreignKey: 'live_room_id',
   otherKey: 'user_id',
   constraints: false,
   through: {
-    model: UserLiveRoom,
+    model: UserLiveRoomModel,
     unique: false, // 不生成唯一索引
   },
 });
 
-User.belongsToMany(LiveRoom, {
+UserModel.belongsToMany(LiveRoomModel, {
   foreignKey: 'user_id',
   otherKey: 'live_room_id',
   constraints: false,
   through: {
-    model: UserLiveRoom,
+    model: UserLiveRoomModel,
     unique: false, // 不生成唯一索引
   },
 });
 
-SigninStatistics.belongsTo(LiveRoom, {
+SigninStatisticsModel.belongsTo(LiveRoomModel, {
   foreignKey: 'live_room_id',
   constraints: false,
 });
 
-SigninRecord.belongsTo(LiveRoom, {
+SigninRecordModel.belongsTo(LiveRoomModel, {
   foreignKey: 'live_room_id',
   constraints: false,
 });
 
-SigninRecord.belongsTo(User, {
+SigninRecordModel.belongsTo(UserModel, {
   foreignKey: 'user_id',
   constraints: false,
 });
 
-SigninStatistics.belongsTo(User, {
+SigninStatisticsModel.belongsTo(UserModel, {
   foreignKey: 'user_id',
   constraints: false,
 });
 
-UserLiveRoom.belongsTo(LiveRoom, {
+UserLiveRoomModel.belongsTo(LiveRoomModel, {
   foreignKey: 'live_room_id',
   constraints: false,
 });
 
-User.hasOne(Wallet, {
+UserModel.hasOne(WalletModel, {
   foreignKey: 'user_id',
   constraints: false,
 });
 
-Live.belongsTo(User, {
+LivePlayModel.belongsTo(UserModel, {
   foreignKey: 'user_id',
   constraints: false,
 });
 
-LivePlay.belongsTo(User, {
+LiveRecordModel.belongsTo(UserModel, {
   foreignKey: 'user_id',
   constraints: false,
 });
 
-LiveRecord.belongsTo(User, {
+LiveModel.belongsTo(LiveRoomModel, {
+  foreignKey: 'live_room_id',
+  constraints: false,
+});
+
+LivePlayModel.belongsTo(LiveRoomModel, {
+  foreignKey: 'live_room_id',
+  constraints: false,
+});
+LiveRecordModel.belongsTo(LiveRoomModel, {
+  foreignKey: 'live_room_id',
+  constraints: false,
+});
+
+LiveRoomModel.hasOne(LiveModel, {
+  foreignKey: 'live_room_id',
+  constraints: false,
+});
+
+LiveRoomModel.hasOne(LivePlayModel, {
+  foreignKey: 'live_room_id',
+  constraints: false,
+});
+LiveRoomModel.hasOne(LiveRecordModel, {
+  foreignKey: 'live_room_id',
+  constraints: false,
+});
+
+WalletModel.belongsTo(UserModel, {
   foreignKey: 'user_id',
   constraints: false,
 });
 
-Live.belongsTo(LiveRoom, {
+LiveRoomModel.hasOne(UserLiveRoomModel, {
   foreignKey: 'live_room_id',
   constraints: false,
 });
 
-LivePlay.belongsTo(LiveRoom, {
-  foreignKey: 'live_room_id',
-  constraints: false,
-});
-LiveRecord.belongsTo(LiveRoom, {
-  foreignKey: 'live_room_id',
-  constraints: false,
-});
-
-LiveRoom.hasOne(Live, {
-  foreignKey: 'live_room_id',
-  constraints: false,
-});
-
-LiveRoom.hasOne(LivePlay, {
-  foreignKey: 'live_room_id',
-  constraints: false,
-});
-LiveRoom.hasOne(LiveRecord, {
-  foreignKey: 'live_room_id',
-  constraints: false,
-});
-
-Wallet.belongsTo(User, {
+UserLiveRoomModel.belongsTo(UserModel, {
   foreignKey: 'user_id',
   constraints: false,
 });
 
-LiveRoom.hasOne(UserLiveRoom, {
-  foreignKey: 'live_room_id',
-  constraints: false,
-});
-
-UserLiveRoom.belongsTo(User, {
-  foreignKey: 'user_id',
-  constraints: false,
-});
-
-Role.belongsToMany(Auth, {
+RoleModel.belongsToMany(AuthModel, {
   foreignKey: 'role_id',
   otherKey: 'auth_id',
   constraints: false,
   through: {
-    model: RoleAuth,
+    model: RoleAuthModel,
     unique: false, // 不生成唯一索引
   },
 });
 
-Auth.belongsToMany(Role, {
+AuthModel.belongsToMany(RoleModel, {
   foreignKey: 'auth_id',
   otherKey: 'role_id',
   constraints: false,
   through: {
-    model: RoleAuth,
+    model: RoleAuthModel,
     unique: false, // 不生成唯一索引
   },
 });
 
-Role.belongsTo(Role, {
+RoleModel.belongsTo(RoleModel, {
   as: 'p_role',
   foreignKey: 'p_id',
   constraints: false,
 });
 
-Role.hasMany(Role, {
+RoleModel.hasMany(RoleModel, {
   as: 'c_role',
   foreignKey: 'p_id',
   constraints: false,
 });
 
-Auth.belongsTo(Auth, {
+AuthModel.belongsTo(AuthModel, {
   as: 'p_auth',
   foreignKey: 'p_id',
   constraints: false,
 });
 
-Auth.hasMany(Auth, {
+AuthModel.hasMany(AuthModel, {
   as: 'c_auth',
   foreignKey: 'p_id',
   constraints: false,
 });
 
-User.hasMany(Order, {
+UserModel.hasMany(OrderModel, {
   foreignKey: 'billd_live_user_id',
   constraints: false,
 });
-Order.belongsTo(User, {
+OrderModel.belongsTo(UserModel, {
   foreignKey: 'billd_live_user_id',
   constraints: false,
 });
 
-User.hasMany(Log, {
+UserModel.hasMany(LogModel, {
   foreignKey: 'user_id',
   constraints: false,
 });
-Log.belongsTo(User, {
+LogModel.belongsTo(UserModel, {
   foreignKey: 'user_id',
   constraints: false,
 });
 
-ThirdUser.belongsTo(User, {
+ThirdUserModel.belongsTo(UserModel, {
   foreignKey: 'third_user_id',
   constraints: false,
 });
 
-QqUser.belongsToMany(User, {
+QqUserModel.belongsToMany(UserModel, {
   foreignKey: 'third_user_id',
   otherKey: 'user_id',
   sourceKey: 'id',
   constraints: false,
   through: {
-    model: ThirdUser,
+    model: ThirdUserModel,
     unique: false, // 不生成唯一索引
   },
 });
 
-User.belongsToMany(QqUser, {
+UserModel.belongsToMany(QqUserModel, {
   foreignKey: 'user_id',
   otherKey: 'third_user_id',
   targetKey: 'id',
   constraints: false,
   through: {
-    model: ThirdUser,
+    model: ThirdUserModel,
     unique: false, // 不生成唯一索引
   },
 });
 
-WechatUser.belongsToMany(User, {
+WechatUserModel.belongsToMany(UserModel, {
   foreignKey: 'third_user_id',
   otherKey: 'user_id',
   sourceKey: 'id',
   constraints: false,
   through: {
-    model: ThirdUser,
+    model: ThirdUserModel,
     unique: false, // 不生成唯一索引
   },
 });
 
-User.belongsToMany(WechatUser, {
+UserModel.belongsToMany(WechatUserModel, {
   foreignKey: 'user_id',
   otherKey: 'third_user_id',
   targetKey: 'id',
   constraints: false,
   through: {
-    model: ThirdUser,
+    model: ThirdUserModel,
     unique: false, // 不生成唯一索引
   },
 });
 
-Role.belongsToMany(User, {
+RoleModel.belongsToMany(UserModel, {
   foreignKey: 'role_id',
   otherKey: 'user_id',
   constraints: false,
   through: {
-    model: UserRole,
+    model: UserRoleModel,
     unique: false, // 不生成唯一索引
   },
 });
-User.belongsToMany(Role, {
+UserModel.belongsToMany(RoleModel, {
   foreignKey: 'user_id',
   otherKey: 'role_id',
   constraints: false,
   through: {
-    model: UserRole,
+    model: UserRoleModel,
     unique: false, // 不生成唯一索引
   },
 });

@@ -8,7 +8,14 @@ import liveModel from '@/model/live.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
 import userLiveRoomModel from '@/model/userLiveRoom.model';
-import { handlePaging } from '@/utils';
+import { ILiveRoom } from '@/types/ILiveRoom';
+import {
+  handleKeyWord,
+  handleOrder,
+  handlePage,
+  handlePaging,
+  handleRangTime,
+} from '@/utils';
 
 class AreaService {
   /** 分区是否存在 */
@@ -38,43 +45,26 @@ class AreaService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<IArea>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = deleteUseLessObjectKey({
       id,
       name,
       remark,
       priority,
     });
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          name: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          remark: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({ keyWord, arr: ['name', 'remark'] });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
     // @ts-ignore
     const result = await areaModel.findAndCountAll({
       distinct: true,
@@ -96,12 +86,7 @@ class AreaService {
     nowPage,
     pageSize,
   }) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const childWhere = deleteUseLessObjectKey({
       is_show: live_room_is_show,
       status: live_room_status,
@@ -159,11 +144,10 @@ class AreaService {
   /** 获取分区列表 */
   async getAreaLiveRoomList({
     id,
-    live_room_status,
-    live_room_is_show,
-    name,
-    remark,
-    priority,
+    cdn,
+    is_fake,
+    is_show,
+    status,
     childNowPage,
     childPageSize,
     childOrderName,
@@ -177,13 +161,8 @@ class AreaService {
     rangTimeType,
     rangTimeStart,
     rangTimeEnd,
-  }: IList<IArea>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+  }: IList<IArea & ILiveRoom>) {
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     let childOffset;
     let childLimit;
     if (childNowPage && childPageSize) {
@@ -192,34 +171,24 @@ class AreaService {
     }
     const allWhere: any = deleteUseLessObjectKey({
       id,
-      name,
-      remark,
-      priority,
     });
-    if (keyWord) {
-      const keyWordWhere = [
-        {
-          name: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-        {
-          remark: {
-            [Op.like]: `%${keyWord}%`,
-          },
-        },
-      ];
+    const keyWordWhere = handleKeyWord({ keyWord, arr: ['name', 'remark'] });
+    if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
     const childWhere = deleteUseLessObjectKey({
-      is_show: live_room_is_show,
-      status: live_room_status,
+      cdn,
+      is_fake,
+      is_show,
+      status,
     });
     if (childKeyWord) {
       const keyWordWhere = [
@@ -241,15 +210,12 @@ class AreaService {
       ];
       childWhere[Op.or] = keyWordWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
     const childOrderRes: any[] = [];
     if (childOrderName && childOrderBy) {
       childOrderRes.push([liveRoomModel, childOrderName, childOrderBy]);
       // childOrderRes.push([
-      //   literal(`${liveRoomModel.name}.${childOrderName}`),
+      //   literal(`${liveRoomModel.tableName}.${childOrderName}`),
       //   childOrderBy,
       // ]);
     }
@@ -257,6 +223,7 @@ class AreaService {
       limit,
       offset,
       order: [...orderRes],
+      where: { ...allWhere },
     });
     const queue: any[] = [];
     result.rows.forEach((item) => {

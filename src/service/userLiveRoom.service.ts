@@ -6,7 +6,7 @@ import areaModel from '@/model/area.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
 import userLiveRoomModel from '@/model/userLiveRoom.model';
-import { handlePaging } from '@/utils';
+import { handleOrder, handlePage, handlePaging, handleRangTime } from '@/utils';
 
 class UserLiveRoomService {
   /** 用户直播间是否存在 */
@@ -34,27 +34,21 @@ class UserLiveRoomService {
     rangTimeStart,
     rangTimeEnd,
   }: IList<IUserLiveRoom>) {
-    let offset;
-    let limit;
-    if (nowPage && pageSize) {
-      offset = (+nowPage - 1) * +pageSize;
-      limit = +pageSize;
-    }
+    const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = deleteUseLessObjectKey({
       id,
       user_id,
       live_room_id,
     });
-    if (rangTimeType && rangTimeStart && rangTimeEnd) {
-      allWhere[rangTimeType] = {
-        [Op.gt]: new Date(+rangTimeStart),
-        [Op.lt]: new Date(+rangTimeEnd),
-      };
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
     }
-    const orderRes: any[] = [];
-    if (orderName && orderBy) {
-      orderRes.push([orderName, orderBy]);
-    }
+    const orderRes = handleOrder({ orderName, orderBy });
     const result = await userLiveRoomModel.findAndCountAll({
       order: [...orderRes],
       limit,
