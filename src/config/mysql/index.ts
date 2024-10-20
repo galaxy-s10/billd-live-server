@@ -58,6 +58,9 @@ export const connectMysql = async (init = false) => {
   );
   if (init) {
     await createDb();
+    loadAllModel();
+    require('@/model/relation');
+    await initDb('force', sequelize);
     return;
   }
   await sequelize.authenticate({ logging: false });

@@ -181,7 +181,7 @@ export const REDIS_PREFIX = {
   dbLiveList: `${REDIS_PREFIX_ENV}dbLiveList___`, // 直播间在线列表
   dbLiveRoomHistoryMsgList: `${REDIS_PREFIX_ENV}dbLiveRoomHistoryMsgList___`, // 直播间历史消息
   deskUserUuid: `${REDIS_PREFIX_ENV}deskUserUuid___`,
-  deskUserSocketid: `${REDIS_PREFIX_ENV}deskUserSocketid___`,
+  deskUserSocketId: `${REDIS_PREFIX_ENV}deskUserSocketId___`,
 };
 
 export const IS_UPLOAD_SERVER = !(PROJECT_ENV === PROJECT_ENV_ENUM.prod); // 是否上传到服务器

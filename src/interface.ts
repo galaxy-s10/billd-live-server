@@ -672,6 +672,15 @@ export type IListBase = {
 
 export type IList<T> = IListBase & T;
 
+export interface IRedisVal<T> {
+  created_at: number;
+  expired_at: number;
+  format_created_at: string;
+  format_expired_at: string;
+  client_ip: string;
+  value: T;
+}
+
 export interface IUserRole {
   id?: number;
   user_id: number;

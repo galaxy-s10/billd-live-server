@@ -2,6 +2,9 @@ import { Server, Socket } from 'socket.io';
 
 import {
   handleWsBatchSendOffer,
+  handleWsBilldDeskJoin,
+  handleWsBilldDeskStartRemote,
+  handleWsBilldDeskUpdateUser,
   handleWsDisableSpeaking,
   handleWsDisconnecting,
   handleWsGetLiveUser,
@@ -10,8 +13,6 @@ import {
   handleWsMsrBlob,
   handleWsRoomNoLive,
   handleWsStartLive,
-  handleWsStartRemoteDesk,
-  handleWsUpdateDeskUser,
   handleWsUpdateJoinInfo,
 } from '@/config/websocket/handleMsg';
 import liveRedisController from '@/config/websocket/live-redis.controller';
@@ -19,6 +20,9 @@ import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import {
   WsAnswerType,
   WsBatchSendOffer,
+  WsBilldDeskBehaviorType,
+  WsBilldDeskJoinType,
+  WsBilldDeskStartRemote,
   WsCandidateType,
   WsConnectStatusEnum,
   WsDisableSpeakingType,
@@ -29,10 +33,8 @@ import {
   WsMsgTypeEnum,
   WsMsrBlobType,
   WsOfferType,
-  WsRemoteDeskBehaviorType,
   WsRoomNoLiveType,
   WsStartLiveType,
-  WsStartRemoteDesk,
   WsUpdateJoinInfoType,
 } from '@/types/websocket';
 import { chalkINFO, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
@@ -100,7 +102,7 @@ export const wsSocket: { io?: Server } = {
 };
 
 /**
- * 有roomId，发送给roomId的出自己以外的其他人
+ * 有roomId，发送给roomId的除自己以外的其他人
  * 没有roomId，发送给自己
  */
 export function socketEmit<T>({
@@ -111,7 +113,7 @@ export function socketEmit<T>({
 }: {
   socket: Socket;
   msgType: WsMsgTypeEnum;
-  roomId?: number;
+  roomId?: number | string;
   data?: T;
 }) {
   try {
@@ -166,7 +168,7 @@ export const connectWebSocket = (server) => {
   function prettierInfoLog(data: {
     msg: string;
     socket: Socket;
-    roomId?: number;
+    roomId?: number | string;
   }) {
     console.log(
       chalkINFO(
@@ -184,6 +186,21 @@ export const connectWebSocket = (server) => {
   // 每个客户端socket连接时都会触发 connection 事件
   io.of('/').on(WsConnectStatusEnum.connection, (socket: Socket) => {
     prettierInfoLog({ msg: 'connection', socket });
+    // 收到用户进入房间
+    socket.on(WsMsgTypeEnum.billdDeskJoin, (data: WsBilldDeskJoinType) => {
+      try {
+        const roomId = data.data.live_room_id;
+        prettierInfoLog({
+          msg: '收到用户进入房间',
+          socket,
+          roomId,
+        });
+        handleWsBilldDeskJoin({ io, socket, roomId, data });
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
     // 收到用户进入房间
     socket.on(WsMsgTypeEnum.join, (data: WsJoinType) => {
       try {
@@ -269,13 +286,13 @@ export const connectWebSocket = (server) => {
       }
     });
 
-    // 收到remoteDeskBehavior
+    // 收到billdDeskBehavior
     socket.on(
-      WsMsgTypeEnum.remoteDeskBehavior,
-      (data: WsRemoteDeskBehaviorType) => {
+      WsMsgTypeEnum.billdDeskBehavior,
+      (data: WsBilldDeskBehaviorType) => {
         try {
           prettierInfoLog({
-            msg: '收到remoteDeskBehavior',
+            msg: '收到billdDeskBehavior',
             socket,
             // @ts-ignore
             roomId: data.data.roomId,
@@ -284,7 +301,7 @@ export const connectWebSocket = (server) => {
             // @ts-ignore
             roomId: data.data.roomId,
             socket,
-            msgType: WsMsgTypeEnum.remoteDeskBehavior,
+            msgType: WsMsgTypeEnum.billdDeskBehavior,
             data: data.data,
           });
         } catch (error) {
@@ -295,7 +312,6 @@ export const connectWebSocket = (server) => {
 
     // 收到心跳
     socket.on(WsMsgTypeEnum.heartbeat, (data: WsHeartbeatType) => {
-      // console.log('收到心跳', data);
       try {
         updateUserJoinedRoom({
           socketId: data.socket_id,
@@ -334,22 +350,27 @@ export const connectWebSocket = (server) => {
       }
     });
 
-    // 收到startRemoteDesk
-    socket.on(WsMsgTypeEnum.startRemoteDesk, (data: WsStartRemoteDesk) => {
-      prettierInfoLog({
-        msg: '收到startRemoteDesk',
-        socket,
-        // @ts-ignore
-        roomId: data.data.roomId,
-      });
-      console.log(data);
-      handleWsStartRemoteDesk({ io, socket, data });
-    });
+    // 收到billdDeskStartRemote
+    socket.on(
+      WsMsgTypeEnum.billdDeskStartRemote,
+      (data: WsBilldDeskStartRemote) => {
+        prettierInfoLog({
+          msg: '收到billdDeskStartRemote',
+          socket,
+          // @ts-ignore
+          roomId: data.data.roomId,
+        });
+        handleWsBilldDeskStartRemote({ io, socket, data });
+      }
+    );
 
-    // 收到updateDeskUser
-    socket.on(WsMsgTypeEnum.updateDeskUser, (data: WsStartRemoteDesk) => {
-      handleWsUpdateDeskUser({ io, socket, data });
-    });
+    // 收到billdDeskUpdateUser
+    socket.on(
+      WsMsgTypeEnum.billdDeskUpdateUser,
+      (data: WsBilldDeskStartRemote) => {
+        handleWsBilldDeskUpdateUser({ io, socket, data });
+      }
+    );
 
     // 收到srsOffer
     socket.on(WsMsgTypeEnum.srsOffer, (data: WsOfferType) => {

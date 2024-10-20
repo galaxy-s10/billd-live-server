@@ -76,7 +76,7 @@ class DeskUserController {
     }
     if (deskUser.password !== password) {
       throw new CustomError(
-        `password错误！`,
+        `旧密码错误！`,
         COMMON_HTTP_CODE.paramsError,
         COMMON_HTTP_CODE.paramsError
       );

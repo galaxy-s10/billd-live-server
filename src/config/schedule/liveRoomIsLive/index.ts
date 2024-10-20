@@ -31,14 +31,14 @@ export const tencentcloudCssMain = async () => {
   });
 
   res1.rows.forEach((item) => {
-    if (item.live_room) {
-      res1Map[`${item.live_room.id!}`] = 1;
-      if (!tencentcloudCssMap[`${item.live_room_id!}`]) {
-        delArr.push(Number(item.live_room_id!));
+    const { live_room_id } = item;
+    if (live_room_id) {
+      res1Map[`${live_room_id}`] = 1;
+      if (!tencentcloudCssMap[`${live_room_id}`]) {
+        delArr.push(Number(live_room_id));
       }
     }
   });
-
   console.log('定时任务删除cdn直播记录', delArr);
   if (delArr.length) {
     liveController.common.deleteByLiveRoomId(delArr);
@@ -56,8 +56,9 @@ export const srsMain = async () => {
   });
   const res1Map = {};
   res1.rows.forEach((item) => {
-    if (item.live_room) {
-      res1Map[`${item.live_room.id!}`] = 1;
+    const { live_room_id } = item;
+    if (live_room_id) {
+      res1Map[`${live_room_id}`] = 1;
     }
   });
   const delArr: number[] = [];
