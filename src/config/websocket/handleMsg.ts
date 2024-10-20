@@ -21,6 +21,7 @@ import {
   WEBM_DIR,
 } from '@/constant';
 import authController from '@/controller/auth.controller';
+import deskUserController from '@/controller/deskUser.controller';
 import liveController from '@/controller/live.controller';
 import liveRoomController from '@/controller/liveRoom.controller';
 import redisController from '@/controller/redis.controller';
@@ -716,18 +717,53 @@ export async function handleWsBilldDeskStartRemote(args: {
   if (
     !data.data.deskUserUuid ||
     !data.data.deskUserPassword ||
-    !data.data.remoteDeskUserUuid
+    !data.data.remoteDeskUserUuid ||
+    !data.data.remoteDeskUserPassword
   ) {
     console.log(
-      'handleWsBilldDeskStartRemote错误，deskUserUuid或deskUserPassword或remoteDeskUserUuid为空'
+      'deskUserUuid或deskUserPassword或remoteDeskUserUuid或remoteDeskUserPassword为空'
     );
     socketEmit({
       socket,
       msgType: WsMsgTypeEnum.billdDeskStartRemoteResult,
       data: {
         code: 1,
-        msg: 'deskUserUuid或deskUserPassword或remoteDeskUserUuid为空',
-        data: data.data,
+        msg: 'deskUserUuid或deskUserPassword或remoteDeskUserUuid或remoteDeskUserPassword为空',
+        data: filterObj(data.data, ['deskUserPassword']),
+      },
+    });
+    return;
+  }
+  const flag1 = await deskUserController.common.login({
+    uuid: data.data.deskUserUuid,
+    password: data.data.deskUserPassword,
+  });
+  if (!flag1) {
+    console.log('主控密码错误');
+    socketEmit({
+      socket,
+      msgType: WsMsgTypeEnum.billdDeskStartRemoteResult,
+      data: {
+        code: 2,
+        msg: '主控密码错误',
+        data: filterObj(data.data, ['deskUserPassword']),
+      },
+    });
+    return;
+  }
+  const flag2 = await deskUserController.common.login({
+    uuid: data.data.remoteDeskUserUuid,
+    password: data.data.remoteDeskUserPassword,
+  });
+  if (!flag2) {
+    console.log('被控密码错误');
+    socketEmit({
+      socket,
+      msgType: WsMsgTypeEnum.billdDeskStartRemoteResult,
+      data: {
+        code: 3,
+        msg: '被控密码错误',
+        data: filterObj(data.data, ['deskUserPassword']),
       },
     });
     return;
@@ -742,9 +778,9 @@ export async function handleWsBilldDeskStartRemote(args: {
       socket,
       msgType: WsMsgTypeEnum.billdDeskStartRemoteResult,
       data: {
-        code: 2,
+        code: 4,
         msg: 'remoteDeskUserUuid不在线',
-        data: data.data,
+        data: filterObj(data.data, ['deskUserPassword']),
       },
     });
     return;
@@ -769,9 +805,9 @@ export async function handleWsBilldDeskStartRemote(args: {
       socket,
       msgType: WsMsgTypeEnum.billdDeskStartRemoteResult,
       data: {
-        code: 3,
+        code: 5,
         msg: '获取remoteDeskUserUuid错误',
-        data: data.data,
+        data: filterObj(data.data, ['deskUserPassword']),
       },
     });
     return;
@@ -783,7 +819,8 @@ export async function handleWsBilldDeskStartRemote(args: {
     data: {
       code: 0,
       msg: 'ok',
-      data: { ...data.data, receiver },
+      // @ts-ignore
+      data: { ...filterObj(data.data, ['deskUserPassword']), receiver },
     },
   });
   socketEmit<WsBilldDeskStartRemoteResult['data']>({
@@ -792,7 +829,8 @@ export async function handleWsBilldDeskStartRemote(args: {
     data: {
       code: 0,
       msg: 'ok',
-      data: { ...data.data, receiver },
+      // @ts-ignore
+      data: { ...filterObj(data.data, ['deskUserPassword']), receiver },
     },
   });
 }

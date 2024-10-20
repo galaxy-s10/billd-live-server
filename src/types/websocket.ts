@@ -327,6 +327,7 @@ export type WsBilldDeskStartRemote = IReqWsFormat<{
   deskUserUuid: string;
   deskUserPassword: string;
   remoteDeskUserUuid: string;
+  remoteDeskUserPassword: string;
 }>;
 
 export type WsBilldDeskBehaviorType = IReqWsFormat<{

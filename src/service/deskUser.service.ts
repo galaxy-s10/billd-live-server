@@ -81,6 +81,20 @@ class DeskUserService {
     return result;
   }
 
+  /** 登录 */
+  async login({ uuid, password }: IDeskUser) {
+    const result = await deskUserModel.findOne({
+      attributes: {
+        exclude: ['password'],
+      },
+      where: {
+        uuid,
+        password,
+      },
+    });
+    return result;
+  }
+
   /** 查找desk用户 */
   async findByUuid(uuid: string) {
     const result = await deskUserModel.findOne({

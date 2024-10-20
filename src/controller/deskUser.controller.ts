@@ -9,7 +9,14 @@ import deskUserService from '@/service/deskUser.service';
 import { IDeskUser } from '@/types/IUser';
 
 class DeskUserController {
-  async login(ctx: ParameterizedContext, next) {
+  common = {
+    login: async ({ uuid, password }) => {
+      const res = await deskUserService.login({ uuid, password });
+      return res;
+    },
+  };
+
+  login = async (ctx: ParameterizedContext, next) => {
     const { uuid, password }: IDeskUser = ctx.request.body;
     if (!uuid || !password) {
       throw new CustomError(
@@ -18,8 +25,8 @@ class DeskUserController {
         COMMON_HTTP_CODE.paramsError
       );
     }
-    const res = await deskUserService.findByUuid(uuid);
-    if (res?.password !== password) {
+    const res = await this.common.login({ uuid, password });
+    if (!res) {
       throw new CustomError(
         `密码错误！`,
         COMMON_HTTP_CODE.paramsError,
@@ -28,7 +35,7 @@ class DeskUserController {
     }
     successHandler({ ctx, data: { msg: '登录成功' } });
     await next();
-  }
+  };
 
   async findReceiverByUuid(ctx: ParameterizedContext, next) {
     const { uuid }: any = ctx.request.query;
