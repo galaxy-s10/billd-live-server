@@ -11,6 +11,8 @@ deskUserRouter.get(
 
 deskUserRouter.post('/login', deskUserController.login);
 
+deskUserRouter.post('/link_verify', deskUserController.linkVerify);
+
 deskUserRouter.post('/create', deskUserController.create);
 
 deskUserRouter.put('/update_by_uuid', deskUserController.updateByUuid);

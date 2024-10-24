@@ -10,6 +10,46 @@ import { COMMON_ERROE_MSG, COMMON_ERROR_CODE } from '../constant';
 import { IListBase } from '../interface';
 import { UserStatusEnum } from '../types/IUser';
 
+/**
+ * 比较版本号，返回1代表version1更大，返回2代表version2更大，返回0代表相等
+ */
+export function compareVersions(version1: string, version2: string) {
+  const v1Parts = version1.split('.').map(Number);
+  const v2Parts = version2.split('.').map(Number);
+
+  // 比较每个部分
+  for (let i = 0; i < Math.max(v1Parts.length, v2Parts.length); i += 1) {
+    const v1Part = v1Parts[i] || 0; // 如果 v1Parts 没有该部分，视为 0
+    const v2Part = v2Parts[i] || 0; // 如果 v2Parts 没有该部分，视为 0
+    if (v1Part > v2Part) return 1; // version1 更大
+    if (v1Part < v2Part) return 2; // version2 更大
+  }
+  return 0; // 两个版本相等
+}
+
+/**
+ * 字符串版本号转数字
+ * 版本号要求是三位数，如：1.2.3，不满三位数或者超过三位数的，会处理成三位数
+ * 每位数最多五位数，如：1.2.99999,1.22222.99999,11111.22222.99999
+ */
+export function strVersionToNumber(version: string) {
+  function addZero(str: string, num: number) {
+    const strLen = str.length;
+    let res1 = str;
+    for (let i = 0; i < num - strLen; i += 1) {
+      res1 += '0';
+    }
+    return res1;
+  }
+  const arr = version.split('.');
+  const res: number[] = [];
+  for (let i = 0; i < 3; i += 1) {
+    res.push(Number(addZero(arr[i] || '0', 5)));
+  }
+  const num = res.reduce((pre, curr) => pre + curr);
+  return num;
+}
+
 export function handleKeyWord({
   keyWord,
   arr,

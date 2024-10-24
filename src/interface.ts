@@ -54,6 +54,7 @@ export interface IQiniuData {
   qiniu_type?: number;
   qiniu_status?: number;
   qiniu_md5?: string;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -276,6 +277,7 @@ export interface ILiveUser {
   // id: string;
   // rooms?: string[];
   // userInfo?: IUser;
+
   created_at: string;
   value: {
     socketId: string;
@@ -292,6 +294,59 @@ export interface IArea {
   /** 权重 */
   priority?: number;
   area_live_rooms?: IAreaLiveRoom[];
+
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
+export interface IDeskConfig {
+  id?: number;
+  type?: number;
+  field_a?: string;
+  field_b?: string;
+  field_c?: string;
+  field_d?: string;
+  field_e?: string;
+  field_f?: string;
+  field_g?: string;
+  remark?: string;
+
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
+export enum DeskConfigEnum {
+  versionConfig,
+}
+
+export interface IDeskVersion {
+  id?: number;
+  /** 1:强制更新; 2:不强制更新 */
+  force?: number;
+  /** 版本 */
+  version?: string;
+  /** 显示版本 */
+  show_version?: string;
+  /** 更新内容 */
+  update_content?: string;
+  /** 更新日期 */
+  update_date?: string;
+  /** 是否禁用，1:禁用; 2:不禁用 */
+  disable?: number;
+  /** 禁用消息 */
+  disable_msg?: number;
+  download_macos_dmg?: string;
+  download_windows_64_exe?: string;
+  download_windows_32_exe?: string;
+  download_windows_arm_exe?: string;
+  download_linux_64_deb?: string;
+  download_linux_64_tar?: string;
+  download_linux_arm_deb?: string;
+  download_linux_arm_tar?: string;
+  remark?: string;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -305,6 +360,7 @@ export interface IAreaLiveRoom {
   area?: IUser;
   /** 直播间信息 */
   live_room?: ILiveRoom;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -318,6 +374,7 @@ export interface IUserLiveRoom {
   user?: IUser;
   /** 直播间信息 */
   live_room?: ILiveRoom;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -343,6 +400,7 @@ export interface ILiveConfig {
   value?: string;
   desc?: string;
   type?: FormTypeEnum;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -361,6 +419,7 @@ export interface IGoods {
   badge?: string;
   badge_bg?: string;
   remark?: string;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -372,6 +431,7 @@ export interface ISettings {
   value?: string;
   desc?: string;
   type?: string;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -446,6 +506,7 @@ export interface IOrder {
   trade_status?: PayStatusEnum;
   /** 本次交易打款给卖家的时间 */
   send_pay_date?: string;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -538,6 +599,7 @@ export interface IBlacklist {
   user_id?: number;
   type?: number;
   msg?: string;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -548,6 +610,7 @@ export interface IEmail {
   email?: string;
   code?: string;
   exp?: number;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -573,6 +636,7 @@ export interface ILog {
   api_error?: string;
   api_err_msg?: string;
   api_err_code?: number;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -628,6 +692,7 @@ export interface IAuth {
   type?: number;
   priority?: number;
   c_auths?: number[];
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -641,6 +706,7 @@ export interface IRole {
   priority?: number;
   role_auths?: number[];
   c_roles?: number[];
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -649,6 +715,7 @@ export interface IRoleAuth {
   id?: number;
   role_id?: number;
   auth_id?: number;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -685,6 +752,7 @@ export interface IUserRole {
   id?: number;
   user_id: number;
   role_id: number;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -693,6 +761,7 @@ export interface IUserRole {
 export interface IDayData {
   id?: number;
   day: string;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;

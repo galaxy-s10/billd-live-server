@@ -48,6 +48,7 @@ const frontendWhiteList = [
   '/desk_user/login',
   '/desk_user/create',
   '/desk_user/update_by_uuid',
+  '/desk_user/link_verify',
 
   '/srs/on_publish',
   '/srs/on_play',

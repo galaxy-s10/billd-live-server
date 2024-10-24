@@ -37,6 +37,15 @@ class DeskUserController {
     await next();
   };
 
+  linkVerify = async (ctx: ParameterizedContext, next) => {
+    const { uuid, password }: IDeskUser = ctx.request.body;
+
+    const res = await this.common.login({ uuid, password });
+
+    successHandler({ ctx, data: { code: res ? 1 : 2 } });
+    await next();
+  };
+
   async findReceiverByUuid(ctx: ParameterizedContext, next) {
     const { uuid }: any = ctx.request.query;
     const val = await redisController.getVal({
