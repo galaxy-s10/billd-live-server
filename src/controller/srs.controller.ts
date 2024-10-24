@@ -595,7 +595,6 @@ class SRSController {
       await Promise.all([
         liveController.common.create({
           live_room_id: Number(roomId),
-          user_id: userLiveRoomInfo.user_id,
           socket_id: '-1',
           track_audio: 1,
           track_video: 1,

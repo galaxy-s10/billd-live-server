@@ -222,7 +222,7 @@ export const initFFmpeg = async (init = true) => {
           type:
             initUser[item].live_room.type === undefined
               ? LiveRoomTypeEnum.system
-              : initUser[item].live_room.type,
+              : initUser[item].live_room.type!,
           priority: initUser[item].live_room.priority!,
           pull_is_should_auth: initUser[item].live_room.pull_is_should_auth!,
           cover_img: initUser[item].live_room.cover_img!,

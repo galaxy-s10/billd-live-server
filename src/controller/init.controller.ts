@@ -574,9 +574,6 @@ class InitController {
     // 删除该用户的所有直播间（user_live_room表）
     await userLiveRoomModel.destroy({ where: { user_id: userId } });
 
-    // 删除该用户的直播（live表）
-    await liveModel.destroy({ where: { user_id: userId } });
-
     // 删除该用户的直播（live_record表）
     await liveRecordModel.destroy({ where: { user_id: userId } });
 
