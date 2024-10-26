@@ -109,7 +109,7 @@ class DeskUserController {
       await next();
     } else {
       throw new CustomError(
-        `找不到该版本号信息！`,
+        `找不到版本配置信息！`,
         COMMON_HTTP_CODE.paramsError,
         COMMON_HTTP_CODE.paramsError
       );
