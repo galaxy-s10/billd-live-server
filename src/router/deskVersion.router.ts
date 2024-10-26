@@ -6,6 +6,8 @@ const deskUserRouter = new Router({ prefix: '/desk_version' });
 
 deskUserRouter.get('/check', deskVersionController.check);
 
+deskUserRouter.get('/latest', deskVersionController.latest);
+
 deskUserRouter.get('/find_by_version', deskVersionController.findByVersion);
 
 export default deskUserRouter;

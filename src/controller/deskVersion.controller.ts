@@ -10,9 +10,35 @@ import { compareVersions } from '@/utils';
 
 class DeskUserController {
   common = {
-    getList: () => {
-      return deskVersionService.getList({});
+    getList: ({
+      id,
+      version,
+      disable,
+      orderBy,
+      orderName,
+      nowPage,
+      pageSize,
+      keyWord,
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    }) => {
+      return deskVersionService.getList({
+        id,
+        version,
+        disable,
+        orderBy,
+        orderName,
+        nowPage,
+        pageSize,
+        keyWord,
+        rangTimeType,
+        rangTimeStart,
+        rangTimeEnd,
+      });
     },
+    findByVersion: (version: string) =>
+      deskVersionService.findByVersion(version),
   };
 
   /**
@@ -46,7 +72,8 @@ class DeskUserController {
       const minVersion = String(versionConfig.field_a);
       const newVersion = String(versionConfig.field_b);
       checkUpdate = Number(versionConfig.field_c);
-      const list = await this.common.getList();
+      // @ts-ignore
+      const list = await this.common.getList({});
       const localVersionInfo = list.rows.find(
         (v: any) => v.version === localVersion
       ) as IDeskVersion | undefined;
@@ -114,6 +141,23 @@ class DeskUserController {
         COMMON_HTTP_CODE.paramsError
       );
     }
+  };
+
+  latest = async (ctx: ParameterizedContext, next) => {
+    const cfgRes = await deskConfigController.common.findByType(
+      DeskConfigEnum.versionConfig
+    );
+    const versionConfig = cfgRes[0];
+    let res;
+    if (versionConfig) {
+      const newVersion = String(versionConfig.field_b);
+      res = await this.common.findByVersion(newVersion);
+    }
+    successHandler({
+      ctx,
+      data: res,
+    });
+    await next();
   };
 
   async findByVersion(ctx: ParameterizedContext, next) {
