@@ -43,13 +43,22 @@ export const QINIU_RESOURCE = {
 };
 
 export const CORS_ALLOW_ORIGIN: string | string[] = [
+  `http://www.${prodDomain}`,
   `https://www.${prodDomain}`,
+  `http://admin.${prodDomain}`,
   `https://admin.${prodDomain}`,
+  `http://live.${prodDomain}`,
   `https://live.${prodDomain}`,
+  `http://live-admin.${prodDomain}`,
   `https://live-admin.${prodDomain}`,
+  `http://nuxt2.${prodDomain}`,
   `https://nuxt2.${prodDomain}`,
+  `http://next.${prodDomain}`,
   `https://next.${prodDomain}`,
+  `http://project.${prodDomain}`,
   `https://project.${prodDomain}`,
+  `http://desk.${prodDomain}`,
+  `https://desk.${prodDomain}`,
 ];
 
 /** 消息最大长度 */
