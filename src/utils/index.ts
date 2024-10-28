@@ -27,29 +27,6 @@ export function compareVersions(version1: string, version2: string) {
   return 0; // 两个版本相等
 }
 
-/**
- * 字符串版本号转数字
- * 版本号要求是三位数，如：1.2.3，不满三位数或者超过三位数的，会处理成三位数
- * 每位数最多五位数，如：1.2.99999,1.22222.99999,11111.22222.99999
- */
-export function strVersionToNumber(version: string) {
-  function addZero(str: string, num: number) {
-    const strLen = str.length;
-    let res1 = str;
-    for (let i = 0; i < num - strLen; i += 1) {
-      res1 += '0';
-    }
-    return res1;
-  }
-  const arr = version.split('.');
-  const res: number[] = [];
-  for (let i = 0; i < 3; i += 1) {
-    res.push(Number(addZero(arr[i] || '0', 5)));
-  }
-  const num = res.reduce((pre, curr) => pre + curr);
-  return num;
-}
-
 export function handleKeyWord({
   keyWord,
   arr,

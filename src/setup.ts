@@ -14,9 +14,8 @@ import { COMMON_HTTP_CODE, STATIC_DIR, UPLOAD_DIR } from '@/constant';
 import { initFFmpeg } from '@/init/initFFmpeg';
 import { CustomError } from '@/model/customError.model';
 import { loadAllRoutes } from '@/router';
-
-import { countdown } from './utils';
-import { pushToBilibili } from './utils/process';
+import { countdown } from '@/utils';
+import { pushToBilibili } from '@/utils/process';
 
 export async function setupKoa({ port }) {
   const app = new Koa();
@@ -73,12 +72,15 @@ export async function setupKoa({ port }) {
   handleRedisKeyExpired();
   initSchedule();
   pushToBilibili(false);
-  setTimeout(() => {
-    const countdownInitFFmpegDelay = 3;
-    countdown({ seconds: countdownInitFFmpegDelay });
+  const useInitFFmpeg = true;
+  if (useInitFFmpeg) {
     setTimeout(() => {
-      // 初始化FFmpeg推流
-      initFFmpeg(true);
-    }, 1000 * (countdownInitFFmpegDelay + 1));
-  }, 500);
+      const countdownInitFFmpegDelay = 3;
+      countdown({ seconds: countdownInitFFmpegDelay });
+      setTimeout(() => {
+        // 初始化FFmpeg推流
+        initFFmpeg(true);
+      }, 1000 * (countdownInitFFmpegDelay + 1));
+    }, 500);
+  }
 }
