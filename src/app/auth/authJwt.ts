@@ -45,7 +45,8 @@ export const jwtVerify = (token: string) => {
             return;
           }
           if (userResult.token !== token) {
-            // 异地登录（防止修改密码后，原本的token还能用）
+            // 1.防止修改密码后，原本的token还能用
+            // 2.重新登录问题，重新登录会更新token（这个待优化，应该是异地重新登陆了才更新token）
             resolve({
               code: COMMON_HTTP_CODE.unauthorized,
               message: COMMON_ERROE_MSG.jwtExpired,
@@ -54,6 +55,7 @@ export const jwtVerify = (token: string) => {
           }
           const userStatusRes = judgeUserStatus(userResult.status!);
           if (userStatusRes.status !== UserStatusEnum.normal) {
+            // 判断用户状态
             resolve({
               code: COMMON_HTTP_CODE.unauthorized,
               errorCode: userStatusRes.errorCode,
@@ -91,11 +93,16 @@ export const authJwt = async (ctx) => {
 };
 
 /**
- * 生成jwt
+ * 生成jwt，exp单位：小时
  */
-export const signJwt = (value: { userInfo: any; exp: number }): string => {
+export const signJwt = (value: { userInfo: IUser; exp: number }): string => {
+  const userInfo = {
+    id: value.userInfo.id,
+    username: value.userInfo.username,
+    avatar: value.userInfo.avatar,
+  };
   const res = jwt.sign(
-    { ...value, exp: Math.floor(Date.now() / 1000) + 60 * 60 * value.exp },
+    { userInfo, exp: Math.floor(Date.now() / 1000) + 60 * 60 * value.exp },
     JWT_SECRET
   );
   return res;
