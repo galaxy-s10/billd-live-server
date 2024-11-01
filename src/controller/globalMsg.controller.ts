@@ -76,6 +76,7 @@ class GlobalMsgController {
       );
     }
     await globalMsgService.update({
+      id,
       user_id,
       type,
       content,
