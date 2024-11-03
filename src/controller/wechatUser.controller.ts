@@ -14,11 +14,12 @@ import redisController from '@/controller/redis.controller';
 import { IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import thirdUserModel from '@/model/thirdUser.model';
-import { WECHAT_APPID, WECHAT_SECRET } from '@/secret/secret';
+import { WECHAT_SECRET } from '@/secret/secret';
 import thirdUserService from '@/service/thirdUser.service';
 import userService from '@/service/user.service';
 import walletService from '@/service/wallet.service';
 import wechatUserService from '@/service/wechatUser.service';
+import { WECHAT_GZH_APPID } from '@/spec-config';
 import { IWechatUser } from '@/types/IUser';
 import { strSlice } from '@/utils';
 import { myaxios } from '@/utils/request';
@@ -103,7 +104,7 @@ class WechatUserController {
   async getAccessToken(code) {
     const params = {
       code,
-      appid: WECHAT_APPID,
+      appid: WECHAT_GZH_APPID,
       secret: WECHAT_SECRET,
       grant_type: 'authorization_code',
     };
@@ -190,7 +191,7 @@ class WechatUserController {
     console.log('wechat登录getUserInfo成功');
     console.log(wxUserInfo);
     const wechatUserInfo = {
-      appid: WECHAT_APPID,
+      appid: WECHAT_GZH_APPID,
       city: wxUserInfo.city,
       country: wxUserInfo.country,
       headimgurl: wxUserInfo.headimgurl,
