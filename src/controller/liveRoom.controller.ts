@@ -13,7 +13,7 @@ import { IList } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveRoomService from '@/service/liveRoom.service';
 import { ILiveRoom } from '@/types/ILiveRoom';
-import { tencentcloudUtils } from '@/utils/tencentcloud';
+import { tencentcloudCssUtils } from '@/utils/tencentcloud-css';
 
 import areaController from './area.controller';
 
@@ -248,7 +248,7 @@ class LiveRoomController {
         type: liveRoom.live_room!.type!,
         key,
       });
-      const cdnPushRes = tencentcloudUtils.getPushUrl({
+      const cdnPushRes = tencentcloudCssUtils.getPushUrl({
         liveRoomId: liveRoom.live_room!.id!,
         type: liveRoom.live_room!.type!,
         key,

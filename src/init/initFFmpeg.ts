@@ -11,7 +11,7 @@ import {
   LiveRoomUseCDNEnum,
 } from '@/types/ILiveRoom';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
-import { tencentcloudUtils } from '@/utils/tencentcloud';
+import { tencentcloudCssUtils } from '@/utils/tencentcloud-css';
 
 function ffmpegIsInstalled() {
   const res = spawnSync('ffmpeg', ['-version']);
@@ -60,10 +60,10 @@ async function addLive({
     type: LiveRoomTypeEnum.system,
     key: key!,
   });
-  const cdnPullRes = tencentcloudUtils.getPullUrl({
+  const cdnPullRes = tencentcloudCssUtils.getPullUrl({
     liveRoomId: live_room_id,
   });
-  const cdnPushRes = tencentcloudUtils.getPushUrl({
+  const cdnPushRes = tencentcloudCssUtils.getPushUrl({
     liveRoomId: live_room_id,
     type: LiveRoomTypeEnum.tencent_css,
     key: key!,
@@ -164,13 +164,13 @@ async function addLive({
     if (PROJECT_ENV !== PROJECT_ENV_ENUM.prod) {
       return;
     }
-    await tencentcloudUtils.dropLiveStream({
+    await tencentcloudCssUtils.dropLiveStream({
       roomId: live_room_id,
     });
-    const { res, err } = await tencentcloudUtils.queryLiveStream({
+    const { res, err } = await tencentcloudCssUtils.queryLiveStream({
       roomId: live_room_id,
     });
-    console.log('tencentcloudUtils.queryLiveStream');
+    console.log('tencentcloudCssUtils.queryLiveStream');
     console.log(err, res);
     if (err) return;
     if (res) {

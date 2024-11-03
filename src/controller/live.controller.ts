@@ -39,7 +39,7 @@ import {
 } from '@/types/ILiveRoom';
 import { chalkERROR } from '@/utils/chalkTip';
 import { getForwardList, killPid } from '@/utils/process';
-import { tencentcloudUtils } from '@/utils/tencentcloud';
+import { tencentcloudCssUtils } from '@/utils/tencentcloud-css';
 
 class LiveController {
   common = {
@@ -76,7 +76,7 @@ class LiveController {
           LiveRoomTypeEnum.tencent_css_pk,
         ].includes(liveRoomType)
       ) {
-        pullRes = tencentcloudUtils.getPullUrl({
+        pullRes = tencentcloudCssUtils.getPullUrl({
           liveRoomId: roomId,
         });
       } else {
@@ -284,7 +284,7 @@ class LiveController {
     closeLive: async (liveRoomId: number) => {
       const res = await Promise.all([
         srsController.common.closeLiveByLiveRoomId(liveRoomId),
-        tencentcloudUtils.dropLiveStream({ roomId: liveRoomId }),
+        tencentcloudCssUtils.dropLiveStream({ roomId: liveRoomId }),
         this.common.deleteByLiveRoomId([liveRoomId]),
       ]);
       nodeSchedule.cancelJob(`${SCHEDULE_TYPE.blobIsExist}___${liveRoomId}`);

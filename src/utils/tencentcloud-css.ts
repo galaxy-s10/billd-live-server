@@ -74,7 +74,7 @@ function getSignFn({ endpoint, params }) {
   return { Signature, reqUrl };
 }
 
-class TencentcloudClass {
+class TencentcloudCssClass {
   liveClient: Client;
 
   constructor() {
@@ -202,4 +202,4 @@ class TencentcloudClass {
   };
 }
 
-export const tencentcloudUtils = new TencentcloudClass();
+export const tencentcloudCssUtils = new TencentcloudCssClass();

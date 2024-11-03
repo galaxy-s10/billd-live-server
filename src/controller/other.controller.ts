@@ -4,8 +4,11 @@ import { logData } from 'billd-html-webpack-plugin';
 import { ParameterizedContext } from 'koa';
 
 import successHandler from '@/app/handler/success-handle';
-import { PROJECT_ENV, PROJECT_NAME } from '@/constant';
+import { COMMON_HTTP_CODE, PROJECT_ENV, PROJECT_NAME } from '@/constant';
+import { CustomError } from '@/model/customError.model';
+import { TENCENTCLOUD_COS } from '@/spec-config';
 import { chalkERROR, chalkINFO } from '@/utils/chalkTip';
+import { getPolicyByRes } from '@/utils/tencentcloud-cos';
 
 function execCmd({ key, cmd }: { key: string; cmd: string }) {
   return new Promise<{ key; res }>((resolve) => {
@@ -54,6 +57,18 @@ const cmdMap = {
 };
 
 class OtherController {
+  async getClientIp(ctx: ParameterizedContext, next) {
+    const ip = ctx?.request?.headers?.['x-real-ip'] || '';
+
+    successHandler({
+      ctx,
+      data: {
+        ip,
+      },
+    });
+    await next();
+  }
+
   getServerInfo = async (ctx: ParameterizedContext, next) => {
     successHandler({
       ctx,
@@ -89,6 +104,24 @@ class OtherController {
     });
     await next();
   };
+
+  async getPolicyByRes(ctx: ParameterizedContext, next) {
+    // @ts-ignore
+    const { prefix }: { prefix: string } = ctx.request.query;
+    if (!TENCENTCLOUD_COS['res-1305322458'].prefix[prefix]) {
+      throw new CustomError(
+        `非法prefix！`,
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
+      );
+    }
+    const res = await getPolicyByRes({ prefix });
+    successHandler({
+      ctx,
+      data: res,
+    });
+    await next();
+  }
 }
 
 export default new OtherController();

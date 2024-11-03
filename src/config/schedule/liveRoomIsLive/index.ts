@@ -5,7 +5,7 @@ import liveController from '@/controller/live.controller';
 import srsController from '@/controller/srs.controller';
 import { initUser } from '@/init/initUser';
 import { chalkINFO } from '@/utils/chalkTip';
-import { tencentcloudUtils } from '@/utils/tencentcloud';
+import { tencentcloudCssUtils } from '@/utils/tencentcloud-css';
 
 const initLiveRoomId: number[] = [];
 Object.keys(initUser).forEach((iten) => {
@@ -17,7 +17,7 @@ export const tencentcloudCssMain = async () => {
     is_tencentcloud_css: 1,
     is_fake: 2,
   });
-  const res2 = await tencentcloudUtils.queryLiveStreamAll();
+  const res2 = await tencentcloudCssUtils.queryLiveStreamAll();
   const res1Map = {};
   const tencentcloudCssMap = {};
   const delArr: number[] = [];

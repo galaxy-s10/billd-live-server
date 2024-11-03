@@ -21,7 +21,7 @@ import {
 } from '@/types/srs';
 import { WsMsgTypeEnum } from '@/types/websocket';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
-import { tencentcloudUtils } from '@/utils/tencentcloud';
+import { tencentcloudCssUtils } from '@/utils/tencentcloud-css';
 
 class TencentcloudCssController {
   async push(ctx: ParameterizedContext, next) {
@@ -40,12 +40,12 @@ class TencentcloudCssController {
     const [userLiveRoomInfo] = await Promise.all([
       userLiveRoomController.common.findByLiveRoomIdAndKey(Number(liveRoomId)),
     ]);
-    const pushRes = tencentcloudUtils.getPushUrl({
+    const pushRes = tencentcloudCssUtils.getPushUrl({
       liveRoomId,
       type: userLiveRoomInfo?.live_room?.type || LiveRoomTypeEnum.tencent_css,
       key: userLiveRoomInfo?.live_room?.key || '',
     });
-    const pullRes = tencentcloudUtils.getPullUrl({
+    const pullRes = tencentcloudCssUtils.getPullUrl({
       liveRoomId,
     });
 
@@ -355,7 +355,7 @@ class TencentcloudCssController {
     }
     // TODO 判断这个流是否在推流，在推流的话不要删除记录。
 
-    const { res } = await tencentcloudUtils.queryLiveStream({
+    const { res } = await tencentcloudCssUtils.queryLiveStream({
       roomId: Number(roomId),
     });
     if (!res?.OnlineInfo.length) {

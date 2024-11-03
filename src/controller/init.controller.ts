@@ -57,7 +57,7 @@ import {
 } from '@/types/ILiveRoom';
 import { IUser } from '@/types/IUser';
 import { chalkWARN } from '@/utils/chalkTip';
-import { tencentcloudUtils } from '@/utils/tencentcloud';
+import { tencentcloudCssUtils } from '@/utils/tencentcloud-css';
 
 class InitController {
   common = {
@@ -216,7 +216,7 @@ class InitController {
             // @ts-ignore
           } else if (user.live_room.cdn === LiveRoomUseCDNEnum.yes) {
             liveUrl = (live_room_id: number) => {
-              const res = tencentcloudUtils.getPullUrl({
+              const res = tencentcloudCssUtils.getPullUrl({
                 liveRoomId: live_room_id,
               });
               return {
@@ -344,8 +344,10 @@ class InitController {
         type: item.type!,
         key: item.key!,
       });
-      const cdnPullRes = tencentcloudUtils.getPullUrl({ liveRoomId: item.id! });
-      const cdnPushRes = tencentcloudUtils.getPushUrl({
+      const cdnPullRes = tencentcloudCssUtils.getPullUrl({
+        liveRoomId: item.id!,
+      });
+      const cdnPushRes = tencentcloudCssUtils.getPushUrl({
         liveRoomId: item.id!,
         type: item.type!,
         key: item.key!,
