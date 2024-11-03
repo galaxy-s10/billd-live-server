@@ -75,6 +75,7 @@ async function addLive({
     // 生产环境时判断prodFFmpeg，是true的才初始化ffmpeg
     if (
       (PROJECT_ENV === PROJECT_ENV_ENUM.development && devFFmpeg) ||
+      (PROJECT_ENV === PROJECT_ENV_ENUM.beta && devFFmpeg) ||
       (PROJECT_ENV === PROJECT_ENV_ENUM.prod && prodFFmpeg)
     ) {
       // const ffmpegCmd = spawn(`ffmpeg`, [
@@ -98,6 +99,8 @@ async function addLive({
       // console.log(chalkWARN('ffmpeg进程pid'), pid);
       let localFile = '';
       if (PROJECT_ENV === PROJECT_ENV_ENUM.development && devFFmpeg) {
+        localFile = devFFmpegLocalFile;
+      } else if (PROJECT_ENV === PROJECT_ENV_ENUM.beta && devFFmpeg) {
         localFile = devFFmpegLocalFile;
       } else if (PROJECT_ENV === PROJECT_ENV_ENUM.prod && prodFFmpeg) {
         localFile = prodFFmpegLocalFile;

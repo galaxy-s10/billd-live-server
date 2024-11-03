@@ -22,26 +22,6 @@ export enum QINIU_UPLOAD_PROGRESS_TYPE {
   chunkFileProgress = 2,
 }
 
-export const QINIU_BACKUP = {
-  domain: `backup.${prodDomain}`,
-  url: `http://backup.${prodDomain}/`,
-  bucket: 'hss-backup',
-  prefix: {
-    'billd-live/mysql/': 'billd-live/mysql/',
-  },
-};
-
-export const QINIU_RESOURCE = {
-  domain: `resource.${prodDomain}`,
-  url: `https://resource.${prodDomain}`,
-  bucket: 'hssblog',
-  prefix: {
-    'billd-live/image/': 'billd-live/image/',
-    'billd-live/msg-image/': 'billd-live/msg-image/',
-    'billd-live/live-preview/': 'billd-live/live-preview/',
-  },
-};
-
 export const CORS_ALLOW_ORIGIN: string | string[] = [
   `http://www.${prodDomain}`,
   `https://www.${prodDomain}`,
@@ -85,17 +65,27 @@ export const UPLOAD_DIR =
     ? resolveApp('/dist/upload/')
     : resolveApp('/upload/'); // 上传文件接口接收到的文件存放的目录
 
-export const SECRET_FILE =
+export const SECRET_DEV_FILE =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
-    ? resolveApp('/dist/secret/secret.js')
-    : resolveApp('/src/secret/secret.ts'); // 秘钥文件
+    ? resolveApp('/dist/secret/secret-dev.js')
+    : resolveApp('/src/secret/secret-dev.ts'); // 秘钥文件
 
-export const SECRETTEMP_FILE =
+export const SECRET_BETA_FILE =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
-    ? resolveApp('/dist/secret/secretTemp.js')
-    : resolveApp('/src/secret/secretTemp.ts'); // 秘钥文件模板
+    ? resolveApp('/dist/secret/secret-beta.js')
+    : resolveApp('/src/secret/secret-beta.ts'); // 秘钥文件
 
-export const maxBitrate = 1000 * 3; // 最大码率，3m
+export const SECRET_PROD_FILE =
+  PROJECT_ENV === PROJECT_ENV_ENUM.prod
+    ? resolveApp('/dist/secret/secret-prod.js')
+    : resolveApp('/src/secret/secret-prod.ts'); // 秘钥文件
+
+export const SECRET_TEMPLATE_FILE =
+  PROJECT_ENV === PROJECT_ENV_ENUM.prod
+    ? resolveApp('/dist/secret/secret-template.js')
+    : resolveApp('/src/secret/secret-template.ts'); // 秘钥文件模板
+
+export const MAX_BITRATE = 1000 * 3; // 最大码率，3m
 
 export const SERVER_VIDEO_DIR = '/node/video/'; // 服务器video目录
 export const LOCALHOST_URL = 'localhost'; // 本地地址，一般是localhost或者127.0.0.1，但也可以是其他本地地址，如192.168.x.x

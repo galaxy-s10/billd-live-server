@@ -4,9 +4,9 @@ import nodeSchedule from 'node-schedule';
 
 import {
   LOCALHOST_URL,
+  MAX_BITRATE,
   PROJECT_ENV,
   SCHEDULE_TYPE,
-  maxBitrate,
 } from '@/constant';
 import srsController from '@/controller/srs.controller';
 import { initUser } from '@/init/initUser';
@@ -51,7 +51,7 @@ async function verifyBitrateIsOver(info: IApiV1Streams['streams'][0]) {
           `流名称：${info.name}，当前码率：${res[0]}，kbps（recv_30s）：${info.kbps.recv_30s}，kbps（send_30s）：${info.kbps.send_30s}，`
         )
       );
-      if (bitrate > maxBitrate) {
+      if (bitrate > MAX_BITRATE) {
         // 码率超过阈值，踢掉
         srsController.common.deleteApiV1Clients(info.publish.cid);
       }
@@ -85,7 +85,7 @@ export const handleVerifyStream = async () => {
       );
       return;
     }
-    if (item.kbps.recv_30s > maxBitrate) {
+    if (item.kbps.recv_30s > MAX_BITRATE) {
       srsController.common.deleteApiV1Clients(item.publish.cid);
     }
   });

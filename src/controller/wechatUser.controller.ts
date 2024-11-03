@@ -212,15 +212,8 @@ class WechatUserController {
         password: getRandomString(8),
         avatar: wechatUserInfo.headimgurl,
       });
-      // if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
-      // 生产环境注册用户权限就是VIP用户
       // @ts-ignore
       await userInfo.setRoles([DEFAULT_ROLE_INFO.VIP_USER.id]);
-      // } else {
-      //   // 非生产环境注册用户权限就是SUPER_ADMIN管理员
-      //   // @ts-ignore
-      //   await userInfo.setRoles([DEFAULT_ROLE_INFO.SUPER_ADMIN.id]);
-      // }
       await walletService.create({ user_id: userInfo.id, balance: 0 });
       await thirdUserModel.create({
         user_id: userInfo.id,

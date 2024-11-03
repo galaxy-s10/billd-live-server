@@ -1,11 +1,7 @@
 import { exec, execSync } from 'child_process';
 
 import { PROJECT_ENV, PROJECT_ENV_ENUM, SRS_CB_URL_PARAMS } from '@/constant';
-import {
-  BILIBILI_LIVE_PUSH_KEY,
-  SERVER_LIVE,
-  SRS_CONFIG,
-} from '@/secret/secret';
+import { BILIBILI_LIVE_PUSH_KEY, SRS_CONFIG, SRS_LIVE } from '@/secret/secret';
 import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
 
 export function pushToBilibili(flag = true) {
@@ -44,7 +40,7 @@ export function forwardToOtherPlatform({
   let localFlvRes = localFlv;
   if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
     localFlvRes = localFlv.replace(
-      SERVER_LIVE.PullDomain,
+      SRS_LIVE.PullDomain,
       `http://localhost:${SRS_CONFIG.docker.port[8080]}`
     );
   }

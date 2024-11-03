@@ -5,7 +5,6 @@ import { existsSync, outputFileSync, removeSync } from 'fs-extra';
 import qiniu from 'qiniu';
 
 import {
-  QINIU_RESOURCE,
   QINIU_UPLOAD_PROGRESS_TYPE,
   REDIS_PREFIX,
   STATIC_DIR,
@@ -14,6 +13,7 @@ import {
 import redisController from '@/controller/redis.controller';
 import { IQiniuData } from '@/interface';
 import { QINIU_ACCESSKEY, QINIU_SECRETKEY } from '@/secret/secret';
+import { QINIU_KODO } from '@/spec-config';
 import { chalkERROR } from '@/utils/chalkTip';
 
 export interface IQiniuKey {
@@ -70,8 +70,8 @@ class QiniuUtils {
     const mac = new qiniu.auth.digest.Mac(QINIU_ACCESSKEY, QINIU_SECRETKEY);
     const options: qiniu.rs.PutPolicyOptions = {
       scope: data.keyToOverwrite
-        ? `${QINIU_RESOURCE.bucket}:${data.keyToOverwrite}`
-        : QINIU_RESOURCE.bucket,
+        ? `${QINIU_KODO.hssblog.bucket}:${data.keyToOverwrite}`
+        : QINIU_KODO.hssblog.bucket,
       expires: data.expires || 600, // 过期时间
       // callbackUrl: '',
       returnBody:
@@ -133,7 +133,7 @@ class QiniuUtils {
             console.log('copy成功', respBody);
             resolve({
               flag: true,
-              resultUrl: `${QINIU_RESOURCE.url}/${destKey}`,
+              resultUrl: `${QINIU_KODO.hssblog.url}/${destKey}`,
               respErr,
               respBody,
               respInfo,
@@ -152,24 +152,28 @@ class QiniuUtils {
     const filepath = STATIC_DIR + prefix + filename;
     const key = prefix + filename;
     const { flag, respBody } = await this.getQiniuStat(
-      QINIU_RESOURCE.bucket,
+      QINIU_KODO.hssblog.bucket,
       key
     );
     if (flag) {
       const destKey = `${prefix + hash}__${getRandomString(6)}.${ext}`;
       // 理论上任何存在重名或者需要确保唯一的操作都需要查数据库
-      // 这里可以while使用this.getQiniuStat(QINIU_RESOURCE.bucket, destKey);判断是否随机生成的key已存在
+      // 这里可以while使用this.getQiniuStat(QINIU_KODO.hssblog.bucket, destKey);判断是否随机生成的key已存在
       const res = await this.copy({
-        srcBucket: QINIU_RESOURCE.bucket,
+        srcBucket: QINIU_KODO.hssblog.bucket,
         srcKey: key,
-        destBucket: QINIU_RESOURCE.bucket,
+        destBucket: QINIU_KODO.hssblog.bucket,
         destKey,
       });
       // 这个copy方法返回的Promise类型里没有putTime，但是下面的new Promise返回的Promise类型里面有putTime，由于ts的类型兼容，这个upload方法的Promise类型里面就会包括putTime
       // 最好两者返回固定的类型，保持一致
       return {
         ...res,
-        respBody: { ...respBody, key: destKey, bucket: QINIU_RESOURCE.bucket },
+        respBody: {
+          ...respBody,
+          key: destKey,
+          bucket: QINIU_KODO.hssblog.bucket,
+        },
         putTime: respBody.putTime.toString(),
       }; // copy成功返回的respBody是null，这里将getQiniuStat的respBody设置给它
     }
@@ -225,7 +229,7 @@ class QiniuUtils {
               removeSync(filepath);
               resolve({
                 flag: true,
-                resultUrl: `${QINIU_RESOURCE.url}/${key}`,
+                resultUrl: `${QINIU_KODO.hssblog.url}/${key}`,
                 respErr,
                 respBody,
                 respInfo,
@@ -284,7 +288,7 @@ class QiniuUtils {
             console.log('uploadForm上传成功');
             resolve({
               flag: true,
-              resultUrl: `${QINIU_RESOURCE.url}/${key}`,
+              resultUrl: `${QINIU_KODO.hssblog.url}/${key}`,
               respErr,
               respBody,
               respInfo,
@@ -407,7 +411,7 @@ class QiniuUtils {
     const mac = new qiniu.auth.digest.Mac(QINIU_ACCESSKEY, QINIU_SECRETKEY);
     const { config } = this;
     const bucketManager = new qiniu.rs.BucketManager(mac, config);
-    const { bucket } = QINIU_RESOURCE;
+    const { bucket } = QINIU_KODO.hssblog;
     const options = {
       prefix: prop.prefix, // 列举的文件前缀
       marker: prop.marker, // 上一次列举返回的位置标记，作为本次列举的起点信息

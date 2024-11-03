@@ -13,16 +13,12 @@ import loginRecordController from '@/controller/loginRecord.controller';
 import { IList, LoginRecordEnum } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import thirdUserModel from '@/model/thirdUser.model';
-import {
-  QQ_CLIENT_ID,
-  QQ_CLIENT_SECRET,
-  QQ_REDIRECT_URI,
-} from '@/secret/secret';
+import { QQ_CLIENT_SECRET, QQ_REDIRECT_URI } from '@/secret/secret';
 import qqUserService from '@/service/qqUser.service';
 import thirdUserService from '@/service/thirdUser.service';
 import userService from '@/service/user.service';
 import walletService from '@/service/wallet.service';
-import { prodDomain } from '@/spec-config';
+import { QQ_CLIENT_ID, prodDomain } from '@/spec-config';
 import { IQqUser, UserStatusEnum } from '@/types/IUser';
 import { judgeUserStatus, strSlice } from '@/utils';
 import { myaxios } from '@/utils/request';

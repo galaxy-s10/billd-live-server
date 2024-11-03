@@ -16,7 +16,6 @@ import {
   handleWsUpdateJoinInfo,
 } from '@/config/websocket/handleMsg';
 import liveRedisController from '@/config/websocket/live-redis.controller';
-import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import {
   WsAnswerType,
   WsBatchSendOffer,
@@ -37,7 +36,7 @@ import {
   WsStartLiveType,
   WsUpdateJoinInfoType,
 } from '@/types/websocket';
-import { chalkINFO, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
+import { chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 
 export function getSocketRealIp(socket: Socket) {
   const realIp = (socket?.handshake?.headers?.['x-real-ip'] as string) || '';
@@ -152,10 +151,6 @@ export function ioEmit<T>({
 }
 
 export const connectWebSocket = (server) => {
-  if (PROJECT_ENV === PROJECT_ENV_ENUM.beta) {
-    console.log(chalkWARN('当前是beta环境，不初始化websocket'));
-    return;
-  }
   console.log(chalkSUCCESS('初始化websocket成功！'));
   const oneK = 1000;
   const io = new Server(server, {

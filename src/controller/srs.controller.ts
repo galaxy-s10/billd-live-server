@@ -22,7 +22,7 @@ import livePlayController from '@/controller/livePlay.controller';
 import liveRecordController from '@/controller/liveRecord.controller';
 import userLiveRoomController from '@/controller/userLiveRoom.controller';
 import { CustomError } from '@/model/customError.model';
-import { SERVER_LIVE, SRS_CONFIG } from '@/secret/secret';
+import { SRS_CONFIG, SRS_LIVE } from '@/secret/secret';
 import liveRoomService from '@/service/liveRoom.service';
 import userService from '@/service/user.service';
 import {
@@ -60,9 +60,9 @@ class SRSController {
       ),
     getPullUrl: (data: { liveRoomId: number }) => {
       return {
-        rtmp: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${data.liveRoomId}`,
-        flv: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${data.liveRoomId}.flv`,
-        hls: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${data.liveRoomId}.m3u8`,
+        rtmp: `${SRS_LIVE.PushDomain}/${SRS_LIVE.AppName}/roomId___${data.liveRoomId}`,
+        flv: `${SRS_LIVE.PullDomain}/${SRS_LIVE.AppName}/roomId___${data.liveRoomId}.flv`,
+        hls: `${SRS_LIVE.PullDomain}/${SRS_LIVE.AppName}/roomId___${data.liveRoomId}.m3u8`,
         webrtc: ``,
       };
     },
@@ -74,10 +74,10 @@ class SRSController {
       const pushParams = (type: LiveRoomTypeEnum) =>
         `?${SRS_CB_URL_PARAMS.roomId}=${data.liveRoomId}&${SRS_CB_URL_PARAMS.publishType}=${type}&${SRS_CB_URL_PARAMS.publishKey}=${data.key}`;
       return {
-        push_rtmp_url: `${SERVER_LIVE.PushDomain}/${
-          SERVER_LIVE.AppName
-        }/roomId___${data.liveRoomId}${pushParams(data.type)}`,
-        push_obs_server: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${data.liveRoomId}`,
+        push_rtmp_url: `${SRS_LIVE.PushDomain}/${SRS_LIVE.AppName}/roomId___${
+          data.liveRoomId
+        }${pushParams(data.type)}`,
+        push_obs_server: `${SRS_LIVE.PushDomain}/${SRS_LIVE.AppName}/roomId___${data.liveRoomId}`,
         push_obs_stream_key: pushParams(LiveRoomTypeEnum.obs),
         push_webrtc_url: ``,
         push_srt_url: ``,

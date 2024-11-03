@@ -21,6 +21,8 @@ export function loadAllRoutes(app) {
     try {
       if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
         if (file === 'index.ts') return;
+      } else if (PROJECT_ENV === PROJECT_ENV_ENUM.beta) {
+        if (file === 'index.ts') return;
       } else if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
         if (file === 'index.js') return;
       } else if (file === 'index.js') return;

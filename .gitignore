@@ -2,7 +2,9 @@ node_modules
 .DS_Store
 /dist
 /src/secret/secret.ts
-/src/secret/secret-remote-dev.ts
+/src/secret/secret-beta.ts
+/src/secret/secret-dev.ts
+/src/secret/secret-prod.ts
 /public/**/*
 /upload/**/*
 /webm/**/*

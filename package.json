@@ -39,13 +39,9 @@
     "@socket.io/redis-adapter": "^8.0.0",
     "alipay-sdk": "^3.4.0",
     "amqplib": "^0.10.3",
-    "autocannon": "^7.14.0",
     "axios": "^1.4.0",
-    "billd-deploy": "^1.0.23",
     "billd-html-webpack-plugin": "^1.0.6",
-    "billd-scss": "^0.0.8",
     "billd-utils": "^0.0.22",
-    "chalk": "^4.1.2",
     "crypto-js": "^4.1.1",
     "dayjs": "^1.11.3",
     "fs-extra": "^11.2.0",
@@ -69,13 +65,11 @@
     "nodemailer": "^6.7.2",
     "qiniu": "7.4.0",
     "redis": "^4.0.4",
-    "rimraf": "^5.0.1",
     "sequelize": "^6.32.1",
     "socket.io": "^4.7.2",
     "socket.io-msgpack-parser": "^3.0.2",
     "ssh2": "^1.7.0",
-    "tencentcloud-sdk-nodejs": "^4.0.616",
-    "trash": "^8.1.1"
+    "tencentcloud-sdk-nodejs": "^4.0.616"
   },
   "devDependencies": {
     "@commitlint/cli": "^16.0.1",
@@ -98,6 +92,8 @@
     "@types/validator": "^13.7.0",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
+    "autocannon": "^7.14.0",
+    "chalk": "^4.1.2",
     "commitizen": "^4.2.4",
     "cross-env": "^7.0.3",
     "eslint": "^8.2.0",
@@ -109,7 +105,9 @@
     "lint-staged": "^12.1.6",
     "nodemon": "^2.0.15",
     "prettier": "^2.6.0",
+    "rimraf": "^5.0.1",
     "standard-version": "^9.3.2",
+    "trash": "^8.1.1",
     "ts-node": "^10.4.0",
     "typescript": "^4.8.2"
   }

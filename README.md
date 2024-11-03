@@ -27,7 +27,6 @@ billd 直播间，目前实现了类似 [bilibili 的 Web 在线直播](https://
 | 直播间前台   | [billd-live](https://github.com/galaxy-s10/billd-live)                           | [![github](https://img.shields.io/github/stars/galaxy-s10/billd-live?label=star&logo=GitHub)](https://github.com/galaxy-s10/billd-live) [![github](https://img.shields.io/github/forks/galaxy-s10/billd-live?label=fork&logo=GitHub)](https://github.com/galaxy-s10/billd-live)                                                     | [https://live.hsslive.cn](https://live.hsslive.cn)                   |
 | 直播间后端   | [billd-live-server](https://github.com/galaxy-s10/billd-live-server)             | [![github](https://img.shields.io/github/stars/galaxy-s10/billd-live-server?label=star&logo=GitHub)](https://github.com/galaxy-s10/billd-live-server) [![github](https://img.shields.io/github/forks/galaxy-s10/billd-live-server?label=fork&logo=GitHub)](https://github.com/galaxy-s10/billd-live-server)                         | [https://live-api.hsslive.cn](https://live-api.hsslive.cn)           |
 | 直播间后台   | [billd-live-admin](https://github.com/galaxy-s10/billd-live-admin)               | [![github](https://img.shields.io/github/stars/galaxy-s10/billd-live-admin?label=star&logo=GitHub)](https://github.com/galaxy-s10/billd-live-admin) [![github](https://img.shields.io/github/forks/galaxy-s10/billd-live-admin?label=fork&logo=GitHub)](https://github.com/galaxy-s10/billd-live-admin)                             | [https://live-admin.hsslive.cn](https://live-admin.hsslive.cn)       |
-| 远程桌面     | [billd-desk](https://github.com/galaxy-s10/billd-desk)                           | [![github](https://img.shields.io/github/stars/galaxy-s10/billd-desk?label=star&logo=GitHub)](https://github.com/galaxy-s10/billd-desk) [![github](https://img.shields.io/github/forks/galaxy-s10/billd-desk?label=fork&logo=GitHub)](https://github.com/galaxy-s10/billd-desk)                                                     | [https://desk.hsslive.cn](https://desk.hsslive.cn)                   |
 | 直播间移动端 | [billd-live-flutter](https://github.com/galaxy-s10/billd-live-flutter)           | [![github](https://img.shields.io/github/stars/galaxy-s10/billd-live-flutter?label=star&logo=GitHub)](https://github.com/galaxy-s10/billd-live-flutter) [![github](https://img.shields.io/github/forks/galaxy-s10/billd-live-flutter?label=fork&logo=GitHub)](https://github.com/galaxy-s10/billd-live-flutter)                     | [https://live.hsslive.cn/download](https://live.hsslive.cn/download) |
 | 直播间移动端 | [billd-live-react-native](https://github.com/galaxy-s10/billd-live-react-native) | [![github](https://img.shields.io/github/stars/galaxy-s10/billd-live-react-native?label=star&logo=GitHub)](https://github.com/galaxy-s10/billd-live-react-native) [![github](https://img.shields.io/github/forks/galaxy-s10/billd-live-react-native?label=fork&logo=GitHub)](https://github.com/galaxy-s10/billd-live-react-native) | [https://live.hsslive.cn/download](https://live.hsslive.cn/download) |
 | 直播间客户端 | [billd-live-electron](https://github.com/galaxy-s10/billd-live-electron)         | [![github](https://img.shields.io/github/stars/galaxy-s10/billd-live-electron?label=star&logo=GitHub)](https://github.com/galaxy-s10/billd-live-flutter) [![github](https://img.shields.io/github/forks/galaxy-s10/billd-live-electron?label=fork&logo=GitHub)](https://github.com/galaxy-s10/billd-live-electron)                  | [https://live.hsslive.cn/download](https://live.hsslive.cn/download) |
@@ -212,22 +211,31 @@ pnpm i
 > 更新 billd 相关依赖：
 
 ```bash
-pnpm i billd-utils@latest billd-scss@latest billd-html-webpack-plugin@latest
+pnpm i billd-utils@latest billd-html-webpack-plugin@latest
 ```
 
 > 本地必须要有 docker、ffmpeg 环境！
+
+- 运行
+
+> 初次运行，会在项目的 src/secret/目录下生成 `secret-dev.ts`、`secret-beta.ts`、`secret-prod.ts` 三个文件，请填写里面的信息（MYSQL_CONFIG、REDIS_CONFIG、SRS_CONFIG 必填！）
 >
-> 项目启动后，会在项目的 src/secret/目录下生成 secret.ts 文件，请填写里面的信息，MYSQL_CONFIG、REDIS_CONFIG、SRS_CONFIG 必填！
+> 运行在 4300 端口
 
 ```bash
-# 1.初始化docker容器
-pnpm run docker:dev
-
-# 2.初始化数据库（可选，只需要执行一次）
-pnpm run mysql:dev
-
-# 3.运行（4300端口）
 pnpm run dev
+```
+
+1. 初始化 docker 容器
+
+```bash
+pnpm run docker:dev
+```
+
+2. 初始化数据库（可选，只需要执行一次）
+
+```bash
+pnpm run mysql:dev
 ```
 
 ## 兼容性
@@ -269,7 +277,7 @@ pnpm run dev
 
 ### 流媒体服务器环境
 
-> 配置：2 核 CPU，2G 内存，带宽 30M（香港）
+> 配置：2 核 CPU，4G 内存，带宽 30M（香港）
 
 - 操作系统：Alibaba Cloud Linux release 3 (Soaring Falcon)
 - node 版本：v16.20.0
@@ -278,6 +286,12 @@ pnpm run dev
 - docker 版本：24.0.2, build cb74dfc
 - srs 版本：基于 docker，镜像：registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5.0.170
 - ffmpeg 版本：6.0
+
+## 关于作者
+
+2020 年开始工作，主业前端开发，业余喜欢写一些有的没的东西。
+
+商务合作请加微信：shuisheng9905
 
 ## 致敬开源
 

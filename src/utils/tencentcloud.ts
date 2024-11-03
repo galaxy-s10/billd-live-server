@@ -6,7 +6,7 @@ import { Client } from 'tencentcloud-sdk-nodejs/tencentcloud/services/live/v2018
 
 import { SRS_CB_URL_PARAMS } from '@/constant';
 import {
-  TENCENTCLOUD_LIVE,
+  TENCENTCLOUD_CSS,
   TENCENTCLOUD_SECRETID,
   TENCENTCLOUD_SECRETKEY,
 } from '@/secret/secret';
@@ -139,8 +139,8 @@ class TencentcloudClass {
   dropLiveStream = async (data: { roomId: number }) => {
     const params = {
       StreamName: `roomId___${data.roomId}`, // 流名称
-      AppName: TENCENTCLOUD_LIVE.AppName,
-      DomainName: TENCENTCLOUD_LIVE.PushDomain,
+      AppName: TENCENTCLOUD_CSS.AppName,
+      DomainName: TENCENTCLOUD_CSS.PushDomain,
     };
     try {
       const res = await this.liveClient.DropLiveStream(params);
@@ -160,7 +160,7 @@ class TencentcloudClass {
    * 获取拉流地址。
    */
   getPullUrl = (data: { liveRoomId: number }) => {
-    const url = `${TENCENTCLOUD_LIVE.PullDomain}/${TENCENTCLOUD_LIVE.AppName}/roomId___${data.liveRoomId}`;
+    const url = `${TENCENTCLOUD_CSS.PullDomain}/${TENCENTCLOUD_CSS.AppName}/roomId___${data.liveRoomId}`;
     return {
       rtmp: `rtmp://${url}`,
       flv: `https://${url}.flv`,
@@ -185,7 +185,7 @@ class TencentcloudClass {
     const Hex = (num: number) => num.toString(16).toUpperCase();
     const txTime = Math.floor(Date.now() / 1000) + 60 * 60; // txTime（地址有效期） 表示何时该 URL 会过期，格式支持十六进制的 UNIX 时间戳（时间单位：秒）。
     const txSecret = cryptojs
-      .MD5(TENCENTCLOUD_LIVE.Key + StreamName + Hex(txTime))
+      .MD5(TENCENTCLOUD_CSS.Key + StreamName + Hex(txTime))
       .toString();
     const key = `${StreamName}?txSecret=${txSecret}&txTime=${Hex(txTime)}&${
       SRS_CB_URL_PARAMS.roomId
@@ -193,10 +193,10 @@ class TencentcloudClass {
       SRS_CB_URL_PARAMS.publishKey
     }=${data.key}`;
     return {
-      push_rtmp_url: `rtmp://${TENCENTCLOUD_LIVE.PushDomain}/${TENCENTCLOUD_LIVE.AppName}/${key}`,
-      push_obs_server: `rtmp://${TENCENTCLOUD_LIVE.PushDomain}/${TENCENTCLOUD_LIVE.AppName}/`,
+      push_rtmp_url: `rtmp://${TENCENTCLOUD_CSS.PushDomain}/${TENCENTCLOUD_CSS.AppName}/${key}`,
+      push_obs_server: `rtmp://${TENCENTCLOUD_CSS.PushDomain}/${TENCENTCLOUD_CSS.AppName}/`,
       push_obs_stream_key: key,
-      push_webrtc_url: `webrtc://${TENCENTCLOUD_LIVE.PushDomain}/${TENCENTCLOUD_LIVE.AppName}/${key}`,
+      push_webrtc_url: `webrtc://${TENCENTCLOUD_CSS.PushDomain}/${TENCENTCLOUD_CSS.AppName}/${key}`,
       push_srt_url: ``,
     };
   };

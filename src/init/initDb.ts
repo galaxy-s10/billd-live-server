@@ -203,6 +203,8 @@ export const loadAllModel = () => {
   fs.readdirSync(modelDir).forEach((file: string) => {
     if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
       if (file.indexOf('.model.ts') === -1) return;
+    } else if (PROJECT_ENV === PROJECT_ENV_ENUM.beta) {
+      if (file.indexOf('.model.ts') === -1) return;
     } else if (file.indexOf('.model.js') === -1) return;
     // eslint-disable-next-line
     require(`${modelDir}/${file}`).default;

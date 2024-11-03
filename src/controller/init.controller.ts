@@ -44,7 +44,7 @@ import userLiveRoomModel from '@/model/userLiveRoom.model';
 import userRoleModel from '@/model/userRole.model';
 import walletModel from '@/model/wallet.model';
 import walletRecordModel from '@/model/walletRecord.model';
-import { SERVER_LIVE } from '@/secret/secret';
+import { SRS_LIVE } from '@/secret/secret';
 import liveRoomService from '@/service/liveRoom.service';
 import userService from '@/service/user.service';
 import walletService from '@/service/wallet.service';
@@ -209,9 +209,9 @@ class InitController {
             .toString();
           if (user.live_room.cdn === LiveRoomUseCDNEnum.no) {
             liveUrl = (live_room_id: number) => ({
-              rtmp_url: `${SERVER_LIVE.PushDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}`,
-              flv_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.flv`,
-              hls_url: `${SERVER_LIVE.PullDomain}/${SERVER_LIVE.AppName}/roomId___${live_room_id}.m3u8`,
+              rtmp_url: `${SRS_LIVE.PushDomain}/${SRS_LIVE.AppName}/roomId___${live_room_id}`,
+              flv_url: `${SRS_LIVE.PullDomain}/${SRS_LIVE.AppName}/roomId___${live_room_id}.flv`,
+              hls_url: `${SRS_LIVE.PullDomain}/${SRS_LIVE.AppName}/roomId___${live_room_id}.m3u8`,
             });
             // @ts-ignore
           } else if (user.live_room.cdn === LiveRoomUseCDNEnum.yes) {

@@ -20,8 +20,6 @@ import {
   IS_UPLOAD_SERVER,
   LOCALHOST_URL,
   PROJECT_PORT,
-  QINIU_BACKUP,
-  QINIU_RESOURCE,
   QINIU_UPLOAD_PROGRESS_TYPE,
   REDIS_PREFIX,
   STATIC_DIR,
@@ -31,6 +29,7 @@ import redisController from '@/controller/redis.controller';
 import { IList, IQiniuData } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import qiniuDataService from '@/service/qiniuData.service';
+import { QINIU_KODO } from '@/spec-config';
 import { formatMemorySize, getLastestWeek } from '@/utils';
 import { chalkWARN } from '@/utils/chalkTip';
 import QiniuUtils, { IQiniuKey } from '@/utils/qiniu';
@@ -40,7 +39,10 @@ class QiniuController {
   getToken = async (ctx: ParameterizedContext, next) => {
     // @ts-ignore
     const { prefix, hash, ext }: IQiniuKey = ctx.request.query;
-    if (!QINIU_BACKUP.prefix[prefix] && !QINIU_RESOURCE.prefix[prefix]) {
+    if (
+      !QINIU_KODO['hss-backup'].prefix[prefix] &&
+      !QINIU_KODO.hssblog.prefix[prefix]
+    ) {
       throw new CustomError(
         '错误的prefix',
         COMMON_HTTP_CODE.paramsError,
@@ -94,7 +96,7 @@ class QiniuController {
     const prefetch: string[][] = [];
     const list = qiniuOfficialRes.map((item) => {
       // eslint-disable-next-line
-      return `${QINIU_RESOURCE.url}/${item.key}`;
+      return `${QINIU_KODO.hssblog.url}/${item.key}`;
     });
     for (let i = 0; i < list.length; i += 60) {
       prefetch.push(list.slice(i, i + 60));
@@ -102,7 +104,7 @@ class QiniuController {
     const promise = prefetch.map((item) => {
       return this.prefetchQiniu(item);
     });
-    const prefetchRes = await Promise.all([promise]);
+    const prefetchRes = await Promise.all(promise);
     console.log('prefetchRes', prefetchRes);
     successHandler({
       ctx,
@@ -153,7 +155,7 @@ class QiniuController {
     const key = `${prefix + hash}.${ext}`;
     if (!IS_UPLOAD_SERVER) {
       const { flag } = await QiniuUtils.getQiniuStat(
-        QINIU_RESOURCE.bucket,
+        QINIU_KODO.hssblog.bucket,
         key
       );
       if (flag) {
@@ -244,7 +246,7 @@ class QiniuController {
   // 合并chunk
   mergeChunk = async (ctx: ParameterizedContext, next) => {
     const { hash, ext, prefix }: IQiniuKey = ctx.request.body;
-    if (!QINIU_RESOURCE.prefix[prefix]) {
+    if (!QINIU_KODO.hssblog.prefix[prefix]) {
       throw new CustomError(
         `prefix错误！`,
         COMMON_HTTP_CODE.paramsError,
@@ -292,7 +294,7 @@ class QiniuController {
   upload = async (ctx: ParameterizedContext, next) => {
     const { userInfo } = await authJwt(ctx);
     const { hash, ext, prefix }: IQiniuKey = ctx.request.body;
-    if (!QINIU_RESOURCE.prefix[prefix]) {
+    if (!QINIU_KODO.hssblog.prefix[prefix]) {
       throw new CustomError(
         `prefix错误！`,
         COMMON_HTTP_CODE.paramsError,
@@ -408,7 +410,7 @@ class QiniuController {
     const key = `${prefix + hash}.${ext}`;
     let flag = false;
     if (!IS_UPLOAD_SERVER) {
-      const res = await QiniuUtils.getQiniuStat(QINIU_RESOURCE.bucket, key);
+      const res = await QiniuUtils.getQiniuStat(QINIU_KODO.hssblog.bucket, key);
       flag = res.flag;
     } else {
       const filename = `${hash}.${ext}`;
@@ -470,7 +472,7 @@ class QiniuController {
       result.qiniu_key,
       result.bucket
     );
-    const cdnUrl = `${QINIU_RESOURCE.url}/${result.qiniu_key!}`;
+    const cdnUrl = `${QINIU_KODO.hssblog.url}/${result.qiniu_key!}`;
     successHandler({
       ctx,
       data: `${
@@ -493,10 +495,10 @@ class QiniuController {
     };
     const qiniuOfficialRes = await QiniuUtils.delete(
       qiniu_key,
-      QINIU_RESOURCE.bucket
+      QINIU_KODO.hssblog.bucket
     );
     const result = await qiniuDataService.findByQiniuKey(qiniu_key);
-    const cdnUrl = `${QINIU_RESOURCE.url}/${qiniu_key}`;
+    const cdnUrl = `${QINIU_KODO.hssblog.url}/${qiniu_key}`;
 
     if (!result) {
       successHandler({
@@ -553,7 +555,10 @@ class QiniuController {
   // 对比差异
   getDiff = async (ctx: ParameterizedContext, next) => {
     const { prefix }: any = ctx.request.query;
-    if (!QINIU_BACKUP.prefix[prefix] && !QINIU_RESOURCE.prefix[prefix]) {
+    if (
+      !QINIU_KODO['hss-backup'].prefix[prefix] &&
+      !QINIU_KODO.hssblog.prefix[prefix]
+    ) {
       throw new CustomError(
         '错误的prefix',
         COMMON_HTTP_CODE.paramsError,
@@ -595,7 +600,10 @@ class QiniuController {
 
   async update(ctx: ParameterizedContext, next) {
     const { bucket, prefix, qiniu_key }: any = ctx.request.body;
-    if (!QINIU_BACKUP.prefix[prefix] && !QINIU_RESOURCE.prefix[prefix]) {
+    if (
+      !QINIU_KODO['hss-backup'].prefix[prefix] &&
+      !QINIU_KODO.hssblog.prefix[prefix]
+    ) {
       throw new CustomError(
         '错误的prefix',
         COMMON_HTTP_CODE.paramsError,
@@ -616,7 +624,7 @@ class QiniuController {
       await QiniuUtils.updateQiniuFile(
         bucket,
         file.qiniu_key,
-        QINIU_RESOURCE.bucket,
+        QINIU_KODO.hssblog.bucket,
         qiniu_key
       );
     if (flag) {
@@ -649,7 +657,10 @@ class QiniuController {
   monitCDN() {
     const cdnManager = QiniuUtils.getQiniuCdnManager();
     // 域名列表
-    const domains = [QINIU_RESOURCE.domain, QINIU_BACKUP.domain];
+    const domains = [
+      QINIU_KODO.hssblog.domain,
+      QINIU_KODO['hss-backup'].domain,
+    ];
     const { startDate, endDate } = getLastestWeek();
     const granularity = 'day'; // 粒度，取值：5min ／ hour ／day
     return new Promise((resolve, reject) => {

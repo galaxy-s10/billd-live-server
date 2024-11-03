@@ -2,17 +2,29 @@ import fs from 'fs';
 
 // eslint-disable-next-line import/order
 import {
-  SECRETTEMP_FILE,
-  SECRET_FILE,
+  SECRET_BETA_FILE,
+  SECRET_DEV_FILE,
+  SECRET_PROD_FILE,
+  SECRET_TEMPLATE_FILE,
   STATIC_DIR,
   UPLOAD_DIR,
 } from '../constant';
 
 export function handleSecretFile() {
-  const isExist = fs.existsSync(SECRET_FILE);
-  if (!isExist) {
-    const secretTemp = fs.readFileSync(SECRETTEMP_FILE);
-    fs.writeFileSync(SECRET_FILE, secretTemp.toString());
+  const devFileIsExist = fs.existsSync(SECRET_DEV_FILE);
+  if (!devFileIsExist) {
+    const secretTemp = fs.readFileSync(SECRET_TEMPLATE_FILE);
+    fs.writeFileSync(SECRET_DEV_FILE, secretTemp.toString());
+  }
+  const betaFileIsExist = fs.existsSync(SECRET_BETA_FILE);
+  if (!betaFileIsExist) {
+    const secretTemp = fs.readFileSync(SECRET_TEMPLATE_FILE);
+    fs.writeFileSync(SECRET_BETA_FILE, secretTemp.toString());
+  }
+  const prodFileIsExist = fs.existsSync(SECRET_PROD_FILE);
+  if (!prodFileIsExist) {
+    const secretTemp = fs.readFileSync(SECRET_TEMPLATE_FILE);
+    fs.writeFileSync(SECRET_PROD_FILE, secretTemp.toString());
   }
 }
 
