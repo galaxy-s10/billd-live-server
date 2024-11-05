@@ -44,6 +44,7 @@ async function main() {
     await (
       await import('./controller/init.controller')
     ).default.common.initDefault();
+    console.log(chalkSUCCESS(`初始化数据库数据完成！`));
     return;
   }
   try {
