@@ -109,7 +109,12 @@ async function addLive({
         console.log(chalkERROR(`FFmpeg推流错误！`), 'localFile为空');
         return;
       }
-      const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec copy -acodec copy -f flv '${
+      // -preset veryfast，编码速度选项，veryfast 是一个较快的选项，适合实时推流。
+      // -tune zerolatency，优化延迟，适合实时流。
+      // -g 1，设置 GOP（Group of Pictures）大小为 1，这样会禁用 B 帧，因为每帧都是 I 帧
+      // -bf 0，禁用 B 帧
+      // WARN 核心是禁用B帧
+      const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec libx264 -preset veryfast -tune zerolatency -bf 0 -g 1 -acodec copy -f flv '${
         cdn === LiveRoomUseCDNEnum.yes
           ? cdnPushRes.push_rtmp_url
           : srsPushRes.push_rtmp_url

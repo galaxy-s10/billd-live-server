@@ -10,6 +10,8 @@ srsRouter.post('/rtcV1Publish', srsController.rtcV1Publish);
 
 srsRouter.post('/rtcV1Play', srsController.rtcV1Play);
 
+srsRouter.post('/rtcV1Whep', srsController.rtcV1Whep);
+
 srsRouter.get('/apiV1Streams', srsController.getApiV1Streams);
 
 srsRouter.get('/apiV1Clients', srsController.getApiV1Clients);

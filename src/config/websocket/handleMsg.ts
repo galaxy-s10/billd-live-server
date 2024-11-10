@@ -432,11 +432,11 @@ export async function handleWsStartLive(args: {
       userId,
       liveRoomType: data.data.type,
     });
-  liveRedisController.setLiveRoomIsLiving({
-    socketId: data.socket_id,
-    liveRoomId: Number(roomId),
-    client_ip: getSocketRealIp(socket),
-  });
+  // liveRedisController.setLiveRoomIsLiving({
+  //   socketId: data.socket_id,
+  //   liveRoomId: Number(roomId),
+  //   client_ip: getSocketRealIp(socket),
+  // });
   if (
     data.data.type === LiveRoomTypeEnum.wertc_live ||
     data.data.type === LiveRoomTypeEnum.wertc_meeting_one

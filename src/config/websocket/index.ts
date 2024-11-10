@@ -74,13 +74,6 @@ async function updateUserJoinedRoom(data: {
   roomLiving?: boolean;
   clientIp: string;
 }) {
-  if (data.roomLiving) {
-    liveRedisController.setLiveRoomIsLiving({
-      socketId: data.socketId,
-      liveRoomId: data.liveRoomId,
-      client_ip: data.clientIp,
-    });
-  }
   const res = await liveRedisController.getUserJoinedRoom({
     socketId: data.socketId,
     joinRoomId: data.liveRoomId,

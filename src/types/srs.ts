@@ -96,11 +96,8 @@ export interface ITencentcloudCssUnPublishCb {
 }
 
 export interface ISrsRTC {
-  api: string;
-  clientip: any;
   sdp: string;
   streamurl: string;
-  tid: string;
 }
 
 export interface IApiV1Streams {

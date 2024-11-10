@@ -55,6 +55,8 @@ const frontendWhiteList = [
   '/srs/on_stop',
   '/srs/on_unpublish',
   '/srs/on_dvr',
+  '/srs/rtcV1Play',
+  '/srs/rtcV1Whep',
 
   '/tencentcloud_css/on_publish',
   '/tencentcloud_css/on_unpublish',

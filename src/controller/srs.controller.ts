@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
+import axios from 'axios';
 import { MD5 } from 'crypto-js';
 import { ParameterizedContext } from 'koa';
 import nodeSchedule from 'node-schedule';
@@ -95,10 +96,10 @@ class SRSController {
   };
 
   rtcV1Publish = async (ctx: ParameterizedContext, next) => {
-    const { api, clientip, sdp, streamurl, tid }: ISrsRTC = ctx.request.body;
+    const { sdp, streamurl }: ISrsRTC = ctx.request.body;
     const res = await myaxios.post(
       `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port[1985]}/rtc/v1/publish/`,
-      { api, clientip, sdp, streamurl, tid }
+      { sdp, streamurl }
     );
     successHandler({
       ctx,
@@ -108,14 +109,28 @@ class SRSController {
   };
 
   rtcV1Play = async (ctx: ParameterizedContext, next) => {
-    const { api, clientip, sdp, streamurl, tid }: ISrsRTC = ctx.request.body;
+    const { sdp, streamurl }: ISrsRTC = ctx.request.body;
     const res = await myaxios.post(
       `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port[1985]}/rtc/v1/play/`,
-      { api, clientip, sdp, streamurl, tid }
+      { sdp, streamurl }
     );
     successHandler({
       ctx,
       data: res,
+    });
+    await next();
+  };
+
+  rtcV1Whep = async (ctx: ParameterizedContext, next) => {
+    const { app, stream, sdp }: { app: string; stream: string; sdp: string } =
+      ctx.request.body;
+    const res = await axios.post(
+      `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port[1985]}/rtc/v1/whep/?app=${app}&stream=${stream}`,
+      sdp
+    );
+    successHandler({
+      ctx,
+      data: { answer: res.data },
     });
     await next();
   };
