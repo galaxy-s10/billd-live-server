@@ -3,7 +3,7 @@
     <img
       width="200"
       src="https://resource.hsslive.cn/billd-live/image/240160ddbc14367f7e0126c1f5b09b69.svg"
-      alt="logo"
+      alt="Billd-Live logo"
     />
   </a>
 </p>
@@ -35,8 +35,8 @@ billd 直播间，目前实现了类似 [bilibili 的 Web 在线直播](https://
 ## 功能
 
 - [x] 原生 webrtc 推拉流
-- [x] srs webrtc 推流，`http-flv` 或 `hls`拉流
-- [x] msr 推流，ffmpeg 转码，`http-flv` 或 `hls`拉流
+- [x] srs webrtc 推流，支持 `http-flv`、`hls`、`webrtc`、`rtmp`拉流
+- [x] msr 推流，ffmpeg 转码，支持 `http-flv`、`hls`、`webrtc`、`rtmp`拉流
 - [x] 一对一打 PK
 - [x] 一对多打 PK
 - [x] 多对多打 PK
@@ -49,10 +49,16 @@ billd 直播间，目前实现了类似 [bilibili 的 Web 在线直播](https://
 - [x] 支付模块（支付宝当面付）
 - [x] 订单模块
 - [x] 商品模块
-- [x] 适配移动端
-- [x] 在线后台
-- [x] 接入腾讯云-云直播
-- [ ] 接入腾讯云-实时音视频 TRTC
+- [x] 礼物模块
+- [x] 直播后台
+- [x] 响应式页面
+- [x] 适配多语言（i18n）
+- [x] 移动端 App（Flutter）
+- [ ] 客户端 App（Electron）
+- [x] 接入 bilibili 直播
+- [x] 接入腾讯云（云直播）
+- [ ] 接入腾讯云（实时音视频 TRTC）
+- [x] 私有化部署
 
 ## 技术栈
 
@@ -211,31 +217,22 @@ pnpm i
 > 更新 billd 相关依赖：
 
 ```bash
-pnpm i billd-utils@latest billd-html-webpack-plugin@latest
+pnpm i billd-utils@latest billd-scss@latest billd-html-webpack-plugin@latest
 ```
 
 > 本地必须要有 docker、ffmpeg 环境！
-
-- 运行
-
-> 初次运行，会在项目的 src/secret/目录下生成 `secret-dev.ts`、`secret-beta.ts`、`secret-prod.ts` 三个文件，请填写里面的信息（MYSQL_CONFIG、REDIS_CONFIG、SRS_CONFIG 必填！）
 >
-> 运行在 4300 端口
+> 项目启动后，会在项目的 src/secret/目录下生成 secret.ts 文件，请填写里面的信息，MYSQL_CONFIG、REDIS_CONFIG、SRS_CONFIG 必填！
 
 ```bash
-pnpm run dev
-```
-
-1. 初始化 docker 容器
-
-```bash
+# 1.初始化docker容器
 pnpm run docker:dev
-```
 
-2. 初始化数据库（可选，只需要执行一次）
-
-```bash
+# 2.初始化数据库（可选，只需要执行一次）
 pnpm run mysql:dev
+
+# 3.运行（4300端口）
+pnpm run dev
 ```
 
 ## 兼容性
@@ -247,6 +244,10 @@ pnpm run mysql:dev
 ## 常见问题
 
 [https://live.hsslive.cn/doc/faq](https://live.hsslive.cn/doc/faq)
+
+## 技术支持
+
+[https://live.hsslive.cn/support](https://live.hsslive.cn/support)
 
 ## 环境配置
 
@@ -277,6 +278,8 @@ pnpm run mysql:dev
 
 ### 流媒体服务器环境
 
+> ~~配置：2 核 CPU，2G 内存，带宽 30M（香港）~~，2G 内存也能跑，但偶尔会占满内存导致服务器卡死。
+>
 > 配置：2 核 CPU，4G 内存，带宽 30M（香港）
 
 - 操作系统：Alibaba Cloud Linux release 3 (Soaring Falcon)
@@ -286,12 +289,6 @@ pnpm run mysql:dev
 - docker 版本：24.0.2, build cb74dfc
 - srs 版本：基于 docker，镜像：registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5.0.170
 - ffmpeg 版本：6.0
-
-## 关于作者
-
-2020 年开始工作，主业前端开发，业余喜欢写一些有的没的东西。
-
-商务合作请加微信：shuisheng9905
 
 ## 致敬开源
 

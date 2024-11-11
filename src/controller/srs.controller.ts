@@ -124,10 +124,16 @@ class SRSController {
   rtcV1Whep = async (ctx: ParameterizedContext, next) => {
     const { app, stream, sdp }: { app: string; stream: string; sdp: string } =
       ctx.request.body;
+    // WARN 线上服务器的是whip-play
     const res = await axios.post(
-      `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port[1985]}/rtc/v1/whep/?app=${app}&stream=${stream}`,
+      `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port[1985]}/rtc/v1/whip-play/?app=${app}&stream=${stream}`,
       sdp
     );
+    // WARN 本地测试的是whep
+    // const res = await axios.post(
+    //   `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port[1985]}/rtc/v1/whep/?app=${app}&stream=${stream}`,
+    //   sdp
+    // );
     successHandler({
       ctx,
       data: { answer: res.data },
