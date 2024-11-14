@@ -3,6 +3,7 @@ import { ParameterizedContext } from 'koa';
 
 import { COMMON_HTTP_CODE } from '@/constant';
 import { CustomError } from '@/model/customError.model';
+import { UserStatusEnum } from '@/types/IUser';
 
 const schema = Joi.object({
   id: Joi.number().error(new Error('id要求是数字！')),
@@ -19,8 +20,10 @@ const schema = Joi.object({
   //   .required(),
   desc: Joi.string().min(3).max(50).error(new Error('描述长度要求3-50！')),
   avatar: Joi.string().min(3).max(100).error(new Error('头像长度要求3-100！')),
-  status: Joi.array().items(1, 2).error(new Error('状态要求1或2！')),
-  code: Joi.string().error(new Error('code角色格式错误！')),
+  status: Joi.array()
+    .valid(UserStatusEnum.disable, UserStatusEnum.normal)
+    .error(new Error('状态错误！')),
+  code: Joi.string().error(new Error('code格式错误！')),
   exp: Joi.number().error(new Error('exp格式错误！')),
   user_roles: Joi.array()
     .items(Joi.number())
