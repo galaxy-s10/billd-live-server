@@ -425,6 +425,22 @@ export interface IGoods {
   deleted_at?: string;
 }
 
+export interface IConfig {
+  id?: number;
+  field_a?: string;
+  field_b?: string;
+  field_c?: string;
+  field_d?: string;
+  field_e?: string;
+  field_f?: string;
+  field_g?: string;
+  remark?: string;
+
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
 export interface ISettings {
   id?: number;
   key?: string;

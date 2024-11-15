@@ -23,6 +23,7 @@ import {
 } from '@/utils/chalkTip';
 
 const start = performance.now();
+
 async function main() {
   function adLog() {
     console.log();
@@ -44,7 +45,7 @@ async function main() {
     await (
       await import('./controller/init.controller')
     ).default.common.initDefault();
-    console.log(chalkSUCCESS(`初始化数据库数据完成！`));
+    console.log(chalkSUCCESS(`初始化数据库数据完成！请退出该命令！`));
     return;
   }
   try {
