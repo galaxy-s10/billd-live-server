@@ -26,37 +26,56 @@ const model = sequelize.define<GoodsModel>(
       autoIncrement: true,
     },
     name: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(200),
+      defaultValue: '',
     },
     type: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100),
+      defaultValue: '',
     },
     desc: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
+      defaultValue: '',
     },
     short_desc: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(200),
+      defaultValue: '',
     },
     cover: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(200),
+      defaultValue: '',
     },
     price: {
       type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
     original_price: {
       type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
     nums: {
       type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    pay_nums: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    inventory: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
     badge: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100),
+      defaultValue: '',
     },
     badge_bg: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100),
+      defaultValue: '',
     },
     remark: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
   },
   {

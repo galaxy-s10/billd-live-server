@@ -73,11 +73,14 @@ class GoodsController {
     const {
       type,
       name,
+      desc,
       short_desc,
       cover,
       price,
       original_price,
       nums,
+      pay_nums,
+      inventory,
       badge,
       badge_bg,
       remark,
@@ -94,11 +97,14 @@ class GoodsController {
       id,
       type,
       name,
+      desc,
       short_desc,
       cover,
       price,
       original_price,
       nums,
+      pay_nums,
+      inventory,
       badge,
       badge_bg,
       remark,
@@ -107,15 +113,18 @@ class GoodsController {
     await next();
   }
 
-  async create(ctx: ParameterizedContext, next) {
+  create = async (ctx: ParameterizedContext, next) => {
     const {
       type,
       name,
+      desc,
       short_desc,
       cover,
       price,
       original_price,
       nums,
+      pay_nums,
+      inventory,
       badge,
       badge_bg,
       remark,
@@ -123,18 +132,21 @@ class GoodsController {
     await this.common.create({
       type,
       name,
+      desc,
       short_desc,
       cover,
       price,
       original_price,
       nums,
+      pay_nums,
+      inventory,
       badge,
       badge_bg,
       remark,
     });
     successHandler({ ctx });
     await next();
-  }
+  };
 
   async delete(ctx: ParameterizedContext, next) {
     const id = +ctx.params.id;

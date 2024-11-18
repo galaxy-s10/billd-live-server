@@ -101,6 +101,9 @@ importers:
       redis:
         specifier: ^4.0.4
         version: 4.0.4
+      rimraf:
+        specifier: ^5.0.1
+        version: 5.0.1
       sequelize:
         specifier: ^6.32.1
         version: 6.32.1(mysql2@2.3.3)
@@ -216,9 +219,6 @@ importers:
       prettier:
         specifier: ^2.6.0
         version: 2.6.0
-      rimraf:
-        specifier: ^5.0.1
-        version: 5.0.1
       standard-version:
         specifier: ^9.3.2
         version: 9.3.2

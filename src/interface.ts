@@ -134,6 +134,7 @@ export enum GoodsTypeEnum {
   sponsors = 'sponsors',
   gift = 'gift',
   recharge = 'recharge',
+  qypShop = 'qypShop',
 }
 
 export enum DanmuMsgTypeEnum {
@@ -144,7 +145,7 @@ export enum DanmuMsgTypeEnum {
   redbag,
 }
 
-export enum WsMessageMsgIsFileEnum {
+export enum WsMessageIsFileEnum {
   yes,
   no,
 }
@@ -155,12 +156,17 @@ export enum WsMessageContentTypeEnum {
   video,
 }
 
-export enum WsMessageMsgIsShowEnum {
+export enum WsMessageIsShowEnum {
   yes,
   no,
 }
 
-export enum WsMessageMsgIsVerifyEnum {
+export enum WsMessageIsVerifyEnum {
+  yes,
+  no,
+}
+
+export enum WsMessageIsBilibiliEnum {
   yes,
   no,
 }
@@ -179,8 +185,9 @@ export interface IWsMessage {
   msg_type?: DanmuMsgTypeEnum;
   user_agent?: string;
   send_msg_time?: number;
-  is_show?: WsMessageMsgIsShowEnum;
-  is_verify?: WsMessageMsgIsVerifyEnum;
+  is_show?: WsMessageIsShowEnum;
+  is_verify?: WsMessageIsVerifyEnum;
+  is_bilibili?: WsMessageIsBilibiliEnum;
   remark?: string;
 
   user?: IUser;
@@ -416,6 +423,8 @@ export interface IGoods {
   price?: number;
   original_price?: number;
   nums?: number;
+  pay_nums?: number;
+  inventory?: number;
   badge?: string;
   badge_bg?: string;
   remark?: string;

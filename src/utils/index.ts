@@ -65,9 +65,13 @@ export function handleRangTime({
 export function handlePage({ nowPage, pageSize }: IListBase) {
   let offset: number | undefined;
   let limit: number | undefined;
-  if (nowPage && pageSize) {
-    offset = (+nowPage - 1) * +pageSize;
-    limit = +pageSize;
+  let nowpage = Number(nowPage);
+  let pagesize = Number(pageSize);
+  nowpage = nowpage <= 0 ? 1 : nowpage;
+  pagesize = pagesize >= 200 ? 200 : pagesize;
+  if (nowpage && pagesize) {
+    offset = (+nowpage - 1) * +pagesize;
+    limit = +pagesize;
   }
   return { offset, limit };
 }

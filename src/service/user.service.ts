@@ -108,6 +108,12 @@ class UserService {
   /** 根据id查找用户（不返回password，但返回token） */
   async findAndToken(id: number) {
     const result = await userModel.findOne({
+      include: [
+        {
+          model: roleModel,
+          through: { attributes: [] },
+        },
+      ],
       attributes: {
         exclude: ['password'],
       },

@@ -11,8 +11,9 @@ import {
   DanmuMsgTypeEnum,
   IWsMessage,
   WsMessageContentTypeEnum,
-  WsMessageMsgIsShowEnum,
-  WsMessageMsgIsVerifyEnum,
+  WsMessageIsBilibiliEnum,
+  WsMessageIsShowEnum,
+  WsMessageIsVerifyEnum,
 } from '@/interface';
 
 interface WsMessageModel
@@ -71,11 +72,15 @@ const model = sequelize.define<WsMessageModel>(
     },
     is_show: {
       type: DataTypes.INTEGER,
-      defaultValue: WsMessageMsgIsShowEnum.yes,
+      defaultValue: WsMessageIsShowEnum.yes,
     },
     is_verify: {
       type: DataTypes.INTEGER,
-      defaultValue: WsMessageMsgIsVerifyEnum.yes,
+      defaultValue: WsMessageIsVerifyEnum.yes,
+    },
+    is_bilibili: {
+      type: DataTypes.INTEGER,
+      defaultValue: WsMessageIsBilibiliEnum.no,
     },
     remark: {
       type: DataTypes.STRING(500),
@@ -101,4 +106,5 @@ const model = sequelize.define<WsMessageModel>(
 );
 
 initTable({ model, sequelize });
+
 export default model;

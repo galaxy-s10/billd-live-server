@@ -28,7 +28,11 @@ import redisController from '@/controller/redis.controller';
 import userLiveRoomController from '@/controller/userLiveRoom.controller';
 import wsMessageController from '@/controller/wsMessage.controller';
 import { initUser } from '@/init/initUser';
-import { IRedisVal, WsMessageMsgIsVerifyEnum } from '@/interface';
+import {
+  IRedisVal,
+  WsMessageIsBilibiliEnum,
+  WsMessageIsVerifyEnum,
+} from '@/interface';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
 import { LiveRoomMsgVerifyEnum, LiveRoomTypeEnum } from '@/types/ILiveRoom';
@@ -65,6 +69,15 @@ export async function handleWsJoin(args: {
   data: WsJoinType;
 }) {
   const { io, socket, data } = args;
+  let userInfo;
+  if (data.user_token) {
+    const res = await jwtVerify(data.user_token);
+    if (!res.userInfo) {
+      console.log(chalkERROR('userInfo为空'));
+      return;
+    }
+    userInfo = res.userInfo;
+  }
   const { roomId } = args;
   const redisRoomId = roomId;
   if (!roomId) {
@@ -88,10 +101,11 @@ export async function handleWsJoin(args: {
     msgType: WsMsgTypeEnum.joined,
     data: {},
   });
+
   liveRedisController.setUserJoinedRoom({
     socketId: data.socket_id,
     joinRoomId: redisRoomId,
-    userInfo: data.user_info,
+    userInfo,
     client_ip: getSocketRealIp(socket),
   });
   liveRedisController.setSocketIdJoinLiveRoom({
@@ -108,7 +122,7 @@ export async function handleWsJoin(args: {
       liveRedisController.setUserJoinedRoom({
         socketId: socket.id,
         joinRoomId: redisRoomId,
-        userInfo: data.user_info,
+        userInfo,
         client_ip: getSocketRealIp(socket),
       });
     } else {
@@ -120,7 +134,7 @@ export async function handleWsJoin(args: {
       liveRedisController.setUserJoinedRoom({
         socketId: socket.id,
         joinRoomId: redisRoomId,
-        userInfo: data.user_info,
+        userInfo,
         client_ip: getSocketRealIp(socket),
       });
     }
@@ -132,7 +146,7 @@ export async function handleWsJoin(args: {
     data: {
       live_room_id: roomId,
       join_socket_id: socket.id,
-      join_user_info: data.user_info,
+      join_user_info: userInfo,
       socket_list: socketList ? [...socketList] : [],
     },
   });
@@ -204,46 +218,57 @@ export async function handleWsMessage(args: {
   data: WsMessageType;
 }) {
   const { io, socket, data } = args;
+  let userInfo;
+  if (data.user_token) {
+    const res = await jwtVerify(data.user_token);
+    if (!res.userInfo) {
+      console.log(chalkERROR('userInfo为空'));
+      return;
+    }
+    userInfo = res.userInfo;
+  } else {
+    return;
+  }
   let liveRoomId = data.data.live_room_id;
-  if (data.data.isBilibili && initUser.systemUserBilibili.live_room.id) {
+  if (
+    data.data.is_bilibili === WsMessageIsBilibiliEnum.yes &&
+    initUser.systemUserBilibili.live_room.id
+  ) {
     liveRoomId = initUser.systemUserBilibili.live_room.id;
   }
+
   if (!liveRoomId) {
     return;
   }
+
   const res = await liveRedisController.getDisableSpeaking({
     liveRoomId,
-    userId: data.user_info?.id || -1,
+    userId: userInfo?.id || -1,
   });
   if (!res) {
     const liveRoomInfo = await liveRoomController.common.find(liveRoomId);
-    const origin_username = data.user_info!.username!;
-    const origin_content = data.data.content;
-    const content = origin_content;
-    const username = origin_username;
     const msgVerify = liveRoomInfo?.msg_verify;
     const user_agent = getSocketUserAgent(socket);
     const msgRes = await wsMessageController.common.create({
       msg_type: data.data.msg_type,
-      user_id: data.user_info?.id,
+      user_id: userInfo.id,
       live_room_id: liveRoomId,
       ip: getSocketRealIp(socket),
-      content,
+      content: data.data.content?.slice(0, MSG_MAX_LENGTH),
       content_type: data.data.content_type,
-      origin_content,
-      username,
-      origin_username,
+      origin_content: data.data.content,
+      username: userInfo.username,
+      origin_username: userInfo.username,
       user_agent: strSlice(user_agent, 490),
       send_msg_time: data.time,
       redbag_send_id: data.data.redbag_send_id,
       is_verify:
         msgVerify === LiveRoomMsgVerifyEnum.yes
-          ? WsMessageMsgIsVerifyEnum.no
-          : WsMessageMsgIsVerifyEnum.yes,
+          ? WsMessageIsVerifyEnum.no
+          : WsMessageIsVerifyEnum.yes,
     });
     const data2 = filterObj(data, ['user_token', 'request_id']);
-    data2.data.content = content.slice(0, MSG_MAX_LENGTH);
-    data2.data.msg_id = msgRes.id;
+    data2.data = { ...msgRes.get(), user: userInfo };
     ioEmit<any>({
       io,
       roomId: liveRoomId,
@@ -270,7 +295,18 @@ export async function handleWsMessage(args: {
 
 export async function handleWsMsrBlob(args: { data: WsMsrBlobType }) {
   const { data } = args;
-  const userId = data.user_info?.id;
+  let userInfo;
+  if (data.user_token) {
+    const res = await jwtVerify(data.user_token);
+    if (!res.userInfo) {
+      console.log(chalkERROR('userInfo为空'));
+      return;
+    }
+    userInfo = res.userInfo;
+  } else {
+    return;
+  }
+  const userId = userInfo.id;
   if (!userId) {
     console.log(chalkERROR('userId为空'));
     return;
@@ -423,7 +459,18 @@ export async function handleWsStartLive(args: {
   data: WsStartLiveType;
 }) {
   const { socket, data } = args;
-  const userId = data.user_info?.id;
+  let userInfo;
+  if (data.user_token) {
+    const res = await jwtVerify(data.user_token);
+    if (!res.userInfo) {
+      console.log(chalkERROR('userInfo为空'));
+      return;
+    }
+    userInfo = res.userInfo;
+  } else {
+    return;
+  }
+  const userId = userInfo.id;
   const {
     roomId,
     userLiveRoomInfo,
@@ -577,6 +624,15 @@ export async function handleWsUpdateJoinInfo(args: {
   data: WsUpdateJoinInfoType;
 }) {
   const { socket, data } = args;
+  let userInfo;
+  if (data.user_token) {
+    const res = await jwtVerify(data.user_token);
+    if (!res.userInfo) {
+      console.log(chalkERROR('userInfo为空'));
+      return;
+    }
+    userInfo = res.userInfo;
+  }
   const res = await liveRedisController.getUserJoinedRoom({
     socketId: data.socket_id,
     joinRoomId: data.data.live_room_id,
@@ -585,7 +641,7 @@ export async function handleWsUpdateJoinInfo(args: {
     liveRedisController.setUserJoinedRoom({
       socketId: data.socket_id,
       joinRoomId: data.data.live_room_id,
-      userInfo: data.user_info,
+      userInfo,
       client_ip: getSocketRealIp(socket),
     });
     liveRedisController.setSocketIdJoinLiveRoom({
@@ -601,11 +657,15 @@ export async function handleWsDisableSpeaking(args: {
   data: WsDisableSpeakingType;
 }) {
   const { io, socket, data } = args;
-  if (!data.user_token) {
-    return;
-  }
-  const { userInfo } = await jwtVerify(data.user_token);
-  if (!userInfo?.id) {
+  let userInfo;
+  if (data.user_token) {
+    const res = await jwtVerify(data.user_token);
+    if (!res.userInfo) {
+      console.log(chalkERROR('userInfo为空'));
+      return;
+    }
+    userInfo = res.userInfo;
+  } else {
     return;
   }
   const auths = await authController.common.getUserAuth(userInfo.id);

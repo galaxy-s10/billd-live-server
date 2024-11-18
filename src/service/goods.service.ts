@@ -33,6 +33,7 @@ class GoodsService {
     short_desc,
     badge,
     badge_bg,
+    remark,
     orderBy,
     orderName,
     nowPage,
@@ -51,10 +52,11 @@ class GoodsService {
       short_desc,
       badge,
       badge_bg,
+      remark,
     });
     const keyWordWhere = handleKeyWord({
       keyWord,
-      arr: ['name', 'desc', 'short_desc', 'remark'],
+      arr: ['name', 'desc', 'short_desc', 'badge', 'badge_bg', 'remark'],
     });
     if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;

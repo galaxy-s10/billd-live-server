@@ -32,6 +32,65 @@ class UserController {
     isSameName: (username: string) => userService.isSameName(username),
   };
 
+  create = async (ctx: ParameterizedContext, next) => {
+    const data: IUser = ctx.request.body;
+    const username = data.username?.trim();
+    const password = data.password?.trim();
+    const { user_roles } = data;
+
+    if (!username || !password) {
+      throw new CustomError(
+        `用户名或密码为空！`,
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
+      );
+    }
+    if (username.length < 3 || username.length > 12) {
+      throw new CustomError(
+        `用户名长度要求3-12位！`,
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
+      );
+    }
+    if (password.length < 6 || password.length > 18) {
+      throw new CustomError(
+        `密码长度要求6-18位！`,
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
+      );
+    }
+    const isExistSameName = await userService.isSameName(username);
+    if (isExistSameName) {
+      throw new CustomError(
+        `已存在用户名为${username}的用户！`,
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
+      );
+    }
+
+    const createUserInfo = await this.common.create(data);
+    if (user_roles) {
+      // @ts-ignore
+      await createUserInfo.setRoles(user_roles);
+    }
+    await walletService.create({ user_id: createUserInfo.id, balance: 0 });
+    await thirdUserService.create({
+      user_id: createUserInfo.id,
+      third_user_id: createUserInfo.id,
+      third_platform: THIRD_PLATFORM.website,
+    });
+    const user_agent = strSlice(String(ctx.request.headers['user-agent']), 490);
+    const ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
+    await loginRecordController.common.create({
+      user_id: createUserInfo.id,
+      type: LoginRecordEnum.registerUsername,
+      user_agent,
+      ip,
+    });
+    successHandler({ ctx });
+    await next();
+  };
+
   register = async (ctx: ParameterizedContext, next) => {
     const data: IUser = ctx.request.body;
     const username = data.username?.trim();

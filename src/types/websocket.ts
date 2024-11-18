@@ -1,8 +1,4 @@
-import {
-  DanmuMsgTypeEnum,
-  ILiveUser,
-  WsMessageContentTypeEnum,
-} from '@/interface';
+import { ILiveUser, IWsMessage } from '@/interface';
 import { ILiveRoom, LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import { IUser } from '@/types/IUser';
 
@@ -95,8 +91,6 @@ export interface IReqWsFormat<T> {
   request_id: string;
   /** 用户socket_id */
   socket_id: string;
-  /** 用户信息 */
-  user_info?: IUser;
   /** 用户token */
   user_token?: string;
   /** 消息时间戳 */
@@ -165,22 +159,8 @@ export type WsRoomLivingType = IResWsFormat<{ live_room_id: number }>;
 /** 直播间没在直播 */
 export type WsRoomNoLiveType = IResWsFormat<{ live_room_id: number }>;
 
-export interface IDanmu {
-  /** 消息类型 */
-  msg_type: DanmuMsgTypeEnum;
-  /** 消息内容类型 */
-  content_type?: WsMessageContentTypeEnum;
-  /** 消息内容 */
-  content: string;
-  live_room_id: number;
-  redbag_send_id?: number;
-  /** 消息id */
-  msg_id?: number;
-  isBilibili?: boolean;
-}
-
 /** ws消息 */
-export type WsMessageType = IReqWsFormat<IDanmu>;
+export type WsMessageType = IReqWsFormat<IWsMessage>;
 
 /** 禁言用户 */
 export type WsDisableSpeakingType = IReqWsFormat<{
