@@ -1,0 +1,596 @@
+
+#user  nobody;
+worker_processes 1;
+
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid        logs/nginx.pid;
+events {
+  worker_connections 1024;
+}
+
+
+http {
+  # 允许最大上传的大小
+  client_max_body_size 50m;
+  include mime.types;
+  default_type application/octet-stream;
+  sendfile on;
+  keepalive_timeout 65;
+
+  # 多个server需要每个listen都写端口号，不写listen的话貌似也没问题？实际测试不写80端口的会找对应的server_name
+
+  server {
+    # 禁止访问目录
+    include extra/disable_dir.conf;
+    # 图片防盗链
+    include extra/valid_referers.conf;
+
+    listen 80;
+    server_name srs-pull.hsslive.cn;
+
+    location / {
+      # 把当前域名的请求，跳转到新域名上，域名变化但路径不变，permanent：返回301永久重定向，浏览器地址栏会显示跳转后的URL地址
+      # proxy_pass http://localhost:5001/;
+      proxy_pass http://0.0.0.0:5001/;
+    }
+  }
+
+  # live-api.hsslive.cn 80端口
+  server {
+    # 禁止访问目录
+    include extra/disable_dir.conf;
+    # 图片防盗链
+    include extra/valid_referers.conf;
+
+    listen 80;
+    server_name live-api.hsslive.cn;
+
+    # 正式环境接口
+    location / {
+      # proxy_read_timeout 300s;
+      # proxy_connect_timeout 75s;
+      # proxy_redirect off;
+      # X-Real-IP是自定义的，给koa里记录日志
+      proxy_set_header X-Real-IP $remote_addr;
+      # X-Forwarded-For,是事实上的标准，暂时没地方用到
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+      proxy_set_header X-Forwarded-Proto $scheme;
+      # proxy_set_header X-NginX-Proxy true;
+      # proxy_pass http://localhost:4200/;
+      proxy_pass http://8.218.5.78:4200/;
+
+    }
+  }
+
+  # live-api.hsslive.cn 443端口
+  server {
+    # 禁止访问目录
+    include extra/disable_dir.conf;
+    # 图片防盗链（这里不能直接include valid_referers.conf，因为它里面的root是/node/，和live.hsslive.cn的root不一致）
+    # include extra/valid_referers.conf;
+
+    # SSL协议访问端口号为443。此处如未添加ssl，可能会造成Nginx无法启动。
+    listen 443 ssl http2;
+    server_name live-api.hsslive.cn;
+
+    # 开启gzip，关闭用off
+    gzip on;
+    # 选择压缩的文件类型，其值可以在 mime.types 文件中找到。
+    gzip_types text/plain text/css application/json application/javascript
+    # 是否在http header中添加Vary: Accept-Encoding，建议开启
+    gzip_vary on;
+    # gzip 压缩级别，1-9，数字越大压缩的越好，也越占用CPU时间，推荐6
+    gzip_comp_level 6;
+
+    # https://cloud.tencent.com/document/product/400/47360
+    ssl_certificate /usr/local/nginx/conf/cert/live-api.hsslive.cn_bundle.crt;
+    ssl_certificate_key /usr/local/nginx/conf/cert/live-api.hsslive.cn.key;
+    ssl_session_timeout 5m;
+    ssl_protocols TLSv1 TlSv1.1 TLSv1.2 TLSv1.3;
+    ssl_ciphers SM2-WITH-SMS4SM3:ECDH:AESGCM:HIGH:MEDIUM:!RC4:!DH:!MD5:!aNULL:!eNULL;
+    ssl_prefer_server_ciphers on;
+
+    location /i0hdslbcom/ {
+
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow-Credentials' 'true';
+      add_header 'Access-Control-Allow-Methods' '*';
+      add_header 'Access-Control-Allow-Headers' '*';
+      # proxy_read_timeout 300s;
+      # proxy_connect_timeout 75s;
+      # proxy_redirect off;
+      # X-Real-IP是自定义的，给koa里记录日志
+      proxy_set_header X-Real-IP $remote_addr;
+      # X-Forwarded-For,是事实上的标准，暂时没地方用到
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+      proxy_set_header X-Forwarded-Proto $scheme;
+      # proxy_set_header X-NginX-Proxy true;
+      # proxy_pass http://localhost:4200/;
+      proxy_pass http://i0.hdslb.com/;
+
+    }
+
+    location /apilivebilibilicom/ {
+
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow-Credentials' 'true';
+      add_header 'Access-Control-Allow-Methods' '*';
+      add_header 'Access-Control-Allow-Headers' '*';
+      # proxy_read_timeout 300s;
+      # proxy_connect_timeout 75s;
+      # proxy_redirect off;
+      # X-Real-IP是自定义的，给koa里记录日志
+      proxy_set_header X-Real-IP $remote_addr;
+      # X-Forwarded-For,是事实上的标准，暂时没地方用到
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+      proxy_set_header X-Forwarded-Proto $scheme;
+      # proxy_set_header X-NginX-Proxy true;
+      # proxy_pass http://localhost:4200/;
+      proxy_pass https://api.live.bilibili.com/;
+
+    }
+    # 正式环境接口
+    location / {
+      # proxy_read_timeout 300s;
+      # proxy_connect_timeout 75s;
+      # proxy_redirect off;
+      # X-Real-IP是自定义的，给koa里记录日志
+      proxy_set_header X-Real-IP $remote_addr;
+      # X-Forwarded-For,是事实上的标准，暂时没地方用到
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+      proxy_set_header X-Forwarded-Proto $scheme;
+      # proxy_set_header X-NginX-Proxy true;
+      # proxy_pass http://localhost:4200/;
+      proxy_pass http://8.218.5.78:4200/;
+
+    }
+
+    # location ^~ /srsflv/ {
+    #     # X-Real-IP是自定义的，给koa里记录日志
+    #     proxy_set_header X-Real-IP $remote_addr;
+    #     # X-Forwarded-For,是事实上的标准，暂时没地方用到
+    #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #     # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+    #     proxy_set_header X-Forwarded-Proto $scheme;
+    #     # proxy_set_header X-NginX-Proxy true;
+    #     # proxy_pass http://42.193.157.44:5001/;
+    #     proxy_pass http://8.218.5.78:5001/;
+    # }
+
+    # location ^~ /livestream/ {
+    #     # X-Real-IP是自定义的，给koa里记录日志
+    #     proxy_set_header X-Real-IP $remote_addr;
+    #     # X-Forwarded-For,是事实上的标准，暂时没地方用到
+    #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #     # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+    #     proxy_set_header X-Forwarded-Proto $scheme;
+    #     # proxy_set_header X-NginX-Proxy true;
+    #     # proxy_pass http://42.193.157.44:5001/;
+    #     proxy_pass http://8.218.5.78:5001;
+    # }
+    # location ^~ /tencentcloud/ {
+    #     # X-Real-IP是自定义的，给koa里记录日志
+    #     proxy_set_header X-Real-IP $remote_addr;
+    #     # X-Forwarded-For,是事实上的标准，暂时没地方用到
+    #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #     # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+    #     proxy_set_header X-Forwarded-Proto $scheme;
+    #     # proxy_set_header X-NginX-Proxy true;
+    #     # proxy_pass http://42.193.157.44:5001/;
+    #     proxy_pass http://pull.hsslive.cn/;
+    # }
+    # location ^~ /srs/ {
+    #     # X-Real-IP是自定义的，给koa里记录日志
+    #     proxy_set_header X-Real-IP $remote_addr;
+    #     # X-Forwarded-For,是事实上的标准，暂时没地方用到
+    #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #     # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+    #     proxy_set_header X-Forwarded-Proto $scheme;
+    #     # proxy_set_header X-NginX-Proxy true;
+    #     # proxy_pass http://localhost:1985/;
+    #     proxy_pass http://8.218.5.78:1985/;
+    # }
+    location /socket.io/ {
+      # X-Real-IP是自定义的，给koa里记录日志
+      proxy_set_header X-Real-IP $remote_addr;
+      # X-Forwarded-For,是事实上的标准，暂时没地方用到
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+      proxy_set_header X-Forwarded-Proto $scheme;
+      # proxy_set_header X-NginX-Proxy true;
+
+      # websocket用的，不能省
+      proxy_set_header Upgrade $http_upgrade;
+      # websocket用的，不能省
+      proxy_set_header Connection Upgrade;
+
+      proxy_pass http://8.218.5.78:4200/socket.io/;
+
+    }
+  }
+
+  # api-live.hsslive.cn 443端口
+  server {
+    # 禁止访问目录
+    include extra/disable_dir.conf;
+    # 图片防盗链（这里不能直接include valid_referers.conf，因为它里面的root是/node/，和live.hsslive.cn的root不一致）
+    # include extra/valid_referers.conf;
+
+    # SSL协议访问端口号为443。此处如未添加ssl，可能会造成Nginx无法启动。
+    listen 443 ssl http2;
+    server_name api-live.hsslive.cn;
+
+    # 开启gzip，关闭用off
+    gzip on;
+    # 选择压缩的文件类型，其值可以在 mime.types 文件中找到。
+    gzip_types text/plain text/css application/json application/javascript
+    # 是否在http header中添加Vary: Accept-Encoding，建议开启
+    gzip_vary on;
+    # gzip 压缩级别，1-9，数字越大压缩的越好，也越占用CPU时间，推荐6
+    gzip_comp_level 6;
+
+    # https://cloud.tencent.com/document/product/400/47360
+    ssl_certificate /usr/local/nginx/conf/cert/api-live.hsslive.cn_bundle.crt;
+    ssl_certificate_key /usr/local/nginx/conf/cert/api-live.hsslive.cn.key;
+    ssl_session_timeout 5m;
+    ssl_protocols TLSv1 TlSv1.1 TLSv1.2 TLSv1.3;
+    ssl_ciphers SM2-WITH-SMS4SM3:ECDH:AESGCM:HIGH:MEDIUM:!RC4:!DH:!MD5:!aNULL:!eNULL;
+    ssl_prefer_server_ciphers on;
+
+    location /i0hdslbcom/ {
+
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow-Credentials' 'true';
+      add_header 'Access-Control-Allow-Methods' '*';
+      add_header 'Access-Control-Allow-Headers' '*';
+      # proxy_read_timeout 300s;
+      # proxy_connect_timeout 75s;
+      # proxy_redirect off;
+      # X-Real-IP是自定义的，给koa里记录日志
+      proxy_set_header X-Real-IP $remote_addr;
+      # X-Forwarded-For,是事实上的标准，暂时没地方用到
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+      proxy_set_header X-Forwarded-Proto $scheme;
+      # proxy_set_header X-NginX-Proxy true;
+      # proxy_pass http://localhost:4200/;
+      proxy_pass http://i0.hdslb.com/;
+
+    }
+
+    location /apilivebilibilicom/ {
+
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow-Credentials' 'true';
+      add_header 'Access-Control-Allow-Methods' '*';
+      add_header 'Access-Control-Allow-Headers' '*';
+      # proxy_read_timeout 300s;
+      # proxy_connect_timeout 75s;
+      # proxy_redirect off;
+      # X-Real-IP是自定义的，给koa里记录日志
+      proxy_set_header X-Real-IP $remote_addr;
+      # X-Forwarded-For,是事实上的标准，暂时没地方用到
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+      proxy_set_header X-Forwarded-Proto $scheme;
+      # proxy_set_header X-NginX-Proxy true;
+      # proxy_pass http://localhost:4200/;
+      proxy_pass https://api.live.bilibili.com/;
+
+    }
+    # 正式环境接口
+    location / {
+      # proxy_read_timeout 300s;
+      # proxy_connect_timeout 75s;
+      # proxy_redirect off;
+      # X-Real-IP是自定义的，给koa里记录日志
+      proxy_set_header X-Real-IP $remote_addr;
+      # X-Forwarded-For,是事实上的标准，暂时没地方用到
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+      proxy_set_header X-Forwarded-Proto $scheme;
+      # proxy_set_header X-NginX-Proxy true;
+      # proxy_pass http://localhost:4200/;
+      proxy_pass http://8.218.5.78:4200/;
+
+    }
+
+    # location ^~ /srsflv/ {
+    #     # X-Real-IP是自定义的，给koa里记录日志
+    #     proxy_set_header X-Real-IP $remote_addr;
+    #     # X-Forwarded-For,是事实上的标准，暂时没地方用到
+    #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #     # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+    #     proxy_set_header X-Forwarded-Proto $scheme;
+    #     # proxy_set_header X-NginX-Proxy true;
+    #     # proxy_pass http://42.193.157.44:5001/;
+    #     proxy_pass http://8.218.5.78:5001/;
+    # }
+
+    # location ^~ /livestream/ {
+    #     # X-Real-IP是自定义的，给koa里记录日志
+    #     proxy_set_header X-Real-IP $remote_addr;
+    #     # X-Forwarded-For,是事实上的标准，暂时没地方用到
+    #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #     # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+    #     proxy_set_header X-Forwarded-Proto $scheme;
+    #     # proxy_set_header X-NginX-Proxy true;
+    #     # proxy_pass http://42.193.157.44:5001/;
+    #     proxy_pass http://8.218.5.78:5001;
+    # }
+    # location ^~ /tencentcloud/ {
+    #     # X-Real-IP是自定义的，给koa里记录日志
+    #     proxy_set_header X-Real-IP $remote_addr;
+    #     # X-Forwarded-For,是事实上的标准，暂时没地方用到
+    #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #     # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+    #     proxy_set_header X-Forwarded-Proto $scheme;
+    #     # proxy_set_header X-NginX-Proxy true;
+    #     # proxy_pass http://42.193.157.44:5001/;
+    #     proxy_pass http://pull.hsslive.cn/;
+    # }
+    # location ^~ /srs/ {
+    #     # X-Real-IP是自定义的，给koa里记录日志
+    #     proxy_set_header X-Real-IP $remote_addr;
+    #     # X-Forwarded-For,是事实上的标准，暂时没地方用到
+    #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #     # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+    #     proxy_set_header X-Forwarded-Proto $scheme;
+    #     # proxy_set_header X-NginX-Proxy true;
+    #     # proxy_pass http://localhost:1985/;
+    #     proxy_pass http://8.218.5.78:1985/;
+    # }
+    location /socket.io/ {
+      # X-Real-IP是自定义的，给koa里记录日志
+      proxy_set_header X-Real-IP $remote_addr;
+      # X-Forwarded-For,是事实上的标准，暂时没地方用到
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+      proxy_set_header X-Forwarded-Proto $scheme;
+      # proxy_set_header X-NginX-Proxy true;
+
+      # websocket用的，不能省
+      proxy_set_header Upgrade $http_upgrade;
+      # websocket用的，不能省
+      proxy_set_header Connection Upgrade;
+
+      proxy_pass http://8.218.5.78:4200/socket.io/;
+
+    }
+  }
+
+  # desk-api.hsslive.cn 443端口
+  server {
+    # 禁止访问目录
+    include extra/disable_dir.conf;
+    # 图片防盗链（这里不能直接include valid_referers.conf，因为它里面的root是/node/，和live.hsslive.cn的root不一致）
+    # include extra/valid_referers.conf;
+
+    # SSL协议访问端口号为443。此处如未添加ssl，可能会造成Nginx无法启动。
+    listen 443 ssl http2;
+    server_name desk-api.hsslive.cn;
+
+    # 开启gzip，关闭用off
+    gzip on;
+    # 选择压缩的文件类型，其值可以在 mime.types 文件中找到。
+    gzip_types text/plain text/css application/json application/javascript
+    # 是否在http header中添加Vary: Accept-Encoding，建议开启
+    gzip_vary on;
+    # gzip 压缩级别，1-9，数字越大压缩的越好，也越占用CPU时间，推荐6
+    gzip_comp_level 6;
+
+    # https://cloud.tencent.com/document/product/400/47360
+    ssl_certificate /usr/local/nginx/conf/cert/desk-api.hsslive.cn_bundle.crt;
+    ssl_certificate_key /usr/local/nginx/conf/cert/desk-api.hsslive.cn.key;
+    ssl_session_timeout 5m;
+    ssl_protocols TLSv1 TlSv1.1 TLSv1.2 TLSv1.3;
+    ssl_ciphers SM2-WITH-SMS4SM3:ECDH:AESGCM:HIGH:MEDIUM:!RC4:!DH:!MD5:!aNULL:!eNULL;
+    ssl_prefer_server_ciphers on;
+
+    location /i0hdslbcom/ {
+
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow-Credentials' 'true';
+      add_header 'Access-Control-Allow-Methods' '*';
+      add_header 'Access-Control-Allow-Headers' '*';
+      # proxy_read_timeout 300s;
+      # proxy_connect_timeout 75s;
+      # proxy_redirect off;
+      # X-Real-IP是自定义的，给koa里记录日志
+      proxy_set_header X-Real-IP $remote_addr;
+      # X-Forwarded-For,是事实上的标准，暂时没地方用到
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+      proxy_set_header X-Forwarded-Proto $scheme;
+      # proxy_set_header X-NginX-Proxy true;
+      # proxy_pass http://localhost:4200/;
+      proxy_pass http://i0.hdslb.com/;
+
+    }
+
+    location /apilivebilibilicom/ {
+
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow-Credentials' 'true';
+      add_header 'Access-Control-Allow-Methods' '*';
+      add_header 'Access-Control-Allow-Headers' '*';
+      # proxy_read_timeout 300s;
+      # proxy_connect_timeout 75s;
+      # proxy_redirect off;
+      # X-Real-IP是自定义的，给koa里记录日志
+      proxy_set_header X-Real-IP $remote_addr;
+      # X-Forwarded-For,是事实上的标准，暂时没地方用到
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+      proxy_set_header X-Forwarded-Proto $scheme;
+      # proxy_set_header X-NginX-Proxy true;
+      # proxy_pass http://localhost:4200/;
+      proxy_pass https://api.live.bilibili.com/;
+
+    }
+    # 正式环境接口
+    location / {
+      # proxy_read_timeout 300s;
+      # proxy_connect_timeout 75s;
+      # proxy_redirect off;
+      # X-Real-IP是自定义的，给koa里记录日志
+      proxy_set_header X-Real-IP $remote_addr;
+      # X-Forwarded-For,是事实上的标准，暂时没地方用到
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+      proxy_set_header X-Forwarded-Proto $scheme;
+      # proxy_set_header X-NginX-Proxy true;
+      # proxy_pass http://localhost:4200/;
+      proxy_pass http://8.218.5.78:4200/;
+
+    }
+
+    # location ^~ /srsflv/ {
+    #     # X-Real-IP是自定义的，给koa里记录日志
+    #     proxy_set_header X-Real-IP $remote_addr;
+    #     # X-Forwarded-For,是事实上的标准，暂时没地方用到
+    #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #     # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+    #     proxy_set_header X-Forwarded-Proto $scheme;
+    #     # proxy_set_header X-NginX-Proxy true;
+    #     # proxy_pass http://42.193.157.44:5001/;
+    #     proxy_pass http://8.218.5.78:5001/;
+    # }
+
+    # location ^~ /livestream/ {
+    #     # X-Real-IP是自定义的，给koa里记录日志
+    #     proxy_set_header X-Real-IP $remote_addr;
+    #     # X-Forwarded-For,是事实上的标准，暂时没地方用到
+    #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #     # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+    #     proxy_set_header X-Forwarded-Proto $scheme;
+    #     # proxy_set_header X-NginX-Proxy true;
+    #     # proxy_pass http://42.193.157.44:5001/;
+    #     proxy_pass http://8.218.5.78:5001;
+    # }
+    # location ^~ /tencentcloud/ {
+    #     # X-Real-IP是自定义的，给koa里记录日志
+    #     proxy_set_header X-Real-IP $remote_addr;
+    #     # X-Forwarded-For,是事实上的标准，暂时没地方用到
+    #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #     # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+    #     proxy_set_header X-Forwarded-Proto $scheme;
+    #     # proxy_set_header X-NginX-Proxy true;
+    #     # proxy_pass http://42.193.157.44:5001/;
+    #     proxy_pass http://pull.hsslive.cn/;
+    # }
+    # location ^~ /srs/ {
+    #     # X-Real-IP是自定义的，给koa里记录日志
+    #     proxy_set_header X-Real-IP $remote_addr;
+    #     # X-Forwarded-For,是事实上的标准，暂时没地方用到
+    #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #     # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+    #     proxy_set_header X-Forwarded-Proto $scheme;
+    #     # proxy_set_header X-NginX-Proxy true;
+    #     # proxy_pass http://localhost:1985/;
+    #     proxy_pass http://8.218.5.78:1985/;
+    # }
+    location /socket.io/ {
+      # X-Real-IP是自定义的，给koa里记录日志
+      proxy_set_header X-Real-IP $remote_addr;
+      # X-Forwarded-For,是事实上的标准，暂时没地方用到
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+      proxy_set_header X-Forwarded-Proto $scheme;
+      # proxy_set_header X-NginX-Proxy true;
+
+      # websocket用的，不能省
+      proxy_set_header Upgrade $http_upgrade;
+      # websocket用的，不能省
+      proxy_set_header Connection Upgrade;
+
+      proxy_pass http://8.218.5.78:4200/socket.io/;
+
+    }
+  }
+
+
+  # srs-pull.hsslive.cn 443端口
+  server {
+    include mime.types;
+    # 禁止访问目录
+    include extra/disable_dir.conf;
+    # 图片防盗链
+    include extra/valid_referers.conf;
+
+    # SSL协议访问端口号为443。此处如未添加ssl，可能会造成Nginx无法启动。
+    listen 443 ssl http2;
+    server_name srs-pull.hsslive.cn;
+
+    # 开启gzip，关闭用off
+    gzip on;
+    # 选择压缩的文件类型，其值可以在 mime.types 文件中找到。
+    gzip_types text/plain text/css application/json application/javascript
+    # 是否在http header中添加Vary: Accept-Encoding，建议开启
+    gzip_vary on;
+    # gzip 压缩级别，1-9，数字越大压缩的越好，也越占用CPU时间，推荐6
+    gzip_comp_level 6;
+
+    # https://cloud.tencent.com/document/product/400/47360
+    ssl_certificate /usr/local/nginx/conf/cert/srs-pull.hsslive.cn_bundle.crt;
+    ssl_certificate_key /usr/local/nginx/conf/cert/srs-pull.hsslive.cn.key;
+    ssl_session_timeout 5m;
+    ssl_protocols TLSv1 TlSv1.1 TLSv1.2 TLSv1.3;
+    ssl_ciphers SM2-WITH-SMS4SM3:ECDH:AESGCM:HIGH:MEDIUM:!RC4:!DH:!MD5:!aNULL:!eNULL;
+    ssl_prefer_server_ciphers on;
+
+    location / {
+      # default_type application/json ;
+      # return 200 '111';
+      # X-Real-IP是自定义的，给koa里记录日志
+      proxy_set_header X-Real-IP $remote_addr;
+      # X-Forwarded-For,是事实上的标准，暂时没地方用到
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+      proxy_set_header X-Forwarded-Proto $scheme;
+      # proxy_set_header X-NginX-Proxy true;
+      # 注意，这里不能设置代理到localhost，得指定服务器ip，
+      # 否则正常情况没问题，但是on_play回调鉴权的时候，鉴权不通过会导致502！
+      proxy_pass http://0.0.0.0:5001/;
+      # proxy_pass http://localhost:5001/;
+      # proxy_pass http://8.218.5.78:5001/;
+    }
+
+    location ^~ /srs/ {
+      # X-Real-IP是自定义的，给koa里记录日志
+      proxy_set_header X-Real-IP $remote_addr;
+      # X-Forwarded-For,是事实上的标准，暂时没地方用到
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+      proxy_set_header X-Forwarded-Proto $scheme;
+      # proxy_set_header X-NginX-Proxy true;
+      proxy_pass http://localhost:1985/;
+    }
+
+    location /socket.io/ {
+      # X-Real-IP是自定义的，给koa里记录日志
+      proxy_set_header X-Real-IP $remote_addr;
+      # X-Forwarded-For,是事实上的标准，暂时没地方用到
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # X-Forwarded-Proto,是事实上的标准，给koa里的cookie使用
+      proxy_set_header X-Forwarded-Proto $scheme;
+      # proxy_set_header X-NginX-Proxy true;
+
+      # websocket用的，不能省
+      proxy_set_header Upgrade $http_upgrade;
+      # websocket用的，不能省
+      proxy_set_header Connection Upgrade;
+
+      proxy_pass http://localhost:4200/socket.io/;
+
+    }
+
+  }
+}

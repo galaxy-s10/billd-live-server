@@ -7,7 +7,11 @@ import {
 
 import sequelize from '@/config/mysql';
 import { initTable } from '@/init/initDb';
-import { ILiveRoom } from '@/types/ILiveRoom';
+import {
+  ILiveRoom,
+  LiveRoomIsShowEnum,
+  LiveRoomStatusEnum,
+} from '@/types/ILiveRoom';
 
 interface LiveRoomModel
   extends Model<
@@ -27,21 +31,27 @@ const model = sequelize.define<LiveRoomModel>(
     },
     name: {
       type: DataTypes.STRING(100),
+      defaultValue: '',
     },
     desc: {
       type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     status: {
       type: DataTypes.INTEGER,
+      defaultValue: LiveRoomStatusEnum.normal,
     },
     is_show: {
       type: DataTypes.INTEGER,
+      defaultValue: LiveRoomIsShowEnum.yes,
     },
     remark: {
       type: DataTypes.STRING(500),
+      defaultValue: '',
     },
     key: {
       type: DataTypes.STRING(100),
+      defaultValue: '',
     },
     type: {
       type: DataTypes.INTEGER,
@@ -57,81 +67,107 @@ const model = sequelize.define<LiveRoomModel>(
     },
     cover_img: {
       type: DataTypes.STRING(200),
+      defaultValue: '',
     },
     bg_img: {
       type: DataTypes.STRING(200),
+      defaultValue: '',
     },
     rtmp_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     flv_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     hls_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     webrtc_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     push_rtmp_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     push_obs_server: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     push_obs_stream_key: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     push_webrtc_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     push_srt_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     cdn_rtmp_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     cdn_flv_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     cdn_hls_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     cdn_webrtc_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     cdn_push_rtmp_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     cdn_push_obs_server: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     cdn_push_obs_stream_key: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     cdn_push_webrtc_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     cdn_push_srt_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     forward_bilibili_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     forward_huya_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     forward_douyu_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     forward_douyin_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     forward_kuaishou_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     forward_xiaohongshu_url: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
     is_fake: {
       type: DataTypes.INTEGER,
