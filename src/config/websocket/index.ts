@@ -5,17 +5,13 @@ import {
   handleWsBilldDeskJoin,
   handleWsBilldDeskStartRemote,
   handleWsBilldDeskUpdateUser,
-  handleWsDisableSpeaking,
-  handleWsDisconnecting,
   handleWsGetLiveUser,
   handleWsJoin,
   handleWsMessage,
   handleWsMsrBlob,
   handleWsRoomNoLive,
   handleWsStartLive,
-  handleWsUpdateJoinInfo,
 } from '@/config/websocket/handleMsg';
-import liveRedisController from '@/config/websocket/live-redis.controller';
 import {
   WsAnswerType,
   WsBatchSendOffer,
@@ -24,9 +20,7 @@ import {
   WsBilldDeskStartRemote,
   WsCandidateType,
   WsConnectStatusEnum,
-  WsDisableSpeakingType,
   WsGetLiveUserType,
-  WsHeartbeatType,
   WsJoinType,
   WsMessageType,
   WsMsgTypeEnum,
@@ -34,7 +28,6 @@ import {
   WsOfferType,
   WsRoomNoLiveType,
   WsStartLiveType,
-  WsUpdateJoinInfoType,
 } from '@/types/websocket';
 import { chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 
@@ -66,27 +59,6 @@ export async function getRoomAllUser(io, roomId: number) {
     return item.rooms.includes(`${roomId}`);
   });
   return res2;
-}
-
-async function updateUserJoinedRoom(data: {
-  socketId: string;
-  liveRoomId: number;
-  roomLiving?: boolean;
-  clientIp: string;
-}) {
-  const res = await liveRedisController.getUserJoinedRoom({
-    socketId: data.socketId,
-    joinRoomId: data.liveRoomId,
-  });
-  if (res) {
-    liveRedisController.setUserJoinedRoom({
-      socketId: res.value.socketId,
-      joinRoomId: res.value.joinRoomId,
-      userInfo: res.value.userInfo,
-      created_at: res.created_at,
-      client_ip: data.clientIp,
-    });
-  }
 }
 
 export const wsSocket: { io?: Server } = {
@@ -190,7 +162,7 @@ export const connectWebSocket = (server) => {
     });
 
     // 收到用户进入房间
-    socket.on(WsMsgTypeEnum.join, (data: WsJoinType) => {
+    socket.on(WsMsgTypeEnum.join, async (data: WsJoinType) => {
       try {
         const roomId = data.data.live_room_id;
         prettierInfoLog({
@@ -198,7 +170,7 @@ export const connectWebSocket = (server) => {
           socket,
           roomId,
         });
-        handleWsJoin({ io, socket, roomId, data });
+        await handleWsJoin({ io, socket, roomId, data });
       } catch (error) {
         console.log(error);
       }
@@ -297,46 +269,6 @@ export const connectWebSocket = (server) => {
         }
       }
     );
-
-    // 收到心跳
-    socket.on(WsMsgTypeEnum.heartbeat, (data: WsHeartbeatType) => {
-      try {
-        updateUserJoinedRoom({
-          socketId: data.socket_id,
-          liveRoomId: data.data.live_room_id,
-          clientIp: getSocketRealIp(socket),
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    });
-
-    // 收到主播禁言用户
-    socket.on(WsMsgTypeEnum.disableSpeaking, (data: WsDisableSpeakingType) => {
-      try {
-        prettierInfoLog({
-          msg: '收到主播禁言用户',
-          socket,
-        });
-        handleWsDisableSpeaking({ io, socket, data });
-      } catch (error) {
-        console.log(error);
-      }
-    });
-
-    // 收到更新加入信息
-    socket.on(WsMsgTypeEnum.updateJoinInfo, (data: WsUpdateJoinInfoType) => {
-      try {
-        prettierInfoLog({
-          msg: '收到更新加入信息',
-          socket,
-          roomId: data.data.live_room_id,
-        });
-        handleWsUpdateJoinInfo({ socket, data });
-      } catch (error) {
-        console.log(error);
-      }
-    });
 
     // 收到billdDeskStartRemote
     socket.on(
@@ -471,7 +403,6 @@ export const connectWebSocket = (server) => {
         socket,
       });
       console.log(reason);
-      handleWsDisconnecting({ io, socket });
     });
 
     // 已断开连接

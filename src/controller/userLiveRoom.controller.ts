@@ -7,17 +7,11 @@ import successHandler from '@/app/handler/success-handle';
 import { COMMON_HTTP_CODE } from '@/constant';
 import liveRoomController from '@/controller/liveRoom.controller';
 import srsController from '@/controller/srs.controller';
-import { IList, IUserLiveRoom } from '@/interface';
+import { IList, IUserLiveRoom, SwitchEnum } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveRoomService from '@/service/liveRoom.service';
 import userLiveRoomService from '@/service/userLiveRoom.service';
-import {
-  LiveRoomIsShowEnum,
-  LiveRoomPullIsShouldAuthEnum,
-  LiveRoomStatusEnum,
-  LiveRoomTypeEnum,
-  LiveRoomUseCDNEnum,
-} from '@/types/ILiveRoom';
+import { LiveRoomStatusEnum, LiveRoomTypeEnum } from '@/types/ILiveRoom';
 
 class UserLiveRoomController {
   common = {
@@ -116,9 +110,8 @@ class UserLiveRoomController {
       key: pushKey,
       type: LiveRoomTypeEnum.obs,
       priority: 21,
-      cdn: LiveRoomUseCDNEnum.no,
-      pull_is_should_auth: LiveRoomPullIsShouldAuthEnum.no,
-      is_show: LiveRoomIsShowEnum.yes,
+      cdn: SwitchEnum.no,
+      is_show: SwitchEnum.yes,
       status: LiveRoomStatusEnum.normal,
     });
     // @ts-ignore

@@ -7,7 +7,7 @@ import {
 
 import sequelize from '@/config/mysql';
 import { initTable } from '@/init/initDb';
-import { ILive } from '@/interface';
+import { ILive, LivePlatformEnum } from '@/interface';
 
 interface LiveModel
   extends Model<InferAttributes<LiveModel>, InferCreationAttributes<LiveModel>>,
@@ -22,63 +22,31 @@ const model = sequelize.define<LiveModel>(
       allowNull: false,
       autoIncrement: true,
     },
-    socket_id: {
-      type: DataTypes.STRING(100),
+    live_record_id: {
+      type: DataTypes.INTEGER,
     },
     live_room_id: {
       type: DataTypes.INTEGER,
     },
-    track_video: {
+    user_id: {
       type: DataTypes.INTEGER,
     },
-    track_audio: {
+    platform: {
       type: DataTypes.INTEGER,
+      defaultValue: LivePlatformEnum.tencentcloud_css,
     },
-    srs_server_id: {
-      type: DataTypes.STRING,
+    stream_name: {
+      type: DataTypes.STRING(300),
+      defaultValue: '',
     },
-    srs_service_id: {
-      type: DataTypes.STRING,
+    stream_id: {
+      type: DataTypes.STRING(100),
+      defaultValue: '',
     },
-    srs_action: {
-      type: DataTypes.STRING,
-    },
-    srs_client_id: {
-      type: DataTypes.STRING,
-    },
-    srs_ip: {
+    remark: {
       type: DataTypes.STRING(500),
+      defaultValue: '',
     },
-    srs_vhost: {
-      type: DataTypes.STRING,
-    },
-    srs_app: {
-      type: DataTypes.STRING,
-    },
-    srs_tcUrl: {
-      type: DataTypes.STRING,
-    },
-    srs_stream: {
-      type: DataTypes.STRING,
-    },
-    srs_param: {
-      type: DataTypes.STRING,
-    },
-    srs_stream_url: {
-      type: DataTypes.STRING,
-    },
-    srs_stream_id: {
-      type: DataTypes.STRING,
-    },
-    is_tencentcloud_css: {
-      type: DataTypes.INTEGER,
-    },
-    flag_id: {
-      type: DataTypes.STRING,
-    },
-    // ddd: {
-    //   type: DataTypes.STRING,
-    // },
   },
   {
     paranoid: true,

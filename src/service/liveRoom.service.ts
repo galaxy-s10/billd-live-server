@@ -37,7 +37,6 @@ class LiveRoomService {
     is_fake,
     type,
     cdn,
-    pull_is_should_auth,
     orderBy,
     orderName,
     nowPage,
@@ -59,12 +58,6 @@ class LiveRoomService {
     }
     if (cdn !== undefined && isPureNumber(`${cdn}`)) {
       allWhere.cdn = cdn;
-    }
-    if (
-      pull_is_should_auth !== undefined &&
-      isPureNumber(`${pull_is_should_auth}`)
-    ) {
-      allWhere.pull_is_should_auth = pull_is_should_auth;
     }
     const keyWordWhere = handleKeyWord({
       keyWord,
@@ -145,7 +138,6 @@ class LiveRoomService {
     is_fake,
     type,
     cdn,
-    pull_is_should_auth,
     exclude_key,
     orderBy,
     orderName,
@@ -168,12 +160,6 @@ class LiveRoomService {
     }
     if (cdn !== undefined && isPureNumber(`${cdn}`)) {
       allWhere.cdn = cdn;
-    }
-    if (
-      pull_is_should_auth !== undefined &&
-      isPureNumber(`${pull_is_should_auth}`)
-    ) {
-      allWhere.pull_is_should_auth = pull_is_should_auth;
     }
     const keyWordWhere = handleKeyWord({
       keyWord,

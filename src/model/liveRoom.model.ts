@@ -7,11 +7,8 @@ import {
 
 import sequelize from '@/config/mysql';
 import { initTable } from '@/init/initDb';
-import {
-  ILiveRoom,
-  LiveRoomIsShowEnum,
-  LiveRoomStatusEnum,
-} from '@/types/ILiveRoom';
+import { SwitchEnum } from '@/interface';
+import { ILiveRoom, LiveRoomStatusEnum } from '@/types/ILiveRoom';
 
 interface LiveRoomModel
   extends Model<
@@ -43,7 +40,7 @@ const model = sequelize.define<LiveRoomModel>(
     },
     is_show: {
       type: DataTypes.INTEGER,
-      defaultValue: LiveRoomIsShowEnum.yes,
+      defaultValue: SwitchEnum.yes,
     },
     remark: {
       type: DataTypes.STRING(500),
@@ -54,9 +51,6 @@ const model = sequelize.define<LiveRoomModel>(
       defaultValue: '',
     },
     type: {
-      type: DataTypes.INTEGER,
-    },
-    pull_is_should_auth: {
       type: DataTypes.INTEGER,
     },
     cdn: {

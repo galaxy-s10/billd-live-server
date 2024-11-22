@@ -8,31 +8,87 @@ import liveRecordService from '@/service/liveRecord.service';
 
 class LiveRecordController {
   common = {
-    find: async (id: number) => {
-      const res = await liveRecordService.find(id);
-      return res;
+    find: (id: number) => {
+      return liveRecordService.find(id);
     },
 
-    create: async (data: ILiveRecord) => {
-      const res = await liveRecordService.create(data);
-      return res;
-    },
-
-    updateByLiveRoomIdAndUserId: async (data: ILiveRecord) => {
-      const res = await liveRecordService.updateByLiveRoomIdAndUserId(data);
-      return res;
-    },
-
-    updateView: async (data: ILiveRecord) => {
-      const res = await liveRecordService.updateView(data);
-      return res;
-    },
-
-    getList: async ({
+    create: ({
       id,
-      client_id,
-      live_room_id,
+      platform,
+      stream_name,
+      stream_id,
       user_id,
+      live_room_id,
+      duration,
+      danmu,
+      view,
+      start_time,
+      end_time,
+      remark,
+    }: ILiveRecord) => {
+      return liveRecordService.create({
+        id,
+        platform,
+        stream_name,
+        stream_id,
+        user_id,
+        live_room_id,
+        duration,
+        danmu,
+        view,
+        start_time,
+        end_time,
+        remark,
+      });
+    },
+
+    update: ({
+      id,
+      platform,
+      stream_name,
+      stream_id,
+      user_id,
+      live_room_id,
+      duration,
+      danmu,
+      view,
+      start_time,
+      end_time,
+      remark,
+    }: ILiveRecord) => {
+      return liveRecordService.update({
+        id,
+        platform,
+        stream_name,
+        stream_id,
+        user_id,
+        live_room_id,
+        duration,
+        danmu,
+        view,
+        start_time,
+        end_time,
+        remark,
+      });
+    },
+
+    updateDuration: (data: ILiveRecord) => {
+      return liveRecordService.updateDuration(data);
+    },
+
+    getList: ({
+      id,
+      platform,
+      stream_name,
+      stream_id,
+      user_id,
+      live_room_id,
+      duration,
+      danmu,
+      view,
+      start_time,
+      end_time,
+      remark,
       childOrderName,
       childOrderBy,
       orderBy,
@@ -44,11 +100,19 @@ class LiveRecordController {
       rangTimeStart,
       rangTimeEnd,
     }: IList<ILiveRecord>) => {
-      const result = await liveRecordService.getList({
+      return liveRecordService.getList({
         id,
-        client_id,
-        live_room_id,
+        platform,
+        stream_name,
+        stream_id,
         user_id,
+        live_room_id,
+        duration,
+        danmu,
+        view,
+        start_time,
+        end_time,
+        remark,
         childOrderName,
         childOrderBy,
         nowPage,
@@ -60,7 +124,6 @@ class LiveRecordController {
         rangTimeStart,
         rangTimeEnd,
       });
-      return result;
     },
 
     delete: async (id: number) => {
@@ -73,15 +136,6 @@ class LiveRecordController {
         );
       }
       await liveRecordService.delete(id);
-    },
-
-    deleteByLiveRoomIdAndUserId: async (data: {
-      client_id: number;
-      live_room_id: number;
-      user_id: number;
-    }) => {
-      const res = await liveRecordService.deleteByLiveRoomIdAndUserId(data);
-      return res;
     },
   };
 

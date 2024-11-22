@@ -3,13 +3,9 @@ import { exec, spawnSync } from 'child_process';
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import srsController from '@/controller/srs.controller';
 import { initUser } from '@/init/initUser';
-import liveService from '@/service/live.service';
+import { SwitchEnum } from '@/interface';
 import liveRoomService from '@/service/liveRoom.service';
-import {
-  LiveRoomPullIsShouldAuthEnum,
-  LiveRoomTypeEnum,
-  LiveRoomUseCDNEnum,
-} from '@/types/ILiveRoom';
+import { LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 import { tencentcloudCssUtils } from '@/utils/tencentcloud-css';
 
@@ -29,7 +25,6 @@ async function addLive({
   cdn,
   type,
   priority,
-  pull_is_should_auth,
   cover_img,
   devFFmpeg,
   prodFFmpeg,
@@ -41,9 +36,8 @@ async function addLive({
   name: string;
   desc: string;
   type: LiveRoomTypeEnum;
-  cdn: LiveRoomUseCDNEnum;
+  cdn: SwitchEnum;
   priority: number;
-  pull_is_should_auth: LiveRoomPullIsShouldAuthEnum;
   cover_img: string;
   devFFmpeg: boolean;
   prodFFmpeg: boolean;
@@ -70,7 +64,6 @@ async function addLive({
   });
 
   async function main() {
-    await liveService.deleteByLiveRoomId(live_room_id);
     // 开发环境时判断devFFmpeg，是true的才初始化ffmpeg
     // 生产环境时判断prodFFmpeg，是true的才初始化ffmpeg
     if (
@@ -115,7 +108,7 @@ async function addLive({
       // -bf 0，禁用 B 帧
       // WARN 核心是禁用B帧
       const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec libx264 -preset veryfast -tune zerolatency -bf 0 -g 1 -acodec copy -f flv '${
-        cdn === LiveRoomUseCDNEnum.yes
+        cdn === SwitchEnum.yes
           ? cdnPushRes.push_rtmp_url
           : srsPushRes.push_rtmp_url
       }'`;
@@ -140,7 +133,6 @@ async function addLive({
       name,
       desc,
       cdn,
-      pull_is_should_auth,
       priority,
       cover_img,
       rtmp_url: srsPullRes.rtmp,
@@ -165,7 +157,7 @@ async function addLive({
     });
   }
 
-  if (cdn === LiveRoomUseCDNEnum.yes) {
+  if (cdn === SwitchEnum.yes) {
     if (PROJECT_ENV !== PROJECT_ENV_ENUM.prod) {
       return;
     }
@@ -220,26 +212,28 @@ export const initFFmpeg = async (init = true) => {
     await Promise.all(oldClientsQueue);
     const queue: any[] = [];
     Object.keys(initUser).forEach((item) => {
-      queue.push(
-        addLive({
-          live_room_id: initUser[item].live_room.id!,
-          user_id: initUser[item].id!,
-          name: initUser[item].live_room.name!,
-          desc: initUser[item].live_room.desc!,
-          cdn: initUser[item].live_room.cdn!,
-          type:
-            initUser[item].live_room.type === undefined
-              ? LiveRoomTypeEnum.system
-              : initUser[item].live_room.type!,
-          priority: initUser[item].live_room.priority!,
-          pull_is_should_auth: initUser[item].live_room.pull_is_should_auth!,
-          cover_img: initUser[item].live_room.cover_img!,
-          devFFmpeg: initUser[item].live_room.devFFmpeg,
-          prodFFmpeg: initUser[item].live_room.prodFFmpeg,
-          devFFmpegLocalFile: initUser[item].live_room.devFFmpegLocalFile,
-          prodFFmpegLocalFile: initUser[item].live_room.prodFFmpegLocalFile,
-        })
-      );
+      const { live_room } = initUser[item];
+      if (live_room) {
+        queue.push(
+          addLive({
+            live_room_id: live_room.id!,
+            user_id: initUser[item].id!,
+            name: live_room.name!,
+            desc: live_room.desc!,
+            cdn: live_room.cdn!,
+            type:
+              live_room.type === undefined
+                ? LiveRoomTypeEnum.system
+                : live_room.type,
+            priority: live_room.priority!,
+            cover_img: live_room.cover_img!,
+            devFFmpeg: live_room.devFFmpeg,
+            prodFFmpeg: live_room.prodFFmpeg,
+            devFFmpegLocalFile: live_room.devFFmpegLocalFile,
+            prodFFmpegLocalFile: live_room.prodFFmpegLocalFile,
+          })
+        );
+      }
     });
     await Promise.all(queue);
     console.log(chalkSUCCESS(`初始化FFmpeg推流成功！`));

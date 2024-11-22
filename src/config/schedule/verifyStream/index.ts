@@ -61,7 +61,10 @@ async function verifyBitrateIsOver(info: IApiV1Streams['streams'][0]) {
 
 const initLiveRoomId: number[] = [];
 Object.keys(initUser).forEach((iten) => {
-  initLiveRoomId.push(initUser[iten].live_room.id!);
+  const live_room_id = initUser[iten]?.live_room?.id;
+  if (live_room_id) {
+    initLiveRoomId.push(live_room_id);
+  }
 });
 
 export const handleVerifyStream = async () => {

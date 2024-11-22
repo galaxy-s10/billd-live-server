@@ -13,17 +13,6 @@ import {
   handleRangTime,
 } from '@/utils';
 
-// async function handleDelRedisByDbLiveRoomHistoryMsgList() {
-//   try {
-//     await redisController.del({
-//       prefix: REDIS_PREFIX.dbLiveRoomHistoryMsgList,
-//       key: '',
-//     });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
-
 class WsMessageService {
   /** 消息是否存在 */
   async isExist(ids: number[]) {
@@ -39,14 +28,21 @@ class WsMessageService {
 
   /** 获取消息列表 */
   async getList({
-    msg_type,
-    redbag_send_id,
+    id,
+    live_record_id,
+    username,
+    origin_username,
+    content_type,
+    content,
+    origin_content,
     live_room_id,
     user_id,
-    content_type,
     ip,
+    msg_type,
+    user_agent,
+    send_msg_time,
     is_show,
-    is_verify,
+    remark,
     orderBy,
     orderName,
     nowPage,
@@ -58,14 +54,21 @@ class WsMessageService {
   }: IList<IWsMessage>) {
     const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = deleteUseLessObjectKey({
-      msg_type,
-      user_id,
-      live_room_id,
-      ip,
-      redbag_send_id,
-      is_show,
-      is_verify,
+      id,
+      live_record_id,
+      username,
+      origin_username,
       content_type,
+      content,
+      origin_content,
+      live_room_id,
+      user_id,
+      ip,
+      msg_type,
+      user_agent,
+      send_msg_time,
+      is_show,
+      remark,
     });
     const keyWordWhere = handleKeyWord({
       keyWord,
@@ -121,6 +124,11 @@ class WsMessageService {
     });
 
     return handlePaging(result, nowPage, pageSize);
+  }
+
+  async getCountByLiveRecordId(live_record_id: number) {
+    const result = await wsMessageModel.count({ where: { live_record_id } });
+    return result;
   }
 
   /** 查找消息 */

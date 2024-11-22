@@ -7,17 +7,17 @@ import {
 
 import sequelize from '@/config/mysql';
 import { initTable } from '@/init/initDb';
-import { ILiveRecord, LivePlatformEnum } from '@/interface';
+import { ILiveView } from '@/interface';
 
-interface LiveRecordModel
+interface LiveViewModel
   extends Model<
-      InferAttributes<LiveRecordModel>,
-      InferCreationAttributes<LiveRecordModel>
+      InferAttributes<LiveViewModel>,
+      InferCreationAttributes<LiveViewModel>
     >,
-    ILiveRecord {}
+    ILiveView {}
 
-const model = sequelize.define<LiveRecordModel>(
-  'live_record',
+const model = sequelize.define<LiveViewModel>(
+  'live_view',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -25,41 +25,29 @@ const model = sequelize.define<LiveRecordModel>(
       allowNull: false,
       autoIncrement: true,
     },
+    live_record_id: {
+      type: DataTypes.INTEGER,
+    },
     live_room_id: {
       type: DataTypes.INTEGER,
     },
     user_id: {
       type: DataTypes.INTEGER,
     },
-    platform: {
-      type: DataTypes.INTEGER,
-      defaultValue: LivePlatformEnum.tencentcloud_css,
-    },
-    stream_name: {
-      type: DataTypes.STRING(300),
-      defaultValue: '',
-    },
-    stream_id: {
-      type: DataTypes.STRING(100),
-      defaultValue: '',
-    },
     duration: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
-    danmu: {
+    user_agent: {
+      type: DataTypes.STRING(500),
+      defaultValue: '',
+    },
+    client_ip: {
+      type: DataTypes.STRING(300),
+      defaultValue: '',
+    },
+    client_env: {
       type: DataTypes.INTEGER,
-      defaultValue: 0,
-    },
-    view: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-    },
-    start_time: {
-      type: DataTypes.DATE,
-    },
-    end_time: {
-      type: DataTypes.DATE,
     },
     remark: {
       type: DataTypes.STRING(500),

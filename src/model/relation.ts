@@ -3,7 +3,6 @@ import AreaLiveRoomModel from '@/model/areaLiveRoom.model';
 import AuthModel from '@/model/auth.model';
 import GlobalMsgModel from '@/model/globalMsg.model';
 import LiveModel from '@/model/live.model';
-import LivePlayModel from '@/model/livePlay.model';
 import LiveRecordModel from '@/model/liveRecord.model';
 import LiveRoomModel from '@/model/liveRoom.model';
 import LogModel from '@/model/log.model';
@@ -128,11 +127,6 @@ UserModel.hasOne(WalletModel, {
   constraints: false,
 });
 
-LivePlayModel.belongsTo(UserModel, {
-  foreignKey: 'user_id',
-  constraints: false,
-});
-
 LiveRecordModel.belongsTo(UserModel, {
   foreignKey: 'user_id',
   constraints: false,
@@ -143,10 +137,16 @@ LiveModel.belongsTo(LiveRoomModel, {
   constraints: false,
 });
 
-LivePlayModel.belongsTo(LiveRoomModel, {
-  foreignKey: 'live_room_id',
+LiveModel.belongsTo(UserModel, {
+  foreignKey: 'user_id',
   constraints: false,
 });
+
+UserModel.hasOne(LiveModel, {
+  foreignKey: 'user_id',
+  constraints: false,
+});
+
 LiveRecordModel.belongsTo(LiveRoomModel, {
   foreignKey: 'live_room_id',
   constraints: false,
@@ -157,10 +157,6 @@ LiveRoomModel.hasOne(LiveModel, {
   constraints: false,
 });
 
-LiveRoomModel.hasOne(LivePlayModel, {
-  foreignKey: 'live_room_id',
-  constraints: false,
-});
 LiveRoomModel.hasOne(LiveRecordModel, {
   foreignKey: 'live_room_id',
   constraints: false,

@@ -14,40 +14,28 @@ import {
   socketEmit,
 } from '@/config/websocket';
 import liveRedisController from '@/config/websocket/live-redis.controller';
-import {
-  DEFAULT_AUTH_INFO,
-  MSG_MAX_LENGTH,
-  REDIS_PREFIX,
-  WEBM_DIR,
-} from '@/constant';
-import authController from '@/controller/auth.controller';
+import { MSG_MAX_LENGTH, REDIS_PREFIX, WEBM_DIR } from '@/constant';
 import deskUserController from '@/controller/deskUser.controller';
 import liveController from '@/controller/live.controller';
-import liveRoomController from '@/controller/liveRoom.controller';
+import liveRecordController from '@/controller/liveRecord.controller';
+import liveViewController from '@/controller/liveView.controller';
 import redisController from '@/controller/redis.controller';
 import userLiveRoomController from '@/controller/userLiveRoom.controller';
 import wsMessageController from '@/controller/wsMessage.controller';
-import { initUser } from '@/init/initUser';
-import {
-  IRedisVal,
-  WsMessageIsBilibiliEnum,
-  WsMessageIsVerifyEnum,
-} from '@/interface';
+import { IRedisVal } from '@/interface';
 import liveService from '@/service/live.service';
 import liveRoomService from '@/service/liveRoom.service';
-import { LiveRoomMsgVerifyEnum, LiveRoomTypeEnum } from '@/types/ILiveRoom';
+import { LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import {
   WsBatchSendOffer,
   WsBilldDeskJoinedType,
   WsBilldDeskJoinType,
   WsBilldDeskStartRemote,
   WsBilldDeskStartRemoteResult,
-  WsDisableSpeakingType,
   WsGetLiveUserType,
   WsGetRoomAllUserType,
   WsJoinedType,
   WsJoinType,
-  WsLeavedType,
   WsLivePkKeyType,
   WsMessageType,
   WsMsgTypeEnum,
@@ -56,7 +44,6 @@ import {
   WsRoomLivingType,
   WsRoomNoLiveType,
   WsStartLiveType,
-  WsUpdateJoinInfoType,
 } from '@/types/websocket';
 import { strSlice } from '@/utils';
 import { chalkERROR, chalkWARN } from '@/utils/chalkTip';
@@ -69,31 +56,17 @@ export async function handleWsJoin(args: {
   data: WsJoinType;
 }) {
   const { io, socket, data } = args;
-  let userInfo;
-  if (data.user_token) {
-    const res = await jwtVerify(data.user_token);
-    if (!res.userInfo) {
-      console.log(chalkERROR('userInfo为空'));
-      return;
-    }
-    userInfo = res.userInfo;
+  if (!data?.data?.duration) {
+    console.log('handleWsJoin参数错误');
+    return;
   }
   const { roomId } = args;
-  const redisRoomId = roomId;
   if (!roomId) {
     console.log(chalkERROR('roomId为空'));
     return;
   }
-  const [liveRoomInfo, liveInfo] = await Promise.all([
-    liveRoomService.find(roomId),
-    liveController.common.findByLiveRoomId(roomId),
-  ]);
-  if (!liveRoomInfo) {
-    console.log(chalkERROR('liveRoomInfo为空'));
-    return;
-  }
   socket.join(`${roomId}`);
-  console.log(chalkWARN(`${socket.id}进入房间号:${roomId}`));
+  console.log(chalkWARN(`${socket.id} 进入房间号:${roomId}`));
   const roomsMap = io.of('/').adapter.rooms;
   const socketList = roomsMap.get(`${data.data.live_room_id}`);
   socketEmit<WsJoinedType['data']>({
@@ -101,44 +74,48 @@ export async function handleWsJoin(args: {
     msgType: WsMsgTypeEnum.joined,
     data: {},
   });
-
-  liveRedisController.setUserJoinedRoom({
-    socketId: data.socket_id,
-    joinRoomId: redisRoomId,
-    userInfo,
-    client_ip: getSocketRealIp(socket),
-  });
-  liveRedisController.setSocketIdJoinLiveRoom({
-    socketId: data.socket_id,
-    joinRoomId: redisRoomId,
-  });
-  if (liveInfo) {
-    if (liveRoomInfo.type === LiveRoomTypeEnum.system) {
-      // socketEmit<WsRoomLivingType['data']>({
-      //   socket,
-      //   msgType: WsMsgTypeEnum.roomLiving,
-      //   data: { live_room_id: roomId },
-      // });
-      liveRedisController.setUserJoinedRoom({
-        socketId: socket.id,
-        joinRoomId: redisRoomId,
-        userInfo,
-        client_ip: getSocketRealIp(socket),
-      });
-    } else {
-      // socketEmit<WsRoomLivingType['data']>({
-      //   socket,
-      //   msgType: WsMsgTypeEnum.roomLiving,
-      //   data: { live_room_id: roomId },
-      // });
-      liveRedisController.setUserJoinedRoom({
-        socketId: socket.id,
-        joinRoomId: redisRoomId,
-        userInfo,
-        client_ip: getSocketRealIp(socket),
+  if (data.user_token) {
+    const { userInfo } = await jwtVerify(data.user_token);
+    if (!userInfo) {
+      console.log(chalkERROR('userInfo为空'));
+      return;
+    }
+    await liveRedisController.joined({
+      roomId,
+      userInfo,
+      exp: data.data.duration + 5,
+      client_ip: getSocketRealIp(socket),
+    });
+    await liveRedisController.addLiveRoomOnlineUser({
+      roomId,
+      userInfo,
+      client_ip: getSocketRealIp(socket),
+    });
+    const recRes = await liveController.common.findLiveRecordByLiveRoomId(
+      roomId
+    );
+    const live_record_id = recRes?.live_record_id;
+    if (!live_record_id) return;
+    const [affectedCount] = await liveViewController.common.updateDuation({
+      live_record_id,
+      live_room_id: roomId,
+      duration: 0,
+      user_id: userInfo.id,
+    });
+    if (!affectedCount) {
+      await liveViewController.common.create({
+        live_record_id,
+        live_room_id: roomId,
+        duration: 0,
+        user_id: userInfo.id,
       });
     }
+    const view = await liveViewController.common.getCountByLiveRecordId(
+      live_record_id
+    );
+    await liveRecordController.common.update({ id: live_record_id, view });
   }
+
   socketEmit<WsOtherJoinType['data']>({
     socket,
     msgType: WsMsgTypeEnum.otherJoin,
@@ -146,10 +123,51 @@ export async function handleWsJoin(args: {
     data: {
       live_room_id: roomId,
       join_socket_id: socket.id,
-      join_user_info: userInfo,
+      join_user_info: {},
       socket_list: socketList ? [...socketList] : [],
     },
   });
+}
+
+export async function handleWsKeepJoined(args: {
+  socket: Socket;
+  roomId: number;
+  data: WsJoinType;
+}) {
+  const { socket, data } = args;
+  const { roomId } = args;
+  if (data.user_token) {
+    const { userInfo } = await jwtVerify(data.user_token);
+    if (!userInfo) {
+      console.log(chalkERROR('userInfo为空'));
+      return;
+    }
+    await liveRedisController.joined({
+      roomId,
+      userInfo,
+      exp: data.data.duration + 5,
+      client_ip: getSocketRealIp(socket),
+    });
+    const recRes = await liveController.common.findLiveRecordByLiveRoomId(
+      roomId
+    );
+    const live_record_id = recRes?.live_record_id;
+    if (!live_record_id) return;
+    const [affectedCount] = await liveViewController.common.updateDuation({
+      live_record_id,
+      live_room_id: roomId,
+      duration: data.data.duration,
+      user_id: userInfo.id,
+    });
+    if (!affectedCount) {
+      await liveViewController.common.create({
+        live_record_id,
+        live_room_id: roomId,
+        duration: data.data.duration,
+        user_id: userInfo.id,
+      });
+    }
+  }
 }
 
 export function handleWsBatchSendOffer(args: {
@@ -229,68 +247,44 @@ export async function handleWsMessage(args: {
   } else {
     return;
   }
-  let liveRoomId = data.data.live_room_id;
-  if (
-    data.data.is_bilibili === WsMessageIsBilibiliEnum.yes &&
-    initUser.systemUserBilibili.live_room.id
-  ) {
-    liveRoomId = initUser.systemUserBilibili.live_room.id;
-  }
-
+  const liveRoomId = data.data.live_room_id;
+  console.log('kkkk', liveRoomId);
   if (!liveRoomId) {
     return;
   }
-
-  const res = await liveRedisController.getDisableSpeaking({
-    liveRoomId,
-    userId: userInfo?.id || -1,
+  const recRes = await liveController.common.findLiveRecordByLiveRoomId(
+    liveRoomId
+  );
+  const live_record_id = recRes?.live_record_id;
+  const user_agent = getSocketUserAgent(socket);
+  const msgRes = await wsMessageController.common.create({
+    msg_type: data.data.msg_type,
+    user_id: userInfo.id,
+    live_room_id: liveRoomId,
+    ip: getSocketRealIp(socket),
+    content: data.data.content?.slice(0, MSG_MAX_LENGTH),
+    content_type: data.data.content_type,
+    origin_content: data.data.content,
+    username: userInfo.username,
+    origin_username: userInfo.username,
+    user_agent: strSlice(user_agent, 490),
+    send_msg_time: data.time,
+    live_record_id,
   });
-  if (!res) {
-    const liveRoomInfo = await liveRoomController.common.find(liveRoomId);
-    const msgVerify = liveRoomInfo?.msg_verify;
-    const user_agent = getSocketUserAgent(socket);
-    const msgRes = await wsMessageController.common.create({
-      msg_type: data.data.msg_type,
-      user_id: userInfo.id,
-      live_room_id: liveRoomId,
-      ip: getSocketRealIp(socket),
-      content: data.data.content?.slice(0, MSG_MAX_LENGTH),
-      content_type: data.data.content_type,
-      origin_content: data.data.content,
-      username: userInfo.username,
-      origin_username: userInfo.username,
-      user_agent: strSlice(user_agent, 490),
-      send_msg_time: data.time,
-      redbag_send_id: data.data.redbag_send_id,
-      is_verify:
-        msgVerify === LiveRoomMsgVerifyEnum.yes
-          ? WsMessageIsVerifyEnum.no
-          : WsMessageIsVerifyEnum.yes,
-    });
-    const data2 = filterObj(data, ['user_token', 'request_id']);
-    data2.data = { ...msgRes.get(), user: userInfo };
-    ioEmit<any>({
-      io,
-      roomId: liveRoomId,
-      msgType: WsMsgTypeEnum.message,
-      data: data2,
-    });
-  } else {
-    io.sockets.sockets.forEach((socketItem) => {
-      if (socketItem.id === data.socket_id) {
-        socketEmit<any>({
-          socket: socketItem,
-          msgType: WsMsgTypeEnum.disableSpeaking,
-          data: {
-            ...data.data,
-            request_id: data.request_id,
-            disable_expired_at: res.expired_at,
-            is_disable_speaking: true,
-          },
-        });
-      }
-    });
+  if (live_record_id) {
+    const danmu = await wsMessageController.common.getCountByLiveRecordId(
+      live_record_id
+    );
+    await liveRecordController.common.update({ id: live_record_id, danmu });
   }
+  const data2 = filterObj(data, ['user_token', 'request_id']);
+  data2.data = { ...msgRes.get(), user: userInfo };
+  ioEmit<any>({
+    io,
+    roomId: liveRoomId,
+    msgType: WsMsgTypeEnum.message,
+    data: data2,
+  });
 }
 
 export async function handleWsMsrBlob(args: { data: WsMsrBlobType }) {
@@ -347,97 +341,6 @@ export async function handleWsMsrBlob(args: { data: WsMsrBlobType }) {
   }
 }
 
-export async function handleWsDisconnecting(args: {
-  io: Server;
-  socket: Socket;
-}) {
-  const { io, socket } = args;
-  const val = await redisController.getVal({
-    prefix: REDIS_PREFIX.deskUserSocketId,
-    key: socket.id,
-  });
-  let remoteDeskUserUuid = '';
-  if (val) {
-    try {
-      remoteDeskUserUuid = JSON.parse(val).value.remoteDeskUserUuid;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  if (remoteDeskUserUuid !== '') {
-    await Promise.all([
-      redisController.del({
-        prefix: REDIS_PREFIX.deskUserUuid,
-        key: remoteDeskUserUuid,
-      }),
-      redisController.del({
-        prefix: REDIS_PREFIX.deskUserSocketId,
-        key: socket.id,
-      }),
-    ]);
-  }
-  const res2 = await liveRedisController.getSocketIdJoinLiveRoom();
-  res2.forEach((item) => {
-    try {
-      const res3 = JSON.parse(item);
-      if (res3.value.socketId === socket.id) {
-        liveRedisController.delUserJoinedRoom({
-          socketId: socket.id,
-          joinRoomId: res3.value.joinRoomId,
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  });
-  const res = await liveRedisController.getSocketIdJoinLiveRoomOne({
-    socketId: socket.id,
-  });
-  try {
-    if (res) {
-      ioEmit<WsLeavedType['data']>({
-        io,
-        roomId: res.value.joinRoomId,
-        msgType: WsMsgTypeEnum.leaved,
-        data: {
-          socket_id: socket.id,
-        },
-      });
-    }
-  } catch (error) {
-    console.log(error);
-  }
-  await liveRedisController.delSocketIdJoinLiveRoom({
-    socketId: socket.id,
-  });
-  // console.log('socket.rooms', socket.rooms);
-  // socket.rooms.forEach((roomIdStr) => {
-  //   const roomId = Number(roomIdStr);
-  //   if (Number.isNaN(roomId)) return;
-  //   liveRedisController
-  //     .getUserJoinedRoom({
-  //       socketId: socket.id,
-  //       joinRoomId: roomId,
-  //     })
-  //     .then((res1) => {
-  //       if (res1) {
-  //         const { joinRoomId, userInfo } = res1.value;
-  //         try {
-  //           liveRedisController.delUserJoinedRoom({
-  //             socketId: socket.id,
-  //             joinRoomId,
-  //           });
-  //         } catch (error) {
-  //           console.log(error);
-  //         }
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // });
-}
-
 export async function handleWsRoomNoLive(args: {
   socket: Socket;
   data: WsRoomNoLiveType;
@@ -459,18 +362,12 @@ export async function handleWsStartLive(args: {
   data: WsStartLiveType;
 }) {
   const { socket, data } = args;
-  let userInfo;
-  if (data.user_token) {
-    const res = await jwtVerify(data.user_token);
-    if (!res.userInfo) {
-      console.log(chalkERROR('userInfo为空'));
-      return;
-    }
-    userInfo = res.userInfo;
-  } else {
+  const { userInfo } = await jwtVerify(data.user_token || '');
+  if (!userInfo) {
+    console.log(chalkERROR('userInfo为空'));
     return;
   }
-  const userId = userInfo.id;
+  const userId = userInfo.id!;
   const {
     roomId,
     userLiveRoomInfo,
@@ -479,21 +376,12 @@ export async function handleWsStartLive(args: {
       userId,
       liveRoomType: data.data.type,
     });
-  // liveRedisController.setLiveRoomIsLiving({
-  //   socketId: data.socket_id,
-  //   liveRoomId: Number(roomId),
-  //   client_ip: getSocketRealIp(socket),
-  // });
   if (
     data.data.type === LiveRoomTypeEnum.wertc_live ||
     data.data.type === LiveRoomTypeEnum.wertc_meeting_one
   ) {
     await liveService.create({
       live_room_id: Number(roomId),
-      socket_id: data.socket_id,
-      track_audio: 1,
-      track_video: 1,
-      is_tencentcloud_css: 2,
     });
     socketEmit<WsRoomLivingType['data']>({
       msgType: WsMsgTypeEnum.roomLiving,
@@ -619,105 +507,6 @@ export async function handleWsGetLiveUser(args: {
   });
 }
 
-export async function handleWsUpdateJoinInfo(args: {
-  socket: Socket;
-  data: WsUpdateJoinInfoType;
-}) {
-  const { socket, data } = args;
-  let userInfo;
-  if (data.user_token) {
-    const res = await jwtVerify(data.user_token);
-    if (!res.userInfo) {
-      console.log(chalkERROR('userInfo为空'));
-      return;
-    }
-    userInfo = res.userInfo;
-  }
-  const res = await liveRedisController.getUserJoinedRoom({
-    socketId: data.socket_id,
-    joinRoomId: data.data.live_room_id,
-  });
-  if (res) {
-    liveRedisController.setUserJoinedRoom({
-      socketId: data.socket_id,
-      joinRoomId: data.data.live_room_id,
-      userInfo,
-      client_ip: getSocketRealIp(socket),
-    });
-    liveRedisController.setSocketIdJoinLiveRoom({
-      socketId: data.socket_id,
-      joinRoomId: data.data.live_room_id,
-    });
-  }
-}
-
-export async function handleWsDisableSpeaking(args: {
-  io: Server;
-  socket: Socket;
-  data: WsDisableSpeakingType;
-}) {
-  const { io, socket, data } = args;
-  let userInfo;
-  if (data.user_token) {
-    const res = await jwtVerify(data.user_token);
-    if (!res.userInfo) {
-      console.log(chalkERROR('userInfo为空'));
-      return;
-    }
-    userInfo = res.userInfo;
-  } else {
-    return;
-  }
-  const auths = await authController.common.getUserAuth(userInfo.id);
-  const hasAuth = auths.find(
-    (v) => v.auth_value === DEFAULT_AUTH_INFO.MESSAGE_DISABLE.auth_value
-  );
-  if (hasAuth) {
-    if (data.data.restore) {
-      await liveRedisController.clearDisableSpeaking({
-        userId: data.data.user_id,
-        liveRoomId: data.data.live_room_id,
-      });
-      ioEmit<WsDisableSpeakingType['data']>({
-        io,
-        msgType: WsMsgTypeEnum.disableSpeaking,
-        data: {
-          ...data.data,
-          restore_disable_ok: true,
-          request_id: data.request_id,
-        },
-      });
-    } else {
-      const exp = data.data.duration || 60 * 5;
-      await liveRedisController.setDisableSpeaking({
-        userId: data.data.user_id,
-        liveRoomId: data.data.live_room_id,
-        exp,
-        client_ip: getSocketRealIp(socket),
-      });
-      socketEmit<WsDisableSpeakingType['data']>({
-        socket,
-        msgType: WsMsgTypeEnum.disableSpeaking,
-        data: {
-          ...data.data,
-          disable_ok: true,
-          request_id: data.request_id,
-        },
-      });
-      ioEmit<WsDisableSpeakingType['data']>({
-        io,
-        msgType: WsMsgTypeEnum.disableSpeaking,
-        data: {
-          ...data.data,
-          disable_expired_at: +new Date() + exp * 1000,
-          is_disable_speaking: true,
-          request_id: data.request_id,
-        },
-      });
-    }
-  }
-}
-
 // ======
 
 export async function handleWsBilldDeskJoin(args: {
@@ -733,7 +522,7 @@ export async function handleWsBilldDeskJoin(args: {
     return;
   }
   socket.join(roomId);
-  console.log(chalkWARN(`${socket.id}进入房间号:${roomId}`));
+  console.log(chalkWARN(`${socket.id} 进入房间号:${roomId}`));
   await redisController.setExVal({
     prefix: REDIS_PREFIX.deskUserUuid,
     exp: 10,

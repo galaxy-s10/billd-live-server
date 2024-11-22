@@ -1,8 +1,6 @@
 import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import { Op } from 'sequelize';
 
-import { REDIS_PREFIX } from '@/constant';
-import redisController from '@/controller/redis.controller';
 import { IList, ILive } from '@/interface';
 import areaModel from '@/model/area.model';
 import liveModel from '@/model/live.model';
@@ -18,13 +16,13 @@ import {
 } from '@/utils';
 
 export async function handleDelRedisByDbLiveList() {
-  try {
-    await redisController.delByPrefix({
-      prefix: REDIS_PREFIX.dbLiveList,
-    });
-  } catch (error) {
-    console.log(error);
-  }
+  // try {
+  //   await redisController.delByPrefix({
+  //     prefix: REDIS_PREFIX.dbLiveList,
+  //   });
+  // } catch (error) {
+  //   console.log(error);
+  // }
 }
 
 class LiveService {
@@ -43,11 +41,13 @@ class LiveService {
   /** 获取直播列表 */
   async getPureList({
     id,
+    live_record_id,
+    platform,
+    stream_name,
+    stream_id,
+    user_id,
     live_room_id,
-    socket_id,
-    track_audio,
-    track_video,
-    flag_id,
+    remark,
     orderBy,
     orderName,
     nowPage,
@@ -60,15 +60,17 @@ class LiveService {
     const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = deleteUseLessObjectKey({
       id,
+      live_record_id,
+      platform,
+      stream_name,
+      stream_id,
+      user_id,
       live_room_id,
-      socket_id,
-      track_audio,
-      track_video,
-      flag_id,
+      remark,
     });
     const keyWordWhere = handleKeyWord({
       keyWord,
-      arr: ['srs_client_id', 'srs_stream', 'srs_stream_url'],
+      arr: ['stream_name', 'stream_id', 'remark'],
     });
     if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
@@ -96,12 +98,13 @@ class LiveService {
   /** 获取直播列表 */
   async getList({
     id,
-    is_tencentcloud_css,
+    live_record_id,
+    platform,
+    stream_name,
+    stream_id,
+    user_id,
     live_room_id,
-    cdn,
-    is_fake,
-    is_show,
-    status,
+    remark,
     childOrderName,
     childOrderBy,
     orderBy,
@@ -116,12 +119,17 @@ class LiveService {
     const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = deleteUseLessObjectKey({
       id,
-      is_tencentcloud_css,
+      live_record_id,
+      platform,
+      stream_name,
+      stream_id,
+      user_id,
       live_room_id,
+      remark,
     });
     const keyWordWhere = handleKeyWord({
       keyWord,
-      arr: ['srs_client_id', 'srs_stream', 'srs_stream_url'],
+      arr: ['stream_name', 'stream_id', 'remark'],
     });
     if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
@@ -134,12 +142,6 @@ class LiveService {
     if (rangTimeWhere) {
       allWhere[rangTimeType!] = rangTimeWhere;
     }
-    const subWhere = deleteUseLessObjectKey({
-      cdn,
-      is_fake,
-      is_show,
-      status,
-    });
     const orderRes = handleOrder({ orderName, orderBy });
     const childOrderRes = handleOrder(
       { orderName: childOrderName, orderBy: childOrderBy },
@@ -170,25 +172,17 @@ class LiveService {
               'forward_xiaohongshu_url',
             ],
           },
-          include: [
-            {
-              model: userModel,
-              attributes: {
-                exclude: ['password', 'token'],
-              },
-              through: {
-                attributes: [],
-              },
-            },
-            {
-              model: areaModel,
-              through: {
-                attributes: [],
-              },
-            },
-          ],
           // where: {
           //   ...subWhere,
+          // },
+        },
+        {
+          model: userModel,
+          attributes: {
+            exclude: ['password', 'token'],
+          },
+          // through: {
+          //   attributes: [],
           // },
         },
       ],
@@ -211,18 +205,6 @@ class LiveService {
     return result;
   }
 
-  /** 查找直播 */
-  async findAllLiveByRoomId(live_room_id: number) {
-    const result = await liveModel.findAll({ where: { live_room_id } });
-    return result;
-  }
-
-  /** 查找直播 */
-  findBySocketId = async (socket_id: string) => {
-    const res = await liveModel.findAndCountAll({ where: { socket_id } });
-    return res;
-  };
-
   /** 查找直播（禁止对外。） */
   findByLiveRoomId = async (live_room_id: number) => {
     const res = await liveModel.findOne({
@@ -239,6 +221,14 @@ class LiveService {
           ],
         },
       ],
+      where: { live_room_id },
+    });
+    return res;
+  };
+
+  /** 查找直播 */
+  findLiveRecordByLiveRoomId = async (live_room_id: number) => {
+    const res = await liveModel.findOne({
       where: { live_room_id },
     });
     return res;
@@ -294,53 +284,6 @@ class LiveService {
     return result;
   }
 
-  /** 修改直播 */
-  async updateByRoomId({
-    socket_id,
-    live_room_id,
-    track_audio,
-    track_video,
-    srs_action,
-    srs_app,
-    srs_client_id,
-    srs_ip,
-    srs_param,
-    srs_server_id,
-    srs_service_id,
-    srs_stream,
-    srs_stream_id,
-    srs_stream_url,
-    srs_tcUrl,
-    srs_vhost,
-    is_tencentcloud_css,
-    flag_id,
-  }: ILive) {
-    const result = await liveModel.update(
-      {
-        socket_id,
-        track_audio,
-        track_video,
-        srs_action,
-        srs_app,
-        srs_client_id,
-        srs_ip,
-        srs_param,
-        srs_server_id,
-        srs_service_id,
-        srs_stream,
-        srs_stream_id,
-        srs_stream_url,
-        srs_tcUrl,
-        srs_vhost,
-        is_tencentcloud_css,
-        flag_id,
-      },
-      { where: { live_room_id } }
-    );
-    handleDelRedisByDbLiveList();
-    return result;
-  }
-
   /** 创建直播 */
   async create(data: ILive) {
     const result = await liveModel.create(data);
@@ -349,7 +292,7 @@ class LiveService {
   }
 
   /** 删除直播 */
-  async delete(id: number | number[]) {
+  async delete(id: number) {
     const result = await liveModel.destroy({
       where: { id },
       limit: 1,
@@ -360,27 +303,27 @@ class LiveService {
   }
 
   /** 删除直播 */
-  deleteByLiveRoomIdAndSocketId = async (data: {
-    live_room_id: number;
-    socket_id: string;
-  }) => {
+  deleteByLiveRoomId = async (live_room_id: number[]) => {
     const res = await liveModel.destroy({
-      where: { live_room_id: data.live_room_id, socket_id: data.socket_id },
+      where: {
+        live_room_id: {
+          [Op.in]: live_room_id,
+        },
+      },
     });
     handleDelRedisByDbLiveList();
     return res;
   };
 
   /** 删除直播 */
-  deleteByLiveRoomId = async (live_room_id: number | number[]) => {
-    const res = await liveModel.destroy({ where: { live_room_id } });
-    handleDelRedisByDbLiveList();
-    return res;
-  };
-
-  /** 删除直播 */
-  deleteBySocketId = async (socket_id: string) => {
-    const res = await liveModel.destroy({ where: { socket_id } });
+  deleteByUserId = async (user_id: number[]) => {
+    const res = await liveModel.destroy({
+      where: {
+        user_id: {
+          [Op.in]: user_id,
+        },
+      },
+    });
     handleDelRedisByDbLiveList();
     return res;
   };

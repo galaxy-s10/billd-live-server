@@ -181,6 +181,8 @@ export const REDIS_PREFIX = {
   dbLiveRoomHistoryMsgList: `${REDIS_PREFIX_ENV}dbLiveRoomHistoryMsgList___`, // 直播间历史消息
   deskUserUuid: `${REDIS_PREFIX_ENV}deskUserUuid___`,
   deskUserSocketId: `${REDIS_PREFIX_ENV}deskUserSocketId___`,
+  tencentcloudCssPublishing: `${REDIS_PREFIX_ENV}tencentcloudCssPublishing___`,
+  keepJoined: `${REDIS_PREFIX_ENV}keepJoined___`, // 用户加入了房间
 };
 
 export const IS_UPLOAD_SERVER = !(PROJECT_ENV === PROJECT_ENV_ENUM.prod); // 是否上传到服务器

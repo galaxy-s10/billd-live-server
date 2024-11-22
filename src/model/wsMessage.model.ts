@@ -10,10 +10,8 @@ import { initTable } from '@/init/initDb';
 import {
   DanmuMsgTypeEnum,
   IWsMessage,
+  SwitchEnum,
   WsMessageContentTypeEnum,
-  WsMessageIsBilibiliEnum,
-  WsMessageIsShowEnum,
-  WsMessageIsVerifyEnum,
 } from '@/interface';
 
 interface WsMessageModel
@@ -35,10 +33,10 @@ const model = sequelize.define<WsMessageModel>(
     live_room_id: {
       type: DataTypes.INTEGER,
     },
-    user_id: {
+    live_record_id: {
       type: DataTypes.INTEGER,
     },
-    redbag_send_id: {
+    user_id: {
       type: DataTypes.INTEGER,
     },
     ip: {
@@ -72,15 +70,7 @@ const model = sequelize.define<WsMessageModel>(
     },
     is_show: {
       type: DataTypes.INTEGER,
-      defaultValue: WsMessageIsShowEnum.yes,
-    },
-    is_verify: {
-      type: DataTypes.INTEGER,
-      defaultValue: WsMessageIsVerifyEnum.yes,
-    },
-    is_bilibili: {
-      type: DataTypes.INTEGER,
-      defaultValue: WsMessageIsBilibiliEnum.no,
+      defaultValue: SwitchEnum.yes,
     },
     remark: {
       type: DataTypes.STRING(500),

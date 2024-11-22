@@ -9,12 +9,14 @@ import { tencentcloudCssUtils } from '@/utils/tencentcloud-css';
 
 const initLiveRoomId: number[] = [];
 Object.keys(initUser).forEach((iten) => {
-  initLiveRoomId.push(initUser[iten].live_room.id!);
+  const live_room_id = initUser[iten]?.live_room?.id;
+  if (live_room_id) {
+    initLiveRoomId.push(live_room_id);
+  }
 });
 
 export const tencentcloudCssMain = async () => {
   const res1 = await liveController.common.getList({
-    is_tencentcloud_css: 1,
     is_fake: 2,
   });
   const res2 = await tencentcloudCssUtils.queryLiveStreamAll();
@@ -47,7 +49,6 @@ export const tencentcloudCssMain = async () => {
 
 export const srsMain = async () => {
   const res1 = await liveController.common.getList({
-    is_tencentcloud_css: 2,
     is_fake: 2,
   });
   const res2 = await srsController.common.getApiV1Streams({

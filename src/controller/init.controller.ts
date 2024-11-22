@@ -2,7 +2,6 @@ import { getRandomString } from 'billd-utils';
 import cryptojs from 'crypto-js';
 import { ParameterizedContext } from 'koa';
 
-import { signJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import { COMMON_HTTP_CODE, THIRD_PLATFORM } from '@/constant';
 import liveRoomController from '@/controller/liveRoom.controller';
@@ -17,8 +16,8 @@ import {
   bulkCreateSettings,
 } from '@/init/initData';
 import { mockTimeBatchInsert } from '@/init/initDb';
-import { initUser } from '@/init/initUser';
-import { IInitUser } from '@/interface';
+import { initLiveRoom, initUser } from '@/init/initUser';
+import { IInitUser, SwitchEnum } from '@/interface';
 import areaModel from '@/model/area.model';
 import areaLiveRoomModel from '@/model/areaLiveRoom.model';
 import authModel from '@/model/auth.model';
@@ -44,16 +43,13 @@ import userLiveRoomModel from '@/model/userLiveRoom.model';
 import userRoleModel from '@/model/userRole.model';
 import walletModel from '@/model/wallet.model';
 import walletRecordModel from '@/model/walletRecord.model';
-import { SRS_LIVE } from '@/secret/secret';
 import liveRoomService from '@/service/liveRoom.service';
 import userService from '@/service/user.service';
 import walletService from '@/service/wallet.service';
 import {
   ILiveRoom,
-  LiveRoomIsShowEnum,
   LiveRoomStatusEnum,
   LiveRoomTypeEnum,
-  LiveRoomUseCDNEnum,
 } from '@/types/ILiveRoom';
 import { IUser } from '@/types/IUser';
 import { chalkWARN } from '@/utils/chalkTip';
@@ -168,6 +164,73 @@ class InitController {
     },
     initUser: async () => {
       const quequ: Promise<any>[] = [];
+      const initUserLiveRoom = async (user: IInitUser) => {
+        if (!user.live_room || !user.live_room.id) return;
+        await userLiveRoomModel.create({
+          live_room_id: user.live_room.id,
+          user_id: user.id,
+        });
+      };
+      const initOneLiveRoom = async (live_room: ILiveRoom) => {
+        const live_room_id = live_room?.id;
+        if (!live_room || !live_room_id) return;
+        const liveRoomIsExist = await liveRoomService.isExist([live_room_id]);
+        if (!liveRoomIsExist) {
+          let liveUrl;
+          const pushKey = cryptojs
+            .MD5(`${+new Date()}___${getRandomString(6)}`)
+            .toString();
+          if (live_room.cdn === SwitchEnum.no) {
+            liveUrl = () => {
+              const res = srsController.common.getPullUrl({
+                liveRoomId: live_room_id,
+              });
+              return {
+                rtmp_url: res.rtmp,
+                flv_url: res.flv,
+                hls_url: res.hls,
+                webrtc_url: res.webrtc,
+              };
+            };
+            // @ts-ignore
+          } else if (live_room.cdn === SwitchEnum.yes) {
+            liveUrl = () => {
+              const res = tencentcloudCssUtils.getPullUrl({
+                liveRoomId: live_room_id,
+              });
+              return {
+                rtmp_url: res.rtmp,
+                flv_url: res.flv,
+                hls_url: res.hls,
+                webrtc_url: res.webrtc,
+              };
+            };
+          }
+
+          const { rtmp_url, flv_url, hls_url, webrtc_url } = liveUrl(
+            live_room?.id
+          );
+          const liveRoom = await liveRoomService.create({
+            id: live_room?.id,
+            name: live_room?.name,
+            desc: live_room?.desc,
+            key: pushKey,
+            type: LiveRoomTypeEnum.system,
+            priority: live_room?.priority,
+            cdn: live_room?.cdn,
+            cover_img: live_room.cover_img,
+            rtmp_url,
+            flv_url,
+            hls_url,
+            webrtc_url,
+            status: LiveRoomStatusEnum.normal,
+          });
+          // @ts-ignore
+          await liveRoom.setAreas(live_room?.area);
+        } else {
+          console.log(chalkWARN(`已存在id为：${live_room_id}的直播间！`));
+        }
+      };
       const initOneUser = async (user: IInitUser) => {
         if (!user.id) return;
         const userIsExist = await userService.isExist([user.id]);
@@ -177,14 +240,9 @@ class InitController {
             id: user.id,
             username: user.username,
             avatar: user.avatar,
+            password: user.password || getRandomString(8),
           };
-          const exp = 24; // token过期时间：24小时
-          const token = signJwt({ userInfo, exp });
-          userRes = await userService.create({
-            ...userInfo,
-            password: getRandomString(8),
-            token,
-          });
+          userRes = await userService.create(userInfo);
           // @ts-ignore
           await userRes.setRoles(user.user_roles);
           await walletService.create({ user_id: userRes.id, balance: 0 });
@@ -194,70 +252,17 @@ class InitController {
             third_platform: THIRD_PLATFORM.website,
           });
         } else {
-          // console.log(chalkWARN(`已存在id为：${user.id}的用户！`));
-          return;
-        }
-
-        if (!user.live_room?.id) return;
-        const liveRoomIsExist = await liveRoomService.isExist([
-          user.live_room?.id,
-        ]);
-        if (!liveRoomIsExist) {
-          let liveUrl;
-          const pushKey = cryptojs
-            .MD5(`${+new Date()}___${getRandomString(6)}`)
-            .toString();
-          if (user.live_room.cdn === LiveRoomUseCDNEnum.no) {
-            liveUrl = (live_room_id: number) => ({
-              rtmp_url: `${SRS_LIVE.PushDomain}/${SRS_LIVE.AppName}/roomId___${live_room_id}`,
-              flv_url: `${SRS_LIVE.PullDomain}/${SRS_LIVE.AppName}/roomId___${live_room_id}.flv`,
-              hls_url: `${SRS_LIVE.PullDomain}/${SRS_LIVE.AppName}/roomId___${live_room_id}.m3u8`,
-            });
-            // @ts-ignore
-          } else if (user.live_room.cdn === LiveRoomUseCDNEnum.yes) {
-            liveUrl = (live_room_id: number) => {
-              const res = tencentcloudCssUtils.getPullUrl({
-                liveRoomId: live_room_id,
-              });
-              return {
-                rtmp_url: res.rtmp,
-                flv_url: res.flv,
-                hls_url: res.hls,
-              };
-            };
-          }
-
-          const { rtmp_url, flv_url, hls_url } = liveUrl(user.live_room?.id);
-          const liveRoom = await liveRoomModel.create({
-            id: user.live_room?.id,
-            name: user.live_room?.name,
-            desc: user.live_room?.desc,
-            key: pushKey,
-            type: LiveRoomTypeEnum.system,
-            priority: user.live_room?.priority,
-            cdn: user.live_room?.cdn,
-            cover_img: user.live_room.cover_img,
-            pull_is_should_auth: user.live_room.pull_is_should_auth,
-            rtmp_url,
-            flv_url,
-            hls_url,
-            status: LiveRoomStatusEnum.normal,
-            is_show: LiveRoomIsShowEnum.yes,
-          });
-          // @ts-ignore
-          await liveRoom.setAreas(user.live_room?.area);
-          await userLiveRoomModel.create({
-            live_room_id: liveRoom.id,
-            user_id: userRes.id,
-          });
-        } else {
-          // console.log(chalkWARN(`已存在id为：${user.id}的直播间！`));
+          console.log(chalkWARN(`已存在id为：${user.id}的用户！`));
         }
       };
-
+      Object.keys(initLiveRoom).forEach((item) => {
+        quequ.push(initOneLiveRoom(initLiveRoom[item]));
+      });
       Object.keys(initUser).forEach((item) => {
         quequ.push(initOneUser(initUser[item]));
+        quequ.push(initUserLiveRoom(initUser[item]));
       });
+
       await Promise.all(quequ);
       await this.common.initUserWallet();
     },

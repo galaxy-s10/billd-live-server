@@ -217,6 +217,7 @@ export type WsJoinType = IReqWsFormat<{
   remoteDeskUserUuid?: string;
   receiver?: string;
   isBilibili?: boolean;
+  duration: number;
 }>;
 
 /** 用户加入直播间 */

@@ -28,7 +28,6 @@ class LiveRoomController {
       desc,
       type,
       cdn,
-      pull_is_should_auth,
       rtmp_url,
       flv_url,
       hls_url,
@@ -65,7 +64,6 @@ class LiveRoomController {
         desc,
         type,
         cdn,
-        pull_is_should_auth,
         rtmp_url,
         flv_url,
         hls_url,
@@ -102,7 +100,6 @@ class LiveRoomController {
       desc,
       type,
       cdn,
-      pull_is_should_auth,
       rtmp_url,
       flv_url,
       hls_url,
@@ -140,7 +137,6 @@ class LiveRoomController {
         desc,
         type,
         cdn,
-        pull_is_should_auth,
         rtmp_url,
         flv_url,
         hls_url,
@@ -183,7 +179,7 @@ class LiveRoomController {
   };
 
   getBilibili = async (ctx: ParameterizedContext, next) => {
-    const roomId = initUser.systemUserBilibili.live_room.id || -1;
+    const roomId = initUser.user_bilibili.live_room.id || -1;
     const result = await this.common.find(roomId);
     successHandler({ ctx, data: result });
     await next();
@@ -283,7 +279,6 @@ class LiveRoomController {
       name,
       desc,
       type,
-      pull_is_should_auth,
       priority,
       rtmp_url,
       cdn,
@@ -322,7 +317,6 @@ class LiveRoomController {
       desc,
       key: cryptojs.MD5(`${+new Date()}___${getRandomString(6)}`).toString(),
       type,
-      pull_is_should_auth,
       priority,
       cdn,
       rtmp_url,
@@ -366,7 +360,6 @@ class LiveRoomController {
       name,
       desc,
       type,
-      pull_is_should_auth,
       priority,
       rtmp_url,
       cdn,
@@ -405,7 +398,6 @@ class LiveRoomController {
       name,
       desc,
       type,
-      pull_is_should_auth,
       priority,
       cdn,
       rtmp_url,

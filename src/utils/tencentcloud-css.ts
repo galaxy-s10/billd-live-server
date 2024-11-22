@@ -1,5 +1,3 @@
-import crypto from 'crypto';
-
 import cryptojs from 'crypto-js';
 import * as tencentcloud from 'tencentcloud-sdk-nodejs';
 import { Client } from 'tencentcloud-sdk-nodejs/tencentcloud/services/live/v20180801/live_client';
@@ -12,67 +10,6 @@ import {
 } from '@/secret/secret';
 import { LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
-
-function getSignFn({ endpoint, params }) {
-  function sort_params(params) {
-    let strParam = '';
-    const keys = Object.keys(params);
-    keys.sort();
-    // eslint-disable-next-line
-    for (const k in keys) {
-      // eslint-disable-next-line
-      strParam += `&${keys[k]}=${params[keys[k]]}`;
-    }
-    return strParam;
-  }
-
-  function get_req_url(params, endpoint) {
-    // eslint-disable-next-line
-    params.Signature = escape(params.Signature);
-    const url_strParam = sort_params(params);
-    return `https://${endpoint}/?${url_strParam.slice(1)}`;
-  }
-
-  function formatSignString(reqMethod, endpoint, path, strParam) {
-    // eslint-disable-next-line
-    const strSign = `${reqMethod + endpoint + path}?${strParam.slice(1)}`;
-    return strSign;
-  }
-
-  function sha1(secretKey, strsign) {
-    const signMethodMap = { HmacSHA1: 'sha1' };
-    const hmac = crypto.createHmac(signMethodMap.HmacSHA1, secretKey || '');
-    return hmac.update(Buffer.from(strsign, 'utf8')).digest('base64');
-  }
-
-  // const params: any = {};
-  // params.Action = Action;
-  // params['InstanceIds.0'] = 'ins-09dx96dg';
-  // params.Limit = 20;
-  // params.Offset = 0;
-  // params.Nonce = Nonce;
-  // params.Region = Region;
-  // params.SecretId = SECRET_ID;
-  // params.Timestamp = Timestamp;
-  // params.Version = Version;
-
-  // 1. 对参数排序,并拼接请求字符串
-  const strParam = sort_params(params);
-  console.log('strParam', strParam);
-  // 2. 拼接签名原文字符串
-  const reqMethod = 'GET';
-  const path = '/';
-  const strSign = formatSignString(reqMethod, endpoint, path, strParam);
-  console.log('strSign', strSign);
-
-  // 3. 生成签名串
-  const Signature = sha1(TENCENTCLOUD_SECRETKEY, strSign);
-  console.log('生成签名串', Signature);
-  // 4. 进行url编码并拼接请求url
-  const reqUrl = get_req_url(params, endpoint);
-  console.log('拼接请求url', reqUrl);
-  return { Signature, reqUrl };
-}
 
 class TencentcloudCssClass {
   liveClient: Client;

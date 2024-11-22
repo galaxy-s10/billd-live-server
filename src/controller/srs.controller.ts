@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 
 import axios from 'axios';
-import { MD5 } from 'crypto-js';
 import { ParameterizedContext } from 'koa';
 import nodeSchedule from 'node-schedule';
 import { rimrafSync } from 'rimraf';
@@ -10,27 +9,18 @@ import { rimrafSync } from 'rimraf';
 import successHandler from '@/app/handler/success-handle';
 import { wsSocket } from '@/config/websocket';
 import {
-  COMMON_HTTP_CODE,
-  DEFAULT_AUTH_INFO,
   LOCALHOST_URL,
   SCHEDULE_TYPE,
   SRS_CB_URL_PARAMS,
   WEBM_DIR,
 } from '@/constant';
-import authController from '@/controller/auth.controller';
 import liveController from '@/controller/live.controller';
-import livePlayController from '@/controller/livePlay.controller';
 import liveRecordController from '@/controller/liveRecord.controller';
 import userLiveRoomController from '@/controller/userLiveRoom.controller';
-import { CustomError } from '@/model/customError.model';
+import { SwitchEnum } from '@/interface';
 import { SRS_CONFIG, SRS_LIVE } from '@/secret/secret';
 import liveRoomService from '@/service/liveRoom.service';
-import userService from '@/service/user.service';
-import {
-  LiveRoomPullIsShouldAuthEnum,
-  LiveRoomTypeEnum,
-  LiveRoomUseCDNEnum,
-} from '@/types/ILiveRoom';
+import { LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import { IApiV1Clients, IApiV1Streams, ISrsCb, ISrsRTC } from '@/types/srs';
 import { WsMsgTypeEnum } from '@/types/websocket';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
@@ -163,322 +153,30 @@ class SRSController {
 
   /** 踢掉观众 */
   deleteAudience = async (ctx: ParameterizedContext, next) => {
-    const id = +ctx.params.id;
-    const livePlayInfo = await livePlayController.common.find(id);
-    let res;
-    if (livePlayInfo) {
-      if (livePlayInfo.end_time) {
-        throw new CustomError(
-          `已观看结束，不能踢了`,
-          COMMON_HTTP_CODE.paramsError,
-          COMMON_HTTP_CODE.paramsError
-        );
-      }
-      res = await this.common.deleteApiV1Clients(livePlayInfo.srs_client_id!);
-      await livePlayController.common.updateEndTime({
-        live_room_id: livePlayInfo.live_room_id!,
-        user_id: livePlayInfo.user_id!,
-        random_id: livePlayInfo.random_id!,
-        srs_client_id: livePlayInfo.srs_client_id!,
-        srs_ip: livePlayInfo.srs_ip!,
-        end_time: `${+new Date()}`,
-      });
-    }
     successHandler({
       ctx,
-      data: res,
     });
     await next();
   };
 
   deleteApiV1Clients = async (ctx: ParameterizedContext, next) => {
-    const { clientId }: { clientId: string } = ctx.params;
-    const res1 = await this.common.getApiV1ClientDetail(clientId);
-    if (res1.code === 0) {
-      if (
-        res1.client.type === 'hls-play' ||
-        res1.client.type === 'flv-play' ||
-        res1.client.type === 'rtmp-play'
-      ) {
-        const roomIdStr = res1.client.name.replace(/\.m3u8$/g, '');
-        const reg = /^roomId___(\d+)$/g;
-        const roomId = reg.exec(roomIdStr)?.[1];
-        await livePlayController.common.updateEndTime({
-          live_room_id: Number(roomId),
-          srs_client_id: res1.client.id,
-          srs_ip: res1.client.ip,
-          end_time: `${+new Date()}`,
-        });
-      }
-    }
-    const res = await this.common.deleteApiV1Clients(clientId);
     successHandler({
       ctx,
-      data: res,
     });
     await next();
   };
 
   async onStop(ctx: ParameterizedContext, next) {
-    // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
-    // code等于数字0表示成功，其他错误码代表失败。
-    // @ts-ignore
-    const { body }: { body: ISrsCb } = ctx.request;
-    console.log(chalkWARN(`on_stop参数`), body);
-
-    const roomIdStr = body.stream.replace(/\.m3u8$/g, '');
-    const reg = /^roomId___(\d+)$/g;
-    const roomId = reg.exec(roomIdStr)?.[1];
-
-    if (!roomId) {
-      console.log(chalkERROR(`[on_stop] 房间id不存在！`));
-      ctx.body = { code: 0, msg: '[on_stop] fail, roomId is not exist' };
-      await next();
-      return;
-    }
-    const [liveRoomInfo] = await Promise.all([
-      liveRoomService.find(Number(roomId)),
-    ]);
-    if (!liveRoomInfo) {
-      console.log(chalkERROR('[on_stop] liveRoomInfo为空'));
-      ctx.body = { code: 0, msg: '[on_stop] fail, liveRoomInfo is not exist' };
-      await next();
-      return;
-    }
-    // body.param格式：?pushtype=0&pushkey=xxxxx
-    const params = new URLSearchParams(body.param);
-    const paramsUserToken = params.get(SRS_CB_URL_PARAMS.userToken);
-    const paramsUserId = params.get(SRS_CB_URL_PARAMS.userId);
-    const paramsRandomId = params.get(SRS_CB_URL_PARAMS.randomId);
-    const userInfo = await userService.findAndToken(Number(paramsUserId));
-    if (!userInfo) {
-      if (paramsRandomId) {
-        await livePlayController.common.updateEndTime({
-          live_room_id: Number(roomId),
-          random_id: paramsRandomId,
-          srs_client_id: body.client_id,
-          srs_ip: body.ip,
-          end_time: `${+new Date()}`,
-        });
-      }
-      console.log(chalkERROR(`[on_stop] 用户不存在，不允许stop`));
-      ctx.body = {
-        code: 0,
-        msg: '[on_stop] fail, userInfo is not exist',
-      };
-      await next();
-      return;
-    }
-    await livePlayController.common.updateEndTime({
-      live_room_id: Number(roomId),
-      user_id: userInfo.id!,
-      srs_client_id: body.client_id,
-      srs_ip: body.ip,
-      end_time: `${+new Date()}`,
-    });
-    const token = MD5(userInfo.token!).toString();
-    if (token !== paramsUserToken) {
-      console.log(chalkERROR(`[on_stop] 鉴权失败，不允许stop`));
-      ctx.body = { code: 0, msg: '[on_stop] fail, token fail' };
-      await next();
-      return;
-    }
-    console.log(
-      chalkSUCCESS(`[on_stop] 房间id：${roomId}，所有验证通过，允许stop`)
-    );
     ctx.body = { code: 0, msg: '[on_stop] all success, pass' };
     await next();
   }
 
   async onPlay(ctx: ParameterizedContext, next) {
-    // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
-    // code等于数字0表示成功，其他错误码代表失败。
-    const startTime = performance.now();
-    let duration = -1;
-    // @ts-ignore
-    const { body }: { body: ISrsCb } = ctx.request;
-    console.log(chalkWARN(`on_play参数`), body);
-
-    const roomIdStr = body.stream.replace(/\.m3u8$/g, '');
-    const reg = /^roomId___(\d+)$/g;
-    const roomId = reg.exec(roomIdStr)?.[1];
-
-    if (!roomId) {
-      duration = Math.floor(performance.now() - startTime);
-      console.log(chalkERROR(`[on_play] 耗时：${duration}，房间id不存在！`));
-      ctx.body = {
-        code: 1,
-        msg: `[on_play] fail, duration: ${duration} , roomId is not exist`,
-      };
-      await next();
-      return;
-    }
-    const [liveRoomInfo] = await Promise.all([
-      liveRoomService.find(Number(roomId)),
-    ]);
-    if (!liveRoomInfo) {
-      duration = Math.floor(performance.now() - startTime);
-      console.log(chalkERROR(`[on_play] 耗时：${duration}，liveRoomInfo为空`));
-      ctx.body = {
-        code: 1,
-        msg: `[on_play] fail, duration: ${duration} , liveRoomInfo is not exist`,
-      };
-      await next();
-      return;
-    }
-    // body.param格式：?pushtype=0&pushkey=xxxxx
-    const params = new URLSearchParams(body.param);
-    const paramsUserToken = params.get(SRS_CB_URL_PARAMS.userToken);
-    const paramsUserId = params.get(SRS_CB_URL_PARAMS.userId);
-    const paramsRandomId = params.get(SRS_CB_URL_PARAMS.randomId);
-    if (liveRoomInfo.pull_is_should_auth === LiveRoomPullIsShouldAuthEnum.yes) {
-      if (!paramsUserToken || !paramsUserId) {
-        duration = Math.floor(performance.now() - startTime);
-        console.log(
-          chalkERROR(
-            `[on_play] 耗时：${duration}，该直播需要拉流token，当前用户没有拉流token，不允许拉流`
-          )
-        );
-        ctx.body = {
-          code: 1,
-          msg: `[on_play] fail, duration: ${duration} , no token`,
-        };
-        await next();
-        return;
-      }
-      const userInfo = await userService.findAndToken(Number(paramsUserId));
-      if (!userInfo) {
-        duration = Math.floor(performance.now() - startTime);
-        console.log(
-          chalkERROR(`[on_play] 耗时：${duration}，用户不存在，不允许拉流`)
-        );
-        ctx.body = {
-          code: 1,
-          msg: `[on_play] fail, duration: ${duration} , userInfo is not exist`,
-        };
-        await next();
-        return;
-      }
-      const token = MD5(userInfo.token!).toString();
-      if (token !== paramsUserToken) {
-        duration = Math.floor(performance.now() - startTime);
-        console.log(
-          chalkERROR(`[on_play] 耗时：${duration}，鉴权失败，不允许拉流`)
-        );
-        ctx.body = {
-          code: 1,
-          msg: `[on_play] fail, duration: ${duration}, token fail`,
-        };
-        await next();
-        return;
-      }
-      const authArr = await authController.common.getUserAuth(userInfo.id!);
-      if (
-        !authArr.find((item) => item.id === DEFAULT_AUTH_INFO.LIVE_PULL_SVIP.id)
-      ) {
-        duration = Math.floor(performance.now() - startTime);
-        console.log(
-          chalkERROR(
-            `[on_play] 耗时：${duration}，鉴权失败，缺少权限，不允许拉流`
-          )
-        );
-        ctx.body = {
-          code: 1,
-          msg: `[on_play] fail, duration: ${duration}, auth fail`,
-        };
-        await next();
-        return;
-      }
-      const isExist = await livePlayController.common.findAll({
-        live_room_id: Number(roomId),
-        user_id: userInfo.id,
-        random_id: paramsRandomId || '-1',
-        rangTimeStart: +new Date() - 1000 * 2,
-        rangTimeEnd: +new Date() + 1000 * 2,
-      });
-      if (!isExist.length) {
-        await Promise.all([
-          livePlayController.common.create({
-            live_room_id: Number(roomId),
-            user_id: userInfo.id,
-            random_id: paramsRandomId || '-1',
-            srs_action: body.action,
-            srs_app: body.app,
-            srs_client_id: body.client_id,
-            srs_ip: body.ip,
-            srs_param: body.param,
-            srs_server_id: body.server_id,
-            srs_service_id: body.service_id,
-            srs_stream: body.stream,
-            srs_stream_id: body.stream_id,
-            srs_stream_url: body.stream_url,
-            srs_tcUrl: body.tcUrl,
-            srs_vhost: body.vhost,
-          }),
-        ]);
-      } else {
-        liveRecordController.common.updateView({
-          client_id: body.client_id,
-          live_room_id: Number(roomId),
-        });
-      }
-      duration = Math.floor(performance.now() - startTime);
-      console.log(
-        chalkSUCCESS(
-          `[on_play] 耗时：${duration}，房间id：${roomId}，所有验证通过，允许拉流`
-        )
-      );
-      ctx.body = {
-        code: 0,
-        msg: `[on_play] duration: ${duration}, all success, pass`,
-      };
-      await next();
-    } else {
-      const isExist = await livePlayController.common.findAll({
-        live_room_id: Number(roomId),
-        user_id: Number(paramsUserId) || -1,
-        random_id: paramsRandomId || '-1',
-        rangTimeStart: +new Date() - 1000 * 2,
-        rangTimeEnd: +new Date() + 1000 * 2,
-      });
-      if (!isExist.length) {
-        await Promise.all([
-          livePlayController.common.create({
-            live_room_id: Number(roomId),
-            user_id: Number(paramsUserId) || -1,
-            random_id: paramsRandomId || '-1',
-            srs_action: body.action,
-            srs_app: body.app,
-            srs_client_id: body.client_id,
-            srs_ip: body.ip,
-            srs_param: body.param,
-            srs_server_id: body.server_id,
-            srs_service_id: body.service_id,
-            srs_stream: body.stream,
-            srs_stream_id: body.stream_id,
-            srs_stream_url: body.stream_url,
-            srs_tcUrl: body.tcUrl,
-            srs_vhost: body.vhost,
-          }),
-        ]);
-      } else {
-        liveRecordController.common.updateView({
-          client_id: body.client_id,
-          live_room_id: Number(roomId),
-        });
-      }
-      duration = Math.floor(performance.now() - startTime);
-      console.log(
-        chalkSUCCESS(
-          `[on_play] 耗时：${duration}，房间id：${roomId}，不需要拉流鉴权`
-        )
-      );
-      ctx.body = {
-        code: 0,
-        msg: `[on_play] duration: ${duration}, all success, pass`,
-      };
-      await next();
-    }
+    ctx.body = {
+      code: 0,
+      msg: `[on_play] all success, pass`,
+    };
+    await next();
   }
 
   onPublish = async (ctx: ParameterizedContext, next) => {
@@ -518,7 +216,7 @@ class SRSController {
       if (paramsPublishType) {
         await liveRoomService.update({
           id: Number(roomId),
-          cdn: LiveRoomUseCDNEnum.no,
+          cdn: SwitchEnum.no,
           type: Number(paramsPublishType),
         });
         if (result) {

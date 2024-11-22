@@ -1,5 +1,5 @@
 import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
-import { Op, literal } from 'sequelize';
+import { literal, Op } from 'sequelize';
 
 import { IList, ILiveRecord } from '@/interface';
 import areaModel from '@/model/area.model';
@@ -14,7 +14,7 @@ import {
   handleRangTime,
 } from '@/utils';
 
-class LivePlayService {
+class LiveRecordService {
   /** 直播记录是否存在 */
   async isExist(ids: number[]) {
     const res = await liveRecordModel.count({
@@ -30,9 +30,17 @@ class LivePlayService {
   /** 获取直播记录列表 */
   async getList({
     id,
-    client_id,
-    live_room_id,
+    platform,
+    stream_name,
+    stream_id,
     user_id,
+    live_room_id,
+    duration,
+    danmu,
+    view,
+    start_time,
+    end_time,
+    remark,
     childOrderName,
     childOrderBy,
     orderBy,
@@ -47,13 +55,21 @@ class LivePlayService {
     const { offset, limit } = handlePage({ nowPage, pageSize });
     const allWhere: any = deleteUseLessObjectKey({
       id,
-      client_id,
-      live_room_id,
+      platform,
+      stream_name,
+      stream_id,
       user_id,
+      live_room_id,
+      duration,
+      danmu,
+      view,
+      start_time,
+      end_time,
+      remark,
     });
     const keyWordWhere = handleKeyWord({
       keyWord,
-      arr: [],
+      arr: ['stream_name', 'stream_id', 'remark'],
     });
     if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
@@ -161,64 +177,16 @@ class LivePlayService {
   }
 
   /** 修改直播记录 */
-  async updateView({ live_room_id }: ILiveRecord) {
-    const lastData = await liveRecordModel.findOne({
-      order: [['created_at', 'desc']],
-      where: { live_room_id, end_time: { [Op.not]: true } },
-    });
-    let flag = true;
-    if (lastData) {
-      await liveRecordModel.update(
-        { view: literal('`view` +1') },
-        {
-          where: { id: lastData.id },
-        }
-      );
-    } else {
-      flag = false;
-    }
-    return flag;
-  }
-
-  /** 修改直播记录 */
-  async updateDanmu({ live_room_id }: ILiveRecord) {
-    const lastData = await liveRecordModel.findOne({
-      order: [['created_at', 'desc']],
-      where: { live_room_id, end_time: { [Op.not]: true } },
-    });
-    let flag = true;
-    if (lastData) {
-      await liveRecordModel.update(
-        { view: literal('`danmu` +1') },
-        {
-          where: { id: lastData.id },
-        }
-      );
-    } else {
-      flag = false;
-    }
-    return flag;
-  }
-
-  /** 修改直播记录 */
-  async updateByLiveRoomIdAndUserId({
-    client_id,
-    live_room_id,
-    user_id,
-    danmu,
-    duration,
-    view,
-    end_time,
-  }: ILiveRecord) {
+  async updateDuration({ id, duration }: ILiveRecord) {
     const result = await liveRecordModel.update(
+      // eslint-disable-next-line
+      { duration: literal('`duration` +' + duration) },
       {
-        danmu,
-        duration,
-        view,
-        end_time,
-      },
-      { where: { client_id, live_room_id, user_id } }
+        where: { id },
+        limit: 1,
+      }
     );
+
     return result;
   }
 
@@ -227,22 +195,6 @@ class LivePlayService {
     const result = await liveRecordModel.create(data);
     return result;
   }
-
-  /** 删除直播记录 */
-  deleteByLiveRoomIdAndUserId = async (data: {
-    client_id: number;
-    live_room_id: number;
-    user_id: number;
-  }) => {
-    const res = await liveRecordModel.destroy({
-      where: {
-        client_id: data.client_id,
-        live_room_id: data.live_room_id,
-        user_id: data.user_id,
-      },
-    });
-    return res;
-  };
 
   /** 删除直播记录 */
   async delete(id: number) {
@@ -255,4 +207,4 @@ class LivePlayService {
   }
 }
 
-export default new LivePlayService();
+export default new LiveRecordService();

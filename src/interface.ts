@@ -102,7 +102,7 @@ export interface ISigninRecord {
 
 export interface IInitUser extends IUser {
   user_roles: number[];
-  live_room: ILiveRoom & {
+  live_room?: ILiveRoom & {
     devFFmpeg: boolean;
     prodFFmpeg: boolean;
     area: number[];
@@ -145,98 +145,30 @@ export enum DanmuMsgTypeEnum {
   redbag,
 }
 
-export enum WsMessageIsFileEnum {
-  yes,
-  no,
-}
-
 export enum WsMessageContentTypeEnum {
   txt,
   img,
   video,
 }
 
-export enum WsMessageIsShowEnum {
-  yes,
-  no,
-}
-
-export enum WsMessageIsVerifyEnum {
-  yes,
-  no,
-}
-
-export enum WsMessageIsBilibiliEnum {
-  yes,
-  no,
-}
-
 export interface IWsMessage {
   id?: number;
+  live_record_id?: number;
   username?: string;
   origin_username?: string;
   content_type?: WsMessageContentTypeEnum;
   content?: string;
   origin_content?: string;
-  redbag_send_id?: number;
   live_room_id?: number;
   user_id?: number;
   ip?: string;
   msg_type?: DanmuMsgTypeEnum;
   user_agent?: string;
   send_msg_time?: number;
-  is_show?: WsMessageIsShowEnum;
-  is_verify?: WsMessageIsVerifyEnum;
-  is_bilibili?: WsMessageIsBilibiliEnum;
+  is_show?: SwitchEnum;
+  is_bilibili?: SwitchEnum;
   remark?: string;
 
-  user?: IUser;
-  redbag_send?: IRedbagSend;
-
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
-}
-
-export interface IRedbagSend {
-  id?: number;
-
-  user_id?: number;
-  live_room_id?: number;
-
-  total_amount?: string;
-  remaining_amount?: string;
-  total_nums?: number;
-  remaining_nums?: number;
-  remark?: string;
-
-  /** 用户信息 */
-  user?: IUser;
-  /** 直播间信息 */
-  live_room?: IGoods;
-
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
-}
-
-export enum RedbagIsGrantEnum {
-  yes,
-  no,
-}
-
-export interface IRedbagRecv {
-  id?: number;
-
-  user_id?: number;
-  redbag_send_id?: number;
-  amount?: string;
-  remark?: string;
-
-  /** 抢到红包了，是否已发放 */
-  is_grant?: RedbagIsGrantEnum;
-
-  /** 用户信息 */
   user?: IUser;
 
   created_at?: string;
@@ -559,59 +491,55 @@ export interface ISrsPublishStream {
 
 export type ILive = {
   id?: number;
-
-  socket_id?: string;
-  live_room_id?: number;
-  /** 1开启;2关闭 */
-  track_video?: number;
-  /** 1开启;2关闭 */
-  track_audio?: number;
-
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
-} & ISrsPublishStream & {
-    /** 直播间信息 */
-    live_room?: ILiveRoom;
-  };
-
-export interface ILivePlay extends ISrsPublishStream {
-  id?: number;
-
-  /** 用户信息 */
-  user?: IUser;
-  /** 直播间信息 */
-  live_room?: ILiveRoom;
-
-  random_id?: string;
+  /** 直播记录id */
+  live_record_id?: number;
+  /** 直播平台 */
+  platform?: LivePlatformEnum;
+  /** 直播流名称 */
+  stream_name?: string;
+  /** 直播流id */
+  stream_id?: string;
+  /** 用户id */
   user_id?: number;
+  /** 直播间id */
   live_room_id?: number;
-  end_time?: string;
+  /** 备注 */
+  remark?: string;
 
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
-}
+};
 
 export interface ILiveRecord {
   id?: number;
-
-  /** 用户信息 */
-  user?: IUser;
-  /** 直播间信息 */
-  live_room?: ILiveRoom;
-
-  client_id?: string;
+  /** 直播平台 */
+  platform?: LivePlatformEnum;
+  /** 直播流名称 */
+  stream_name?: string;
+  /** 直播流id */
+  stream_id?: string;
+  /** 用户id */
   user_id?: number;
+  /** 直播间id */
   live_room_id?: number;
-  /** 直播时长 */
+  /** 直播时长（单位：秒） */
   duration?: number;
   /** 弹幕数 */
   danmu?: number;
   /** 观看数 */
   view?: number;
+  /** 直播开始时间 */
+  start_time?: string;
   /** 直播结束时间 */
   end_time?: string;
+  /** 备注 */
+  remark?: string;
+
+  /** 直播间信息 */
+  live_room?: ILiveRoom;
+  /** 用户信息 */
+  user?: IUser;
 
   created_at?: string;
   updated_at?: string;
@@ -804,6 +732,49 @@ export interface IHourData {
 export interface IMinuteData {
   id?: number;
   minute: string;
+
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
+export enum SwitchEnum {
+  yes,
+  no,
+}
+
+/** 直播平台 */
+export enum LivePlatformEnum {
+  srs,
+  tencentcloud_css,
+}
+
+export enum ClientEnvEnum {
+  android,
+  ios,
+  ipad,
+  web,
+  web_mobile,
+  web_pc,
+  windows,
+  macos,
+}
+
+export interface ILiveView {
+  id?: number;
+  /** 直播记录id */
+  live_record_id?: number;
+  /** 直播间id */
+  live_room_id?: number;
+  /** 用户id */
+  user_id?: number;
+  /** 时长（单位：秒） */
+  duration?: number;
+  user_agent?: string;
+  client_ip?: string;
+  client_env?: ClientEnvEnum;
+  /** 备注 */
+  remark?: string;
 
   created_at?: string;
   updated_at?: string;

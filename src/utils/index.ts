@@ -12,6 +12,7 @@ import { UserStatusEnum } from '../types/IUser';
 
 /**
  * 比较版本号，返回1代表version1更大，返回2代表version2更大，返回0代表相等
+ * 版本号格式：1.3.4.5
  */
 export function compareVersions(version1: string, version2: string) {
   const v1Parts = version1.split('.').map(Number);

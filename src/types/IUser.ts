@@ -116,31 +116,6 @@ export enum UserStatusEnum {
   disable,
 }
 
-export enum UserIsTouristEnum {
-  yes,
-  no,
-}
-
-export enum UserIsRobotEnum {
-  yes,
-  no,
-}
-
-export enum UserCanMsgEnum {
-  yes,
-  no,
-}
-
-export enum UserCanWatchLiveEnum {
-  yes,
-  no,
-}
-
-export enum UserIsKickEnum {
-  yes,
-  no,
-}
-
 export interface IUser {
   id?: number;
   username?: string;
@@ -149,13 +124,7 @@ export interface IUser {
   avatar?: string;
   desc?: string;
   token?: string;
-  is_tourist?: UserIsTouristEnum;
-  is_robot?: UserIsRobotEnum;
-  can_msg?: UserCanMsgEnum;
-  can_watch_live?: UserCanWatchLiveEnum;
-  is_kick?: UserIsKickEnum;
   remark?: string;
-  batch_create_user?: IUser[];
 
   qq_users?: IQqUser[];
   wechat_users?: IWechatUser[];

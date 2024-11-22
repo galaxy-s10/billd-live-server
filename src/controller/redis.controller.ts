@@ -6,19 +6,16 @@ class RedisController {
    * @param {*} param1
    * @return {*}
    */
-  getTTL = async (data: { prefix: string; key: string }) => {
-    const res = await redisClient.ttl(`${data.prefix}${data.key}`);
-    return res;
+  getTTL = (data: { prefix: string; key: string }) => {
+    return redisClient.ttl(`${data.prefix}${data.key}`);
   };
 
-  del = async (data: { prefix: string; key: string }) => {
-    const res = await redisClient.del(`${data.prefix}${data.key}`);
-    return res;
+  del = (data: { prefix: string; key: string }) => {
+    return redisClient.del(`${data.prefix}${data.key}`);
   };
 
-  findByPrefix = async (data: { prefix: string }) => {
-    const res = await redisClient.keys(`${data.prefix}*`);
-    return res;
+  findByPrefix = (data: { prefix: string }) => {
+    return redisClient.keys(`${data.prefix}*`);
   };
 
   delByPrefix = async (data: { prefix: string }) => {
@@ -31,135 +28,104 @@ class RedisController {
     return res;
   };
 
-  getVal = async (data: { prefix: string; key: string }) => {
-    const res = await redisClient.get(`${data.prefix}${data.key}`);
-    return res;
+  getVal = (data: { prefix: string; key: string }) => {
+    return redisClient.get(`${data.prefix}${data.key}`);
   };
 
-  setVal = async (data: {
-    prefix: string;
-    key: string;
-    value: Record<string, any>;
-    created_at?: number;
-  }) => {
-    const nowTime = +new Date();
-    const createdAt = data.created_at || nowTime;
-    await redisClient.set(
+  setVal = (data: { prefix: string; key: string; value: any }) => {
+    return redisClient.set(
       `${data.prefix}${data.key}`,
       JSON.stringify({
-        created_at: createdAt,
-        format_created_at: new Date(createdAt).toLocaleString(),
+        created_at: +new Date(),
         value: data.value,
       })
     );
   };
 
-  setExVal = async (data: {
+  setExVal = (data: {
     prefix: string;
     key: string;
-    value: Record<string, any>;
+    value: any;
     /** 有效期，单位：秒 */
     exp: number;
-    created_at?: number;
-    expired_at?: number;
     client_ip?: string;
   }) => {
-    const nowTime = +new Date();
-    const createdAt = data.created_at || nowTime;
-    const expiredAt = data.expired_at || nowTime + data.exp * 1000;
-    await redisClient.setEx(
+    return redisClient.setEx(
       `${data.prefix}${data.key}`,
       data.exp,
       JSON.stringify({
-        created_at: createdAt,
-        expired_at: expiredAt,
-        format_created_at: new Date(createdAt).toLocaleString(),
-        format_expired_at: new Date(expiredAt).toLocaleString(),
+        created_at: +new Date(),
         client_ip: data.client_ip || '',
         value: data.value,
       })
     );
   };
 
-  setHashVal = async (data: {
+  setHashVal = (data: {
     key: string;
     field: string;
-    value: Record<string, any>;
+    value: any;
+    client_ip: string;
   }) => {
-    const createdAt = +new Date();
     // 执行HSET命令并指定已存在的字段，那么这个字段的值会被新值覆盖。
     // 你不希望覆盖已存在的字段的值，你可以使用hSetNX命令，这个命令只有在指定的字段不存在时，才会设置值。
-    const res = await redisClient.hSet(
+    return redisClient.hSet(
       data.key,
       data.field,
       JSON.stringify({
-        created_at: createdAt,
-        format_created_at: new Date(createdAt).toLocaleString(),
+        created_at: +new Date(),
+        client_ip: data.client_ip,
         value: data.value,
       })
     );
-    return res;
   };
 
-  delHashVal = async (data: { key: string; field: string }) => {
-    const res = await redisClient.hDel(data.key, data.field);
-    return res;
+  delHashVal = (data: { key: string; field: string }) => {
+    return redisClient.hDel(data.key, data.field);
   };
 
-  setExpire = async (data: { key: string; seconds: number }) => {
-    const res = await redisClient.expire(data.key, data.seconds);
-    return res;
+  setExpire = (data: { key: string; seconds: number }) => {
+    return redisClient.expire(data.key, data.seconds);
   };
 
-  getHashVal = async (data: { key: string; field: string }) => {
-    const res = await redisClient.hGet(data.key, data.field);
-    return res;
+  getHashVal = (data: { key: string; field: string }) => {
+    return redisClient.hGet(data.key, data.field);
   };
 
-  getAllHashVal = async (key: string) => {
-    const res = await redisClient.hVals(key);
-    return res;
+  getAllHashVal = (key: string) => {
+    return redisClient.hVals(key);
   };
 
-  getHashLenVal = async (key: string) => {
-    const res = await redisClient.hLen(key);
-    return res;
+  getHashLenVal = (key: string) => {
+    return redisClient.hLen(key);
   };
 
-  setSetVal = async (data: { key: string; value: Record<string, any> }) => {
-    const createdAt = +new Date();
-    const res = await redisClient.sAdd(
+  setSetVal = (data: { key: string; value: any }) => {
+    return redisClient.sAdd(
       data.key,
       JSON.stringify({
-        created_at: createdAt,
-        format_created_at: new Date(createdAt).toLocaleString(),
+        created_at: +new Date(),
         value: data.value,
       })
     );
-    return res;
   };
 
-  getSetVal = async (key: string) => {
-    const res = await redisClient.sMembers(key);
-    return res;
+  getSetVal = (key: string) => {
+    return redisClient.sMembers(key);
   };
 
-  setListVal = async (data: { key: string; value: Record<string, any> }) => {
-    const createdAt = +new Date();
-    const res = await redisClient.lPush(
+  setListVal = (data: { key: string; value: any }) => {
+    return redisClient.lPush(
       data.key,
       JSON.stringify({
-        created_at: createdAt,
-        format_created_at: new Date(createdAt).toLocaleString(),
+        created_at: +new Date(),
         value: data.value,
       })
     );
-    return res;
   };
 
-  getListVal = async (key: string) => {
-    const res = await redisClient.lRange(key, 0, -1);
-    return res;
+  getListVal = (key: string) => {
+    return redisClient.lRange(key, 0, -1);
   };
 }
 
