@@ -182,6 +182,7 @@ export const REDIS_PREFIX = {
   deskUserUuid: `${REDIS_PREFIX_ENV}deskUserUuid___`,
   deskUserSocketId: `${REDIS_PREFIX_ENV}deskUserSocketId___`,
   tencentcloudCssPublishing: `${REDIS_PREFIX_ENV}tencentcloudCssPublishing___`,
+  srsPublishing: `${REDIS_PREFIX_ENV}srsPublishing___`,
   keepJoined: `${REDIS_PREFIX_ENV}keepJoined___`, // 用户加入了房间
 };
 
@@ -315,4 +316,5 @@ export const SRS_CB_URL_PARAMS = {
   userId: 'userid',
   randomId: 'randomid',
   roomId: 'roomid',
+  isdev: 'isdev',
 };

@@ -1,34 +1,56 @@
-import fs from 'fs';
-import path from 'path';
-
 import axios from 'axios';
 import { ParameterizedContext } from 'koa';
-import nodeSchedule from 'node-schedule';
-import { rimrafSync } from 'rimraf';
 
 import successHandler from '@/app/handler/success-handle';
 import { wsSocket } from '@/config/websocket';
-import {
-  LOCALHOST_URL,
-  SCHEDULE_TYPE,
-  SRS_CB_URL_PARAMS,
-  WEBM_DIR,
-} from '@/constant';
+import liveRedisController from '@/config/websocket/live-redis.controller';
+import { LOCALHOST_URL, SRS_CB_URL_PARAMS } from '@/constant';
 import liveController from '@/controller/live.controller';
 import liveRecordController from '@/controller/liveRecord.controller';
-import userLiveRoomController from '@/controller/userLiveRoom.controller';
-import { SwitchEnum } from '@/interface';
+import { LivePlatformEnum } from '@/interface';
 import { SRS_CONFIG, SRS_LIVE } from '@/secret/secret';
-import liveRoomService from '@/service/liveRoom.service';
 import { LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import { IApiV1Clients, IApiV1Streams, ISrsCb, ISrsRTC } from '@/types/srs';
 import { WsMsgTypeEnum } from '@/types/websocket';
+import { strSlice } from '@/utils';
+import { liveRoomVerifyAuth } from '@/utils/business';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
-import { forwardToOtherPlatform } from '@/utils/process';
 import { myaxios } from '@/utils/request';
 
 class SRSController {
+  allowDev = true;
+
   common = {
+    isLive: async (roomId: number) => {
+      try {
+        const liveRes = await liveController.common.findByLiveRoomId(
+          Number(roomId)
+        );
+        if (!liveRes?.stream_id) {
+          return false;
+        }
+        const res = await this.common.getApiV1StreamsDetail(liveRes.stream_id);
+        return res.code === 0;
+      } catch (error) {
+        console.log(error);
+        return true;
+      }
+    },
+    closeLive: async ({ live_room_id }) => {
+      const liveRes = await liveController.common.findLiveRecordByLiveRoomId(
+        Number(live_room_id)
+      );
+      if (!liveRes) {
+        return;
+      }
+      // await tencentcloudUtils.dropLiveStream({ roomId: live_room_id });
+      await liveController.common.delete(liveRes.id!);
+      await liveRecordController.common.update({
+        id: liveRes.live_record_id,
+        // @ts-ignore
+        end_time: +new Date(),
+      });
+    },
     getApiV1ClientDetail: (clientId: string) =>
       myaxios.get(
         `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port[1985]}/api/v1/clients/${clientId}`
@@ -73,15 +95,6 @@ class SRSController {
         push_webrtc_url: ``,
         push_srt_url: ``,
       };
-    },
-    closeLiveByLiveRoomId: async (liveRoomId: number) => {
-      const res1 = await liveController.common.findAllLiveByRoomId(liveRoomId);
-      const arr: any[] = [];
-      res1.forEach((item) => {
-        arr.push(this.common.deleteApiV1Clients(item.srs_client_id!));
-      });
-      const res = await Promise.all(arr);
-      return res;
     },
   };
 
@@ -182,168 +195,108 @@ class SRSController {
   onPublish = async (ctx: ParameterizedContext, next) => {
     // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
     // code等于数字0表示成功，其他错误码代表失败。
-    // @ts-ignore
-    const { body }: { body: ISrsCb } = ctx.request;
-    console.log(chalkWARN(`on_publish参数`), body);
+    try {
+      // @ts-ignore
+      const { body }: { body: ISrsCb } = ctx.request;
+      console.log(chalkWARN(`srs on_publish参数`), body);
+      const roomIdStr = body.stream.replace(/\.m3u8$/g, '');
+      const reg = /^roomId___(\d+)$/g;
+      const roomId = reg.exec(roomIdStr)?.[1];
 
-    const roomIdStr = body.stream.replace(/\.m3u8$/g, '');
-    const reg = /^roomId___(\d+)$/g;
-    const roomId = reg.exec(roomIdStr)?.[1];
-
-    if (!roomId) {
-      console.log(chalkERROR(`[on_publish] 房间id不存在！`));
-      ctx.body = { code: 1, msg: '[on_publish] fail, roomId is not exist' };
-      await next();
-    } else {
+      if (!roomId) {
+        console.log(chalkERROR(`[srs on_publish] 房间id不存在！`));
+        ctx.body = { code: 1, msg: '[srs on_publish] 房间id不存在！' };
+        await next();
+        return;
+      }
       // body.param格式：?pushtype=0&pushkey=xxxxx
       const params = new URLSearchParams(body.param);
-      const paramsPublishKey = params.get(SRS_CB_URL_PARAMS.publishKey);
-      const paramsPublishType = params.get(SRS_CB_URL_PARAMS.publishType);
-      if (!paramsPublishKey) {
-        console.log(chalkERROR(`[on_publish] 没有推流token`));
-        ctx.body = { code: 1, msg: '[on_publish] fail, no token' };
-        await next();
-        return;
-      }
-      const result = await liveRoomService.findKey(Number(roomId));
-      const pushKey = result?.key;
-      if (pushKey !== paramsPublishKey) {
-        console.log(chalkERROR(`[on_publish] 房间id：${roomId}，鉴权失败`));
-        ctx.body = { code: 1, msg: '[on_publish] fail, auth fail' };
-        await next();
-        return;
-      }
-      if (paramsPublishType) {
-        await liveRoomService.update({
-          id: Number(roomId),
-          cdn: SwitchEnum.no,
-          type: Number(paramsPublishType),
+      const publishKey = params.get(SRS_CB_URL_PARAMS.publishKey);
+      const userId = params.get(SRS_CB_URL_PARAMS.userId);
+      const isdev = params.get(SRS_CB_URL_PARAMS.isdev);
+      let authRes;
+      if (this.allowDev && isdev === '1') {
+        console.log(chalkSUCCESS(`[srs on_publish] 开发模式，不鉴权`));
+        successHandler({
+          code: 0,
+          ctx,
+          data: '[srs on_publish] 开发模式，不鉴权',
         });
-        if (result) {
-          if (
-            Number(paramsPublishType) === LiveRoomTypeEnum.forward_bilibili ||
-            Number(paramsPublishType) === LiveRoomTypeEnum.forward_huya ||
-            Number(paramsPublishType) === LiveRoomTypeEnum.forward_all
-          ) {
-            let index = 0;
-            const max = 30;
-            const timer = setInterval(() => {
-              if (index > max) {
-                clearInterval(timer);
-              }
-              index += 1;
-              // 根据body.stream_id，轮询判断查找流里面的audio，audio有值了，再转推流
-              this.common
-                .getApiV1StreamsDetail(body.stream_id)
-                .then((res) => {
-                  if (res && res.stream?.video && res.stream?.audio) {
-                    clearInterval(timer);
-                    console.log(chalkSUCCESS('开始转推'));
-                    if (
-                      Number(paramsPublishType) ===
-                      LiveRoomTypeEnum.forward_bilibili
-                    ) {
-                      forwardToOtherPlatform({
-                        platform: 'bilibili',
-                        localFlv: result.flv_url!,
-                        remoteRtmp: result.forward_bilibili_url!,
-                      });
-                    } else if (
-                      Number(paramsPublishType) ===
-                      LiveRoomTypeEnum.forward_huya
-                    ) {
-                      forwardToOtherPlatform({
-                        platform: 'huya',
-                        localFlv: result.flv_url!,
-                        remoteRtmp: result.forward_huya_url!,
-                      });
-                    } else if (
-                      Number(paramsPublishType) === LiveRoomTypeEnum.forward_all
-                    ) {
-                      forwardToOtherPlatform({
-                        platform: 'bilibili',
-                        localFlv: result.flv_url!,
-                        remoteRtmp: result.forward_bilibili_url!,
-                      });
-                      forwardToOtherPlatform({
-                        platform: 'huya',
-                        localFlv: result.flv_url!,
-                        remoteRtmp: result.forward_huya_url!,
-                      });
-                    }
-                  }
-                })
-                .catch((error) => {
-                  console.log(error);
-                });
-            }, 1000);
-          }
+        await next();
+      } else {
+        const res = await liveRoomVerifyAuth({ roomId, publishKey });
+        authRes = res;
+        if (res.code === 0) {
+          console.log(chalkSUCCESS(`[srs on_publish] ${res.msg}`));
+        } else {
+          console.log(chalkERROR(`[srs on_publish] ${res.msg}`));
+          successHandler({
+            code: 1,
+            ctx,
+            data: `[srs on_publish] ${res.msg}`,
+          });
+          return;
         }
       }
-      const isLiveing = await liveController.common.findByLiveRoomId(
+      const isLiving = await liveController.common.findByLiveRoomId(
         Number(roomId)
       );
-      if (isLiveing) {
-        console.log(
-          chalkERROR(
-            `[on_publish] 房间id：${roomId}，鉴权成功，但是正在直播，不允许推流`
-          )
-        );
-        ctx.body = { code: 1, msg: '[on_publish] fail, room is living' };
-        await next();
-        return;
-      }
-      const [userLiveRoomInfo] = await Promise.all([
-        userLiveRoomController.common.findByLiveRoomId(Number(roomId)),
-      ]);
-      if (!userLiveRoomInfo) {
-        console.log(
-          chalkERROR('[on_publish] userLiveRoomInfo为空，不允许推流')
-        );
-        ctx.body = {
+      if (isLiving) {
+        successHandler({
           code: 1,
-          msg: '[on_publish] fail, userLiveRoomInfo is not exist',
-        };
+          ctx,
+          data: '[srs on_publish] 正在直播',
+        });
         await next();
         return;
       }
-      console.log(
-        chalkSUCCESS(`[on_publish] 房间id：${roomId}，所有验证通过，允许推流`)
-      );
-      ctx.body = { code: 0, msg: '[on_publish] all success, pass' };
-      await Promise.all([
-        liveController.common.create({
-          live_room_id: Number(roomId),
-          socket_id: '-1',
-          track_audio: 1,
-          track_video: 1,
-          srs_action: body.action,
-          srs_app: body.app,
-          srs_client_id: body.client_id,
-          srs_ip: body.ip,
-          srs_param: body.param,
-          srs_server_id: body.server_id,
-          srs_service_id: body.service_id,
-          srs_stream: body.stream,
-          srs_stream_id: body.stream_id,
-          srs_stream_url: body.stream_url,
-          srs_tcUrl: body.tcUrl,
-          srs_vhost: body.vhost,
-          is_tencentcloud_css: 2,
-          flag_id: body.client_id,
-        }),
-        liveRecordController.common.create({
-          client_id: body.client_id,
-          live_room_id: Number(roomId),
-          user_id: userLiveRoomInfo.user_id,
-          danmu: 0,
-          duration: 0,
-          view: 0,
-        }),
-      ]);
+      const recRes = await liveRecordController.common.create({
+        platform: LivePlatformEnum.srs,
+        stream_name: '',
+        stream_id: body.stream_id,
+        user_id: Number(userId || -1),
+        live_room_id: Number(roomId),
+        duration: 0,
+        danmu: 0,
+        view: 0,
+        // @ts-ignore
+        start_time: +new Date(),
+        remark: '',
+      });
+      const liveRes = await liveController.common.create({
+        live_record_id: recRes.id,
+        live_room_id: Number(roomId),
+        user_id: Number(userId || -1),
+        stream_id: body.stream_id,
+        stream_name: body.stream,
+      });
       wsSocket.io
-        ?.to(roomId)
+        ?.to(`${roomId}`)
         .emit(WsMsgTypeEnum.roomLiving, { live_room_id: roomId });
+      const ip = strSlice(String(ctx.request.headers['x-real-ip']), 290);
+      liveRedisController.setSrsPublishing({
+        data: {
+          live_room_id: Number(roomId),
+          live_record_id: recRes.id!,
+          live_id: liveRes.id!,
+        },
+        client_ip: ip,
+        exp: 5,
+      });
+      successHandler({
+        code: 0,
+        ctx,
+        // eslint-disable-next-line
+        data: `[srs on_publish] ${authRes.msg}`,
+      });
+      await next();
+    } catch (error) {
+      console.log(error);
+      successHandler({
+        code: 1,
+        ctx,
+        data: '[srs on_publish] catch error',
+      });
       await next();
     }
   };
@@ -353,73 +306,84 @@ class SRSController {
     // code等于数字0表示成功，其他错误码代表失败。
     // @ts-ignore
     const { body }: { body: ISrsCb } = ctx.request;
-    console.log(chalkWARN(`on_unpublish参数`), body);
+    console.log(chalkWARN(`srs on_unpublish参数`), body);
+    try {
+      const roomIdStr = body.stream.replace(/\.m3u8$/g, '');
+      const reg = /^roomId___(\d+)$/g;
+      const roomId = reg.exec(roomIdStr)?.[1];
 
-    const roomIdStr = body.stream.replace(/\.m3u8$/g, '');
-    const reg = /^roomId___(\d+)$/g;
-    const roomId = reg.exec(roomIdStr)?.[1];
-
-    if (!roomId) {
-      console.log(chalkERROR('[on_unpublish] 房间id不存在！'));
-      ctx.body = { code: 1, msg: '[on_unpublish] fail, roomId is not exist' };
-      await next();
-      return;
-    }
-    // body.param格式：?pushtype=0&pushkey=xxxxx
-    const params = new URLSearchParams(body.param);
-    const paramsPublishKey = params.get(SRS_CB_URL_PARAMS.publishKey);
-    if (!paramsPublishKey) {
-      console.log(chalkERROR(`[on_unpublish] 没有推流token`));
-      ctx.body = { code: 1, msg: '[on_unpublish] fail, no token' };
-      await next();
-      return;
-    }
-    const result = await liveRoomService.findKey(Number(roomId));
-    const pushKey = result?.key;
-    if (pushKey !== paramsPublishKey) {
-      console.log(chalkERROR(`[on_unpublish] 房间id：${roomId}，鉴权失败`));
-      ctx.body = { code: 1, msg: '[on_unpublish] fail, auth fail' };
-      await next();
-      return;
-    }
-    const userLiveRoomInfo =
-      await userLiveRoomController.common.findByLiveRoomId(Number(roomId));
-    if (!userLiveRoomInfo) {
-      console.log(chalkERROR('[on_unpublish] userLiveRoomInfo为空'));
-      ctx.body = {
-        code: 1,
-        msg: '[on_unpublish] fail, userLiveRoomInfo is not exist',
-      };
-      await next();
-      return;
-    }
-    await Promise.all([
-      liveController.common.deleteByLiveRoomId([Number(roomId)]),
-      liveRecordController.common.updateByLiveRoomIdAndUserId({
-        client_id: body.client_id,
+      if (!roomId) {
+        console.log(chalkERROR('[srs on_unpublish] 房间id不存在！'));
+        ctx.body = { code: 1, msg: '[srs on_unpublish] 房间id不存在！' };
+        await next();
+        return;
+      }
+      // body.param格式：?pushtype=0&pushkey=xxxxx
+      const params = new URLSearchParams(body.param);
+      const publishKey = params.get(SRS_CB_URL_PARAMS.publishKey);
+      const isdev = params.get(SRS_CB_URL_PARAMS.isdev);
+      let authRes;
+      if (this.allowDev && isdev === '1') {
+        console.log(chalkSUCCESS(`[srs on_unpublish] 开发模式，不鉴权`));
+        successHandler({
+          code: 0,
+          ctx,
+          data: '[srs on_unpublish] 开发模式，不鉴权',
+        });
+        await next();
+      } else {
+        const res = await liveRoomVerifyAuth({ roomId, publishKey });
+        authRes = res;
+        if (res.code === 0) {
+          console.log(chalkSUCCESS(`[srs on_unpublish] ${res.msg}`));
+        } else {
+          console.log(chalkERROR(`[srs on_unpublish] ${res.msg}`));
+          successHandler({
+            code: 1,
+            ctx,
+            data: `[srs on_unpublish] 房间id不存在！`,
+          });
+          await next();
+          return;
+        }
+      }
+      const liveRes = await liveController.common.findLiveRecordByLiveRoomId(
+        Number(roomId)
+      );
+      if (!liveRes) {
+        successHandler({
+          code: 1,
+          ctx,
+          data: `[srs on_unpublish] 房间id：${roomId}，没在直播`,
+        });
+        await next();
+        return;
+      }
+      await this.common.closeLive({
         live_room_id: Number(roomId),
-        user_id: userLiveRoomInfo.user_id,
-        end_time: `${+new Date()}`,
-      }),
-    ]);
-    wsSocket.io?.to(roomId).emit(WsMsgTypeEnum.roomNoLive);
-    console.log(chalkSUCCESS(`[on_unpublish] 房间id：${roomId}，成功`));
-    ctx.body = { code: 0, msg: '[on_unpublish] success' };
-    nodeSchedule.cancelJob(`${SCHEDULE_TYPE.blobIsExist}___${roomId}`);
-    await next();
-    const roomDir = path.resolve(WEBM_DIR, `roomId_${roomId}`);
-    if (fs.existsSync(roomDir)) {
-      console.log('收到主播断开直播，删除直播间的webm目录');
-      rimrafSync(roomDir);
+      });
+      wsSocket.io?.to(`${roomId}`).emit(WsMsgTypeEnum.roomNoLive);
+      successHandler({
+        code: 0,
+        ctx,
+        // eslint-disable-next-line
+        data: `[srs on_unpublish] ${authRes.msg}`,
+      });
+      await next();
+    } catch (error) {
+      console.log(error);
+      successHandler({
+        code: 1,
+        ctx,
+        data: '[srs on_unpublish] catch error',
+      });
+      await next();
     }
   }
 
   async onDvr(ctx: ParameterizedContext, next) {
     // https://ossrs.net/lts/zh-cn/docs/v5/doc/http-callback#nodejs-koa-example
     // code等于数字0表示成功，其他错误码代表失败。
-    // @ts-ignore
-    const { body }: { body: ISrsCb } = ctx.request;
-    console.log(chalkWARN(`on_dvr参数`), body);
     ctx.body = { code: 0, msg: '[on_dvr] success' };
     await next();
   }

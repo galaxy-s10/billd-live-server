@@ -1,10 +1,11 @@
 import { exec, spawnSync } from 'child_process';
 
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import liveRoomController from '@/controller/liveRoom.controller';
 import srsController from '@/controller/srs.controller';
+import tencentcloudCssController from '@/controller/tencentcloudCss.controller';
 import { initUser } from '@/init/initUser';
 import { SwitchEnum } from '@/interface';
-import liveRoomService from '@/service/liveRoom.service';
 import { LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 import { tencentcloudCssUtils } from '@/utils/tencentcloud-css';
@@ -20,31 +21,22 @@ function ffmpegIsInstalled() {
 
 async function addLive({
   live_room_id,
-  name,
-  desc,
   cdn,
   type,
-  priority,
-  cover_img,
   devFFmpeg,
   prodFFmpeg,
   devFFmpegLocalFile,
   prodFFmpegLocalFile,
 }: {
   live_room_id: number;
-  user_id: number;
-  name: string;
-  desc: string;
-  type: LiveRoomTypeEnum;
   cdn: SwitchEnum;
-  priority: number;
-  cover_img: string;
+  type: LiveRoomTypeEnum;
   devFFmpeg: boolean;
   prodFFmpeg: boolean;
   devFFmpegLocalFile: string;
   prodFFmpegLocalFile: string;
 }) {
-  const liveRoomInfo = await liveRoomService.findKey(live_room_id);
+  const liveRoomInfo = await liveRoomController.common.findKey(live_room_id);
   const key = liveRoomInfo?.key;
   const srsPullRes = srsController.common.getPullUrl({
     liveRoomId: live_room_id,
@@ -66,6 +58,8 @@ async function addLive({
   async function main() {
     // 开发环境时判断devFFmpeg，是true的才初始化ffmpeg
     // 生产环境时判断prodFFmpeg，是true的才初始化ffmpeg
+    await srsController.common.closeLive({ live_room_id });
+    await tencentcloudCssController.common.closeLive({ live_room_id });
     if (
       (PROJECT_ENV === PROJECT_ENV_ENUM.development && devFFmpeg) ||
       (PROJECT_ENV === PROJECT_ENV_ENUM.beta && devFFmpeg) ||
@@ -128,13 +122,10 @@ async function addLive({
         console.log(chalkERROR(`FFmpeg推流错误！`), error);
       }
     }
-    await liveRoomService.update({
+    await liveRoomController.common.update({
       id: live_room_id,
-      name,
-      desc,
       cdn,
-      priority,
-      cover_img,
+      type,
       rtmp_url: srsPullRes.rtmp,
       flv_url: srsPullRes.flv,
       hls_url: srsPullRes.hls,
@@ -153,7 +144,6 @@ async function addLive({
       cdn_push_obs_stream_key: cdnPushRes.push_obs_stream_key,
       cdn_push_webrtc_url: cdnPushRes.push_webrtc_url,
       cdn_push_srt_url: cdnPushRes.push_srt_url,
-      type,
     });
   }
 
@@ -221,10 +211,7 @@ export const initFFmpeg = async (init = true) => {
             name: live_room.name!,
             desc: live_room.desc!,
             cdn: live_room.cdn!,
-            type:
-              live_room.type === undefined
-                ? LiveRoomTypeEnum.system
-                : live_room.type,
+            type: live_room.type!,
             priority: live_room.priority!,
             cover_img: live_room.cover_img!,
             devFFmpeg: live_room.devFFmpeg,

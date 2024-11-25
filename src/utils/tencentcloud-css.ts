@@ -60,11 +60,11 @@ class TencentcloudCssClass {
     };
     try {
       const res = await this.liveClient.DescribeLiveStreamOnlineList(params);
-      console.log(chalkSUCCESS('查询腾讯云直播中的流成功！'));
+      console.log(chalkSUCCESS('查询腾讯云直播中的所有流成功！'));
       return { res };
     } catch (err) {
       console.log(err);
-      console.log(chalkERROR('查询腾讯云直播中的流错误！'));
+      console.log(chalkERROR('查询腾讯云直播中的所有流错误！'));
       return { err };
     }
   };

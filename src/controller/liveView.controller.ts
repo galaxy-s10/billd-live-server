@@ -10,7 +10,7 @@ class LiveViewController {
   common = {
     getCountByLiveRecordId: (live_record_id: number) =>
       liveViewService.getCountByLiveRecordId(live_record_id),
-    updateDuation: (data: ILiveView) => liveViewService.updateDuation(data),
+    updateDuration: (data: ILiveView) => liveViewService.updateDuration(data),
     create: (data: ILiveView) => liveViewService.create(data),
     find: (id: number) => liveViewService.find(id),
   };

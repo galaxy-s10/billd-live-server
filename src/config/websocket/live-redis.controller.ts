@@ -68,6 +68,25 @@ class WSController {
     });
   };
 
+  setSrsPublishing = async (data: {
+    data: {
+      live_room_id: number;
+      live_record_id: number;
+      live_id: number;
+    };
+    /** 有效期，单位：秒 */
+    exp: number;
+    client_ip?: string;
+  }) => {
+    await redisController.setExVal({
+      prefix: `${REDIS_PREFIX.srsPublishing}`,
+      key: `${data.data.live_room_id}___${data.data.live_record_id}___${data.data.live_id}`,
+      value: {},
+      exp: data.exp,
+      client_ip: data.client_ip,
+    });
+  };
+
   /** 获取房间里的在线用户 */
   getLiveRoomOnlineUser = async (liveRoomId: number) => {
     const res = await redisController.getAllHashVal(

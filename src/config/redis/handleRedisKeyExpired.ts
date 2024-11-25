@@ -3,6 +3,7 @@ import liveRedisController from '@/config/websocket/live-redis.controller';
 import { REDIS_PREFIX } from '@/constant';
 import liveRecordController from '@/controller/liveRecord.controller';
 import orderController from '@/controller/order.controller';
+import srsController from '@/controller/srs.controller';
 import tencentcloudCssController from '@/controller/tencentcloudCss.controller';
 import { REDIS_CONFIG } from '@/secret/secret';
 
@@ -32,6 +33,39 @@ export const handleRedisKeyExpired = () => {
           );
           if (islive) {
             await liveRedisController.setTencentcloudCssPublishing({
+              data: {
+                live_id,
+                live_record_id,
+                live_room_id,
+              },
+              exp: 5,
+            });
+            await liveRecordController.common.updateDuration({
+              id: live_record_id,
+              duration: 5,
+            });
+          } else {
+            await tencentcloudCssController.common.closeLive({
+              live_room_id,
+            });
+          }
+        }
+
+        // srsPublishing过期
+        if (redisKey.indexOf(REDIS_PREFIX.srsPublishing) === 0) {
+          const key = redisKey.replace(`${REDIS_PREFIX.srsPublishing}`, '');
+          console.log('srsPublishing过期', key);
+          // key: `${data.data.live_room_id}___${data.data.live_record_id}___${data.data.live_id}`,
+          const keyArr = key.split('___');
+          const live_room_id = Number(keyArr[0]);
+          const live_record_id = Number(keyArr[1]);
+          const live_id = Number(keyArr[2]);
+          if (!live_room_id || !live_record_id || !live_id) {
+            return;
+          }
+          const islive = await srsController.common.isLive(live_room_id);
+          if (islive) {
+            await liveRedisController.setSrsPublishing({
               data: {
                 live_id,
                 live_record_id,

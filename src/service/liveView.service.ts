@@ -102,7 +102,7 @@ class LiveViewService {
     return handlePaging(result, nowPage, pageSize);
   }
 
-  async updateDuation({
+  async updateDuration({
     live_room_id,
     live_record_id,
     user_id,

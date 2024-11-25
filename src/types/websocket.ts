@@ -26,6 +26,7 @@ export enum WsMsgTypeEnum {
   join = 'join',
   /** 用户进入聊天完成 */
   joined = 'joined',
+  keepJoined = 'keepJoined',
   /** 用户进入聊天 */
   otherJoin = 'otherJoin',
   /** 用户退出聊天 */

@@ -80,6 +80,7 @@ export async function handleWsJoin(args: {
       console.log(chalkERROR('userInfo为空'));
       return;
     }
+    console.log('3333');
     await liveRedisController.joined({
       roomId,
       userInfo,
@@ -96,7 +97,7 @@ export async function handleWsJoin(args: {
     );
     const live_record_id = recRes?.live_record_id;
     if (!live_record_id) return;
-    const [affectedCount] = await liveViewController.common.updateDuation({
+    const [affectedCount] = await liveViewController.common.updateDuration({
       live_record_id,
       live_room_id: roomId,
       duration: 0,
@@ -153,7 +154,7 @@ export async function handleWsKeepJoined(args: {
     );
     const live_record_id = recRes?.live_record_id;
     if (!live_record_id) return;
-    const [affectedCount] = await liveViewController.common.updateDuation({
+    const [affectedCount] = await liveViewController.common.updateDuration({
       live_record_id,
       live_room_id: roomId,
       duration: data.data.duration,

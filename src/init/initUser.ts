@@ -11,6 +11,7 @@ export const initLiveRoom = {
     desc: '房东的猫livehouse合集',
     priority: 2,
     cdn: SwitchEnum.no,
+    type: LiveRoomTypeEnum.system,
     area: [1],
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: false, // 初始化ffmpeg
@@ -24,6 +25,7 @@ export const initLiveRoom = {
     priority: 10,
     type: LiveRoomTypeEnum.tencent_css,
     cdn: SwitchEnum.yes,
+    type: LiveRoomTypeEnum.system,
     area: [1],
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: true, // 初始化ffmpeg
@@ -36,6 +38,7 @@ export const initLiveRoom = {
     desc: '房东的猫livehouse合集',
     priority: 3,
     cdn: SwitchEnum.no,
+    type: LiveRoomTypeEnum.system,
     area: [1],
     devFFmpeg: true, // 初始化ffmpeg
     prodFFmpeg: true, // 初始化ffmpeg
@@ -48,6 +51,7 @@ export const initLiveRoom = {
     desc: '房东的猫livehouse合集',
     priority: 20,
     cdn: SwitchEnum.no,
+    type: LiveRoomTypeEnum.system,
     area: [1],
     devFFmpeg: true, // 初始化ffmpeg
     prodFFmpeg: true, // 初始化ffmpeg
@@ -60,6 +64,7 @@ export const initLiveRoom = {
     desc: '房东的猫livehouse合集',
     priority: 2,
     cdn: SwitchEnum.no,
+    type: LiveRoomTypeEnum.system,
     area: [1],
     devFFmpeg: true, // 初始化ffmpeg
     prodFFmpeg: true, // 初始化ffmpeg
@@ -72,6 +77,7 @@ export const initLiveRoom = {
     desc: '房东的猫livehouse合集',
     priority: 2,
     cdn: SwitchEnum.no,
+    type: LiveRoomTypeEnum.system,
     area: [1],
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: true, // 初始化ffmpeg
@@ -84,6 +90,7 @@ export const initLiveRoom = {
     desc: '周杰伦演唱会合集',
     priority: 2,
     cdn: SwitchEnum.no,
+    type: LiveRoomTypeEnum.system,
     area: [1],
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: true, // 初始化ffmpeg
@@ -96,6 +103,7 @@ export const initLiveRoom = {
     desc: '周杰伦演唱会合集',
     priority: 2,
     cdn: SwitchEnum.no,
+    type: LiveRoomTypeEnum.system,
     area: [1],
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: false, // 初始化ffmpeg
@@ -108,6 +116,7 @@ export const initLiveRoom = {
     desc: '房东的猫livehouse合集',
     priority: 2,
     cdn: SwitchEnum.no,
+    type: LiveRoomTypeEnum.system,
     area: [1],
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: true, // 初始化ffmpeg
@@ -120,6 +129,7 @@ export const initLiveRoom = {
     desc: '龙珠系列合集',
     priority: 2,
     cdn: SwitchEnum.no,
+    type: LiveRoomTypeEnum.system,
     area: [1],
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: true, // 初始化ffmpeg
@@ -132,6 +142,7 @@ export const initLiveRoom = {
     desc: '周杰伦演唱会合集',
     priority: 2,
     cdn: SwitchEnum.no,
+    type: LiveRoomTypeEnum.system,
     area: [1],
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: false, // 初始化ffmpeg
@@ -144,6 +155,7 @@ export const initLiveRoom = {
     desc: '从零搭建一个开源直播间系列',
     priority: 10,
     cdn: SwitchEnum.no,
+    type: LiveRoomTypeEnum.system,
     area: [1],
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: true, // 初始化ffmpeg
@@ -159,6 +171,7 @@ export const initLiveRoom = {
     desc: '转播哔哩哔哩直播间',
     priority: 10,
     cdn: SwitchEnum.no,
+    type: LiveRoomTypeEnum.system,
     area: [1],
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: false, // 初始化ffmpeg
@@ -171,6 +184,7 @@ export const initLiveRoom = {
     desc: '周杰伦演唱会合集',
     priority: 2,
     cdn: SwitchEnum.no,
+    type: LiveRoomTypeEnum.system,
     area: [1],
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: false, // 初始化ffmpeg

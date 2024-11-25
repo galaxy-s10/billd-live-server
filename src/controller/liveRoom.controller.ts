@@ -19,6 +19,7 @@ import areaController from './area.controller';
 
 class LiveRoomController {
   common = {
+    findKey: (id) => liveRoomService.findKey(id),
     getList: ({
       id,
       status,
