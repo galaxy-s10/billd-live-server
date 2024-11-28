@@ -159,6 +159,18 @@ class LiveRecordService {
     return handlePaging<ILiveRecord>(result, nowPage, pageSize);
   }
 
+  async statistics1({ live_room_id, user_id, startTime, endTime }) {
+    const result = await liveRecordModel.findAll({
+      where: {
+        ...deleteUseLessObjectKey({ live_room_id, user_id }),
+        created_at: {
+          [Op.between]: [new Date(startTime), new Date(endTime)],
+        },
+      },
+    });
+    return result;
+  }
+
   /** 查找直播记录 */
   async find(id: number) {
     const result = await liveRecordModel.findOne({ where: { id } });

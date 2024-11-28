@@ -5,6 +5,7 @@ import GlobalMsgModel from '@/model/globalMsg.model';
 import LiveModel from '@/model/live.model';
 import LiveRecordModel from '@/model/liveRecord.model';
 import LiveRoomModel from '@/model/liveRoom.model';
+import LiveViewModel from '@/model/liveView.model';
 import LogModel from '@/model/log.model';
 import LoginRecordModel from '@/model/loginRecord.model';
 import OrderModel from '@/model/order.model';
@@ -20,6 +21,11 @@ import UserRoleModel from '@/model/userRole.model';
 import WalletModel from '@/model/wallet.model';
 import WechatUserModel from '@/model/wechatUser.model';
 import WsMessageModel from '@/model/wsMessage.model';
+
+LiveViewModel.belongsTo(UserModel, {
+  foreignKey: 'user_id',
+  constraints: false,
+});
 
 LoginRecordModel.belongsTo(UserModel, {
   foreignKey: 'user_id',

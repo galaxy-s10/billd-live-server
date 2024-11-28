@@ -11,7 +11,7 @@ import { chalk, chalkERROR } from '@/utils/chalkTip';
 
 const errorHandler = (error, ctx: ParameterizedContext) => {
   const { path, method } = ctx.request;
-  const ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
+  const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
   // eslint-disable-next-line
   const errorLog = (error) => {
     console.log(chalk.redBright('httpStatusCode:'), error.httpStatusCode);

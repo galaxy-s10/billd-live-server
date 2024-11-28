@@ -73,7 +73,7 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
   console.log(chalkINFO('===== apiBeforeVerify中间件开始 ====='));
   const startTime = performance.now();
   const url = ctx.request.path;
-  const ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
+  const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
   const consoleEnd = () => {
     const duration = Math.floor(performance.now() - startTime);
     console.log(

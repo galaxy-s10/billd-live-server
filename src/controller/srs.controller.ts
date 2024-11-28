@@ -273,7 +273,7 @@ class SRSController {
       wsSocket.io
         ?.to(`${roomId}`)
         .emit(WsMsgTypeEnum.roomLiving, { live_room_id: roomId });
-      const ip = strSlice(String(ctx.request.headers['x-real-ip']), 290);
+      const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
       liveRedisController.setSrsPublishing({
         data: {
           live_room_id: Number(roomId),

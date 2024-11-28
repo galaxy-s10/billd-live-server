@@ -65,7 +65,7 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
   try {
     const startTime = performance.now();
     const url = ctx.request.path;
-    const ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
+    const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
     const consoleEnd = () => {
       duration = Math.floor(performance.now() - startTime);
       console.log(

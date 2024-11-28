@@ -40,7 +40,7 @@ const model = sequelize.define<WsMessageModel>(
       type: DataTypes.INTEGER,
     },
     ip: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(100),
     },
     content_type: {
       type: DataTypes.INTEGER,

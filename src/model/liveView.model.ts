@@ -43,7 +43,7 @@ const model = sequelize.define<LiveViewModel>(
       defaultValue: '',
     },
     client_ip: {
-      type: DataTypes.STRING(300),
+      type: DataTypes.STRING(100),
       defaultValue: '',
     },
     client_env: {

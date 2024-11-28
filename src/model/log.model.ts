@@ -43,7 +43,7 @@ const model = sequelize.define<LogModel>(
       type: DataTypes.STRING(500),
     },
     api_real_ip: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(100),
     },
     api_host: {
       type: DataTypes.STRING(500),

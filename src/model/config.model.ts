@@ -47,7 +47,7 @@ const model = sequelize.define<ConfigModel>(
       type: DataTypes.STRING(500),
     },
     remark: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(500),
     },
   },
   {

@@ -247,13 +247,13 @@ class WechatUserController {
         token,
       };
       const redisExp = 10;
-      const client_ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
+      const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
       await redisController.setExVal({
         prefix: REDIS_PREFIX.qrCodeLogin,
         key: `${platform}___${login_id}`,
         exp: redisExp,
         value: createDate,
-        client_ip,
+        client_ip: ip,
       });
       successHandler({ ctx, data: token, message: 'wechat登录成功！' });
     } else {
@@ -313,13 +313,13 @@ class WechatUserController {
         token,
       };
       const redisExp = 10;
-      const client_ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
+      const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
       await redisController.setExVal({
         prefix: REDIS_PREFIX.qrCodeLogin,
         key: `${platform}___${login_id}`,
         exp: redisExp,
         value: createDate,
-        client_ip,
+        client_ip: ip,
       });
       successHandler({ ctx, data: token, message: 'wechat登录成功！' });
     }

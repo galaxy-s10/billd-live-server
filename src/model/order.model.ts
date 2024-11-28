@@ -35,7 +35,7 @@ const model = sequelize.define<OrderModel>(
       type: DataTypes.INTEGER,
     },
     client_ip: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(100),
     },
     billd_live_order_subject: {
       type: DataTypes.STRING(100),

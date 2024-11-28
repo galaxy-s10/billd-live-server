@@ -103,7 +103,7 @@ class OrderController {
   async create(ctx: ParameterizedContext, next) {
     const { userInfo } = await authJwt(ctx);
     const { goodsId, liveRoomId, money } = ctx.request.body;
-    const client_ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
+    const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
     const goodsInfo = await goodsControllerfrom.common.find(goodsId);
     if (!goodsInfo) {
       throw new CustomError(
@@ -156,7 +156,7 @@ class OrderController {
         billd_live_order_subject: res.bizContent.subject,
         product_code: res.bizContent.product_code,
         qr_code: res.aliPayRes.qrCode,
-        client_ip,
+        client_ip: ip,
       };
       await orderService.create(createDate);
       const exp = 60 * 5;

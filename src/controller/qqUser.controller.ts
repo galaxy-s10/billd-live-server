@@ -189,7 +189,7 @@ class QqUserController {
     let userId;
     let token;
     const user_agent = strSlice(String(ctx.request.headers['user-agent']), 490);
-    const ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
+    const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
     if (!isExist) {
       console.log('不存在qq账号');
       const qqUser = await qqUserService.create(qqUserInfo);

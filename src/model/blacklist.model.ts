@@ -26,7 +26,7 @@ const model = sequelize.define<BlacklistModel>(
       autoIncrement: true,
     },
     ip: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(100),
     },
     user_id: {
       type: DataTypes.INTEGER,

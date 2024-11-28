@@ -80,7 +80,7 @@ class UserController {
       third_platform: THIRD_PLATFORM.website,
     });
     const user_agent = strSlice(String(ctx.request.headers['user-agent']), 490);
-    const ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
+    const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
     await loginRecordController.common.create({
       user_id: createUserInfo.id,
       type: LoginRecordEnum.registerUsername,
@@ -139,7 +139,7 @@ class UserController {
       third_platform: THIRD_PLATFORM.website,
     });
     const user_agent = strSlice(String(ctx.request.headers['user-agent']), 490);
-    const ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
+    const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
     await loginRecordController.common.create({
       user_id: createUserInfo.id,
       type: LoginRecordEnum.registerUsername,
@@ -239,7 +239,7 @@ class UserController {
     // 每次登录都更新token
     await userService.update({ token, id });
     const user_agent = strSlice(String(ctx.request.headers['user-agent']), 490);
-    const ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
+    const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
     await loginRecordController.common.create({
       user_id: id,
       type: LoginRecordEnum.loginId,
@@ -291,7 +291,7 @@ class UserController {
     // 每次登录都更新token
     await userService.update({ token, id: userInfo?.id });
     const user_agent = strSlice(String(ctx.request.headers['user-agent']), 490);
-    const ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
+    const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
     await loginRecordController.common.create({
       user_id: userInfo?.id,
       type: LoginRecordEnum.loginUsername,
