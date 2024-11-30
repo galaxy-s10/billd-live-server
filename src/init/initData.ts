@@ -4,10 +4,9 @@ import {
   GoodsTypeEnum,
   IArea,
   IAuth,
+  IConfig,
   IGoods,
-  ILiveConfig,
   IRole,
-  ISettings,
 } from '@/interface';
 import { QINIU_KODO } from '@/spec-config';
 
@@ -337,23 +336,6 @@ const initRoleAuth = () => {
   return roleAuth;
 };
 
-export const bulkCreateLiveConfig: ILiveConfig[] = [
-  {
-    id: 1,
-    key: 'frontend_live_home_bg',
-    value: '',
-    desc: '直播间前台首页的背景图',
-    type: FormTypeEnum.upload,
-  },
-  {
-    id: 2,
-    key: 'frontend_wechat_qrcode',
-    value: '',
-    desc: 'h5页面的客服二维码',
-    type: FormTypeEnum.upload,
-  },
-];
-
 export const bulkCreateArea: IArea[] = [
   {
     id: 1,
@@ -564,22 +546,28 @@ export const bulkCreateGoods: IGoods[] = [
   },
 ];
 
-const initSettings = (): ISettings[] => [
+const initConfig = (): IConfig[] => [
   {
-    key: 'allow_home_modal',
-    value: '2',
-    desc: "是否开启首页弹窗（'1'开启；'2'关闭）",
-    type: 'switch',
+    field_a: 'home_bg',
+    field_b: '',
+    field_c: FormTypeEnum.upload,
+    remark: '直播间前台首页的背景图',
   },
   {
-    key: 'home_modal_content',
-    value: '持续更新中...',
-    desc: '首页弹窗内容',
-    type: 'markdown',
+    field_a: 'allow_home_modal',
+    field_b: '2',
+    field_c: "是否开启首页弹窗（'1'开启；'2'关闭）",
+    remark: 'switch',
+  },
+  {
+    field_a: 'home_modal_content',
+    field_b: '持续更新中...',
+    field_c: '首页弹窗内容',
+    remark: 'markdown',
   },
 ];
 
-export const bulkCreateSettings = initSettings();
+export const bulkCreateConfig = initConfig();
 export const bulkCreateRole = initRole();
 export const bulkCreateAuth = initAuth();
 export const bulkCreateRoleAuth = initRoleAuth();

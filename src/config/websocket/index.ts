@@ -5,7 +5,6 @@ import {
   handleWsBilldDeskJoin,
   handleWsBilldDeskStartRemote,
   handleWsBilldDeskUpdateUser,
-  handleWsGetLiveUser,
   handleWsJoin,
   handleWsKeepJoined,
   handleWsMessage,
@@ -21,7 +20,6 @@ import {
   WsBilldDeskStartRemote,
   WsCandidateType,
   WsConnectStatusEnum,
-  WsGetLiveUserType,
   WsJoinType,
   WsMessageType,
   WsMsgTypeEnum,
@@ -228,20 +226,6 @@ export const connectWebSocket = (server) => {
           roomId: data.data.live_room_id,
         });
         handleWsRoomNoLive({ socket, data });
-      } catch (error) {
-        console.log(error);
-      }
-    });
-
-    // 收到用户获取当前在线用户
-    socket.on(WsMsgTypeEnum.getLiveUser, (data: WsGetLiveUserType) => {
-      try {
-        prettierInfoLog({
-          msg: '收到用户获取当前在线用户',
-          socket,
-          roomId: data.data.live_room_id,
-        });
-        handleWsGetLiveUser({ socket, data });
       } catch (error) {
         console.log(error);
       }

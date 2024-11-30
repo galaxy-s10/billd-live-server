@@ -4,16 +4,14 @@ import { ParameterizedContext } from 'koa';
 
 import successHandler from '@/app/handler/success-handle';
 import { COMMON_HTTP_CODE, THIRD_PLATFORM } from '@/constant';
-import liveRoomController from '@/controller/liveRoom.controller';
 import srsController from '@/controller/srs.controller';
 import {
   bulkCreateArea,
   bulkCreateAuth,
+  bulkCreateConfig,
   bulkCreateGoods,
-  bulkCreateLiveConfig,
   bulkCreateRole,
   bulkCreateRoleAuth,
-  bulkCreateSettings,
 } from '@/init/initData';
 import { mockTimeBatchInsert } from '@/init/initDb';
 import { initLiveRoom, initUser } from '@/init/initUser';
@@ -21,10 +19,10 @@ import { IInitUser, SwitchEnum } from '@/interface';
 import areaModel from '@/model/area.model';
 import areaLiveRoomModel from '@/model/areaLiveRoom.model';
 import authModel from '@/model/auth.model';
+import configModel from '@/model/config.model';
 import { CustomError } from '@/model/customError.model';
 import goodsModel from '@/model/goods.model';
 import liveModel from '@/model/live.model';
-import liveConfigModel from '@/model/liveConfig.model';
 import liveRecordModel from '@/model/liveRecord.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import logModel from '@/model/log.model';
@@ -36,7 +34,6 @@ import orderModel from '@/model/order.model';
 import qqUserModel from '@/model/qqUser.model';
 import roleModel from '@/model/role.model';
 import roleAuthModel from '@/model/roleAuth.model';
-import settingsModel from '@/model/settings.model';
 import thirdUserModel from '@/model/thirdUser.model';
 import userModel from '@/model/user.model';
 import userLiveRoomModel from '@/model/userLiveRoom.model';
@@ -65,9 +62,9 @@ class InitController {
           this.common.initHourData(365 * 3 * 24),
           this.common.initMinuteTenData(365 * 3 * 24 * 6),
           this.common.initMinuteThirtyData(365 * 3 * 24 * 2),
-          this.common.initLiveConfig(),
           this.common.initRole(),
           this.common.initAuth(),
+          this.common.initConfig(),
           this.common.initRoleAuth(),
           this.common.initUserWallet(),
           this.common.initArea(),
@@ -85,18 +82,6 @@ class InitController {
       } else {
         throw new CustomError(
           '已经初始化过分区，不能再初始化了！',
-          COMMON_HTTP_CODE.paramsError,
-          COMMON_HTTP_CODE.paramsError
-        );
-      }
-    },
-    initLiveConfig: async () => {
-      const count = await liveConfigModel.count();
-      if (count === 0) {
-        await liveConfigModel.bulkCreate(bulkCreateLiveConfig);
-      } else {
-        throw new CustomError(
-          '已经初始化过直播配置，不能再初始化了！',
           COMMON_HTTP_CODE.paramsError,
           COMMON_HTTP_CODE.paramsError
         );
@@ -138,10 +123,10 @@ class InitController {
         );
       }
     },
-    initSettings: async () => {
-      const count = await settingsModel.count();
+    initConfig: async () => {
+      const count = await configModel.count();
       if (count === 0) {
-        await settingsModel.bulkCreate(bulkCreateSettings);
+        await configModel.bulkCreate(bulkCreateConfig);
       } else {
         throw new CustomError(
           '已经初始化过设置了，不能再初始化了！',
@@ -333,60 +318,6 @@ class InitController {
     },
   };
 
-  // 更新直播间url
-  updateLiveRoomUrl = async (ctx: ParameterizedContext, next) => {
-    const res1 = await liveRoomController.common.getPureList({
-      exclude_key: false,
-    });
-    const queue: any[] = [];
-    // @ts-ignore
-    res1.rows.forEach((item: ILiveRoom) => {
-      const srsPullRes = srsController.common.getPullUrl({
-        liveRoomId: item.id!,
-      });
-      const srsPushRes = srsController.common.getPushUrl({
-        liveRoomId: item.id!,
-        type: item.type!,
-        key: item.key!,
-      });
-      const cdnPullRes = tencentcloudCssUtils.getPullUrl({
-        liveRoomId: item.id!,
-      });
-      const cdnPushRes = tencentcloudCssUtils.getPushUrl({
-        liveRoomId: item.id!,
-        type: item.type!,
-        key: item.key!,
-      });
-      queue.push(
-        liveRoomController.common.update({
-          id: item.id,
-          rtmp_url: srsPullRes.rtmp,
-          flv_url: srsPullRes.flv,
-          hls_url: srsPullRes.hls,
-          webrtc_url: srsPullRes.webrtc,
-          push_obs_server: srsPushRes.push_obs_server,
-          push_obs_stream_key: srsPushRes.push_obs_stream_key,
-          push_rtmp_url: srsPushRes.push_rtmp_url,
-          push_srt_url: srsPushRes.push_srt_url,
-          push_webrtc_url: srsPushRes.push_webrtc_url,
-          cdn_flv_url: cdnPullRes.flv,
-          cdn_hls_url: cdnPullRes.hls,
-          cdn_push_rtmp_url: cdnPullRes.rtmp,
-          cdn_webrtc_url: cdnPullRes.webrtc,
-          cdn_push_obs_server: cdnPushRes.push_obs_server,
-          cdn_push_obs_stream_key: cdnPushRes.push_obs_stream_key,
-          cdn_push_srt_url: cdnPushRes.push_srt_url,
-          cdn_push_webrtc_url: cdnPushRes.push_webrtc_url,
-          cdn_rtmp_url: cdnPushRes.push_rtmp_url,
-        })
-      );
-    });
-
-    await Promise.all(queue);
-    successHandler({ ctx, message: '更新直播间url成功！' });
-    await next();
-  };
-
   // 添加用户
   addUser = async (ctx: ParameterizedContext, next) => {
     await this.common.initRole();
@@ -416,8 +347,8 @@ class InitController {
   };
 
   // 初始化设置
-  initSettings = async (ctx: ParameterizedContext, next) => {
-    await this.common.initSettings();
+  initConfig = async (ctx: ParameterizedContext, next) => {
+    await this.common.initConfig();
     successHandler({ ctx, message: '初始化设置表成功！' });
     await next();
   };

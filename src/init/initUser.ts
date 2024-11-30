@@ -1,7 +1,7 @@
 import path from 'path';
 
 import { DEFAULT_ROLE_INFO, SERVER_VIDEO_DIR, VIDEO_DIR } from '@/constant';
-import { IInitUser, SwitchEnum } from '@/interface';
+import { SwitchEnum } from '@/interface';
 import { LiveRoomTypeEnum } from '@/types/ILiveRoom';
 
 export const initLiveRoom = {
@@ -193,7 +193,7 @@ export const initLiveRoom = {
   },
 };
 
-export const initUser: Record<string, IInitUser> = {
+export const initUser = {
   admin1: {
     id: 1,
     username: 'admin1',

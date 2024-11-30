@@ -104,6 +104,7 @@ class TencentcloudCssController {
         Number(liveRoomId)
       );
     const pushRes = tencentcloudCssUtils.getPushUrl({
+      userId: authRes.userInfo.id!,
       liveRoomId,
       type: userLiveRoomInfo?.live_room?.type || LiveRoomTypeEnum.tencent_css,
       key: userLiveRoomInfo?.live_room?.key || '',

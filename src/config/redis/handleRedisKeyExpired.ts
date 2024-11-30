@@ -94,7 +94,7 @@ export const handleRedisKeyExpired = () => {
           const roomId = keyArr[1];
           await liveRedisController.delLiveRoomOnlineUser({
             roomId: Number(roomId),
-            userId: Number(userId),
+            userId,
           });
         }
 

@@ -1,4 +1,4 @@
-import { ILiveUser, IWsMessage } from '@/interface';
+import { IWsMessage } from '@/interface';
 import { ILiveRoom, LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import { IUser } from '@/types/IUser';
 
@@ -142,11 +142,6 @@ export type WsUpdateJoinInfoType = IReqWsFormat<{
 export type WsLivePkKeyType = IReqWsFormat<{
   live_room_id: number;
   key: string;
-}>;
-
-/** 获取在线用户 */
-export type WsGetRoomAllUserType = IReqWsFormat<{
-  liveUser: ILiveUser[];
 }>;
 
 /** 获取在线用户 */

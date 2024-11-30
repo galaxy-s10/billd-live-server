@@ -21,6 +21,7 @@ function ffmpegIsInstalled() {
 
 async function addLive({
   live_room_id,
+  user_id,
   cdn,
   type,
   devFFmpeg,
@@ -29,6 +30,7 @@ async function addLive({
   prodFFmpegLocalFile,
 }: {
   live_room_id: number;
+  user_id: number;
   cdn: SwitchEnum;
   type: LiveRoomTypeEnum;
   devFFmpeg: boolean;
@@ -42,6 +44,7 @@ async function addLive({
     liveRoomId: live_room_id,
   });
   const srsPushRes = srsController.common.getPushUrl({
+    userId: user_id,
     liveRoomId: live_room_id,
     type: LiveRoomTypeEnum.system,
     key: key!,
@@ -50,6 +53,7 @@ async function addLive({
     liveRoomId: live_room_id,
   });
   const cdnPushRes = tencentcloudCssUtils.getPushUrl({
+    userId: user_id,
     liveRoomId: live_room_id,
     type: LiveRoomTypeEnum.tencent_css,
     key: key!,
@@ -122,6 +126,22 @@ async function addLive({
         console.log(chalkERROR(`FFmpeg推流错误！`), error);
       }
     }
+    console.log({
+      push_rtmp_url: srsPushRes.push_rtmp_url,
+      push_obs_server: srsPushRes.push_obs_server,
+      push_obs_stream_key: srsPushRes.push_obs_stream_key,
+      push_webrtc_url: srsPushRes.push_webrtc_url,
+      push_srt_url: srsPushRes.push_srt_url,
+      cdn_rtmp_url: cdnPullRes.rtmp,
+      cdn_flv_url: cdnPullRes.flv,
+      cdn_hls_url: cdnPullRes.hls,
+      cdn_webrtc_url: cdnPullRes.webrtc,
+      cdn_push_rtmp_url: cdnPushRes.push_rtmp_url,
+      cdn_push_obs_server: cdnPushRes.push_obs_server,
+      cdn_push_obs_stream_key: cdnPushRes.push_obs_stream_key,
+      cdn_push_webrtc_url: cdnPushRes.push_webrtc_url,
+      cdn_push_srt_url: cdnPushRes.push_srt_url,
+    });
     await liveRoomController.common.update({
       id: live_room_id,
       cdn,
@@ -208,12 +228,8 @@ export const initFFmpeg = async (init = true) => {
           addLive({
             live_room_id: live_room.id!,
             user_id: initUser[item].id!,
-            name: live_room.name!,
-            desc: live_room.desc!,
             cdn: live_room.cdn!,
             type: live_room.type!,
-            priority: live_room.priority!,
-            cover_img: live_room.cover_img!,
             devFFmpeg: live_room.devFFmpeg,
             prodFFmpeg: live_room.prodFFmpeg,
             devFFmpegLocalFile: live_room.devFFmpegLocalFile,

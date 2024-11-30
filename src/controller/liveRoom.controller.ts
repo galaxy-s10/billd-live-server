@@ -241,11 +241,13 @@ class LiveRoomController {
         .MD5(`${+new Date()}___${getRandomString(6)}`)
         .toString();
       const srsPushRes = srsController.common.getPushUrl({
+        userId: userInfo.id!,
         liveRoomId: liveRoom.live_room!.id!,
         type: liveRoom.live_room!.type!,
         key,
       });
       const cdnPushRes = tencentcloudCssUtils.getPushUrl({
+        userId: userInfo.id!,
         liveRoomId: liveRoom.live_room!.id!,
         type: liveRoom.live_room!.type!,
         key,

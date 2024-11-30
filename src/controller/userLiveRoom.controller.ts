@@ -120,6 +120,7 @@ class UserLiveRoomController {
       liveRoomId: liveRoom.id!,
     });
     const pushUrlRes = srsController.common.getPushUrl({
+      userId: userInfo.id!,
       liveRoomId: liveRoom.id!,
       type: LiveRoomTypeEnum.srs,
       key: pushKey,

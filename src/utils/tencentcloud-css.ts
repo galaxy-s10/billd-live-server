@@ -112,6 +112,7 @@ class TencentcloudCssClass {
    */
   getPushUrl = (data: {
     liveRoomId: number;
+    userId: number;
     key: string;
     type: LiveRoomTypeEnum;
   }) => {
@@ -128,7 +129,7 @@ class TencentcloudCssClass {
       SRS_CB_URL_PARAMS.roomId
     }=${data.liveRoomId}&${SRS_CB_URL_PARAMS.publishType}=${data.type}&${
       SRS_CB_URL_PARAMS.publishKey
-    }=${data.key}`;
+    }=${data.key}&${SRS_CB_URL_PARAMS.userId}=${data.userId}`;
     return {
       push_rtmp_url: `rtmp://${TENCENTCLOUD_CSS.PushDomain}/${TENCENTCLOUD_CSS.AppName}/${key}`,
       push_obs_server: `rtmp://${TENCENTCLOUD_CSS.PushDomain}/${TENCENTCLOUD_CSS.AppName}/`,

@@ -26,25 +26,25 @@ const model = sequelize.define<ConfigModel>(
       autoIncrement: true,
     },
     field_a: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.TEXT,
     },
     field_b: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.TEXT,
     },
     field_c: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.TEXT,
     },
     field_d: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.TEXT,
     },
     field_e: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.TEXT,
     },
     field_f: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.TEXT,
     },
     field_g: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.TEXT,
     },
     remark: {
       type: DataTypes.STRING(500),

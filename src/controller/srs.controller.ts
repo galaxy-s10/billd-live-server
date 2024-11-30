@@ -81,11 +81,12 @@ class SRSController {
     },
     getPushUrl: (data: {
       liveRoomId: number;
+      userId: number;
       type: LiveRoomTypeEnum;
       key: string;
     }) => {
       const pushParams = (type: LiveRoomTypeEnum) =>
-        `?${SRS_CB_URL_PARAMS.roomId}=${data.liveRoomId}&${SRS_CB_URL_PARAMS.publishType}=${type}&${SRS_CB_URL_PARAMS.publishKey}=${data.key}`;
+        `?${SRS_CB_URL_PARAMS.roomId}=${data.liveRoomId}&${SRS_CB_URL_PARAMS.publishType}=${type}&${SRS_CB_URL_PARAMS.publishKey}=${data.key}&${SRS_CB_URL_PARAMS.userId}=${data.userId}`;
       return {
         push_rtmp_url: `${SRS_LIVE.PushDomain}/${SRS_LIVE.AppName}/roomId___${
           data.liveRoomId
@@ -214,6 +215,12 @@ class SRSController {
       const publishKey = params.get(SRS_CB_URL_PARAMS.publishKey);
       const userId = params.get(SRS_CB_URL_PARAMS.userId);
       const isdev = params.get(SRS_CB_URL_PARAMS.isdev);
+      if (!Number(userId)) {
+        console.log(chalkERROR(`[srs on_publish] userId不存在！`));
+        ctx.body = { code: 1, msg: '[srs on_publish] userId不存在！' };
+        await next();
+        return;
+      }
       let authRes;
       if (this.allowDev && isdev === '1') {
         console.log(chalkSUCCESS(`[srs on_publish] 开发模式，不鉴权`));
@@ -254,7 +261,7 @@ class SRSController {
         platform: LivePlatformEnum.srs,
         stream_name: '',
         stream_id: body.stream_id,
-        user_id: Number(userId || -1),
+        user_id: Number(userId),
         live_room_id: Number(roomId),
         duration: 0,
         danmu: 0,
@@ -266,7 +273,7 @@ class SRSController {
       const liveRes = await liveController.common.create({
         live_record_id: recRes.id,
         live_room_id: Number(roomId),
-        user_id: Number(userId || -1),
+        user_id: Number(userId),
         stream_id: body.stream_id,
         stream_name: body.stream,
       });

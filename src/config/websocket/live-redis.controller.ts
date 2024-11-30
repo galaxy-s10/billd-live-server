@@ -5,7 +5,7 @@ import { IUser } from '@/types/IUser';
 class WSController {
   joined = async (data: {
     roomId: number;
-    userInfo?: IUser;
+    userInfo: IUser;
     /** 有效期，单位：秒 */
     exp: number;
     client_ip?: string;
@@ -22,27 +22,30 @@ class WSController {
 
   /** 增加房间里的在线用户 */
   addLiveRoomOnlineUser = async (data: {
-    roomId: number;
-    userInfo?: IUser;
+    liveRoomId: number;
+    liveRoomName: string;
+    userInfo: IUser;
     created_at?: number;
     expired_at?: number;
     client_ip?: string;
   }) => {
     const userId = data.userInfo?.id || -1;
     await redisController.setHashVal({
-      key: `${REDIS_PREFIX.liveRoomOnlineUser}${data.roomId}`,
+      key: `${REDIS_PREFIX.liveRoomOnlineUser}${data.liveRoomId}`,
       field: `${userId}`,
       value: {
-        live_room_id: data.roomId,
+        live_room_id: data.liveRoomId,
+        live_room_name: data.liveRoomName,
         user_id: data.userInfo?.id,
-        username: data.userInfo?.username,
+        user_username: data.userInfo?.username,
+        user_avatar: data.userInfo?.avatar,
       },
       client_ip: data.client_ip || '',
     });
   };
 
   /** 删除房间里的在线用户 */
-  delLiveRoomOnlineUser = async (data: { roomId: number; userId: number }) => {
+  delLiveRoomOnlineUser = async (data: { roomId: number; userId: string }) => {
     await redisController.delHashVal({
       key: `${REDIS_PREFIX.liveRoomOnlineUser}${data.roomId}`,
       field: `${data.userId}`,
