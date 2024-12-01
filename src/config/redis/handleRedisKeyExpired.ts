@@ -40,11 +40,11 @@ export const handleRedisKeyExpired = () => {
                 live_record_id,
                 live_room_id,
               },
-              exp: 5,
+              exp: 10,
             });
             await liveRecordController.common.updateDuration({
               id: live_record_id,
-              duration: 5,
+              duration: 10,
             });
           } else {
             await tencentcloudCssController.common.closeLive({

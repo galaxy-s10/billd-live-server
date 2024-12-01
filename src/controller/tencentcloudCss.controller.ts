@@ -31,8 +31,12 @@ class TencentcloudCssController {
 
   common = {
     isLive: async (roomId: number) => {
-      const res = await tencentcloudCssUtils.queryLiveStream({ roomId });
-      return !!res.res?.OnlineInfo.length;
+      const liveRes = await liveController.common.findByLiveRoomId(
+        Number(roomId)
+      );
+      return !!liveRes;
+      // const res = await tencentcloudCssUtils.queryLiveStream({ roomId });
+      // return !!res.res?.OnlineInfo.length;
     },
     closeLive: async ({ live_room_id }) => {
       const liveRes = await liveController.common.findLiveRecordByLiveRoomId(
@@ -215,7 +219,7 @@ class TencentcloudCssController {
           live_id: liveRes.id!,
         },
         client_ip,
-        exp: 5,
+        exp: 10,
       });
       successHandler({
         ctx,

@@ -26,11 +26,12 @@ class SRSController {
         const liveRes = await liveController.common.findByLiveRoomId(
           Number(roomId)
         );
-        if (!liveRes?.stream_id) {
-          return false;
-        }
-        const res = await this.common.getApiV1StreamsDetail(liveRes.stream_id);
-        return res.code === 0;
+        return !!liveRes;
+        // if (!liveRes?.stream_id) {
+        //   return false;
+        // }
+        // const res = await this.common.getApiV1StreamsDetail(liveRes.stream_id);
+        // return res.code === 0;
       } catch (error) {
         console.log(error);
         return true;
@@ -43,7 +44,6 @@ class SRSController {
       if (!liveRes) {
         return;
       }
-      // await tencentcloudUtils.dropLiveStream({ roomId: live_room_id });
       await liveController.common.delete(liveRes.id!);
       await liveRecordController.common.update({
         id: liveRes.live_record_id,
