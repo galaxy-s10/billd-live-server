@@ -7,13 +7,13 @@ const successHandler = ({
   code = COMMON_HTTP_CODE.success,
   ctx,
   data,
-  message,
+  msg,
 }: {
   httpStatusCode?: number;
   code?: number;
   ctx: ParameterizedContext;
   data?: any;
-  message?: string;
+  msg?: string;
 }) => {
   const methods = ctx.request.method;
 
@@ -21,7 +21,7 @@ const successHandler = ({
   ctx.body = {
     code,
     data,
-    message: message || COMMON_SUCCESS_MSG[methods],
+    msg: msg || COMMON_SUCCESS_MSG[methods],
   };
 };
 

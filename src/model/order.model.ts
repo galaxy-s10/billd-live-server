@@ -36,6 +36,7 @@ const model = sequelize.define<OrderModel>(
     },
     client_ip: {
       type: DataTypes.STRING(100),
+      defaultValue: '',
     },
     billd_live_order_subject: {
       type: DataTypes.STRING(100),

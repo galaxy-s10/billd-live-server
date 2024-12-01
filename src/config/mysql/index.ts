@@ -67,6 +67,10 @@ export const connectMysql = async (init = false) => {
   loadAllModel();
   require('@/model/relation');
   // await initDb('alert', sequelize);
+  // await initDb('force', sequelize);
+  // await (
+  //   await import('../../controller/init.controller')
+  // ).default.common.initDefault();
   console.log(chalkSUCCESS(msg(true)));
 };
 

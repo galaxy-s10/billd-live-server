@@ -31,7 +31,7 @@ const model = sequelize.define<LiveRoomModel>(
       defaultValue: '',
     },
     desc: {
-      type: DataTypes.STRING(300),
+      type: DataTypes.STRING(100),
       defaultValue: '',
     },
     status: {
@@ -43,11 +43,11 @@ const model = sequelize.define<LiveRoomModel>(
       defaultValue: SwitchEnum.yes,
     },
     remark: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(100),
       defaultValue: '',
     },
     key: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(50),
       defaultValue: '',
     },
     type: {
@@ -67,105 +67,105 @@ const model = sequelize.define<LiveRoomModel>(
       type: DataTypes.STRING(200),
       defaultValue: '',
     },
-    rtmp_url: {
-      type: DataTypes.STRING(300),
+    pull_rtmp_url: {
+      type: DataTypes.STRING(200),
       defaultValue: '',
     },
-    flv_url: {
-      type: DataTypes.STRING(300),
+    pull_flv_url: {
+      type: DataTypes.STRING(200),
       defaultValue: '',
     },
-    hls_url: {
-      type: DataTypes.STRING(300),
+    pull_hls_url: {
+      type: DataTypes.STRING(200),
       defaultValue: '',
     },
-    webrtc_url: {
-      type: DataTypes.STRING(300),
+    pull_webrtc_url: {
+      type: DataTypes.STRING(200),
+      defaultValue: '',
+    },
+    pull_cdn_rtmp_url: {
+      type: DataTypes.STRING(200),
+      defaultValue: '',
+    },
+    pull_cdn_flv_url: {
+      type: DataTypes.STRING(200),
+      defaultValue: '',
+    },
+    pull_cdn_hls_url: {
+      type: DataTypes.STRING(200),
+      defaultValue: '',
+    },
+    pull_cdn_webrtc_url: {
+      type: DataTypes.STRING(200),
+      defaultValue: '',
+    },
+    push_cdn_rtmp_url: {
+      type: DataTypes.TEXT,
       defaultValue: '',
     },
     push_rtmp_url: {
-      type: DataTypes.STRING(300),
+      type: DataTypes.TEXT,
       defaultValue: '',
     },
     push_obs_server: {
-      type: DataTypes.STRING(300),
+      type: DataTypes.TEXT,
       defaultValue: '',
     },
     push_obs_stream_key: {
-      type: DataTypes.STRING(300),
+      type: DataTypes.TEXT,
       defaultValue: '',
     },
     push_webrtc_url: {
-      type: DataTypes.STRING(300),
+      type: DataTypes.TEXT,
       defaultValue: '',
     },
     push_srt_url: {
-      type: DataTypes.STRING(300),
+      type: DataTypes.TEXT,
       defaultValue: '',
     },
-    cdn_rtmp_url: {
-      type: DataTypes.STRING(300),
+    push_cdn_obs_server: {
+      type: DataTypes.TEXT,
       defaultValue: '',
     },
-    cdn_flv_url: {
-      type: DataTypes.STRING(300),
+    push_cdn_obs_stream_key: {
+      type: DataTypes.TEXT,
       defaultValue: '',
     },
-    cdn_hls_url: {
-      type: DataTypes.STRING(300),
+    push_cdn_webrtc_url: {
+      type: DataTypes.TEXT,
       defaultValue: '',
     },
-    cdn_webrtc_url: {
-      type: DataTypes.STRING(300),
-      defaultValue: '',
-    },
-    cdn_push_rtmp_url: {
-      type: DataTypes.STRING(300),
-      defaultValue: '',
-    },
-    cdn_push_obs_server: {
-      type: DataTypes.STRING(300),
-      defaultValue: '',
-    },
-    cdn_push_obs_stream_key: {
-      type: DataTypes.STRING(300),
-      defaultValue: '',
-    },
-    cdn_push_webrtc_url: {
-      type: DataTypes.STRING(300),
-      defaultValue: '',
-    },
-    cdn_push_srt_url: {
-      type: DataTypes.STRING(300),
+    push_cdn_srt_url: {
+      type: DataTypes.TEXT,
       defaultValue: '',
     },
     forward_bilibili_url: {
-      type: DataTypes.STRING(300),
+      type: DataTypes.TEXT,
       defaultValue: '',
     },
     forward_huya_url: {
-      type: DataTypes.STRING(300),
+      type: DataTypes.TEXT,
       defaultValue: '',
     },
     forward_douyu_url: {
-      type: DataTypes.STRING(300),
+      type: DataTypes.TEXT,
       defaultValue: '',
     },
     forward_douyin_url: {
-      type: DataTypes.STRING(300),
+      type: DataTypes.TEXT,
       defaultValue: '',
     },
     forward_kuaishou_url: {
-      type: DataTypes.STRING(300),
+      type: DataTypes.TEXT,
       defaultValue: '',
     },
     forward_xiaohongshu_url: {
-      type: DataTypes.STRING(300),
+      type: DataTypes.TEXT,
       defaultValue: '',
     },
     is_fake: {
       type: DataTypes.INTEGER,
-      defaultValue: 2,
+      defaultValue: SwitchEnum.no,
     },
   },
   {

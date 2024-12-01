@@ -52,7 +52,7 @@ class BlacklistController {
 
   async update(ctx: ParameterizedContext, next) {
     const id = +ctx.params.id;
-    const { user_id, ip, msg }: IBlacklist = ctx.request.body;
+    const { user_id, client_ip, msg }: IBlacklist = ctx.request.body;
     const isExist = await blacklistService.isExist([id]);
     if (!isExist) {
       throw new CustomError(
@@ -64,7 +64,7 @@ class BlacklistController {
     await blacklistService.update({
       id,
       user_id,
-      ip,
+      client_ip,
       msg,
     });
     successHandler({ ctx });
@@ -72,10 +72,10 @@ class BlacklistController {
   }
 
   async create(ctx: ParameterizedContext, next) {
-    const { user_id, ip, type, msg }: IBlacklist = ctx.request.body;
+    const { user_id, client_ip, type, msg }: IBlacklist = ctx.request.body;
     await this.common.create({
       user_id,
-      ip,
+      client_ip,
       type,
       msg,
     });

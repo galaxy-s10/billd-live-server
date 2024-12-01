@@ -70,9 +70,9 @@ class WalletRecordController {
   };
 
   getMyList = async (ctx: ParameterizedContext, next) => {
-    const { code, errorCode, userInfo, message } = await authJwt(ctx);
+    const { code, errorCode, userInfo, msg } = await authJwt(ctx);
     if (code !== COMMON_HTTP_CODE.success || !userInfo) {
-      throw new CustomError(message, code, errorCode);
+      throw new CustomError(msg, code, errorCode);
     }
     const data = ctx.request.query;
     const result = await this.common.getList({ ...data, user_id: userInfo.id });

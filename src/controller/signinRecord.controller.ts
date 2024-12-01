@@ -75,9 +75,9 @@ class SigninRecordController {
   };
 
   todayIsSignin = async (ctx: ParameterizedContext, next) => {
-    const { code, errorCode, userInfo, message } = await authJwt(ctx);
+    const { code, errorCode, userInfo, msg } = await authJwt(ctx);
     if (code !== COMMON_HTTP_CODE.success || !userInfo) {
-      throw new CustomError(message, code, errorCode);
+      throw new CustomError(msg, code, errorCode);
     }
     const res = await this.common.todayIsSignin(userInfo.id!);
     successHandler({ ctx, data: res });
@@ -85,9 +85,9 @@ class SigninRecordController {
   };
 
   create = async (ctx: ParameterizedContext, next) => {
-    const { code, errorCode, userInfo, message } = await authJwt(ctx);
+    const { code, errorCode, userInfo, msg } = await authJwt(ctx);
     if (code !== COMMON_HTTP_CODE.success || !userInfo) {
-      throw new CustomError(message, code, errorCode);
+      throw new CustomError(msg, code, errorCode);
     }
     const today = await this.common.todayIsSignin(userInfo.id!);
     if (today) {

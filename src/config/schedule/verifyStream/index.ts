@@ -35,6 +35,7 @@ function executeCommandWithTimeout(command, timeout) {
   });
 }
 
+// eslint-disable-next-line
 async function verifyBitrateIsOver(info: IApiV1Streams['streams'][0]) {
   try {
     await executeCommandWithTimeout(

@@ -5,7 +5,7 @@ export interface IVisitorLog {
   id?: number;
   live_room_id?: number;
   user_id?: number;
-  ip?: string;
+  client_ip?: string;
   user_agent?: string;
   duration?: number;
   /** 获取一段时间内，每个ip访问的次数的时候添加的 */
@@ -161,7 +161,7 @@ export interface IWsMessage {
   origin_content?: string;
   live_room_id?: number;
   user_id?: number;
-  ip?: string;
+  client_ip?: string;
   msg_type?: DanmuMsgTypeEnum;
   user_agent?: string;
   send_msg_time?: number;
@@ -523,7 +523,7 @@ export interface ILiveRecord {
 
 export interface IBlacklist {
   id?: number;
-  ip?: string;
+  client_ip?: string;
   user_id?: number;
   type?: number;
   msg?: string;
@@ -584,7 +584,7 @@ export interface ILoginRecord {
   user_id?: number;
   user_agent?: string;
   type?: LoginRecordEnum;
-  ip?: string;
+  client_ip?: string;
   remark?: string;
 
   user?: IUser;
@@ -595,13 +595,18 @@ export interface ILoginRecord {
 }
 
 export enum GlobalMsgTypeEnum {
-  system,
+  user = 'user',
+  system = 'system',
+  activity = 'activity',
 }
 
 export interface IGlobalMsg {
   id?: number;
   user_id?: number;
+  client_ip?: string;
   type?: GlobalMsgTypeEnum;
+  show?: SwitchEnum;
+  priority?: number;
   content?: string;
   remark?: string;
 
@@ -720,6 +725,7 @@ export enum SwitchEnum {
 
 /** 直播平台 */
 export enum LivePlatformEnum {
+  rtc,
   srs,
   tencentcloud_css,
 }

@@ -12,16 +12,16 @@ export const getAnalysisByDaySql = (data: {
 SELECT
   COALESCE ( sum( duration ), 0 ) AS sum_duration,
   t3.day AS format_date,
-  GROUP_CONCAT( DISTINCT ip SEPARATOR ', ' ) AS unique_ip_str,
+  GROUP_CONCAT( DISTINCT client_ip SEPARATOR ', ' ) AS unique_ip_str,
 	GROUP_CONCAT( DISTINCT user_id SEPARATOR ', ' ) AS unique_user_id_str,
-	GROUP_CONCAT( ip SEPARATOR ', ' ) AS ip_str,
+	GROUP_CONCAT( client_ip SEPARATOR ', ' ) AS ip_str,
 	GROUP_CONCAT( user_id SEPARATOR ', ' ) AS user_id_str,
 	GROUP_CONCAT( duration SEPARATOR ', ' ) AS duration_str
 FROM
 	(
 	SELECT
 		id,
-		ip,
+		client_ip,
 		user_id,
 		live_room_id,
 		duration,
@@ -48,16 +48,16 @@ export const getAnalysisByHourSql = (data: {
 SELECT
   COALESCE ( sum( duration ), 0 ) AS sum_duration,
   t3.hour AS format_date,
-  GROUP_CONCAT( DISTINCT ip SEPARATOR ', ' ) AS unique_ip_str,
+  GROUP_CONCAT( DISTINCT client_ip SEPARATOR ', ' ) AS unique_ip_str,
 	GROUP_CONCAT( DISTINCT user_id SEPARATOR ', ' ) AS unique_user_id_str,
-	GROUP_CONCAT( ip SEPARATOR ', ' ) AS ip_str,
+	GROUP_CONCAT( client_ip SEPARATOR ', ' ) AS ip_str,
 	GROUP_CONCAT( user_id SEPARATOR ', ' ) AS user_id_str,
 	GROUP_CONCAT( duration SEPARATOR ', ' ) AS duration_str
 FROM
 	(
 	SELECT
 		id,
-		ip,
+		client_ip,
 		user_id,
 		live_room_id,
 		duration,
@@ -84,16 +84,16 @@ export const getAnalysisByMinuteTenSql = (data: {
 SELECT
   COALESCE ( sum( duration ), 0 ) AS sum_duration,
   t3.minute AS format_date,
-  GROUP_CONCAT( DISTINCT ip SEPARATOR ', ' ) AS unique_ip_str,
+  GROUP_CONCAT( DISTINCT client_ip SEPARATOR ', ' ) AS unique_ip_str,
 	GROUP_CONCAT( DISTINCT user_id SEPARATOR ', ' ) AS unique_user_id_str,
-	GROUP_CONCAT( ip SEPARATOR ', ' ) AS ip_str,
+	GROUP_CONCAT( client_ip SEPARATOR ', ' ) AS ip_str,
 	GROUP_CONCAT( user_id SEPARATOR ', ' ) AS user_id_str,
 	GROUP_CONCAT( duration SEPARATOR ', ' ) AS duration_str
 FROM
 	(
 	SELECT
 		id,
-		ip,
+		client_ip,
 		user_id,
 		live_room_id,
 		duration,
@@ -154,7 +154,7 @@ export const getUserVisitRecordSql = (data: {
 };
 
 export const getIpVisitRecordSql = (data: {
-  ip: string;
+  client_ip: string;
   rangTimeStart: string;
   rangTimeEnd: string;
   orderName?: string;
@@ -167,13 +167,13 @@ export const getIpVisitRecordSql = (data: {
   return `
   SELECT
     t3.day AS format_date,
-    COALESCE ( ip, '${data.ip}' ) AS ip,
-    count( ip ) AS ip_nums,
+    COALESCE ( client_ip, '${data.client_ip}' ) AS client_ip,
+    count( client_ip ) AS ip_nums,
     COALESCE ( sum( duration ), 0 ) AS sum_duration,
     COALESCE ( GROUP_CONCAT( DISTINCT live_room_id SEPARATOR ', ' ), '' ) AS live_room_id_str,
     COALESCE ( GROUP_CONCAT( duration SEPARATOR ', ' ), '' ) AS duration_str
   FROM
-    ( SELECT ip, duration, live_room_id, DATE_FORMAT( created_at, '%Y-%m-%d' ) AS format_date FROM ${visitorLogModel.tableName} WHERE deleted_at IS NULL AND ip = '${data.ip}' AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}' ) AS subquery
+    ( SELECT client_ip, duration, live_room_id, DATE_FORMAT( created_at, '%Y-%m-%d' ) AS format_date FROM ${visitorLogModel.tableName} WHERE deleted_at IS NULL AND ip = '${data.client_ip}' AND created_at >= '${data.rangTimeStart}' AND created_at <= '${data.rangTimeEnd}' ) AS subquery
     RIGHT JOIN ${mockDayDataModel.tableName} AS t3 ON t3.day = subquery.format_date
   WHERE
     t3.day >= '${data.rangTimeStart}'

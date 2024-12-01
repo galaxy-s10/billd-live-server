@@ -1,5 +1,4 @@
 import { getRandomString } from 'billd-utils';
-import cryptojs from 'crypto-js';
 import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
@@ -15,6 +14,33 @@ import { LiveRoomStatusEnum, LiveRoomTypeEnum } from '@/types/ILiveRoom';
 
 class UserLiveRoomController {
   common = {
+    getList: ({
+      id,
+      user_id,
+      live_room_id,
+      orderBy,
+      orderName,
+      nowPage,
+      pageSize,
+      keyWord,
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    }: IList<IUserLiveRoom>) =>
+      userLiveRoomService.getList({
+        id,
+        user_id,
+        live_room_id,
+        orderBy,
+        orderName,
+        nowPage,
+        pageSize,
+        keyWord,
+        rangTimeType,
+        rangTimeStart,
+        rangTimeEnd,
+      }),
+    findAll: () => userLiveRoomService.findAll(),
     create: (data: IUserLiveRoom) => userLiveRoomService.create(data),
     findByUserId: (userId: number) => userLiveRoomService.findByUserId(userId),
     findByLiveRoomId: (liveRoomId: number) =>
@@ -24,32 +50,8 @@ class UserLiveRoomController {
   };
 
   async getList(ctx: ParameterizedContext, next) {
-    const {
-      id,
-      user_id,
-      live_room_id,
-      orderBy,
-      orderName,
-      nowPage,
-      pageSize,
-      keyWord,
-      rangTimeType,
-      rangTimeStart,
-      rangTimeEnd,
-    }: IList<IUserLiveRoom> = ctx.request.query;
-    const result = await userLiveRoomService.getList({
-      id,
-      user_id,
-      live_room_id,
-      orderBy,
-      orderName,
-      nowPage,
-      pageSize,
-      keyWord,
-      rangTimeType,
-      rangTimeStart,
-      rangTimeEnd,
-    });
+    const data = ctx.request.query;
+    const result = await this.common.getList(data);
     successHandler({ ctx, data: result });
     await next();
   }
@@ -89,9 +91,9 @@ class UserLiveRoomController {
   }
 
   create = async (ctx: ParameterizedContext, next) => {
-    const { code, userInfo, message } = await authJwt(ctx);
+    const { code, userInfo, msg } = await authJwt(ctx);
     if (code !== COMMON_HTTP_CODE.success || !userInfo) {
-      throw new CustomError(message, code, code);
+      throw new CustomError(msg, code, code);
     }
     const isExist = await this.common.findByUserId(userInfo.id!);
     if (isExist) {
@@ -102,12 +104,10 @@ class UserLiveRoomController {
       );
     }
 
-    const pushKey = cryptojs
-      .MD5(`${+new Date()}___${getRandomString(6)}`)
-      .toString();
+    const key = getRandomString(30);
     const liveRoom = await liveRoomController.common.create({
       name: `${userInfo.username!.slice(0, 10)}的直播间`,
-      key: pushKey,
+      key,
       type: LiveRoomTypeEnum.obs,
       priority: 21,
       cdn: SwitchEnum.no,
@@ -123,17 +123,18 @@ class UserLiveRoomController {
       userId: userInfo.id!,
       liveRoomId: liveRoom.id!,
       type: LiveRoomTypeEnum.srs,
-      key: pushKey,
+      key,
     });
     await liveRoomService.update({
-      rtmp_url: pullUrlRes.rtmp,
-      flv_url: pullUrlRes.flv,
-      hls_url: pullUrlRes.hls,
-      push_rtmp_url: pushUrlRes.push_rtmp_url,
-      push_obs_server: pushUrlRes.push_obs_server,
-      push_obs_stream_key: pushUrlRes.push_obs_stream_key,
-      push_webrtc_url: pushUrlRes.push_webrtc_url,
-      push_srt_url: pushUrlRes.push_srt_url,
+      pull_rtmp_url: pullUrlRes.rtmp,
+      pull_flv_url: pullUrlRes.flv,
+      pull_hls_url: pullUrlRes.hls,
+      pull_webrtc_url: pullUrlRes.webrtc,
+      push_rtmp_url: pushUrlRes.rtmp_url,
+      push_obs_server: pushUrlRes.obs_server,
+      push_obs_stream_key: pushUrlRes.obs_stream_key,
+      push_webrtc_url: pushUrlRes.webrtc_url,
+      push_srt_url: pushUrlRes.srt_url,
       id: liveRoom.id,
     });
     const result = await this.common.create({

@@ -1,26 +1,30 @@
 import { getRandomString } from 'billd-utils';
-import cryptojs from 'crypto-js';
 import { ParameterizedContext } from 'koa';
 
 import successHandler from '@/app/handler/success-handle';
 import { COMMON_HTTP_CODE, THIRD_PLATFORM } from '@/constant';
+import liveRoomController from '@/controller/liveRoom.controller';
 import srsController from '@/controller/srs.controller';
+import userController from '@/controller/user.controller';
+import walletController from '@/controller/wallet.controller';
 import {
   bulkCreateArea,
   bulkCreateAuth,
   bulkCreateConfig,
+  bulkCreateGlobalMsg,
   bulkCreateGoods,
   bulkCreateRole,
   bulkCreateRoleAuth,
 } from '@/init/initData';
 import { mockTimeBatchInsert } from '@/init/initDb';
 import { initLiveRoom, initUser } from '@/init/initUser';
-import { IInitUser, SwitchEnum } from '@/interface';
+import { IInitUser } from '@/interface';
 import areaModel from '@/model/area.model';
 import areaLiveRoomModel from '@/model/areaLiveRoom.model';
 import authModel from '@/model/auth.model';
 import configModel from '@/model/config.model';
 import { CustomError } from '@/model/customError.model';
+import globalMsgModel from '@/model/globalMsg.model';
 import goodsModel from '@/model/goods.model';
 import liveModel from '@/model/live.model';
 import liveRecordModel from '@/model/liveRecord.model';
@@ -40,9 +44,6 @@ import userLiveRoomModel from '@/model/userLiveRoom.model';
 import userRoleModel from '@/model/userRole.model';
 import walletModel from '@/model/wallet.model';
 import walletRecordModel from '@/model/walletRecord.model';
-import liveRoomService from '@/service/liveRoom.service';
-import userService from '@/service/user.service';
-import walletService from '@/service/wallet.service';
 import {
   ILiveRoom,
   LiveRoomStatusEnum,
@@ -51,6 +52,8 @@ import {
 import { IUser } from '@/types/IUser';
 import { chalkWARN } from '@/utils/chalkTip';
 import { tencentcloudCssUtils } from '@/utils/tencentcloud-css';
+
+import userLiveRoomController from './userLiveRoom.controller';
 
 class InitController {
   common = {
@@ -65,6 +68,7 @@ class InitController {
           this.common.initRole(),
           this.common.initAuth(),
           this.common.initConfig(),
+          this.common.initGlobalMsg(),
           this.common.initRoleAuth(),
           this.common.initUserWallet(),
           this.common.initArea(),
@@ -135,6 +139,18 @@ class InitController {
         );
       }
     },
+    initGlobalMsg: async () => {
+      const count = await globalMsgModel.count();
+      if (count === 0) {
+        await globalMsgModel.bulkCreate(bulkCreateGlobalMsg);
+      } else {
+        throw new CustomError(
+          '已经初始化过全局消息了，不能再初始化了！',
+          COMMON_HTTP_CODE.paramsError,
+          COMMON_HTTP_CODE.paramsError
+        );
+      }
+    },
     initRoleAuth: async () => {
       const count = await roleAuthModel.count();
       if (count === 0) {
@@ -149,66 +165,62 @@ class InitController {
     },
     initUser: async () => {
       const quequ: Promise<any>[] = [];
-      const initUserLiveRoom = async (user: IInitUser) => {
-        if (!user.live_room || !user.live_room.id) return;
-        await userLiveRoomModel.create({
-          live_room_id: user.live_room.id,
-          user_id: user.id,
-        });
-      };
-      const initOneLiveRoom = async (live_room: ILiveRoom) => {
+
+      const initOneLiveRoom = async (live_room: ILiveRoom, user_id: number) => {
         const live_room_id = live_room?.id;
         if (!live_room || !live_room_id) return;
-        const liveRoomIsExist = await liveRoomService.isExist([live_room_id]);
+        const liveRoomIsExist = await liveRoomController.common.isExist([
+          live_room_id,
+        ]);
         if (!liveRoomIsExist) {
-          let liveUrl;
-          const pushKey = cryptojs
-            .MD5(`${+new Date()}___${getRandomString(6)}`)
-            .toString();
-          if (live_room.cdn === SwitchEnum.no) {
-            liveUrl = () => {
-              const res = srsController.common.getPullUrl({
-                liveRoomId: live_room_id,
-              });
-              return {
-                rtmp_url: res.rtmp,
-                flv_url: res.flv,
-                hls_url: res.hls,
-                webrtc_url: res.webrtc,
-              };
-            };
-            // @ts-ignore
-          } else if (live_room.cdn === SwitchEnum.yes) {
-            liveUrl = () => {
-              const res = tencentcloudCssUtils.getPullUrl({
-                liveRoomId: live_room_id,
-              });
-              return {
-                rtmp_url: res.rtmp,
-                flv_url: res.flv,
-                hls_url: res.hls,
-                webrtc_url: res.webrtc,
-              };
-            };
-          }
+          const pushKey = getRandomString(6);
+          const srsPushRes = srsController.common.getPushUrl({
+            userId: user_id,
+            liveRoomId: live_room.id!,
+            type: live_room.type!,
+            key: pushKey,
+          });
+          const cdnPushRes = tencentcloudCssUtils.getPushUrl({
+            userId: user_id,
+            liveRoomId: live_room.id!,
+            type: live_room.type!,
+            key: pushKey,
+          });
+          const srsPullRes = srsController.common.getPullUrl({
+            liveRoomId: live_room_id,
+          });
+          const cdnPullRes = tencentcloudCssUtils.getPullUrl({
+            liveRoomId: live_room.id!,
+          });
 
-          const { rtmp_url, flv_url, hls_url, webrtc_url } = liveUrl(
-            live_room?.id
-          );
-          const liveRoom = await liveRoomService.create({
+          const liveRoom = await liveRoomController.common.create({
             id: live_room?.id,
             name: live_room?.name,
             desc: live_room?.desc,
+            status: LiveRoomStatusEnum.normal,
             key: pushKey,
             type: LiveRoomTypeEnum.system,
             priority: live_room?.priority,
             cdn: live_room?.cdn,
             cover_img: live_room.cover_img,
-            rtmp_url,
-            flv_url,
-            hls_url,
-            webrtc_url,
-            status: LiveRoomStatusEnum.normal,
+            pull_rtmp_url: srsPullRes.rtmp,
+            pull_flv_url: srsPullRes.flv,
+            pull_hls_url: srsPullRes.hls,
+            pull_webrtc_url: srsPullRes.webrtc,
+            pull_cdn_rtmp_url: cdnPullRes.rtmp,
+            pull_cdn_flv_url: cdnPullRes.flv,
+            pull_cdn_hls_url: cdnPullRes.hls,
+            pull_cdn_webrtc_url: cdnPullRes.webrtc,
+            push_rtmp_url: srsPushRes.rtmp_url,
+            push_obs_server: srsPushRes.obs_server,
+            push_obs_stream_key: srsPushRes.obs_stream_key,
+            push_webrtc_url: srsPushRes.webrtc_url,
+            push_srt_url: srsPushRes.srt_url,
+            push_cdn_srt_url: cdnPushRes.srt_url,
+            push_cdn_rtmp_url: cdnPushRes.rtmp_url,
+            push_cdn_obs_server: cdnPushRes.obs_server,
+            push_cdn_obs_stream_key: cdnPushRes.obs_stream_key,
+            push_cdn_webrtc_url: cdnPushRes.webrtc_url,
           });
           // @ts-ignore
           await liveRoom.setAreas(live_room?.area);
@@ -218,7 +230,7 @@ class InitController {
       };
       const initOneUser = async (user: IInitUser) => {
         if (!user.id) return;
-        const userIsExist = await userService.isExist([user.id]);
+        const userIsExist = await userController.common.isExist([user.id]);
         let userRes;
         if (!userIsExist) {
           const userInfo = {
@@ -227,10 +239,13 @@ class InitController {
             avatar: user.avatar,
             password: user.password || getRandomString(8),
           };
-          userRes = await userService.create(userInfo);
+          userRes = await userController.common.create(userInfo);
           // @ts-ignore
           await userRes.setRoles(user.user_roles);
-          await walletService.create({ user_id: userRes.id, balance: 0 });
+          await walletController.common.create({
+            user_id: userRes.id,
+            balance: 0,
+          });
           await thirdUserModel.create({
             user_id: userRes.id,
             third_user_id: userRes.id,
@@ -240,9 +255,20 @@ class InitController {
           console.log(chalkWARN(`已存在id为：${user.id}的用户！`));
         }
       };
-      Object.keys(initLiveRoom).forEach((item) => {
-        quequ.push(initOneLiveRoom(initLiveRoom[item]));
-      });
+      const initUserLiveRoom = async (user: IInitUser) => {
+        if (user.live_room?.id) {
+          initOneLiveRoom(initLiveRoom[user.live_room.id], user.id!);
+        }
+        if (user.live_room && user.live_room.id) {
+          await userLiveRoomModel.create({
+            live_room_id: user.live_room.id,
+            user_id: user.id,
+          });
+        }
+      };
+      // Object.keys(initLiveRoom).forEach((item) => {
+      //   quequ.push(initOneLiveRoom(initLiveRoom[item]));
+      // });
       Object.keys(initUser).forEach((item) => {
         quequ.push(initOneUser(initUser[item]));
         quequ.push(initUserLiveRoom(initUser[item]));
@@ -254,9 +280,12 @@ class InitController {
     initUserWallet: async () => {
       const userListRes = await userModel.findAndCountAll();
       const handleWallet = async (item: IUser) => {
-        const flag = await walletService.findByUserId(item.id!);
+        const flag = await walletController.common.findByUserId(item.id!);
         if (!flag) {
-          await walletService.create({ user_id: item.id, balance: 0 });
+          await walletController.common.create({
+            user_id: item.id,
+            balance: 0,
+          });
         } else {
           // console.log(chalkWARN(`id为${item.id!}的用户已存在钱包！`));
         }
@@ -321,42 +350,42 @@ class InitController {
   // 添加用户
   addUser = async (ctx: ParameterizedContext, next) => {
     await this.common.initRole();
-    successHandler({ ctx, message: '初始化角色表成功！' });
+    successHandler({ ctx, msg: '初始化角色表成功！' });
     await next();
   };
 
   // 初始化角色
   initRole = async (ctx: ParameterizedContext, next) => {
     await this.common.initRole();
-    successHandler({ ctx, message: '初始化角色表成功！' });
+    successHandler({ ctx, msg: '初始化角色表成功！' });
     await next();
   };
 
   // 初始化权限
   initAuth = async (ctx: ParameterizedContext, next) => {
     await this.common.initAuth();
-    successHandler({ ctx, message: '初始化权限表成功！' });
+    successHandler({ ctx, msg: '初始化权限表成功！' });
     await next();
   };
 
   // 初始化商品
   initGoods = async (ctx: ParameterizedContext, next) => {
     await this.common.initGoods();
-    successHandler({ ctx, message: '初始化商品成功！' });
+    successHandler({ ctx, msg: '初始化商品成功！' });
     await next();
   };
 
   // 初始化设置
   initConfig = async (ctx: ParameterizedContext, next) => {
     await this.common.initConfig();
-    successHandler({ ctx, message: '初始化设置表成功！' });
+    successHandler({ ctx, msg: '初始化设置表成功！' });
     await next();
   };
 
   // 初始化角色权限
   initRoleAuth = async (ctx: ParameterizedContext, next) => {
     await this.common.initRoleAuth();
-    successHandler({ ctx, message: '初始化角色权限表成功！' });
+    successHandler({ ctx, msg: '初始化角色权限表成功！' });
     await next();
   };
 
@@ -370,21 +399,21 @@ class InitController {
     await this.common.initRole();
     await this.common.initAuth();
     await this.common.initRoleAuth();
-    successHandler({ ctx, message: '初始化角色、权限、角色权限成功！' });
+    successHandler({ ctx, msg: '初始化角色、权限、角色权限成功！' });
     await next();
   };
 
   // 初始化用户
   initUser = async (ctx: ParameterizedContext, next) => {
     await this.common.initUser();
-    successHandler({ ctx, data: '初始化用户成功！' });
+    successHandler({ ctx, msg: '初始化用户成功！' });
     await next();
   };
 
   // 初始化用户钱包
   initUserWallet = async (ctx: ParameterizedContext, next) => {
     await this.common.initUserWallet();
-    successHandler({ ctx, data: '初始化用户钱包成功！' });
+    successHandler({ ctx, msg: '初始化用户钱包成功！' });
     await next();
   };
 
@@ -394,7 +423,7 @@ class InitController {
     await this.common.initDayData(365 * 3);
     successHandler({
       ctx,
-      data: `初始化${mockDayDataModel.tableName}表成功！`,
+      msg: `初始化${mockDayDataModel.tableName}表成功！`,
     });
     await next();
   };
@@ -405,7 +434,7 @@ class InitController {
     await this.common.initHourData(365 * 3 * 24);
     successHandler({
       ctx,
-      data: `初始化${mockHourDataModel.tableName}表成功！`,
+      msg: `初始化${mockHourDataModel.tableName}表成功！`,
     });
     await next();
   };
@@ -416,7 +445,7 @@ class InitController {
     await this.common.initMinuteTenData(365 * 3 * 24 * 6);
     successHandler({
       ctx,
-      data: `初始化${mockMinuteTenDataModel.tableName}表成功！`,
+      msg: `初始化${mockMinuteTenDataModel.tableName}表成功！`,
     });
     await next();
   };
@@ -427,7 +456,65 @@ class InitController {
     await this.common.initMinuteThirtyData(365 * 3 * 24 * 2);
     successHandler({
       ctx,
-      data: `初始化${mockMinuteThirtyDataModel.tableName}表成功！`,
+      msg: `初始化${mockMinuteThirtyDataModel.tableName}表成功！`,
+    });
+    await next();
+  };
+
+  resetLiveRoomUrl = async (ctx: ParameterizedContext, next) => {
+    await mockMinuteThirtyDataModel.sync({ alter: true });
+    const res = await userLiveRoomController.common.findAll();
+    const queue: Promise<any>[] = [];
+    res.forEach((item) => {
+      const key = getRandomString(30);
+      const srsPullRes = srsController.common.getPullUrl({
+        liveRoomId: item.live_room_id!,
+      });
+      const srsPushRes = srsController.common.getPushUrl({
+        userId: item.user_id!,
+        liveRoomId: item.live_room_id!,
+        type: LiveRoomTypeEnum.system,
+        key,
+      });
+      const cdnPullRes = tencentcloudCssUtils.getPullUrl({
+        liveRoomId: item.live_room_id!,
+      });
+      const cdnPushRes = tencentcloudCssUtils.getPushUrl({
+        userId: item.user_id!,
+        liveRoomId: item.live_room_id!,
+        type: LiveRoomTypeEnum.tencent_css,
+        key,
+      });
+      queue.push(
+        liveRoomController.common.update({
+          id: item.live_room_id,
+          pull_rtmp_url: srsPullRes.rtmp,
+          pull_flv_url: srsPullRes.flv,
+          pull_hls_url: srsPullRes.hls,
+          pull_webrtc_url: srsPullRes.webrtc,
+
+          pull_cdn_rtmp_url: cdnPullRes.rtmp,
+          pull_cdn_flv_url: cdnPullRes.flv,
+          pull_cdn_hls_url: cdnPullRes.hls,
+          pull_cdn_webrtc_url: cdnPullRes.webrtc,
+
+          push_rtmp_url: srsPushRes.rtmp_url,
+          push_obs_server: srsPushRes.obs_server,
+          push_obs_stream_key: srsPushRes.obs_stream_key,
+          push_webrtc_url: srsPushRes.webrtc_url,
+          push_srt_url: srsPushRes.srt_url,
+
+          push_cdn_rtmp_url: cdnPushRes.rtmp_url,
+          push_cdn_obs_server: cdnPushRes.obs_server,
+          push_cdn_obs_stream_key: cdnPushRes.obs_stream_key,
+          push_cdn_webrtc_url: cdnPushRes.webrtc_url,
+          push_cdn_srt_url: cdnPushRes.srt_url,
+        })
+      );
+    });
+    await Promise.all(queue);
+    successHandler({
+      ctx,
     });
     await next();
   };
@@ -450,7 +537,7 @@ class InitController {
       orderModel.sync({ force: true }),
     ]);
 
-    successHandler({ ctx, data: '重建表成功！' });
+    successHandler({ ctx, msg: '重建表成功！' });
     await next();
   };
 
@@ -515,7 +602,7 @@ class InitController {
     // 删除该用户的直播（live_record表）
     await liveRecordModel.destroy({ where: { user_id: userId } });
 
-    successHandler({ ctx, data: '删除用户成功！' });
+    successHandler({ ctx, msg: '删除用户成功！' });
     await next();
   };
 }

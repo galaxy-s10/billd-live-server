@@ -247,15 +247,18 @@ class WechatUserController {
         token,
       };
       const redisExp = 10;
-      const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
+      const client_ip = strSlice(
+        String(ctx.request.headers['x-real-ip'] || ''),
+        100
+      );
       await redisController.setExVal({
         prefix: REDIS_PREFIX.qrCodeLogin,
         key: `${platform}___${login_id}`,
         exp: redisExp,
         value: createDate,
-        client_ip: ip,
+        client_ip,
       });
-      successHandler({ ctx, data: token, message: 'wechat登录成功！' });
+      successHandler({ ctx, data: token, msg: 'wechat登录成功！' });
     } else {
       console.log('已存在wechat账号');
       await wechatUserService.update(wechatUserInfo);
@@ -313,15 +316,18 @@ class WechatUserController {
         token,
       };
       const redisExp = 10;
-      const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
+      const client_ip = strSlice(
+        String(ctx.request.headers['x-real-ip'] || ''),
+        100
+      );
       await redisController.setExVal({
         prefix: REDIS_PREFIX.qrCodeLogin,
         key: `${platform}___${login_id}`,
         exp: redisExp,
         value: createDate,
-        client_ip: ip,
+        client_ip,
       });
-      successHandler({ ctx, data: token, message: 'wechat登录成功！' });
+      successHandler({ ctx, data: token, msg: 'wechat登录成功！' });
     }
 
     /**

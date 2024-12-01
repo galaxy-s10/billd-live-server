@@ -47,7 +47,7 @@ class LoginRecordService {
     });
     const keyWordWhere = handleKeyWord({
       keyWord,
-      arr: ['user_agent', 'ip', 'remark'],
+      arr: ['user_agent', 'client_ip', 'remark'],
     });
     if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;

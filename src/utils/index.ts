@@ -105,7 +105,7 @@ export function handleCtxRequestHeaders(ctx: ParameterizedContext) {
   const body = strSlice(JSON.stringify(ctx.request.body), 2000);
   const query = strSlice(JSON.stringify(ctx.request.query), 2000);
   const user_agent = strSlice(String(headers['user-agent']), 490);
-  const real_ip = strSlice(String(headers['x-real-ip']), 490);
+  const real_ip = strSlice(String(headers['x-real-ip']), 100);
   const forwarded_for = strSlice(String(headers['x-forwarded-for']), 490);
   const referer = strSlice(String(headers.referer), 490);
   // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -125,16 +125,16 @@ export function judgeUserStatus(status: UserStatusEnum) {
   const res = {
     status,
     errorCode: COMMON_ERROR_CODE.userStatusIsDisable,
-    message: COMMON_ERROE_MSG.userStatusIsDisable,
+    msg: COMMON_ERROE_MSG.userStatusIsDisable,
   };
   switch (status) {
     case UserStatusEnum.disable:
       res.errorCode = COMMON_ERROR_CODE.userStatusIsDisable;
-      res.message = COMMON_ERROE_MSG.userStatusIsDisable;
+      res.msg = COMMON_ERROE_MSG.userStatusIsDisable;
       break;
     default:
       res.errorCode = COMMON_ERROR_CODE.userStatusNoNormal;
-      res.message = COMMON_ERROE_MSG.userStatusNoNormal;
+      res.msg = COMMON_ERROE_MSG.userStatusNoNormal;
       break;
   }
   return res;
@@ -164,8 +164,8 @@ export function dateStartAndEnd(date: Date) {
   const y = date.getFullYear();
   const m = date.getMonth() + 1;
   const d = date.getDate();
-  const startTime = `${y}-${m}-${d} 00:00:00`;
-  const endTime = `${y}-${m}-${d} 23:59:59`;
+  const startTime = `${y}/${m}/${d} 00:00:00`;
+  const endTime = `${y}/${m}/${d} 23:59:59`;
   return {
     startTime,
     endTime,

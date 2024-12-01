@@ -1,5 +1,8 @@
 import liveRoomController from '@/controller/liveRoom.controller';
 
+/**
+ * code：0，鉴权成功；非0代表鉴权错误
+ */
 export async function liveRoomVerifyAuth({ roomId, publishKey }) {
   if (!roomId) {
     return {

@@ -1,6 +1,7 @@
 import { deleteUseLessObjectKey, filterObj, isPureNumber } from 'billd-utils';
 import { Op } from 'sequelize';
 
+import { LIVE_ROOM_MODEL_EXCLUDE } from '@/constant';
 import { IList } from '@/interface';
 import areaModel from '@/model/area.model';
 import liveModel from '@/model/live.model';
@@ -93,31 +94,7 @@ class LiveRoomService {
         },
       ],
       attributes: {
-        exclude: [
-          'key',
-          'push_rtmp_url',
-          'push_obs_server',
-          'push_obs_stream_key',
-          'push_webrtc_url',
-          'push_srt_url',
-          'cdn_push_rtmp_url',
-          'cdn_push_obs_server',
-          'cdn_push_obs_stream_key',
-          'cdn_push_webrtc_url',
-          'cdn_push_srt_url',
-          'forward_bilibili_url',
-          'forward_huya_url',
-          'forward_douyu_url',
-          'forward_douyin_url',
-          'forward_kuaishou_url',
-          'forward_xiaohongshu_url',
-        ],
-        // include: [
-        //   [col('user_live_room.id'), 'idd'],
-        //   [col('user_live_room.user.id'), 'user_id'],
-        //   [col('user_live_room.user.username'), 'user_username'],
-        //   [col('user_live_room.user.avatar'), 'user_avatar'],
-        // ],
+        exclude: LIVE_ROOM_MODEL_EXCLUDE,
       },
       distinct: true,
       order: [...orderRes],
@@ -138,7 +115,6 @@ class LiveRoomService {
     is_fake,
     type,
     cdn,
-    exclude_key,
     orderBy,
     orderName,
     nowPage,
@@ -177,30 +153,9 @@ class LiveRoomService {
       allWhere[rangTimeType!] = rangTimeWhere;
     }
     const orderRes = handleOrder({ orderName, orderBy });
-    const excludeArr = [
-      'push_rtmp_url',
-      'push_obs_server',
-      'push_obs_stream_key',
-      'push_webrtc_url',
-      'push_srt_url',
-      'cdn_push_rtmp_url',
-      'cdn_push_obs_server',
-      'cdn_push_obs_stream_key',
-      'cdn_push_webrtc_url',
-      'cdn_push_srt_url',
-      'forward_bilibili_url',
-      'forward_huya_url',
-      'forward_douyu_url',
-      'forward_douyin_url',
-      'forward_kuaishou_url',
-      'forward_xiaohongshu_url',
-    ];
-    if (exclude_key) {
-      excludeArr.push('key');
-    }
     const result = await liveRoomModel.findAndCountAll({
       attributes: {
-        exclude: excludeArr,
+        exclude: LIVE_ROOM_MODEL_EXCLUDE,
       },
       distinct: true,
       order: [...orderRes],
@@ -237,25 +192,7 @@ class LiveRoomService {
         },
       ],
       attributes: {
-        exclude: [
-          'key',
-          'push_rtmp_url',
-          'push_obs_server',
-          'push_obs_stream_key',
-          'push_webrtc_url',
-          'push_srt_url',
-          'cdn_push_rtmp_url',
-          'cdn_push_obs_server',
-          'cdn_push_obs_stream_key',
-          'cdn_push_webrtc_url',
-          'cdn_push_srt_url',
-          'forward_bilibili_url',
-          'forward_huya_url',
-          'forward_douyu_url',
-          'forward_douyin_url',
-          'forward_kuaishou_url',
-          'forward_xiaohongshu_url',
-        ],
+        exclude: LIVE_ROOM_MODEL_EXCLUDE,
       },
       where: { id },
     });
@@ -266,25 +203,7 @@ class LiveRoomService {
   async findPure(id: number) {
     const result = await liveRoomModel.findOne({
       attributes: {
-        exclude: [
-          'key',
-          'push_rtmp_url',
-          'push_obs_server',
-          'push_obs_stream_key',
-          'push_webrtc_url',
-          'push_srt_url',
-          'cdn_push_rtmp_url',
-          'cdn_push_obs_server',
-          'cdn_push_obs_stream_key',
-          'cdn_push_webrtc_url',
-          'cdn_push_srt_url',
-          'forward_bilibili_url',
-          'forward_huya_url',
-          'forward_douyu_url',
-          'forward_douyin_url',
-          'forward_kuaishou_url',
-          'forward_xiaohongshu_url',
-        ],
+        exclude: LIVE_ROOM_MODEL_EXCLUDE,
       },
       where: { id },
     });
@@ -318,25 +237,7 @@ class LiveRoomService {
         },
       ],
       attributes: {
-        exclude: [
-          'key',
-          'push_rtmp_url',
-          'push_obs_server',
-          'push_obs_stream_key',
-          'push_webrtc_url',
-          'push_srt_url',
-          'cdn_push_rtmp_url',
-          'cdn_push_obs_server',
-          'cdn_push_obs_stream_key',
-          'cdn_push_webrtc_url',
-          'cdn_push_srt_url',
-          'forward_bilibili_url',
-          'forward_huya_url',
-          'forward_douyu_url',
-          'forward_douyin_url',
-          'forward_kuaishou_url',
-          'forward_xiaohongshu_url',
-        ],
+        exclude: LIVE_ROOM_MODEL_EXCLUDE,
       },
       where: { name },
     });
@@ -346,29 +247,16 @@ class LiveRoomService {
   /** 查找直播间key */
   async findKey(id: number) {
     const result = await liveRoomModel.findOne({
-      attributes: [
-        'key',
-        'rtmp_url',
-        'flv_url',
-        'hls_url',
-        'webrtc_url',
-        'push_rtmp_url',
-        'push_obs_server',
-        'push_obs_stream_key',
-        'push_webrtc_url',
-        'push_srt_url',
-        'cdn_push_rtmp_url',
-        'cdn_push_obs_server',
-        'cdn_push_obs_stream_key',
-        'cdn_push_webrtc_url',
-        'cdn_push_srt_url',
-        'forward_bilibili_url',
-        'forward_huya_url',
-        'forward_douyu_url',
-        'forward_douyin_url',
-        'forward_kuaishou_url',
-        'forward_xiaohongshu_url',
-      ],
+      attributes: ['key'],
+      where: { id },
+    });
+    return result;
+  }
+
+  /** 查找直播间key */
+  async findKey2(id: number) {
+    const result = await liveRoomModel.findOne({
+      attributes: LIVE_ROOM_MODEL_EXCLUDE,
       where: { id },
       include: [
         {

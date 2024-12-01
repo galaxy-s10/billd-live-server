@@ -26,9 +26,8 @@ export const dockerRunSRS = (init = true) => {
   try {
     // 停掉旧的容器
     execSync(`docker stop ${SRS_CONFIG.docker.container}`);
-  } catch (error) {
+  } catch {
     console.log('停掉旧的srs容器出错');
-    // console.log(error);
   }
 
   try {

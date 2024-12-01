@@ -46,9 +46,9 @@ class AuthController {
 
   /** 获取我的权限 */
   getMyAuth = async (ctx: ParameterizedContext, next) => {
-    const { code, userInfo, message } = await authJwt(ctx);
+    const { code, userInfo, msg } = await authJwt(ctx);
     if (code !== COMMON_HTTP_CODE.success) {
-      throw new CustomError(message, code, code);
+      throw new CustomError(msg, code, code);
     }
     const res = await this.common.getUserAuth(userInfo!.id!);
     successHandler({ ctx, data: res });
@@ -311,7 +311,7 @@ class AuthController {
     await authService.delete([id, ...result.map((v) => v.id)]);
     successHandler({
       ctx,
-      message: `删除成功，且删除了${result.length}个关联权限`,
+      msg: `删除成功，且删除了${result.length}个关联权限`,
     });
     await next();
   };
@@ -423,7 +423,7 @@ class AuthController {
     await authService.delete([...authResFlat.map((v) => v.id), ...c_auths]);
     successHandler({
       ctx,
-      message: `删除成功，删除了${c_auths.length}个子权限和${authResFlat.length}个关联权限`,
+      msg: `删除成功，删除了${c_auths.length}个子权限和${authResFlat.length}个关联权限`,
     });
     await next();
   };

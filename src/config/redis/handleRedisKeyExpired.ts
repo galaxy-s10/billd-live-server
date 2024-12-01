@@ -1,6 +1,7 @@
 import { pubClient } from '@/config/redis/pub';
 import liveRedisController from '@/config/websocket/live-redis.controller';
 import { REDIS_PREFIX } from '@/constant';
+import liveController from '@/controller/live.controller';
 import liveRecordController from '@/controller/liveRecord.controller';
 import orderController from '@/controller/order.controller';
 import srsController from '@/controller/srs.controller';
@@ -83,6 +84,26 @@ export const handleRedisKeyExpired = () => {
               live_room_id,
             });
           }
+        }
+
+        // rtcLiving过期
+        if (redisKey.indexOf(REDIS_PREFIX.rtcLiving) === 0) {
+          const key = redisKey.replace(`${REDIS_PREFIX.rtcLiving}`, '');
+          console.log(chalkINFO('rtcLiving过期'), key);
+          // key: `${data.data.live_room_id}___${data.data.live_record_id}___${data.data.live_id}`,
+          const keyArr = key.split('___');
+          const live_room_id = Number(keyArr[0]);
+          const live_record_id = Number(keyArr[1]);
+          const live_id = Number(keyArr[2]);
+          if (!live_room_id || !live_record_id || !live_id) {
+            return;
+          }
+          await liveController.common.delete(live_id);
+          await liveRecordController.common.update({
+            id: live_record_id,
+            // @ts-ignore
+            end_time: +new Date(),
+          });
         }
 
         // joined过期

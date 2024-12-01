@@ -1,7 +1,7 @@
 import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import { Op } from 'sequelize';
 
-import { IGlobalMsg, IList } from '@/interface';
+import { GlobalMsgTypeEnum, IGlobalMsg, IList } from '@/interface';
 import globalMsgModel from '@/model/globalMsg.model';
 import userModel from '@/model/user.model';
 import {
@@ -29,7 +29,11 @@ class GlobalMsgService {
   async getList({
     id,
     user_id,
+    client_ip,
+    priority,
+    show,
     type,
+    remark,
     orderBy,
     orderName,
     nowPage,
@@ -43,15 +47,94 @@ class GlobalMsgService {
     const allWhere: any = deleteUseLessObjectKey({
       id,
       user_id,
+      client_ip,
+      priority,
+      show,
       type,
+      remark,
     });
     const keyWordWhere = handleKeyWord({
       keyWord,
-      arr: ['content', 'remark'],
+      arr: ['content', 'client_ip', 'remark'],
     });
     if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
     }
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
+    }
+    const orderRes = handleOrder({ orderName, orderBy });
+    const result = await globalMsgModel.findAndCountAll({
+      include: [
+        {
+          model: userModel,
+          attributes: {
+            exclude: ['password', 'token'],
+          },
+        },
+      ],
+      order: [...orderRes],
+      limit,
+      offset,
+      where: {
+        ...allWhere,
+      },
+    });
+    return handlePaging(result, nowPage, pageSize);
+  }
+
+  /** 获取全局消息列表 */
+  async getMyList({
+    id,
+    user_id,
+    client_ip,
+    priority,
+    show,
+    type,
+    remark,
+    orderBy,
+    orderName,
+    nowPage,
+    pageSize,
+    keyWord,
+    rangTimeType,
+    rangTimeStart,
+    rangTimeEnd,
+  }: IList<IGlobalMsg>) {
+    const { offset, limit } = handlePage({ nowPage, pageSize });
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+      client_ip,
+      priority,
+      show,
+      type,
+      remark,
+    });
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['content', 'client_ip', 'remark'],
+    });
+    allWhere[Op.or] = [
+      {
+        type: {
+          [Op.in]: [GlobalMsgTypeEnum.activity, GlobalMsgTypeEnum.system],
+        },
+      },
+      {
+        user_id: {
+          [Op.in]: [user_id],
+        },
+      },
+    ];
+    if (keyWordWhere) {
+      allWhere[Op.or].push(...keyWordWhere);
+    }
+
     const rangTimeWhere = handleRangTime({
       rangTimeType,
       rangTimeStart,

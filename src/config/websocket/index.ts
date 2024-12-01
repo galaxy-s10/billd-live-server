@@ -7,6 +7,7 @@ import {
   handleWsBilldDeskUpdateUser,
   handleWsJoin,
   handleWsKeepJoined,
+  handleWsKeepRtcLiving,
   handleWsMessage,
   handleWsMsrBlob,
   handleWsRoomNoLive,
@@ -184,6 +185,20 @@ export const connectWebSocket = (server) => {
           roomId,
         });
         await handleWsKeepJoined({ socket, roomId, data });
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
+    socket.on(WsMsgTypeEnum.keepRtcLiving, async (data: WsJoinType) => {
+      try {
+        const roomId = data.data.live_room_id;
+        prettierInfoLog({
+          msg: '收到用户keepRtcLiving',
+          socket,
+          roomId,
+        });
+        await handleWsKeepRtcLiving({ socket, roomId, data });
       } catch (error) {
         console.log(error);
       }

@@ -32,8 +32,9 @@ const model = sequelize.define<VisitorLogModel>(
     user_id: {
       type: DataTypes.INTEGER,
     },
-    ip: {
+    client_ip: {
       type: DataTypes.STRING(100),
+      defaultValue: '',
     },
     user_agent: {
       type: DataTypes.STRING(500),
@@ -50,8 +51,8 @@ const model = sequelize.define<VisitorLogModel>(
         fields: ['user_id'],
       },
       {
-        name: 'ip',
-        fields: ['ip'],
+        name: 'client_ip',
+        fields: ['client_ip'],
       },
     ],
     paranoid: true,

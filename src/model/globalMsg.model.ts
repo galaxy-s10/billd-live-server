@@ -7,7 +7,7 @@ import {
 
 import sequelize from '@/config/mysql';
 import { initTable } from '@/init/initDb';
-import { IGlobalMsg } from '@/interface';
+import { IGlobalMsg, SwitchEnum } from '@/interface';
 
 interface GlobalMsgModel
   extends Model<
@@ -28,11 +28,23 @@ const model = sequelize.define<GlobalMsgModel>(
     user_id: {
       type: DataTypes.INTEGER,
     },
+    client_ip: {
+      type: DataTypes.STRING(100),
+      defaultValue: '',
+    },
     type: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(100),
     },
     content: {
       type: DataTypes.STRING(500),
+    },
+    show: {
+      type: DataTypes.INTEGER,
+      defaultValue: SwitchEnum.no,
+    },
+    priority: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
     remark: {
       type: DataTypes.STRING(500),

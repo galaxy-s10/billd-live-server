@@ -183,6 +183,7 @@ export const REDIS_PREFIX = {
   deskUserSocketId: `${REDIS_PREFIX_ENV}deskUserSocketId___`,
   tencentcloudCssPublishing: `${REDIS_PREFIX_ENV}tencentcloudCssPublishing___`,
   srsPublishing: `${REDIS_PREFIX_ENV}srsPublishing___`,
+  rtcLiving: `${REDIS_PREFIX_ENV}rtcLiving___`,
   keepJoined: `${REDIS_PREFIX_ENV}keepJoined___`, // 用户加入了房间
 };
 
@@ -309,7 +310,7 @@ export const DEFAULT_ROLE_INFO = {
   },
 };
 
-export const SRS_CB_URL_PARAMS = {
+export const SRS_CB_URL_QUERY = {
   publishKey: 'pushkey',
   publishType: 'pushtype',
   userToken: 'usertoken',
@@ -318,3 +319,22 @@ export const SRS_CB_URL_PARAMS = {
   roomId: 'roomid',
   isdev: 'isdev',
 };
+
+export const LIVE_ROOM_MODEL_EXCLUDE = [
+  'push_rtmp_url',
+  'push_obs_server',
+  'push_obs_stream_key',
+  'push_webrtc_url',
+  'push_srt_url',
+  'push_cdn_rtmp_url',
+  'push_cdn_obs_server',
+  'push_cdn_obs_stream_key',
+  'push_cdn_webrtc_url',
+  'push_cdn_srt_url',
+  'forward_bilibili_url',
+  'forward_huya_url',
+  'forward_douyu_url',
+  'forward_douyin_url',
+  'forward_kuaishou_url',
+  'forward_xiaohongshu_url',
+];

@@ -48,9 +48,9 @@ class LoginRecordController {
   };
 
   getMyList = async (ctx: ParameterizedContext, next) => {
-    const { code, userInfo, message } = await authJwt(ctx);
+    const { code, userInfo, msg } = await authJwt(ctx);
     if (code !== COMMON_HTTP_CODE.success || !userInfo) {
-      throw new CustomError(message, code, code);
+      throw new CustomError(msg, code, code);
     }
     const data: IList<ILoginRecord> = ctx.request.query;
     const result = await this.common.getList({ ...data, user_id: userInfo.id });
@@ -67,7 +67,8 @@ class LoginRecordController {
 
   async update(ctx: ParameterizedContext, next) {
     const id = +ctx.params.id;
-    const { type, ip, user_agent, remark }: ILoginRecord = ctx.request.body;
+    const { type, client_ip, user_agent, remark }: ILoginRecord =
+      ctx.request.body;
     const isExist = await loginRecordService.isExist([id]);
     if (!isExist) {
       throw new CustomError(
@@ -79,7 +80,7 @@ class LoginRecordController {
     await loginRecordService.update({
       id,
       type,
-      ip,
+      client_ip,
       user_agent,
       remark,
     });
@@ -88,11 +89,11 @@ class LoginRecordController {
   }
 
   create = async (ctx: ParameterizedContext, next) => {
-    const { type, ip, user_id, remark }: ILoginRecord = ctx.request.body;
+    const { type, client_ip, user_id, remark }: ILoginRecord = ctx.request.body;
     const user_agent = strSlice(String(ctx.request.headers['user-agent']), 490);
     await this.common.create({
       type,
-      ip,
+      client_ip,
       user_agent,
       user_id,
       remark,

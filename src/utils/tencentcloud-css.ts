@@ -2,7 +2,7 @@ import cryptojs from 'crypto-js';
 import * as tencentcloud from 'tencentcloud-sdk-nodejs';
 import { Client } from 'tencentcloud-sdk-nodejs/tencentcloud/services/live/v20180801/live_client';
 
-import { SRS_CB_URL_PARAMS } from '@/constant';
+import { SRS_CB_URL_QUERY } from '@/constant';
 import {
   TENCENTCLOUD_CSS,
   TENCENTCLOUD_SECRETID,
@@ -126,16 +126,16 @@ class TencentcloudCssClass {
       .MD5(TENCENTCLOUD_CSS.Key + StreamName + Hex(txTime))
       .toString();
     const key = `${StreamName}?txSecret=${txSecret}&txTime=${Hex(txTime)}&${
-      SRS_CB_URL_PARAMS.roomId
-    }=${data.liveRoomId}&${SRS_CB_URL_PARAMS.publishType}=${data.type}&${
-      SRS_CB_URL_PARAMS.publishKey
-    }=${data.key}&${SRS_CB_URL_PARAMS.userId}=${data.userId}`;
+      SRS_CB_URL_QUERY.roomId
+    }=${data.liveRoomId}&${SRS_CB_URL_QUERY.publishType}=${data.type}&${
+      SRS_CB_URL_QUERY.publishKey
+    }=${data.key}&${SRS_CB_URL_QUERY.userId}=${data.userId}`;
     return {
-      push_rtmp_url: `rtmp://${TENCENTCLOUD_CSS.PushDomain}/${TENCENTCLOUD_CSS.AppName}/${key}`,
-      push_obs_server: `rtmp://${TENCENTCLOUD_CSS.PushDomain}/${TENCENTCLOUD_CSS.AppName}/`,
-      push_obs_stream_key: key,
-      push_webrtc_url: `webrtc://${TENCENTCLOUD_CSS.PushDomain}/${TENCENTCLOUD_CSS.AppName}/${key}`,
-      push_srt_url: ``,
+      rtmp_url: `rtmp://${TENCENTCLOUD_CSS.PushDomain}/${TENCENTCLOUD_CSS.AppName}/${key}`,
+      obs_server: `rtmp://${TENCENTCLOUD_CSS.PushDomain}/${TENCENTCLOUD_CSS.AppName}/`,
+      obs_stream_key: key,
+      webrtc_url: `webrtc://${TENCENTCLOUD_CSS.PushDomain}/${TENCENTCLOUD_CSS.AppName}/${key}`,
+      srt_url: ``,
     };
   };
 }

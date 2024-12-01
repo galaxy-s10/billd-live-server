@@ -58,12 +58,12 @@ const cmdMap = {
 
 class OtherController {
   async getClientIp(ctx: ParameterizedContext, next) {
-    const ip = ctx?.request?.headers?.['x-real-ip'] || '';
+    const client_ip = ctx?.request?.headers?.['x-real-ip'] || '';
 
     successHandler({
       ctx,
       data: {
-        ip,
+        client_ip,
       },
     });
     await next();

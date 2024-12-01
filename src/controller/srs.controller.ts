@@ -4,7 +4,7 @@ import { ParameterizedContext } from 'koa';
 import successHandler from '@/app/handler/success-handle';
 import { wsSocket } from '@/config/websocket';
 import liveRedisController from '@/config/websocket/live-redis.controller';
-import { LOCALHOST_URL, SRS_CB_URL_PARAMS } from '@/constant';
+import { LOCALHOST_URL, SRS_CB_URL_QUERY } from '@/constant';
 import liveController from '@/controller/live.controller';
 import liveRecordController from '@/controller/liveRecord.controller';
 import { LivePlatformEnum } from '@/interface';
@@ -86,15 +86,15 @@ class SRSController {
       key: string;
     }) => {
       const pushParams = (type: LiveRoomTypeEnum) =>
-        `?${SRS_CB_URL_PARAMS.roomId}=${data.liveRoomId}&${SRS_CB_URL_PARAMS.publishType}=${type}&${SRS_CB_URL_PARAMS.publishKey}=${data.key}&${SRS_CB_URL_PARAMS.userId}=${data.userId}`;
+        `?${SRS_CB_URL_QUERY.roomId}=${data.liveRoomId}&${SRS_CB_URL_QUERY.publishType}=${type}&${SRS_CB_URL_QUERY.publishKey}=${data.key}&${SRS_CB_URL_QUERY.userId}=${data.userId}`;
       return {
-        push_rtmp_url: `${SRS_LIVE.PushDomain}/${SRS_LIVE.AppName}/roomId___${
+        rtmp_url: `${SRS_LIVE.PushDomain}/${SRS_LIVE.AppName}/roomId___${
           data.liveRoomId
         }${pushParams(data.type)}`,
-        push_obs_server: `${SRS_LIVE.PushDomain}/${SRS_LIVE.AppName}/roomId___${data.liveRoomId}`,
-        push_obs_stream_key: pushParams(LiveRoomTypeEnum.obs),
-        push_webrtc_url: ``,
-        push_srt_url: ``,
+        obs_server: `${SRS_LIVE.PushDomain}/${SRS_LIVE.AppName}/roomId___${data.liveRoomId}`,
+        obs_stream_key: pushParams(LiveRoomTypeEnum.obs),
+        webrtc_url: ``,
+        srt_url: ``,
       };
     },
   };
@@ -212,9 +212,9 @@ class SRSController {
       }
       // body.param格式：?pushtype=0&pushkey=xxxxx
       const params = new URLSearchParams(body.param);
-      const publishKey = params.get(SRS_CB_URL_PARAMS.publishKey);
-      const userId = params.get(SRS_CB_URL_PARAMS.userId);
-      const isdev = params.get(SRS_CB_URL_PARAMS.isdev);
+      const publishKey = params.get(SRS_CB_URL_QUERY.publishKey);
+      const userId = params.get(SRS_CB_URL_QUERY.userId);
+      const isdev = params.get(SRS_CB_URL_QUERY.isdev);
       if (!Number(userId)) {
         console.log(chalkERROR(`[srs on_publish] userId不存在！`));
         ctx.body = { code: 1, msg: '[srs on_publish] userId不存在！' };
@@ -280,14 +280,17 @@ class SRSController {
       wsSocket.io
         ?.to(`${roomId}`)
         .emit(WsMsgTypeEnum.roomLiving, { live_room_id: roomId });
-      const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
+      const client_ip = strSlice(
+        String(ctx.request.headers['x-real-ip'] || ''),
+        100
+      );
       liveRedisController.setSrsPublishing({
         data: {
           live_room_id: Number(roomId),
           live_record_id: recRes.id!,
           live_id: liveRes.id!,
         },
-        client_ip: ip,
+        client_ip,
         exp: 5,
       });
       successHandler({
@@ -327,8 +330,8 @@ class SRSController {
       }
       // body.param格式：?pushtype=0&pushkey=xxxxx
       const params = new URLSearchParams(body.param);
-      const publishKey = params.get(SRS_CB_URL_PARAMS.publishKey);
-      const isdev = params.get(SRS_CB_URL_PARAMS.isdev);
+      const publishKey = params.get(SRS_CB_URL_QUERY.publishKey);
+      const isdev = params.get(SRS_CB_URL_QUERY.isdev);
       let authRes;
       if (this.allowDev && isdev === '1') {
         console.log(chalkSUCCESS(`[srs on_unpublish] 开发模式，不鉴权`));

@@ -7,7 +7,7 @@ import liveRedisController from '@/config/websocket/live-redis.controller';
 import {
   COMMON_HTTP_CODE,
   DEFAULT_AUTH_INFO,
-  SRS_CB_URL_PARAMS,
+  SRS_CB_URL_QUERY,
 } from '@/constant';
 import liveController from '@/controller/live.controller';
 import liveRecordController from '@/controller/liveRecord.controller';
@@ -15,7 +15,6 @@ import liveRoomController from '@/controller/liveRoom.controller';
 import userLiveRoomController from '@/controller/userLiveRoom.controller';
 import { LivePlatformEnum, SwitchEnum } from '@/interface';
 import { CustomError } from '@/model/customError.model';
-import liveRoomService from '@/service/liveRoom.service';
 import { LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import {
   ITencentcloudCssPublishCb,
@@ -23,6 +22,7 @@ import {
 } from '@/types/srs';
 import { WsMsgTypeEnum } from '@/types/websocket';
 import { strSlice } from '@/utils';
+import { liveRoomVerifyAuth } from '@/utils/business';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 import { tencentcloudCssUtils } from '@/utils/tencentcloud-css';
 
@@ -48,32 +48,6 @@ class TencentcloudCssController {
         // @ts-ignore
         end_time: +new Date(),
       });
-    },
-    verifyAuth: async ({ roomId, publishKey }) => {
-      if (!roomId) {
-        return {
-          code: 1,
-          msg: '没有roomId',
-        };
-      }
-      if (!publishKey) {
-        return {
-          code: 1,
-          msg: '没有推流key',
-        };
-      }
-      const result = await liveRoomService.findKey(Number(roomId));
-      const pushKey = result?.key;
-      if (pushKey !== publishKey) {
-        return {
-          code: 1,
-          msg: `房间id：${roomId as string}，鉴权失败`,
-        };
-      }
-      return {
-        code: 0,
-        msg: '鉴权成功',
-      };
     },
   };
 
@@ -115,10 +89,10 @@ class TencentcloudCssController {
     await liveRoomController.common.update({
       id: liveRoomId,
       cdn: SwitchEnum.yes,
-      rtmp_url: pullRes.rtmp,
-      flv_url: pullRes.flv,
-      hls_url: pullRes.hls,
-      webrtc_url: pullRes.webrtc,
+      pull_cdn_rtmp_url: pullRes.rtmp,
+      pull_cdn_flv_url: pullRes.flv,
+      pull_cdn_hls_url: pullRes.hls,
+      pull_cdn_webrtc_url: pullRes.webrtc,
     });
     successHandler({ ctx, data: pushRes });
     await next();
@@ -126,11 +100,9 @@ class TencentcloudCssController {
 
   remoteAuth = async (ctx: ParameterizedContext, next) => {
     console.log(chalkWARN(`tencentcloud_css remote_auth`), ctx.request.query);
-    const roomId = ctx.request.query[SRS_CB_URL_PARAMS.roomId] as string;
-    const publishKey = ctx.request.query[
-      SRS_CB_URL_PARAMS.publishKey
-    ] as string;
-    const isdev = ctx.request.query[SRS_CB_URL_PARAMS.isdev] as string;
+    const roomId = ctx.request.query[SRS_CB_URL_QUERY.roomId] as string;
+    const publishKey = ctx.request.query[SRS_CB_URL_QUERY.publishKey] as string;
+    const isdev = ctx.request.query[SRS_CB_URL_QUERY.isdev] as string;
     if (this.allowDev && isdev === '1') {
       console.log(
         chalkSUCCESS(`[tencentcloud_css remote_auth] 开发模式，不鉴权`)
@@ -141,7 +113,7 @@ class TencentcloudCssController {
       });
       await next();
     } else {
-      const res = await this.common.verifyAuth({ roomId, publishKey });
+      const res = await liveRoomVerifyAuth({ roomId, publishKey });
       if (res.code === 0) {
         console.log(chalkSUCCESS(`[tencentcloud_css remote_auth] ${res.msg}`));
         successHandler({
@@ -177,9 +149,9 @@ class TencentcloudCssController {
       const reg = /^roomId___(\d+)$/g;
       const roomId = reg.exec(body.stream_id)?.[1];
       const params = new URLSearchParams(body.stream_param);
-      const publishKey = params.get(SRS_CB_URL_PARAMS.publishKey);
-      const userId = params.get(SRS_CB_URL_PARAMS.userId);
-      const isdev = params.get(SRS_CB_URL_PARAMS.isdev);
+      const publishKey = params.get(SRS_CB_URL_QUERY.publishKey);
+      const userId = params.get(SRS_CB_URL_QUERY.userId);
+      const isdev = params.get(SRS_CB_URL_QUERY.isdev);
       let authRes;
       if (this.allowDev && isdev === '1') {
         console.log(
@@ -191,7 +163,7 @@ class TencentcloudCssController {
         });
         await next();
       } else {
-        const res = await this.common.verifyAuth({ roomId, publishKey });
+        const res = await liveRoomVerifyAuth({ roomId, publishKey });
         authRes = res;
         if (res.code === 0) {
           console.log(chalkSUCCESS(`[tencentcloud_css on_publish] ${res.msg}`));
@@ -232,14 +204,17 @@ class TencentcloudCssController {
       wsSocket.io
         ?.to(`${roomId!}`)
         .emit(WsMsgTypeEnum.roomLiving, { live_room_id: roomId });
-      const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
+      const client_ip = strSlice(
+        String(ctx.request.headers['x-real-ip'] || ''),
+        100
+      );
       liveRedisController.setTencentcloudCssPublishing({
         data: {
           live_room_id: Number(roomId),
           live_record_id: recRes.id!,
           live_id: liveRes.id!,
         },
-        client_ip: ip,
+        client_ip,
         exp: 5,
       });
       successHandler({
@@ -266,8 +241,8 @@ class TencentcloudCssController {
       const reg = /^roomId___(\d+)$/g;
       const roomId = reg.exec(body.stream_id)?.[1];
       const params = new URLSearchParams(body.stream_param);
-      const publishKey = params.get(SRS_CB_URL_PARAMS.publishKey);
-      const isdev = params.get(SRS_CB_URL_PARAMS.isdev);
+      const publishKey = params.get(SRS_CB_URL_QUERY.publishKey);
+      const isdev = params.get(SRS_CB_URL_QUERY.isdev);
       let authRes;
       if (this.allowDev && isdev === '1') {
         console.log(
@@ -279,7 +254,7 @@ class TencentcloudCssController {
         });
         await next();
       } else {
-        const res = await this.common.verifyAuth({ roomId, publishKey });
+        const res = await liveRoomVerifyAuth({ roomId, publishKey });
         authRes = res;
         if (res.code === 0) {
           console.log(

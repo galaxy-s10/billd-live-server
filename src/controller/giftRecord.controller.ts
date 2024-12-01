@@ -188,9 +188,9 @@ class GiftRecordController {
   };
 
   create = async (ctx: ParameterizedContext, next) => {
-    const { code, userInfo, message } = await authJwt(ctx);
+    const { code, userInfo, msg } = await authJwt(ctx);
     if (code !== COMMON_HTTP_CODE.success || !userInfo) {
-      throw new CustomError(message, code, code);
+      throw new CustomError(msg, code, code);
     }
     const {
       live_room_id,

@@ -38,11 +38,6 @@ liveRouter.post(
   liveController.closeLiveByLiveRoomId
 );
 
-liveRouter.post(
-  '/update_my_live_room_info',
-  liveController.startLiveUpdateMyLiveRoomInfo
-);
-
 liveRouter.get('/is_live', liveController.isLive);
 
 liveRouter.get(

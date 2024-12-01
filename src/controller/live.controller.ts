@@ -9,79 +9,16 @@ import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
 import liveRedisController from '@/config/websocket/live-redis.controller';
 import { COMMON_HTTP_CODE, SCHEDULE_TYPE, WEBM_DIR } from '@/constant';
-import srsController from '@/controller/srs.controller';
-import userLiveRoomController from '@/controller/userLiveRoom.controller';
-import { IList, ILive, SwitchEnum } from '@/interface';
+import { IList, ILive } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveService from '@/service/live.service';
-import liveRoomService from '@/service/liveRoom.service';
-import { ILiveRoom, LiveRoomTypeEnum } from '@/types/ILiveRoom';
-import { chalkERROR } from '@/utils/chalkTip';
+import { ILiveRoom } from '@/types/ILiveRoom';
 import { getForwardList, killPid } from '@/utils/process';
-import { tencentcloudCssUtils } from '@/utils/tencentcloud-css';
 
 import tencentcloudCssController from './tencentcloudCss.controller';
 
 class LiveController {
   common = {
-    async startLiveUpdateMyLiveRoomInfo(data: {
-      userId?: number;
-      liveRoomType: number;
-    }) {
-      const { userId, liveRoomType } = data;
-      const res: any = { roomId: undefined, userLiveRoomInfo: undefined };
-
-      if (!userId) {
-        console.log(chalkERROR('userId为空'));
-        return res;
-      }
-      const userLiveRoomInfo = await userLiveRoomController.common.findByUserId(
-        userId
-      );
-      if (!userLiveRoomInfo) {
-        console.log(chalkERROR('userLiveRoomInfo为空'));
-        return res;
-      }
-      res.userLiveRoomInfo = userLiveRoomInfo;
-      const roomId = userLiveRoomInfo.live_room_id!;
-      res.roomId = roomId;
-      let pullRes: {
-        rtmp: string;
-        flv: string;
-        hls: string;
-        webrtc: string;
-      };
-      if (
-        [
-          LiveRoomTypeEnum.tencent_css,
-          LiveRoomTypeEnum.tencent_css_pk,
-        ].includes(liveRoomType)
-      ) {
-        pullRes = tencentcloudCssUtils.getPullUrl({
-          liveRoomId: roomId,
-        });
-      } else {
-        pullRes = srsController.common.getPullUrl({
-          liveRoomId: roomId,
-        });
-      }
-
-      await liveRoomService.update({
-        id: roomId,
-        type: liveRoomType,
-        cdn: [
-          LiveRoomTypeEnum.tencent_css,
-          LiveRoomTypeEnum.tencent_css_pk,
-        ].includes(liveRoomType)
-          ? SwitchEnum.yes
-          : SwitchEnum.no,
-        rtmp_url: pullRes.rtmp,
-        flv_url: pullRes.flv,
-        hls_url: pullRes.hls,
-        webrtc_url: pullRes.webrtc,
-      });
-      return res;
-    },
     getList: async ({
       id,
       live_room_id,
@@ -98,41 +35,6 @@ class LiveController {
       rangTimeStart,
       rangTimeEnd,
     }: IList<ILive & ILiveRoom>) => {
-      // try {
-      //   const key = cryptojs.MD5(
-      //     JSON.stringify({
-      //       id,
-      //       live_room_id,
-      //       live_room_is_show,
-      //       live_room_status,
-      //       cdn,
-      //       is_fake,
-      //       orderBy,
-      //       orderName,
-      //       nowPage,
-      //       pageSize,
-      //       keyWord,
-      //       rangTimeType,
-      //       rangTimeStart,
-      //       rangTimeEnd,
-      //     })
-      //   );
-      //   const oldCache = await redisController.getVal({
-      //     prefix: REDIS_PREFIX.dbLiveList,
-      //     key: key.toString(),
-      //   });
-      //   if (oldCache) {
-      //     return JSON.parse(oldCache).value as {
-      //       nowPage: number;
-      //       pageSize: number;
-      //       hasMore: boolean;
-      //       total: number;
-      //       rows: ILive[];
-      //     };
-      //   }
-      // } catch (error) {
-      //   console.log(error);
-      // }
       const result = await liveService.getList({
         id,
         live_room_id,
@@ -149,34 +51,6 @@ class LiveController {
         rangTimeStart,
         rangTimeEnd,
       });
-      // try {
-      //   const key = cryptojs.MD5(
-      //     JSON.stringify({
-      //       id,
-      //       live_room_id,
-      //       cdn,
-      //       is_fake,
-      //       is_show,
-      //       status,
-      //       orderBy,
-      //       orderName,
-      //       nowPage,
-      //       pageSize,
-      //       keyWord,
-      //       rangTimeType,
-      //       rangTimeStart,
-      //       rangTimeEnd,
-      //     })
-      //   );
-      //   redisController.setExVal({
-      //     prefix: REDIS_PREFIX.dbLiveList,
-      //     key: key.toString(),
-      //     value: result,
-      //     exp: 3,
-      //   });
-      // } catch (error) {
-      //   console.log(error);
-      // }
       return result;
     },
 
@@ -278,20 +152,6 @@ class LiveController {
     },
   };
 
-  startLiveUpdateMyLiveRoomInfo = async (ctx: ParameterizedContext, next) => {
-    const { code, userInfo, message } = await authJwt(ctx);
-    if (code !== COMMON_HTTP_CODE.success || !userInfo) {
-      throw new CustomError(message, code, code);
-    }
-    const { type } = ctx.request.body;
-    const result = await this.common.startLiveUpdateMyLiveRoomInfo({
-      userId: userInfo.id,
-      liveRoomType: type,
-    });
-    successHandler({ ctx, data: result });
-    await next();
-  };
-
   getList = async (ctx: ParameterizedContext, next) => {
     const result = await this.common.getList(ctx.request.query);
     successHandler({ ctx, data: result });
@@ -339,9 +199,9 @@ class LiveController {
   };
 
   closeLive = async (ctx: ParameterizedContext, next) => {
-    const { code, userInfo, message } = await authJwt(ctx);
+    const { code, userInfo, msg } = await authJwt(ctx);
     if (code !== COMMON_HTTP_CODE.success || !userInfo) {
-      throw new CustomError(message, code, code);
+      throw new CustomError(msg, code, code);
     }
 
     successHandler({ ctx });

@@ -57,6 +57,7 @@ export enum WsMsgTypeEnum {
   disableSpeaking = 'disableSpeaking',
   /** 主播踢掉用户 */
   kick = 'kick',
+  keepRtcLiving = 'keepRtcLiving',
 
   srsOffer = 'srsOffer',
   srsAnswer = 'srsAnswer',
@@ -92,6 +93,8 @@ export interface IReqWsFormat<T> {
   request_id: string;
   /** 用户socket_id */
   socket_id: string;
+  /** 不需要手动传用户代理，从请求头拿 */
+  // user_agent: string;
   /** 用户token */
   user_token?: string;
   /** 消息时间戳 */
@@ -131,11 +134,6 @@ export type WsChangeVideoContentHintType = IReqWsFormat<{
 export type WsChangeAudioContentHintType = IReqWsFormat<{
   live_room_id: number;
   val: string;
-}>;
-
-export type WsUpdateJoinInfoType = IReqWsFormat<{
-  live_room_id: number;
-  track?: { audio: number; video: number };
 }>;
 
 /** 直播pk秘钥 */
@@ -205,14 +203,13 @@ export type WsStartLiveType = IReqWsFormat<{
 export type WsJoinType = IReqWsFormat<{
   live_room_id: number;
   live_room?: ILiveRoom;
-  anchor_info?: IUser;
-  isRemoteDesk?: boolean;
   socket_list?: string[];
-  deskUserUuid?: string;
-  deskUserPassword?: string;
-  remoteDeskUserUuid?: string;
-  receiver?: string;
-  isBilibili?: boolean;
+  duration: number;
+}>;
+
+/** 用户加入直播间 */
+export type WsKeepRtcLivingType = IReqWsFormat<{
+  live_room_id: number;
   duration: number;
 }>;
 
@@ -269,6 +266,35 @@ export type WsCandidateType = IReqWsFormat<{
   candidate: RTCIceCandidate;
   receiver: string;
   sender: string;
+}>;
+
+export enum RemoteDeskBehaviorEnum {
+  move,
+  drag,
+  pressButtonLeft,
+  pressButtonRight,
+  releaseButtonLeft,
+  releaseButtonRight,
+  setPosition,
+  doubleClick,
+  leftClick,
+  rightClick,
+  scrollDown,
+  scrollUp,
+  scrollLeft,
+  scrollRight,
+
+  keyboardType,
+}
+
+export type WsRemoteDeskBehaviorType = IReqWsFormat<{
+  roomId: string;
+  sender: string;
+  receiver: string;
+  type: RemoteDeskBehaviorEnum;
+  x: number;
+  y: number;
+  keyboardtype: string | number;
 }>;
 
 // ==========

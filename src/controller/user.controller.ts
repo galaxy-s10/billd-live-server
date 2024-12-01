@@ -27,6 +27,7 @@ import { judgeUserStatus, strSlice } from '@/utils';
 
 class UserController {
   common = {
+    isExist: (ids) => userService.isExist(ids),
     list: (data) => userService.getList(data),
     create: (data: IUser) => userService.create(data),
     isSameName: (username: string) => userService.isSameName(username),
@@ -80,12 +81,15 @@ class UserController {
       third_platform: THIRD_PLATFORM.website,
     });
     const user_agent = strSlice(String(ctx.request.headers['user-agent']), 490);
-    const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
+    const client_ip = strSlice(
+      String(ctx.request.headers['x-real-ip'] || ''),
+      100
+    );
     await loginRecordController.common.create({
       user_id: createUserInfo.id,
       type: LoginRecordEnum.registerUsername,
       user_agent,
-      ip,
+      client_ip,
     });
     successHandler({ ctx });
     await next();
@@ -139,12 +143,15 @@ class UserController {
       third_platform: THIRD_PLATFORM.website,
     });
     const user_agent = strSlice(String(ctx.request.headers['user-agent']), 490);
-    const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
+    const client_ip = strSlice(
+      String(ctx.request.headers['x-real-ip'] || ''),
+      100
+    );
     await loginRecordController.common.create({
       user_id: createUserInfo.id,
       type: LoginRecordEnum.registerUsername,
       user_agent,
-      ip,
+      client_ip,
     });
     successHandler({ ctx });
     await next();
@@ -227,7 +234,7 @@ class UserController {
     const userStatusRes = judgeUserStatus(userInfo.status!);
     if (userStatusRes.status !== UserStatusEnum.normal) {
       throw new CustomError(
-        userStatusRes.message,
+        userStatusRes.msg,
         COMMON_HTTP_CODE.unauthorized,
         COMMON_HTTP_CODE.unauthorized
       );
@@ -239,14 +246,17 @@ class UserController {
     // 每次登录都更新token
     await userService.update({ token, id });
     const user_agent = strSlice(String(ctx.request.headers['user-agent']), 490);
-    const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
+    const client_ip = strSlice(
+      String(ctx.request.headers['x-real-ip'] || ''),
+      100
+    );
     await loginRecordController.common.create({
       user_id: id,
       type: LoginRecordEnum.loginId,
       user_agent,
-      ip,
+      client_ip,
     });
-    successHandler({ ctx, data: token, message: '登录成功！' });
+    successHandler({ ctx, data: token, msg: '登录成功！' });
 
     /**
      * 这个其实是最后一个中间件了，其实加不加调不调用next都没硬性，但是为了防止后面要
@@ -275,7 +285,7 @@ class UserController {
     const userStatusRes = judgeUserStatus(userInfo.status!);
     if (userStatusRes.status !== UserStatusEnum.normal) {
       throw new CustomError(
-        userStatusRes.message,
+        userStatusRes.msg,
         COMMON_HTTP_CODE.unauthorized,
         COMMON_HTTP_CODE.unauthorized
       );
@@ -291,17 +301,20 @@ class UserController {
     // 每次登录都更新token
     await userService.update({ token, id: userInfo?.id });
     const user_agent = strSlice(String(ctx.request.headers['user-agent']), 490);
-    const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
+    const client_ip = strSlice(
+      String(ctx.request.headers['x-real-ip'] || ''),
+      100
+    );
     await loginRecordController.common.create({
       user_id: userInfo?.id,
       type: LoginRecordEnum.loginUsername,
       user_agent,
-      ip,
+      client_ip,
     });
     successHandler({
       ctx,
       data: token,
-      message: COMMON_SUCCESS_MSG.loginSuccess,
+      msg: COMMON_SUCCESS_MSG.loginSuccess,
     });
 
     /**
@@ -350,9 +363,9 @@ class UserController {
   }
 
   async getUserInfo(ctx: ParameterizedContext, next) {
-    const { code, userInfo, message } = await authJwt(ctx);
+    const { code, userInfo, msg } = await authJwt(ctx);
     if (code !== COMMON_HTTP_CODE.success || !userInfo) {
-      throw new CustomError(message, code, code);
+      throw new CustomError(msg, code, code);
     }
     const [auths, result] = await Promise.all([
       authController.common.getUserAuth(userInfo.id!),
@@ -364,9 +377,9 @@ class UserController {
   }
 
   async updatePwd(ctx: ParameterizedContext, next) {
-    const { code, userInfo, message } = await authJwt(ctx);
+    const { code, userInfo, msg } = await authJwt(ctx);
     if (code !== COMMON_HTTP_CODE.success || !userInfo) {
-      throw new CustomError(message, code, code);
+      throw new CustomError(msg, code, code);
     }
     const { oldpwd, newpwd } = ctx.request.body;
     if (!oldpwd || !newpwd) {
@@ -389,7 +402,7 @@ class UserController {
       password: newpwd,
       token: '',
     });
-    successHandler({ ctx, message: '修改密码成功！' });
+    successHandler({ ctx, msg: '修改密码成功！' });
     await next();
   }
 
@@ -470,7 +483,7 @@ class UserController {
   }
 
   delete(ctx: ParameterizedContext, next) {
-    successHandler({ ctx, message: '敬请期待' });
+    successHandler({ ctx, msg: '敬请期待' });
     next();
   }
 }

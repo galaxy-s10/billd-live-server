@@ -204,9 +204,9 @@ class RoleController {
 
   // 获取我的角色
   getMyRole = async (ctx: ParameterizedContext, next) => {
-    const { code, userInfo, message } = await authJwt(ctx);
+    const { code, userInfo, msg } = await authJwt(ctx);
     if (code !== COMMON_HTTP_CODE.success) {
-      throw new CustomError(message, code, code);
+      throw new CustomError(msg, code, code);
     }
     const result = await roleService.getUserRole(userInfo!.id!);
     successHandler({ ctx, data: { total: result.length, result } });
@@ -215,9 +215,9 @@ class RoleController {
 
   // 获取我的角色（递归找所有）
   getMyAllRole = async (ctx: ParameterizedContext, next) => {
-    const { code, userInfo, message } = await authJwt(ctx);
+    const { code, userInfo, msg } = await authJwt(ctx);
     if (code !== COMMON_HTTP_CODE.success) {
-      throw new CustomError(message, code, code);
+      throw new CustomError(msg, code, code);
     }
     const result = await this.common.getUserAllRole(userInfo!.id!);
     successHandler({ ctx, data: result });
@@ -448,7 +448,7 @@ class RoleController {
     await roleService.delete([...roleResFlat.map((v) => v.id), ...c_roles]);
     successHandler({
       ctx,
-      message: `删除成功，删除了${c_roles.length}个子角色和${roleResFlat.length}个关联角色`,
+      msg: `删除成功，删除了${c_roles.length}个子角色和${roleResFlat.length}个关联角色`,
     });
 
     await next();
@@ -532,7 +532,7 @@ class RoleController {
     await roleService.delete([id, ...result.map((v) => v.id!)]);
     successHandler({
       ctx,
-      message: `删除成功，且删除了${result.length}个关联角色`,
+      msg: `删除成功，且删除了${result.length}个关联角色`,
     });
 
     await next();

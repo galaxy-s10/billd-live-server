@@ -109,4 +109,6 @@ initRouter.post(
   initController.deleteUser
 );
 
+initRouter.post('/resetLiveRoomUrl', initController.resetLiveRoomUrl);
+
 export default initRouter;

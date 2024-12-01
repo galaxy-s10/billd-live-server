@@ -115,30 +115,36 @@ export interface ILiveRoom {
   mock_live_user_nums_refresh_delay?: number;
   /** 聊天消息审核 */
   msg_verify?: SwitchEnum;
-  rtmp_url?: string;
-  flv_url?: string;
-  hls_url?: string;
-  webrtc_url?: string;
+
+  pull_rtmp_url?: string;
+  pull_flv_url?: string;
+  pull_hls_url?: string;
+  pull_webrtc_url?: string;
+
+  pull_cdn_rtmp_url?: string;
+  pull_cdn_flv_url?: string;
+  pull_cdn_hls_url?: string;
+  pull_cdn_webrtc_url?: string;
+
   push_rtmp_url?: string;
   push_obs_server?: string;
   push_obs_stream_key?: string;
   push_webrtc_url?: string;
   push_srt_url?: string;
-  cdn_rtmp_url?: string;
-  cdn_flv_url?: string;
-  cdn_hls_url?: string;
-  cdn_webrtc_url?: string;
-  cdn_push_rtmp_url?: string;
-  cdn_push_obs_server?: string;
-  cdn_push_obs_stream_key?: string;
-  cdn_push_webrtc_url?: string;
-  cdn_push_srt_url?: string;
+
+  push_cdn_rtmp_url?: string;
+  push_cdn_obs_server?: string;
+  push_cdn_obs_stream_key?: string;
+  push_cdn_webrtc_url?: string;
+  push_cdn_srt_url?: string;
+
   forward_bilibili_url?: string;
   forward_douyu_url?: string;
   forward_huya_url?: string;
   forward_douyin_url?: string;
   forward_kuaishou_url?: string;
   forward_xiaohongshu_url?: string;
+
   /** 直播间备注 */
   remark?: string;
 
@@ -154,10 +160,7 @@ export interface ILiveRoom {
   live?: ILive;
   user_live_room?: IUserLiveRoom & { user: IUser };
 
-  /** 是否假直播间，1是，2否 */
-  is_fake?: number;
-
-  exclude_key?: boolean;
+  is_fake?: SwitchEnum;
 
   created_at?: string;
   updated_at?: string;

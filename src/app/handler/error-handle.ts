@@ -11,7 +11,10 @@ import { chalk, chalkERROR } from '@/utils/chalkTip';
 
 const errorHandler = (error, ctx: ParameterizedContext) => {
   const { path, method } = ctx.request;
-  const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
+  const client_ip = strSlice(
+    String(ctx.request.headers['x-real-ip'] || ''),
+    100
+  );
   // eslint-disable-next-line
   const errorLog = (error) => {
     console.log(chalk.redBright('httpStatusCode:'), error.httpStatusCode);
@@ -34,14 +37,14 @@ const errorHandler = (error, ctx: ParameterizedContext) => {
         code: COMMON_HTTP_CODE.serverError,
         errorCode: COMMON_ERROR_CODE.serverError,
         error: error.message,
-        message: COMMON_ERROE_MSG.serverError,
+        msg: COMMON_ERROE_MSG.serverError,
       };
       ctx.status = defaultError.code;
       ctx.body = {
         code: defaultError.errorCode,
         errorCode: defaultError.errorCode,
         error: defaultError.error,
-        message: defaultError.message,
+        msg: defaultError.msg,
       };
       errorLog(error);
       console.log(
@@ -59,12 +62,14 @@ const errorHandler = (error, ctx: ParameterizedContext) => {
     ctx.body = {
       code: error.errorCode,
       errorCode: error.errorCode,
-      message: error?.message || COMMON_ERROE_MSG[error.httpStatusCode],
+      msg: error?.message || COMMON_ERROE_MSG[error.httpStatusCode],
     };
 
     errorLog(error);
     console.log(
-      chalkERROR(`===== 收到自定义错误: ip:${ip},${method} ${path} =====`)
+      chalkERROR(
+        `===== 收到自定义错误: ip:${client_ip},${method} ${path} =====`
+      )
     );
   }
 

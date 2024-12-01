@@ -25,17 +25,18 @@ const model = sequelize.define<BlacklistModel>(
       allowNull: false,
       autoIncrement: true,
     },
-    ip: {
-      type: DataTypes.STRING(100),
-    },
     user_id: {
       type: DataTypes.INTEGER,
     },
+    client_ip: {
+      type: DataTypes.STRING(100),
+      defaultValue: '',
+    },
     type: {
-      type: DataTypes.INTEGER, // 禁用类型,1:频繁操作；2:管理员手动禁用
+      type: DataTypes.INTEGER,
     },
     msg: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(300),
     },
   },
   {

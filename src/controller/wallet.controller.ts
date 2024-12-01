@@ -7,7 +7,7 @@ import { IList, IWallet } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import walletService from '@/service/wallet.service';
 
-class LiveRoomController {
+class WalletController {
   common = {
     create: ({ user_id, balance }: IWallet) =>
       walletService.create({ user_id, balance }),
@@ -57,9 +57,9 @@ class LiveRoomController {
   }
 
   findMyWallet = async (ctx: ParameterizedContext, next) => {
-    const { code, userInfo, message } = await authJwt(ctx);
+    const { code, userInfo, msg } = await authJwt(ctx);
     if (code !== COMMON_HTTP_CODE.success || !userInfo) {
-      throw new CustomError(message, code, code);
+      throw new CustomError(msg, code, code);
     }
     const result = await this.common.findByUserId(userInfo.id!);
     successHandler({ ctx, data: result });
@@ -109,4 +109,4 @@ class LiveRoomController {
   }
 }
 
-export default new LiveRoomController();
+export default new WalletController();

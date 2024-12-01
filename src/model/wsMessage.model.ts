@@ -39,8 +39,9 @@ const model = sequelize.define<WsMessageModel>(
     user_id: {
       type: DataTypes.INTEGER,
     },
-    ip: {
+    client_ip: {
       type: DataTypes.STRING(100),
+      defaultValue: '',
     },
     content_type: {
       type: DataTypes.INTEGER,
@@ -83,8 +84,8 @@ const model = sequelize.define<WsMessageModel>(
         fields: ['user_id'],
       },
       {
-        name: 'ip',
-        fields: ['ip'],
+        name: 'client_ip',
+        fields: ['client_ip'],
       },
     ],
     paranoid: true,

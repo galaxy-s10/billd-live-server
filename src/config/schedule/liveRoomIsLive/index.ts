@@ -4,6 +4,7 @@ import { PROJECT_ENV, SCHEDULE_TYPE } from '@/constant';
 import liveController from '@/controller/live.controller';
 import srsController from '@/controller/srs.controller';
 import { initUser } from '@/init/initUser';
+import { SwitchEnum } from '@/interface';
 import { chalkINFO } from '@/utils/chalkTip';
 import { tencentcloudCssUtils } from '@/utils/tencentcloud-css';
 
@@ -17,7 +18,7 @@ Object.keys(initUser).forEach((iten) => {
 
 export const tencentcloudCssMain = async () => {
   const res1 = await liveController.common.getList({
-    is_fake: 2,
+    is_fake: SwitchEnum.no,
   });
   const res2 = await tencentcloudCssUtils.queryLiveStreamAll();
   const res1Map = {};
@@ -49,7 +50,7 @@ export const tencentcloudCssMain = async () => {
 
 export const srsMain = async () => {
   const res1 = await liveController.common.getList({
-    is_fake: 2,
+    is_fake: SwitchEnum.no,
   });
   const res2 = await srsController.common.getApiV1Streams({
     start: 0,

@@ -23,7 +23,6 @@ export const initLiveRoom = {
     name: '房东的猫-云烟成雨',
     desc: '房东的猫livehouse合集',
     priority: 10,
-    type: LiveRoomTypeEnum.tencent_css,
     cdn: SwitchEnum.yes,
     type: LiveRoomTypeEnum.system,
     area: [1],

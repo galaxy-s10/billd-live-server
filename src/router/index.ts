@@ -10,7 +10,7 @@ const router = new Router();
 export function loadAllRoutes(app) {
   router.get('/', async (ctx, next) => {
     ctx.body = {
-      message: `欢迎访问${PROJECT_NAME},当前环境是:${PROJECT_ENV},当前时间:${new Date().toLocaleString()}`,
+      msg: `欢迎访问${PROJECT_NAME},当前环境是:${PROJECT_ENV},当前时间:${new Date().toLocaleString()}`,
     };
     await next();
   });

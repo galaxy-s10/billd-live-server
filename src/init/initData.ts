@@ -1,12 +1,15 @@
 import { DEFAULT_AUTH_INFO, DEFAULT_ROLE_INFO } from '@/constant';
 import {
   FormTypeEnum,
+  GlobalMsgTypeEnum,
   GoodsTypeEnum,
   IArea,
   IAuth,
   IConfig,
+  IGlobalMsg,
   IGoods,
   IRole,
+  SwitchEnum,
 } from '@/interface';
 import { QINIU_KODO } from '@/spec-config';
 
@@ -553,20 +556,27 @@ const initConfig = (): IConfig[] => [
     field_c: FormTypeEnum.upload,
     remark: '直播间前台首页的背景图',
   },
+];
+
+const initGlobalMsg = (): IGlobalMsg[] => [
   {
-    field_a: 'allow_home_modal',
-    field_b: '2',
-    field_c: "是否开启首页弹窗（'1'开启；'2'关闭）",
-    remark: 'switch',
+    type: GlobalMsgTypeEnum.system,
+    content: '持续更新中',
+    show: SwitchEnum.yes,
+    priority: 1,
+    remark: '首页弹窗内容',
   },
   {
-    field_a: 'home_modal_content',
-    field_b: '持续更新中...',
-    field_c: '首页弹窗内容',
-    remark: 'markdown',
+    type: GlobalMsgTypeEnum.user,
+    content: '请勿直播传奇游戏！',
+    show: SwitchEnum.yes,
+    user_id: 2,
+    priority: 99,
+    remark: '给id为2的用户发消息',
   },
 ];
 
+export const bulkCreateGlobalMsg = initGlobalMsg();
 export const bulkCreateConfig = initConfig();
 export const bulkCreateRole = initRole();
 export const bulkCreateAuth = initAuth();

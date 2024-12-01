@@ -19,7 +19,7 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
     errorCode: number;
     duration: number;
     error: string;
-    message: string;
+    msg: string;
   }) => {
     try {
       if (PROJECT_ENV !== 'beta') {
@@ -52,7 +52,7 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
           api_hostname: ctx.request.hostname, // ctx.request.hostname不带端口号;ctx.request.host带端口号
           api_status_code: info.httpStatusCode,
           api_error: info.error,
-          api_err_msg: info.message,
+          api_err_msg: info.msg,
           api_duration: info.duration,
           api_err_code: info.errorCode,
         });
@@ -65,7 +65,10 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
   try {
     const startTime = performance.now();
     const url = ctx.request.path;
-    const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
+    const client_ip = strSlice(
+      String(ctx.request.headers['x-real-ip'] || ''),
+      100
+    );
     const consoleEnd = () => {
       duration = Math.floor(performance.now() - startTime);
       console.log(
@@ -74,12 +77,14 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
         )
       );
       console.log(
-        chalkSUCCESS(`ip:${ip},响应请求 ${ctx.request.method} ${url}`)
+        chalkSUCCESS(`ip:${client_ip},响应请求 ${ctx.request.method} ${url}`)
       );
       console.log();
     };
     console.log();
-    console.log(chalkINFO(`ip:${ip},收到请求 ${ctx.request.method} ${url}`));
+    console.log(
+      chalkINFO(`ip:${client_ip},收到请求 ${ctx.request.method} ${url}`)
+    );
     console.log(chalkINFO('===== catchErrorMiddle中间件开始 ====='));
     await next();
     consoleEnd();
@@ -114,7 +119,7 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
           httpStatusCode,
           errorCode: httpStatusCode,
           error: msg,
-          message: msg,
+          msg,
           duration,
         };
         // 服务端返回http状态码404、405，写入日志表
@@ -125,7 +130,7 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
           httpStatusCode,
           errorCode: COMMON_ERROR_CODE.errStatusCode,
           error: msg,
-          message: msg,
+          msg,
           duration,
         };
         // 服务端返回http状态码不是404、405，写入日志表
@@ -140,7 +145,7 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
     //   httpStatusCode,
     //   errorCode: httpStatusCode,
     //   error: '请求成功！',
-    //   message: '请求成功！',
+    //   msg: '请求成功！',
     //   duration,
     // };
     // // 请求成功不写入日志表
@@ -156,8 +161,8 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
       const defaultError = {
         httpStatusCode: COMMON_HTTP_CODE.serverError,
         errorCode: COMMON_ERROR_CODE.serverError,
-        error: error?.message,
-        message: '服务器错误！',
+        error: error?.msg,
+        msg: '服务器错误！',
         duration,
       };
       // 不是CustomError，也写入日志表
@@ -175,7 +180,7 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
         httpStatusCode: error.httpStatusCode,
         error: error.message,
         errorCode: error.errorCode,
-        message: error.message,
+        msg: error.message,
         duration,
       });
     }

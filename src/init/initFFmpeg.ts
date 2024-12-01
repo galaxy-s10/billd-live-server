@@ -38,8 +38,10 @@ async function addLive({
   devFFmpegLocalFile: string;
   prodFFmpegLocalFile: string;
 }) {
-  const liveRoomInfo = await liveRoomController.common.findKey(live_room_id);
-  const key = liveRoomInfo?.key;
+  const liveRoomInfoResult = await liveRoomController.common.findKey(
+    live_room_id
+  );
+  const key = liveRoomInfoResult?.key || '';
   const srsPullRes = srsController.common.getPullUrl({
     liveRoomId: live_room_id,
   });
@@ -47,7 +49,7 @@ async function addLive({
     userId: user_id,
     liveRoomId: live_room_id,
     type: LiveRoomTypeEnum.system,
-    key: key!,
+    key,
   });
   const cdnPullRes = tencentcloudCssUtils.getPullUrl({
     liveRoomId: live_room_id,
@@ -56,7 +58,7 @@ async function addLive({
     userId: user_id,
     liveRoomId: live_room_id,
     type: LiveRoomTypeEnum.tencent_css,
-    key: key!,
+    key,
   });
 
   async function main() {
@@ -106,9 +108,7 @@ async function addLive({
       // -bf 0，禁用 B 帧
       // WARN 核心是禁用B帧
       const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec libx264 -preset veryfast -tune zerolatency -bf 0 -g 1 -acodec copy -f flv '${
-        cdn === SwitchEnum.yes
-          ? cdnPushRes.push_rtmp_url
-          : srsPushRes.push_rtmp_url
+        cdn === SwitchEnum.yes ? cdnPushRes.rtmp_url : srsPushRes.rtmp_url
       }'`;
       // const ffmpegSyncCmd = `${ffmpegCmd} 1>/dev/null 2>&1 &`;
       try {
@@ -126,44 +126,33 @@ async function addLive({
         console.log(chalkERROR(`FFmpeg推流错误！`), error);
       }
     }
-    console.log({
-      push_rtmp_url: srsPushRes.push_rtmp_url,
-      push_obs_server: srsPushRes.push_obs_server,
-      push_obs_stream_key: srsPushRes.push_obs_stream_key,
-      push_webrtc_url: srsPushRes.push_webrtc_url,
-      push_srt_url: srsPushRes.push_srt_url,
-      cdn_rtmp_url: cdnPullRes.rtmp,
-      cdn_flv_url: cdnPullRes.flv,
-      cdn_hls_url: cdnPullRes.hls,
-      cdn_webrtc_url: cdnPullRes.webrtc,
-      cdn_push_rtmp_url: cdnPushRes.push_rtmp_url,
-      cdn_push_obs_server: cdnPushRes.push_obs_server,
-      cdn_push_obs_stream_key: cdnPushRes.push_obs_stream_key,
-      cdn_push_webrtc_url: cdnPushRes.push_webrtc_url,
-      cdn_push_srt_url: cdnPushRes.push_srt_url,
-    });
+
     await liveRoomController.common.update({
       id: live_room_id,
       cdn,
       type,
-      rtmp_url: srsPullRes.rtmp,
-      flv_url: srsPullRes.flv,
-      hls_url: srsPullRes.hls,
-      webrtc_url: srsPullRes.webrtc,
-      push_rtmp_url: srsPushRes.push_rtmp_url,
-      push_obs_server: srsPushRes.push_obs_server,
-      push_obs_stream_key: srsPushRes.push_obs_stream_key,
-      push_webrtc_url: srsPushRes.push_webrtc_url,
-      push_srt_url: srsPushRes.push_srt_url,
-      cdn_rtmp_url: cdnPullRes.rtmp,
-      cdn_flv_url: cdnPullRes.flv,
-      cdn_hls_url: cdnPullRes.hls,
-      cdn_webrtc_url: cdnPullRes.webrtc,
-      cdn_push_rtmp_url: cdnPushRes.push_rtmp_url,
-      cdn_push_obs_server: cdnPushRes.push_obs_server,
-      cdn_push_obs_stream_key: cdnPushRes.push_obs_stream_key,
-      cdn_push_webrtc_url: cdnPushRes.push_webrtc_url,
-      cdn_push_srt_url: cdnPushRes.push_srt_url,
+
+      pull_rtmp_url: srsPullRes.rtmp,
+      pull_flv_url: srsPullRes.flv,
+      pull_hls_url: srsPullRes.hls,
+      pull_webrtc_url: srsPullRes.webrtc,
+
+      pull_cdn_rtmp_url: cdnPullRes.rtmp,
+      pull_cdn_flv_url: cdnPullRes.flv,
+      pull_cdn_hls_url: cdnPullRes.hls,
+      pull_cdn_webrtc_url: cdnPullRes.webrtc,
+
+      push_rtmp_url: srsPushRes.rtmp_url,
+      push_obs_server: srsPushRes.obs_server,
+      push_obs_stream_key: srsPushRes.obs_stream_key,
+      push_webrtc_url: srsPushRes.webrtc_url,
+      push_srt_url: srsPushRes.srt_url,
+
+      push_cdn_rtmp_url: cdnPushRes.rtmp_url,
+      push_cdn_obs_server: cdnPushRes.obs_server,
+      push_cdn_obs_stream_key: cdnPushRes.obs_stream_key,
+      push_cdn_webrtc_url: cdnPushRes.webrtc_url,
+      push_cdn_srt_url: cdnPushRes.srt_url,
     });
   }
 

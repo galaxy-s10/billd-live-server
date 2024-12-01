@@ -1,6 +1,6 @@
 import { exec, execSync } from 'child_process';
 
-import { PROJECT_ENV, PROJECT_ENV_ENUM, SRS_CB_URL_PARAMS } from '@/constant';
+import { PROJECT_ENV, PROJECT_ENV_ENUM, SRS_CB_URL_QUERY } from '@/constant';
 import { BILIBILI_LIVE_PUSH_KEY, SRS_CONFIG, SRS_LIVE } from '@/secret/secret';
 import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
 
@@ -97,11 +97,11 @@ export function mp4PushRtmp(data: {
   rtmpUrl: string;
   token: string;
 }) {
-  const cmd = `ffmpeg -threads 1 -readrate 1 -f concat -safe 0 -i '${data.txt}' -vcodec copy -acodec copy -f flv '${data.rtmpUrl}?${SRS_CB_URL_PARAMS.publishKey}=${data.token}'`;
-  // const cmd = `ffmpeg -threads 1 -readrate 1 -f concat -safe 0 -i '${data.txt}' -vcodec h264 -acodec aac -f flv '${data.rtmpUrl}?${SRS_CB_URL_PARAMS.publishKey}=${data.token}'`;
+  const cmd = `ffmpeg -threads 1 -readrate 1 -f concat -safe 0 -i '${data.txt}' -vcodec copy -acodec copy -f flv '${data.rtmpUrl}?${SRS_CB_URL_QUERY.publishKey}=${data.token}'`;
+  // const cmd = `ffmpeg -threads 1 -readrate 1 -f concat -safe 0 -i '${data.txt}' -vcodec h264 -acodec aac -f flv '${data.rtmpUrl}?${SRS_CB_URL_QUERY.publishKey}=${data.token}'`;
   exec(cmd, (err, stdout, stderr) => {
     console.log('mp4PushRtmp', cmd);
-    // console.log(err, stdout, stderr);
+    console.log(err, stdout, stderr);
   });
 }
 

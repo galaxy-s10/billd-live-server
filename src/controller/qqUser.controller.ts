@@ -189,7 +189,10 @@ class QqUserController {
     let userId;
     let token;
     const user_agent = strSlice(String(ctx.request.headers['user-agent']), 490);
-    const ip = strSlice(String(ctx.request.headers['x-real-ip'] || ''), 100);
+    const client_ip = strSlice(
+      String(ctx.request.headers['x-real-ip'] || ''),
+      100
+    );
     if (!isExist) {
       console.log('不存在qq账号');
       const qqUser = await qqUserService.create(qqUserInfo);
@@ -203,7 +206,7 @@ class QqUserController {
         user_id: userId,
         type: LoginRecordEnum.registerQq,
         user_agent,
-        ip,
+        client_ip,
       });
       // @ts-ignore
       await userInfo.setRoles([DEFAULT_ROLE_INFO.VIP_USER.id]);
@@ -303,7 +306,7 @@ class QqUserController {
       const userStatusRes = judgeUserStatus(userInfo.status!);
       if (userStatusRes.status !== UserStatusEnum.normal) {
         throw new CustomError(
-          userStatusRes.message,
+          userStatusRes.msg,
           COMMON_HTTP_CODE.unauthorized,
           COMMON_HTTP_CODE.unauthorized
         );
@@ -369,9 +372,9 @@ class QqUserController {
       user_id: userId,
       type: LoginRecordEnum.loginQq,
       user_agent,
-      ip,
+      client_ip,
     });
-    successHandler({ ctx, data: token, message: 'qq登录成功！' });
+    successHandler({ ctx, data: token, msg: 'qq登录成功！' });
 
     /**
      * 这个其实是最后一个中间件了，其实加不加调不调用next都没硬性，但是为了防止后面要
@@ -425,9 +428,9 @@ class QqUserController {
   bindQQ = async (ctx: ParameterizedContext, next) => {
     const { code } = ctx.request.body; // 注意此code会在10分钟内过期。
 
-    const { code: authCode, userInfo, message } = await authJwt(ctx);
+    const { code: authCode, userInfo, msg } = await authJwt(ctx);
     if (authCode !== COMMON_HTTP_CODE.success) {
-      throw new CustomError(message, authCode, authCode);
+      throw new CustomError(msg, authCode, authCode);
     }
     const result: any = await thirdUserService.findByUserId(userInfo!.id!);
     const ownIsBind = result.filter(
@@ -475,7 +478,7 @@ class QqUserController {
       third_user_id: qqUser.id,
       third_platform: THIRD_PLATFORM.qq,
     });
-    successHandler({ ctx, message: '绑定qq成功！' });
+    successHandler({ ctx, msg: '绑定qq成功！' });
 
     await next();
   };

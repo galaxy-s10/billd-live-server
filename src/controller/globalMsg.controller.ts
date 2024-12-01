@@ -14,7 +14,11 @@ class GlobalMsgController {
     getList: ({
       id,
       user_id,
+      client_ip,
+      priority,
+      show,
       type,
+      remark,
       orderBy,
       orderName,
       nowPage,
@@ -27,6 +31,42 @@ class GlobalMsgController {
       globalMsgService.getList({
         id,
         user_id,
+        client_ip,
+        priority,
+        show,
+        type,
+        orderBy,
+        orderName,
+        nowPage,
+        pageSize,
+        keyWord,
+        rangTimeType,
+        rangTimeStart,
+        rangTimeEnd,
+      }),
+    getMyList: ({
+      id,
+      user_id,
+      client_ip,
+      priority,
+      show,
+      type,
+      remark,
+      orderBy,
+      orderName,
+      nowPage,
+      pageSize,
+      keyWord,
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    }: IList<IGlobalMsg>) =>
+      globalMsgService.getMyList({
+        id,
+        user_id,
+        client_ip,
+        priority,
+        show,
         type,
         orderBy,
         orderName,
@@ -47,12 +87,13 @@ class GlobalMsgController {
   };
 
   getMyList = async (ctx: ParameterizedContext, next) => {
-    const { code, userInfo, message } = await authJwt(ctx);
-    if (code !== COMMON_HTTP_CODE.success || !userInfo) {
-      throw new CustomError(message, code, code);
-    }
+    const { userInfo } = await authJwt(ctx);
     const data: IList<IGlobalMsg> = ctx.request.query;
-    const result = await this.common.getList({ ...data, user_id: userInfo.id });
+    const result = await this.common.getMyList({
+      ...data,
+      // @ts-ignore
+      user_id: userInfo?.id || null,
+    });
     successHandler({ ctx, data: result });
     await next();
   };
@@ -66,7 +107,8 @@ class GlobalMsgController {
 
   async update(ctx: ParameterizedContext, next) {
     const id = +ctx.params.id;
-    const { user_id, type, content, remark }: IGlobalMsg = ctx.request.body;
+    const { user_id, client_ip, priority, show, type, remark }: IGlobalMsg =
+      ctx.request.body;
     const isExist = await globalMsgService.isExist([id]);
     if (!isExist) {
       throw new CustomError(
@@ -78,8 +120,10 @@ class GlobalMsgController {
     await globalMsgService.update({
       id,
       user_id,
+      client_ip,
+      priority,
+      show,
       type,
-      content,
       remark,
     });
     successHandler({ ctx });
@@ -87,13 +131,8 @@ class GlobalMsgController {
   }
 
   create = async (ctx: ParameterizedContext, next) => {
-    const { user_id, type, content, remark }: IGlobalMsg = ctx.request.body;
-    await this.common.create({
-      user_id,
-      type,
-      content,
-      remark,
-    });
+    const data = ctx.request.body;
+    await this.common.create(data);
     successHandler({ ctx });
     await next();
   };

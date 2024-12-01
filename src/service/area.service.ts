@@ -1,6 +1,7 @@
 import { deleteUseLessObjectKey, filterObj } from 'billd-utils';
 import { Op } from 'sequelize';
 
+import { LIVE_ROOM_MODEL_EXCLUDE } from '@/constant';
 import { IArea, IList } from '@/interface';
 import areaModel from '@/model/area.model';
 import areaLiveRoomModel from '@/model/areaLiveRoom.model';
@@ -103,25 +104,7 @@ class AreaService {
         },
       ],
       attributes: {
-        exclude: [
-          'key',
-          'push_rtmp_url',
-          'push_obs_server',
-          'push_obs_stream_key',
-          'push_webrtc_url',
-          'push_srt_url',
-          'cdn_push_rtmp_url',
-          'cdn_push_obs_server',
-          'cdn_push_obs_stream_key',
-          'cdn_push_webrtc_url',
-          'cdn_push_srt_url',
-          'forward_bilibili_url',
-          'forward_huya_url',
-          'forward_douyu_url',
-          'forward_douyin_url',
-          'forward_kuaishou_url',
-          'forward_xiaohongshu_url',
-        ],
+        exclude: LIVE_ROOM_MODEL_EXCLUDE,
       },
       where: { ...childWhere },
     });
@@ -222,25 +205,7 @@ class AreaService {
             {
               model: liveRoomModel,
               attributes: {
-                exclude: [
-                  'key',
-                  'push_rtmp_url',
-                  'push_obs_server',
-                  'push_obs_stream_key',
-                  'push_webrtc_url',
-                  'push_srt_url',
-                  'cdn_push_rtmp_url',
-                  'cdn_push_obs_server',
-                  'cdn_push_obs_stream_key',
-                  'cdn_push_webrtc_url',
-                  'cdn_push_srt_url',
-                  'forward_bilibili_url',
-                  'forward_huya_url',
-                  'forward_douyu_url',
-                  'forward_douyin_url',
-                  'forward_kuaishou_url',
-                  'forward_xiaohongshu_url',
-                ],
+                exclude: LIVE_ROOM_MODEL_EXCLUDE,
               },
               include: [
                 {
@@ -299,25 +264,7 @@ class AreaService {
         {
           model: liveRoomModel,
           attributes: {
-            exclude: [
-              'key',
-              'push_rtmp_url',
-              'push_obs_server',
-              'push_obs_stream_key',
-              'push_webrtc_url',
-              'push_srt_url',
-              'cdn_push_rtmp_url',
-              'cdn_push_obs_server',
-              'cdn_push_obs_stream_key',
-              'cdn_push_webrtc_url',
-              'cdn_push_srt_url',
-              'forward_bilibili_url',
-              'forward_huya_url',
-              'forward_douyu_url',
-              'forward_douyin_url',
-              'forward_kuaishou_url',
-              'forward_xiaohongshu_url',
-            ],
+            exclude: LIVE_ROOM_MODEL_EXCLUDE,
           },
         },
       ],

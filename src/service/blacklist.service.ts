@@ -44,7 +44,7 @@ class BlackListService {
     });
     const keyWordWhere = handleKeyWord({
       keyWord,
-      arr: ['ip', 'msg'],
+      arr: ['client_ip', 'msg'],
     });
     if (keyWordWhere) {
       allWhere[Op.or] = keyWordWhere;
@@ -76,8 +76,8 @@ class BlackListService {
   }
 
   /** 根据ip查找黑名单 */
-  async findByIp(ip: string) {
-    const result = await blacklistModel.findOne({ where: { ip } });
+  async findByIp(client_ip: string) {
+    const result = await blacklistModel.findOne({ where: { client_ip } });
     return result;
   }
 

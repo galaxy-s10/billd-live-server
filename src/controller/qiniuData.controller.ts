@@ -54,7 +54,7 @@ class QiniuController {
     successHandler({
       ctx,
       data: token,
-      message: '获取七牛云token成功，有效期10分钟',
+      msg: '获取七牛云token成功，有效期10分钟',
     });
     await next();
   };
@@ -113,7 +113,7 @@ class QiniuController {
         prefetchRes,
         promise,
       },
-      message: '预取成功！',
+      msg: '预取成功！',
     });
 
     await next();
@@ -162,7 +162,7 @@ class QiniuController {
         successHandler({
           code: 3,
           ctx,
-          message: '文件已存在，不需要再上传chunk，请直接调用upload',
+          msg: '文件已存在，不需要再上传chunk，请直接调用upload',
         });
         await next();
         return;
@@ -171,7 +171,7 @@ class QiniuController {
       successHandler({
         code: 3,
         ctx,
-        message: '文件已存在，不需要再上传chunk，请直接调用upload',
+        msg: '文件已存在，不需要再上传chunk，请直接调用upload',
       });
     }
     const { uploadFiles } = ctx.request.files!;
@@ -209,7 +209,7 @@ class QiniuController {
           ctx,
           code: 2,
           data: { percentage },
-          message: `${hash}/${chunkName}已存在！`,
+          msg: `${hash}/${chunkName}已存在！`,
         });
       } else {
         copySync(chunkInfo.filepath, destHashChunk);
@@ -232,7 +232,7 @@ class QiniuController {
           data: {
             percentage,
           },
-          message: `${hash}/${chunkName}上传成功！`,
+          msg: `${hash}/${chunkName}上传成功！`,
         });
       }
       await next();
@@ -278,13 +278,13 @@ class QiniuController {
       successHandler({
         ctx,
         code: 1,
-        message: '合并成功！',
+        msg: '合并成功！',
       });
     } else {
       successHandler({
         ctx,
         code: 2,
-        message: `合并失败！${chunkDir}目录不存在！`,
+        msg: `合并失败！${chunkDir}目录不存在！`,
       });
     }
 
@@ -421,7 +421,7 @@ class QiniuController {
       successHandler({
         code: 3,
         ctx,
-        message: '文件已存在，无需merge，请直接调用upload',
+        msg: '文件已存在，无需merge，请直接调用upload',
       });
     } else {
       const redisData = await redisController.getVal({
@@ -433,13 +433,13 @@ class QiniuController {
           code: 1,
           ctx,
           data: JSON.parse(redisData),
-          message: '获取上传进度成功！',
+          msg: '获取上传进度成功！',
         });
       } else {
         successHandler({
           code: 2,
           ctx,
-          message: `没有该文件的上传进度！`,
+          msg: `没有该文件的上传进度！`,
         });
       }
     }
