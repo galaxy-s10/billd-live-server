@@ -488,6 +488,7 @@ class InitController {
       queue.push(
         liveRoomController.common.update({
           id: item.live_room_id,
+          key,
           pull_rtmp_url: srsPullRes.rtmp,
           pull_flv_url: srsPullRes.flv,
           pull_hls_url: srsPullRes.hls,

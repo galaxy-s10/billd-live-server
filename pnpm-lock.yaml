@@ -26,6 +26,9 @@ importers:
       billd-utils:
         specifier: ^0.0.22
         version: 0.0.22(tslib@2.6.2)(typescript@4.8.2)
+      chalk:
+        specifier: ^4.1.2
+        version: 4.1.2
       cos-nodejs-sdk-v5:
         specifier: ^2.14.6
         version: 2.14.6
@@ -186,9 +189,6 @@ importers:
       autocannon:
         specifier: ^7.14.0
         version: 7.14.0
-      chalk:
-        specifier: ^4.1.2
-        version: 4.1.2
       commitizen:
         specifier: ^4.2.4
         version: 4.2.4(@types/node@16.11.9)(typescript@4.8.2)

@@ -12,18 +12,60 @@ import { COMMON_HTTP_CODE, SCHEDULE_TYPE, WEBM_DIR } from '@/constant';
 import { IList, ILive } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveService from '@/service/live.service';
-import { ILiveRoom } from '@/types/ILiveRoom';
 import { getForwardList, killPid } from '@/utils/process';
 
 import tencentcloudCssController from './tencentcloudCss.controller';
 
 class LiveController {
   common = {
+    findAll: async ({
+      id,
+      live_record_id,
+      live_room_id,
+      user_id,
+      platform,
+      stream_name,
+      stream_id,
+      remark,
+      orderBy,
+      orderName,
+      nowPage,
+      pageSize,
+      keyWord,
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    }: IList<ILive>) => {
+      const result = await liveService.findAll({
+        id,
+        live_record_id,
+        live_room_id,
+        user_id,
+        platform,
+        stream_name,
+        stream_id,
+        remark,
+        nowPage,
+        pageSize,
+        orderBy,
+        orderName,
+        keyWord,
+        rangTimeType,
+        rangTimeStart,
+        rangTimeEnd,
+      });
+      return result;
+    },
+
     getList: async ({
       id,
+      live_record_id,
       live_room_id,
-      cdn,
-      status,
+      user_id,
+      platform,
+      stream_name,
+      stream_id,
+      remark,
       childOrderName,
       childOrderBy,
       orderBy,
@@ -34,12 +76,16 @@ class LiveController {
       rangTimeType,
       rangTimeStart,
       rangTimeEnd,
-    }: IList<ILive & ILiveRoom>) => {
+    }: IList<ILive>) => {
       const result = await liveService.getList({
         id,
+        live_record_id,
         live_room_id,
-        cdn,
-        status,
+        user_id,
+        platform,
+        stream_name,
+        stream_id,
+        remark,
         childOrderName,
         childOrderBy,
         orderBy,
@@ -57,11 +103,11 @@ class LiveController {
     getPureList: async ({
       id,
       live_record_id,
+      live_room_id,
+      user_id,
       platform,
       stream_name,
       stream_id,
-      user_id,
-      live_room_id,
       remark,
       orderBy,
       orderName,
@@ -75,11 +121,11 @@ class LiveController {
       const result = await liveService.getPureList({
         id,
         live_record_id,
+        live_room_id,
+        user_id,
         platform,
         stream_name,
         stream_id,
-        user_id,
-        live_room_id,
         remark,
         nowPage,
         pageSize,
@@ -110,11 +156,8 @@ class LiveController {
 
     deleteByLiveRoomId: async (liveRoomIds: number[]) => {
       if (!liveRoomIds.length) {
-        throw new CustomError(
-          'liveRoomIds为空',
-          COMMON_HTTP_CODE.paramsError,
-          COMMON_HTTP_CODE.paramsError
-        );
+        console.log('liveRoomIds为空');
+        return 0;
       }
       const res = await liveService.deleteByLiveRoomId(liveRoomIds);
       return res;
@@ -146,8 +189,26 @@ class LiveController {
       return res;
     },
 
-    create: async (data: ILive) => {
-      const res = await liveService.create(data);
+    create: async ({
+      id,
+      live_record_id,
+      live_room_id,
+      user_id,
+      platform,
+      stream_name,
+      stream_id,
+      remark,
+    }: ILive) => {
+      const res = await liveService.create({
+        id,
+        live_record_id,
+        live_room_id,
+        user_id,
+        platform,
+        stream_name,
+        stream_id,
+        remark,
+      });
       return res;
     },
   };

@@ -201,6 +201,7 @@ class TencentcloudCssController {
         remark: '',
       });
       const liveRes = await liveController.common.create({
+        platform: LivePlatformEnum.tencentcloud_css,
         live_record_id: recRes.id,
         live_room_id: Number(roomId),
         user_id: Number(userId || -1),

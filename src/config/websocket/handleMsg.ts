@@ -309,7 +309,6 @@ export async function handleWsMessage(args: {
     return;
   }
   const liveRoomId = data.data.live_room_id;
-  console.log('kkkk', liveRoomId);
   if (!liveRoomId) {
     return;
   }
@@ -450,6 +449,7 @@ export async function handleWsStartLive(args: {
       remark: '',
     });
     await liveController.common.create({
+      platform: LivePlatformEnum.rtc,
       live_record_id: recRes.id,
       live_room_id: Number(roomId),
       user_id: Number(userId),

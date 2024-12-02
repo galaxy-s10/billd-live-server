@@ -43,11 +43,11 @@ class LiveService {
   async getPureList({
     id,
     live_record_id,
+    live_room_id,
+    user_id,
     platform,
     stream_name,
     stream_id,
-    user_id,
-    live_room_id,
     remark,
     orderBy,
     orderName,
@@ -62,11 +62,11 @@ class LiveService {
     const allWhere: any = deleteUseLessObjectKey({
       id,
       live_record_id,
+      live_room_id,
+      user_id,
       platform,
       stream_name,
       stream_id,
-      user_id,
-      live_room_id,
       remark,
     });
     const keyWordWhere = handleKeyWord({
@@ -100,11 +100,11 @@ class LiveService {
   async getList({
     id,
     live_record_id,
+    live_room_id,
+    user_id,
     platform,
     stream_name,
     stream_id,
-    user_id,
-    live_room_id,
     remark,
     childOrderName,
     childOrderBy,
@@ -121,11 +121,11 @@ class LiveService {
     const allWhere: any = deleteUseLessObjectKey({
       id,
       live_record_id,
+      live_room_id,
+      user_id,
       platform,
       stream_name,
       stream_id,
-      user_id,
-      live_room_id,
       remark,
     });
     const keyWordWhere = handleKeyWord({
@@ -186,6 +186,60 @@ class LiveService {
   async find(id: number) {
     const result = await liveModel.findOne({ where: { id } });
     return result;
+  }
+
+  /** 获取直播列表 */
+  async findAll({
+    id,
+    live_record_id,
+    live_room_id,
+    user_id,
+    platform,
+    stream_name,
+    stream_id,
+    remark,
+    orderBy,
+    orderName,
+    nowPage,
+    pageSize,
+    keyWord,
+    rangTimeType,
+    rangTimeStart,
+    rangTimeEnd,
+  }: IList<ILive>) {
+    const allWhere: any = deleteUseLessObjectKey({
+      id,
+      live_record_id,
+      live_room_id,
+      user_id,
+      platform,
+      stream_name,
+      stream_id,
+      remark,
+    });
+    const keyWordWhere = handleKeyWord({
+      keyWord,
+      arr: ['stream_name', 'stream_id', 'remark'],
+    });
+    if (keyWordWhere) {
+      allWhere[Op.or] = keyWordWhere;
+    }
+    const rangTimeWhere = handleRangTime({
+      rangTimeType,
+      rangTimeStart,
+      rangTimeEnd,
+    });
+    if (rangTimeWhere) {
+      allWhere[rangTimeType!] = rangTimeWhere;
+    }
+    const orderRes = handleOrder({ orderName, orderBy });
+    const result = await liveModel.findAll({
+      order: [...orderRes],
+      where: {
+        ...allWhere,
+      },
+    });
+    return handlePaging<ILive>(result, nowPage, pageSize);
   }
 
   /** 查找直播（禁止对外。） */
@@ -268,12 +322,10 @@ class LiveService {
   }
 
   /** 删除直播 */
-  deleteByLiveRoomId = async (live_room_id: number[]) => {
+  deleteByLiveRoomId = async (liveRoomIds: number[]) => {
     const res = await liveModel.destroy({
       where: {
-        live_room_id: {
-          [Op.in]: live_room_id,
-        },
+        live_room_id: liveRoomIds,
       },
     });
     handleDelRedisByDbLiveList();

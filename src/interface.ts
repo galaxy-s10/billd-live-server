@@ -464,28 +464,6 @@ export interface ISrsPublishStream {
   flag_id?: string;
 }
 
-export type ILive = {
-  id?: number;
-  /** 直播记录id */
-  live_record_id?: number;
-  /** 直播平台 */
-  platform?: LivePlatformEnum;
-  /** 直播流名称 */
-  stream_name?: string;
-  /** 直播流id */
-  stream_id?: string;
-  /** 用户id */
-  user_id?: number;
-  /** 直播间id */
-  live_room_id?: number;
-  /** 备注 */
-  remark?: string;
-
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
-};
-
 export interface ILiveRecord {
   id?: number;
   /** 直播平台 */
@@ -722,6 +700,33 @@ export enum SwitchEnum {
   yes,
   no,
 }
+
+export type ILive = {
+  id?: number;
+  /** 直播记录id */
+  live_record_id?: number;
+  /** 直播平台 */
+  platform?: LivePlatformEnum;
+  /** 直播流名称 */
+  stream_name?: string;
+  /** 直播流id */
+  stream_id?: string;
+  /** 用户id */
+  user_id?: number;
+  /** 直播间id */
+  live_room_id?: number;
+  /** 备注 */
+  remark?: string;
+
+  /** 直播间信息 */
+  live_room?: ILiveRoom;
+  /** 用户信息 */
+  user?: IUser;
+
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+};
 
 /** 直播平台 */
 export enum LivePlatformEnum {
