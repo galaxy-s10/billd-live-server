@@ -146,7 +146,7 @@ export async function handleWsJoin(args: {
     data: {
       live_room_id: roomId,
       join_socket_id: socket.id,
-      join_user_info: {},
+      join_user_info: userInfo,
       socket_list: socketList ? [...socketList] : [],
     },
   });

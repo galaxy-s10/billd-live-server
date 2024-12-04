@@ -766,3 +766,16 @@ export interface ILiveView {
   updated_at?: string;
   deleted_at?: string;
 }
+
+export interface IStreamKey {
+  rtmp_url: string;
+  obs_server: string;
+  obs_stream_key: string;
+  webrtc_url: string;
+  srt_url: string;
+}
+
+export interface IPushRes {
+  srsPushRes: IStreamKey;
+  cdnPushRes: IStreamKey;
+}
