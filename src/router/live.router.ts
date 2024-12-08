@@ -30,7 +30,7 @@ liveRouter.post('/add_fake_live', liveController.addFakeLive);
 // 删除一个假直播开播
 liveRouter.post('/del_fake_live', liveController.delFakeLive);
 
-liveRouter.post('/close_live', liveController.closeLive);
+liveRouter.post('/close_my_live', liveController.closeMyLive);
 
 liveRouter.post(
   '/close_live_by_live_room_id/:live_room_id',

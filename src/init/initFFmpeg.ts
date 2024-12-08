@@ -46,6 +46,7 @@ async function addLive({
     liveRoomId: live_room_id,
   });
   const srsPushRes = srsController.common.getPushUrl({
+    isdev: PROJECT_ENV === PROJECT_ENV_ENUM.prod ? '2' : '1',
     userId: user_id,
     liveRoomId: live_room_id,
     type: LiveRoomTypeEnum.system,
@@ -55,6 +56,7 @@ async function addLive({
     liveRoomId: live_room_id,
   });
   const cdnPushRes = tencentcloudCssUtils.getPushUrl({
+    isdev: PROJECT_ENV === PROJECT_ENV_ENUM.prod ? '2' : '1',
     userId: user_id,
     liveRoomId: live_room_id,
     type: LiveRoomTypeEnum.tencent_css,
@@ -102,12 +104,28 @@ async function addLive({
         console.log(chalkERROR(`FFmpeg推流错误！`), 'localFile为空');
         return;
       }
+      /**
+       * -preset值：
+       * ultrafast: 编码速度最快，文件大小较大，质量较差。
+       * superfast: 较快的编码速度，相对较大的文件。
+       * veryfast: 快速编码，适合实时应用。
+       * faster: 在速度和质量之间取得平衡。
+       * fast: 速度和质量的良好权衡。
+       * medium: 默认值，适合大多数用途。
+       * slow: 质量较高，但编码速度较慢。
+       * veryslow: 质量更高，编码速度更慢，适合需要最佳质量的场合。
+       * placebo: 质量极高，但速度极慢，通常不推荐用于实际编码。
+       */
+      // -vcodec libx264，使用H.264编码
       // -preset veryfast，编码速度选项，veryfast 是一个较快的选项，适合实时推流。
-      // -tune zerolatency，优化延迟，适合实时流。
-      // -g 1，设置 GOP（Group of Pictures）大小为 1，这样会禁用 B 帧，因为每帧都是 I 帧
-      // -bf 0，禁用 B 帧
-      // WARN 核心是禁用B帧
-      const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec libx264 -preset veryfast -tune zerolatency -bf 0 -g 1 -acodec copy -f flv '${
+      // -tune zerolatency，优化延迟，适合实时流。这个选项优化编码以减少延迟，可能会增加CPU使用率，因为它会影响编码的方式以实现低延迟。
+      // -g 1，设置 GOP（Group of Pictures）大小为 1，这样会禁用 B 帧，因为每帧都是 I 帧，每一帧都是关键帧，这会显著增加CPU占用，因为每帧都需要完整编码。
+      // -bf 0，禁用 B 帧，设置B帧为0，减少了编码的复杂性，有助于降低CPU占用。
+      // WARN 核心是禁用B帧，rtc-rtmp需要禁用b帧，则不能-vcodec copy，需要使用编码
+      // const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec copy -acodec copy -f flv '${
+      //   cdn === SwitchEnum.yes ? cdnPushRes.rtmp_url : srsPushRes.rtmp_url
+      // }'`;
+      const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec libx264 -preset ultrafast -b:v 1200k -filter:v fps=fps=20:round=down -acodec copy -f flv '${
         cdn === SwitchEnum.yes ? cdnPushRes.rtmp_url : srsPushRes.rtmp_url
       }'`;
       // const ffmpegSyncCmd = `${ffmpegCmd} 1>/dev/null 2>&1 &`;

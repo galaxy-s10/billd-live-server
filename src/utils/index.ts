@@ -8,7 +8,23 @@ import { Op } from 'sequelize';
 
 import { COMMON_ERROE_MSG, COMMON_ERROR_CODE } from '../constant';
 import { IListBase } from '../interface';
+import { ILiveRoom, LiveRoomTypeEnum } from '../types/ILiveRoom';
 import { UserStatusEnum } from '../types/IUser';
+
+export function getForwardMapUrl(data: { liveRoom: ILiveRoom | null }) {
+  const map = {
+    [LiveRoomTypeEnum.forward_bilibili]:
+      data.liveRoom?.forward_bilibili_url || '',
+    [LiveRoomTypeEnum.forward_douyin]: data.liveRoom?.forward_douyin_url || '',
+    [LiveRoomTypeEnum.forward_douyu]: data.liveRoom?.forward_douyu_url || '',
+    [LiveRoomTypeEnum.forward_huya]: data.liveRoom?.forward_huya_url || '',
+    [LiveRoomTypeEnum.forward_kuaishou]:
+      data.liveRoom?.forward_kuaishou_url || '',
+    [LiveRoomTypeEnum.forward_xiaohongshu]:
+      data.liveRoom?.forward_xiaohongshu_url || '',
+  };
+  return map;
+}
 
 /**
  * 比较版本号，返回1代表version1更大，返回2代表version2更大，返回0代表相等

@@ -1,7 +1,8 @@
 import { exec, execSync } from 'child_process';
 
 import { PROJECT_ENV, PROJECT_ENV_ENUM, SRS_CB_URL_QUERY } from '@/constant';
-import { BILIBILI_LIVE_PUSH_KEY, SRS_CONFIG, SRS_LIVE } from '@/secret/secret';
+import { BILIBILI_LIVE_PUSH_KEY } from '@/secret/secret';
+import { LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import { chalkERROR, chalkSUCCESS } from '@/utils/chalkTip';
 
 export function pushToBilibili(flag = true) {
@@ -21,31 +22,29 @@ export function pushToBilibili(flag = true) {
   }
 }
 
-export function forwardToOtherPlatform({
+export function forwardThirdPartyLiveStreaming({
   platform,
   localFlv,
   remoteRtmp,
 }: {
   platform:
-    | 'bilibili'
-    | 'xiaohongshu'
-    | 'kuaishou'
-    | 'douyu'
-    | 'douyin'
-    | 'huya';
+    | LiveRoomTypeEnum.forward_all
+    | LiveRoomTypeEnum.forward_bilibili
+    | LiveRoomTypeEnum.forward_douyin
+    | LiveRoomTypeEnum.forward_douyu
+    | LiveRoomTypeEnum.forward_huya
+    | LiveRoomTypeEnum.forward_kuaishou
+    | LiveRoomTypeEnum.forward_xiaohongshu;
   localFlv: string;
   remoteRtmp: string;
 }) {
-  // const cmd = `ffmpeg -f flv -i '${localFlv}?forwardToOtherPlatform=${platform}' -c copy -f flv '${remoteRtmp}'`;
+  // const cmd = `ffmpeg -f flv -i '${localFlv}?forwardThirdPartyLiveStreaming=${platform}' -vcodec copy -acodec copy -f flv '${remoteRtmp}'`;
   let localFlvRes = localFlv;
   if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
-    localFlvRes = localFlv.replace(
-      SRS_LIVE.PullDomain,
-      `http://localhost:${SRS_CONFIG.docker.port[8080]}`
-    );
+    localFlvRes = localFlv.replace('http://', 'https://');
   }
-  const cmd = `ffmpeg -f flv -i '${localFlvRes}?forwardToOtherPlatform=${platform}' -c:v copy -c:a aac -f flv '${remoteRtmp}'`;
-  // const cmd = `ffmpeg -f flv -i '${localFlv}?forwardToOtherPlatform=${platform}' -c copy -f flv 'rtmp://localhost/livestream/roomId___12?pushkey=159117a86318005a17e2c55ff318d998&pushtype=1'`;
+  const cmd = `ffmpeg -f flv -i '${localFlvRes}?forwardThirdPartyLiveStreaming=${platform}' -vcodec copy -acodec copy -f flv '${remoteRtmp}'`;
+  // const cmd = `ffmpeg -f flv -i '${localFlv}?forwardThirdPartyLiveStreaming=${platform}' -vcodec copy -acodec copy -f flv 'rtmp://localhost/livestream/roomId___12?pushkey=159117a86318005a17e2c55ff318d998&pushtype=1'`;
   try {
     exec(cmd);
     console.log(cmd);
@@ -58,7 +57,7 @@ export function forwardToOtherPlatform({
 
 export function getForwardList() {
   return new Promise((resolve) => {
-    const cmd = `ps aux | grep '?forwardToOtherPlatform=' | grep -v grep`;
+    const cmd = `ps aux | grep '?forwardThirdPartyLiveStreaming=' | grep -v grep`;
     exec(cmd, (err, stdout, stderr) => {
       resolve({ cmd, err, stdout, stderr });
     });

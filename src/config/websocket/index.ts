@@ -146,20 +146,6 @@ export const connectWebSocket = (server) => {
   // 每个客户端socket连接时都会触发 connection 事件
   io.of('/').on(WsConnectStatusEnum.connection, (socket: Socket) => {
     prettierInfoLog({ msg: 'connection', socket });
-    // 收到用户进入房间
-    socket.on(WsMsgTypeEnum.billdDeskJoin, (data: WsBilldDeskJoinType) => {
-      try {
-        const roomId = data.data.live_room_id;
-        prettierInfoLog({
-          msg: '收到用户进入房间',
-          socket,
-          roomId,
-        });
-        handleWsBilldDeskJoin({ io, socket, roomId, data });
-      } catch (error) {
-        console.log(error);
-      }
-    });
 
     // 收到用户进入房间
     socket.on(WsMsgTypeEnum.join, async (data: WsJoinType) => {
@@ -213,48 +199,68 @@ export const connectWebSocket = (server) => {
           socket,
           roomId: Number(roomId),
         });
-        handleWsBatchSendOffer({ io, socket, roomId: Number(roomId), data });
+        handleWsBatchSendOffer({
+          io,
+          socket,
+          roomId: Number(roomId),
+          data,
+        });
       } catch (error) {
         console.log(error);
       }
     });
 
     // 收到主播开始直播
-    socket.on(WsMsgTypeEnum.startLive, (data: WsStartLiveType) => {
+    socket.on(WsMsgTypeEnum.startLive, async (data: WsStartLiveType) => {
       try {
         prettierInfoLog({
           msg: '收到主播开始直播',
           socket,
         });
-        handleWsStartLive({ io, socket, data });
+        await handleWsStartLive({ io, socket, data });
       } catch (error) {
         console.log(error);
       }
     });
 
     // 收到主播断开直播
-    socket.on(WsMsgTypeEnum.roomNoLive, (data: WsRoomNoLiveType) => {
+    socket.on(WsMsgTypeEnum.roomNoLive, async (data: WsRoomNoLiveType) => {
       try {
         prettierInfoLog({
           msg: '收到主播断开直播',
           socket,
           roomId: data.data.live_room_id,
         });
-        handleWsRoomNoLive({ socket, data });
+        await handleWsRoomNoLive({ socket, data });
       } catch (error) {
         console.log(error);
       }
     });
 
     // 收到用户发送消息
-    socket.on(WsMsgTypeEnum.message, (data: WsMessageType) => {
+    socket.on(WsMsgTypeEnum.message, async (data: WsMessageType) => {
       try {
         prettierInfoLog({
           msg: '收到用户发送消息',
           socket,
           roomId: data.data.live_room_id,
         });
-        handleWsMessage({ io, socket, data });
+        await handleWsMessage({ io, socket, data });
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
+    // 收到用户进入房间
+    socket.on(WsMsgTypeEnum.billdDeskJoin, (data: WsBilldDeskJoinType) => {
+      try {
+        const roomId = data.data.live_room_id;
+        prettierInfoLog({
+          msg: '收到用户进入房间',
+          socket,
+          roomId,
+        });
+        handleWsBilldDeskJoin({ io, socket, roomId, data });
       } catch (error) {
         console.log(error);
       }
@@ -431,9 +437,5 @@ export const connectWebSocket = (server) => {
         console.log(error);
       }
     });
-  });
-
-  io.of('/live').on(WsConnectStatusEnum.connection, () => {
-    console.log('live-ws');
   });
 };

@@ -2,7 +2,7 @@ import cryptojs from 'crypto-js';
 import * as tencentcloud from 'tencentcloud-sdk-nodejs';
 import { Client } from 'tencentcloud-sdk-nodejs/tencentcloud/services/live/v20180801/live_client';
 
-import { SRS_CB_URL_QUERY } from '@/constant';
+import { PROJECT_ENV, PROJECT_ENV_ENUM, SRS_CB_URL_QUERY } from '@/constant';
 import {
   TENCENTCLOUD_CSS,
   TENCENTCLOUD_SECRETID,
@@ -97,12 +97,13 @@ class TencentcloudCssClass {
    * 获取拉流地址。
    */
   getPullUrl = (data: { liveRoomId: number }) => {
-    const url = `${TENCENTCLOUD_CSS.PullDomain}/${TENCENTCLOUD_CSS.AppName}/roomId___${data.liveRoomId}`;
+    const http =
+      PROJECT_ENV === PROJECT_ENV_ENUM.development ? 'http' : 'https';
     return {
-      rtmp: `rtmp://${url}`,
-      flv: `https://${url}.flv`,
-      hls: `https://${url}.m3u8`,
-      webrtc: `webrtc://${url}`,
+      rtmp: `rtmp://${TENCENTCLOUD_CSS.PullDomain}/${TENCENTCLOUD_CSS.AppName}/roomId___${data.liveRoomId}`,
+      flv: `${http}://${TENCENTCLOUD_CSS.PullDomain}/${TENCENTCLOUD_CSS.AppName}/roomId___${data.liveRoomId}.flv`,
+      hls: `${http}://${TENCENTCLOUD_CSS.PullDomain}/${TENCENTCLOUD_CSS.AppName}/roomId___${data.liveRoomId}.m3u8`,
+      webrtc: `webrtc://${TENCENTCLOUD_CSS.PullDomain}/${TENCENTCLOUD_CSS.AppName}/roomId___${data.liveRoomId}`,
     };
   };
 
@@ -111,6 +112,8 @@ class TencentcloudCssClass {
    * https://cloud.tencent.com/document/product/267/32720
    */
   getPushUrl = (data: {
+    /** 1不需要鉴权，2需要鉴权 */
+    isdev: '1' | '2';
     liveRoomId: number;
     userId: number;
     key: string;
@@ -129,7 +132,9 @@ class TencentcloudCssClass {
       SRS_CB_URL_QUERY.roomId
     }=${data.liveRoomId}&${SRS_CB_URL_QUERY.publishType}=${data.type}&${
       SRS_CB_URL_QUERY.publishKey
-    }=${data.key}&${SRS_CB_URL_QUERY.userId}=${data.userId}`;
+    }=${data.key}&${SRS_CB_URL_QUERY.userId}=${data.userId}&${
+      SRS_CB_URL_QUERY.isdev
+    }=${data.isdev}`;
     return {
       rtmp_url: `rtmp://${TENCENTCLOUD_CSS.PushDomain}/${TENCENTCLOUD_CSS.AppName}/${key}`,
       obs_server: `rtmp://${TENCENTCLOUD_CSS.PushDomain}/${TENCENTCLOUD_CSS.AppName}/`,

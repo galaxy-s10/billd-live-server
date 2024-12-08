@@ -3,7 +3,7 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import { COMMON_HTTP_CODE } from '@/constant';
+import { COMMON_HTTP_CODE, PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import liveRoomController from '@/controller/liveRoom.controller';
 import srsController from '@/controller/srs.controller';
 import { IList, IUserLiveRoom, SwitchEnum } from '@/interface';
@@ -120,6 +120,7 @@ class UserLiveRoomController {
       liveRoomId: liveRoom.id!,
     });
     const pushUrlRes = srsController.common.getPushUrl({
+      isdev: PROJECT_ENV === PROJECT_ENV_ENUM.prod ? '2' : '1',
       userId: userInfo.id!,
       liveRoomId: liveRoom.id!,
       type: LiveRoomTypeEnum.srs,

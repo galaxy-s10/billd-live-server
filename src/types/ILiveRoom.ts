@@ -25,8 +25,16 @@ export enum LiveRoomTypeEnum {
   tencent_css_pk,
   /** 转推b站 */
   forward_bilibili,
-  /** 转推斗鱼 */
+  /** 转推虎牙 */
   forward_huya,
+  /** 转推斗鱼 */
+  forward_douyu,
+  /** 转推抖音 */
+  forward_douyin,
+  /** 转推抖音 */
+  forward_kuaishou,
+  /** 转推小红书 */
+  forward_xiaohongshu,
   /** 转推所有 */
   forward_all,
 }

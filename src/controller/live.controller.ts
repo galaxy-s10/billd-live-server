@@ -14,7 +14,9 @@ import { CustomError } from '@/model/customError.model';
 import liveService from '@/service/live.service';
 import { getForwardList, killPid } from '@/utils/process';
 
+import srsController from './srs.controller';
 import tencentcloudCssController from './tencentcloudCss.controller';
+import userLiveRoomController from './userLiveRoom.controller';
 
 class LiveController {
   common = {
@@ -178,7 +180,11 @@ class LiveController {
     },
 
     closeLive: async (liveRoomId: number) => {
-      const res = await tencentcloudCssController.common.closeLive({
+      const tencentcloudCssCloseRes =
+        await tencentcloudCssController.common.closeLive({
+          live_room_id: liveRoomId,
+        });
+      const srsCloseRes = await srsController.common.closeLive({
         live_room_id: liveRoomId,
       });
       nodeSchedule.cancelJob(`${SCHEDULE_TYPE.blobIsExist}___${liveRoomId}`);
@@ -186,7 +192,7 @@ class LiveController {
       if (fs.existsSync(roomDir)) {
         rimrafSync(roomDir);
       }
-      return res;
+      return { tencentcloudCssCloseRes, srsCloseRes };
     },
 
     create: async ({
@@ -259,13 +265,23 @@ class LiveController {
     await next();
   };
 
-  closeLive = async (ctx: ParameterizedContext, next) => {
+  closeMyLive = async (ctx: ParameterizedContext, next) => {
     const { code, userInfo, msg } = await authJwt(ctx);
     if (code !== COMMON_HTTP_CODE.success || !userInfo) {
       throw new CustomError(msg, code, code);
     }
-
-    successHandler({ ctx });
+    const liveRoom = await userLiveRoomController.common.findByUserId(
+      userInfo.id || -1
+    );
+    if (!liveRoom) {
+      throw new CustomError(
+        `你还没有开通直播间！`,
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
+      );
+    }
+    const res = await this.common.closeLive(liveRoom.id!);
+    successHandler({ ctx, data: res });
     await next();
   };
 

@@ -2,7 +2,12 @@ import { getRandomString } from 'billd-utils';
 import { ParameterizedContext } from 'koa';
 
 import successHandler from '@/app/handler/success-handle';
-import { COMMON_HTTP_CODE, THIRD_PLATFORM } from '@/constant';
+import {
+  COMMON_HTTP_CODE,
+  PROJECT_ENV,
+  PROJECT_ENV_ENUM,
+  THIRD_PLATFORM,
+} from '@/constant';
 import liveRoomController from '@/controller/liveRoom.controller';
 import srsController from '@/controller/srs.controller';
 import userController from '@/controller/user.controller';
@@ -175,12 +180,14 @@ class InitController {
         if (!liveRoomIsExist) {
           const pushKey = getRandomString(6);
           const srsPushRes = srsController.common.getPushUrl({
+            isdev: PROJECT_ENV === PROJECT_ENV_ENUM.prod ? '2' : '1',
             userId: user_id,
             liveRoomId: live_room.id!,
             type: live_room.type!,
             key: pushKey,
           });
           const cdnPushRes = tencentcloudCssUtils.getPushUrl({
+            isdev: PROJECT_ENV === PROJECT_ENV_ENUM.prod ? '2' : '1',
             userId: user_id,
             liveRoomId: live_room.id!,
             type: live_room.type!,
@@ -471,6 +478,7 @@ class InitController {
         liveRoomId: item.live_room_id!,
       });
       const srsPushRes = srsController.common.getPushUrl({
+        isdev: PROJECT_ENV === PROJECT_ENV_ENUM.prod ? '2' : '1',
         userId: item.user_id!,
         liveRoomId: item.live_room_id!,
         type: LiveRoomTypeEnum.system,
@@ -480,6 +488,7 @@ class InitController {
         liveRoomId: item.live_room_id!,
       });
       const cdnPushRes = tencentcloudCssUtils.getPushUrl({
+        isdev: PROJECT_ENV === PROJECT_ENV_ENUM.prod ? '2' : '1',
         userId: item.user_id!,
         liveRoomId: item.live_room_id!,
         type: LiveRoomTypeEnum.tencent_css,

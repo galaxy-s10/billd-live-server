@@ -7,6 +7,8 @@ import liveRedisController from '@/config/websocket/live-redis.controller';
 import {
   COMMON_HTTP_CODE,
   DEFAULT_AUTH_INFO,
+  PROJECT_ENV,
+  PROJECT_ENV_ENUM,
   SRS_CB_URL_QUERY,
 } from '@/constant';
 import liveController from '@/controller/live.controller';
@@ -21,10 +23,13 @@ import {
   ITencentcloudCssUnPublishCb,
 } from '@/types/srs';
 import { WsMsgTypeEnum } from '@/types/websocket';
-import { strSlice } from '@/utils';
+import { getForwardMapUrl, strSlice } from '@/utils';
 import { liveRoomVerifyAuth } from '@/utils/business';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
+import { forwardThirdPartyLiveStreaming } from '@/utils/process';
 import { tencentcloudCssUtils } from '@/utils/tencentcloud-css';
+
+import srsController from './srs.controller';
 
 class TencentcloudCssController {
   allowDev = true;
@@ -82,6 +87,7 @@ class TencentcloudCssController {
         Number(liveRoomId)
       );
     const pushRes = tencentcloudCssUtils.getPushUrl({
+      isdev: PROJECT_ENV === PROJECT_ENV_ENUM.prod ? '2' : '1',
       userId: authRes.userInfo.id!,
       liveRoomId,
       type: userLiveRoomInfo?.live_room?.type || LiveRoomTypeEnum.tencent_css,
@@ -143,6 +149,11 @@ class TencentcloudCssController {
     console.log(chalkWARN(`tencentcloud_css on_publish`), body);
     try {
       if (body.errcode !== 0) {
+        console.log(
+          chalkERROR(
+            `[tencentcloud_css on_publish] 推流错误，errcode: ${body.errcode}`
+          )
+        );
         successHandler({
           ctx,
           data: `[tencentcloud_css on_publish] 推流错误，errcode: ${body.errcode}`,
@@ -154,35 +165,37 @@ class TencentcloudCssController {
       const roomId = reg.exec(body.stream_id)?.[1];
       const params = new URLSearchParams(body.stream_param);
       const publishKey = params.get(SRS_CB_URL_QUERY.publishKey);
+      const publishType = params.get(SRS_CB_URL_QUERY.publishType);
       const userId = params.get(SRS_CB_URL_QUERY.userId);
       const isdev = params.get(SRS_CB_URL_QUERY.isdev);
-      let authRes;
+      const authRes = await liveRoomVerifyAuth({ roomId, publishKey });
+      const { liveRoomInfo } = authRes;
       if (this.allowDev && isdev === '1') {
         console.log(
           chalkSUCCESS(`[tencentcloud_css on_publish] 开发模式，不鉴权`)
         );
-        successHandler({
-          ctx,
-          data: '[tencentcloud_css on_publish] 开发模式，不鉴权',
-        });
-        await next();
+      } else if (authRes.code !== 0) {
+        console.log(chalkERROR(`[tencentcloud_css on_publish] ${authRes.msg}`));
+        return;
       } else {
-        const res = await liveRoomVerifyAuth({ roomId, publishKey });
-        authRes = res;
-        if (res.code === 0) {
-          console.log(chalkSUCCESS(`[tencentcloud_css on_publish] ${res.msg}`));
-        } else {
-          console.log(chalkERROR(`[tencentcloud_css on_publish] ${res.msg}`));
-          return;
-        }
+        console.log(
+          chalkSUCCESS(`[tencentcloud_css on_unpublish] ${authRes.msg}`)
+        );
       }
       const isLiving = await liveController.common.findByLiveRoomId(
         Number(roomId)
       );
       if (isLiving) {
+        console.log(
+          chalkERROR(
+            `[tencentcloud_css on_publish] 房间id：${Number(roomId)}，正在直播`
+          )
+        );
         successHandler({
           ctx,
-          data: '[tencentcloud_css on_publish] 正在直播',
+          data: `[tencentcloud_css on_publish] 房间id：${Number(
+            roomId
+          )}，正在直播`,
         });
         await next();
         return;
@@ -206,6 +219,102 @@ class TencentcloudCssController {
         live_room_id: Number(roomId),
         user_id: Number(userId || -1),
       });
+      if (
+        [
+          LiveRoomTypeEnum.forward_all,
+          LiveRoomTypeEnum.forward_bilibili,
+          LiveRoomTypeEnum.forward_douyin,
+          LiveRoomTypeEnum.forward_douyu,
+          LiveRoomTypeEnum.forward_huya,
+          LiveRoomTypeEnum.forward_kuaishou,
+          LiveRoomTypeEnum.forward_xiaohongshu,
+        ].includes(Number(publishType))
+      ) {
+        if (liveRoomInfo) {
+          if (liveRoomInfo.cdn === SwitchEnum.no) {
+            let index = 0;
+            const max = 30;
+            const timer = setInterval(() => {
+              if (index > max) {
+                clearInterval(timer);
+              }
+              index += 1;
+              // 根据body.stream_id，轮询判断查找流里面的audio，audio有值了，再转推流
+              srsController.common
+                .getApiV1StreamsDetail(body.stream_id)
+                .then((res1) => {
+                  if (res1 && res1.stream?.video && res1.stream?.audio) {
+                    clearInterval(timer);
+                    console.log(chalkSUCCESS('开始使用srs转推'));
+                    if (Number(publishType) === LiveRoomTypeEnum.forward_all) {
+                      [
+                        LiveRoomTypeEnum.forward_bilibili,
+                        LiveRoomTypeEnum.forward_douyin,
+                        LiveRoomTypeEnum.forward_douyu,
+                        LiveRoomTypeEnum.forward_huya,
+                        LiveRoomTypeEnum.forward_kuaishou,
+                        LiveRoomTypeEnum.forward_xiaohongshu,
+                      ].forEach((item) => {
+                        forwardThirdPartyLiveStreaming({
+                          platform: Number(publishType),
+                          localFlv: liveRoomInfo?.pull_flv_url || '',
+                          remoteRtmp: getForwardMapUrl({
+                            liveRoom: liveRoomInfo,
+                          })[item],
+                        });
+                      });
+                    } else {
+                      forwardThirdPartyLiveStreaming({
+                        platform: Number(publishType),
+                        localFlv: liveRoomInfo?.pull_flv_url || '',
+                        remoteRtmp: getForwardMapUrl({
+                          liveRoom: liveRoomInfo,
+                        })[Number(publishType)],
+                      });
+                    }
+                  } else {
+                    console.log(chalkWARN('缺少音频或视频轨，暂不使用srs转推'));
+                  }
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            }, 1000);
+          } else {
+            console.log(chalkSUCCESS('开始使用cdn转推'));
+            if (Number(publishType) === LiveRoomTypeEnum.forward_all) {
+              [
+                LiveRoomTypeEnum.forward_bilibili,
+                LiveRoomTypeEnum.forward_douyin,
+                LiveRoomTypeEnum.forward_douyu,
+                LiveRoomTypeEnum.forward_huya,
+                LiveRoomTypeEnum.forward_kuaishou,
+                LiveRoomTypeEnum.forward_xiaohongshu,
+              ].forEach((item) => {
+                forwardThirdPartyLiveStreaming({
+                  platform: Number(publishType),
+                  localFlv: liveRoomInfo?.pull_cdn_flv_url || '',
+                  remoteRtmp: getForwardMapUrl({
+                    liveRoom: liveRoomInfo,
+                  })[item],
+                });
+              });
+            } else {
+              forwardThirdPartyLiveStreaming({
+                platform: Number(publishType),
+                localFlv: liveRoomInfo?.pull_cdn_flv_url || '',
+                remoteRtmp: getForwardMapUrl({
+                  liveRoom: liveRoomInfo,
+                })[Number(publishType)],
+              });
+            }
+          }
+        } else {
+          console.warn(chalkWARN('不存在直播间信息不转推'));
+        }
+      } else {
+        console.log(chalkWARN(`非转推直播间`));
+      }
       wsSocket.io
         ?.to(`${roomId!}`)
         .emit(WsMsgTypeEnum.roomLiving, { live_room_id: roomId });
@@ -224,8 +333,7 @@ class TencentcloudCssController {
       });
       successHandler({
         ctx,
-        // eslint-disable-next-line
-        data: `[tencentcloud_css on_publish] ${authRes.msg}`,
+        data: `[tencentcloud_css on_publish] ${String(authRes?.msg)}`,
       });
       await next();
     } catch (error) {
@@ -248,32 +356,30 @@ class TencentcloudCssController {
       const params = new URLSearchParams(body.stream_param);
       const publishKey = params.get(SRS_CB_URL_QUERY.publishKey);
       const isdev = params.get(SRS_CB_URL_QUERY.isdev);
-      let authRes;
+      const authRes = await liveRoomVerifyAuth({ roomId, publishKey });
       if (this.allowDev && isdev === '1') {
         console.log(
           chalkSUCCESS(`[tencentcloud_css on_unpublish] 开发模式，不鉴权`)
         );
-        successHandler({
-          ctx,
-          data: '[tencentcloud_css on_unpublish] 开发模式，不鉴权',
-        });
-        await next();
+      } else if (authRes.code !== 0) {
+        console.log(
+          chalkERROR(`[tencentcloud_css on_unpublish] ${authRes.msg}`)
+        );
+        return;
       } else {
-        const res = await liveRoomVerifyAuth({ roomId, publishKey });
-        authRes = res;
-        if (res.code === 0) {
-          console.log(
-            chalkSUCCESS(`[tencentcloud_css on_unpublish] ${res.msg}`)
-          );
-        } else {
-          console.log(chalkERROR(`[tencentcloud_css on_unpublish] ${res.msg}`));
-          return;
-        }
+        console.log(
+          chalkSUCCESS(`[tencentcloud_css on_unpublish] ${authRes.msg}`)
+        );
       }
       const liveRes = await liveController.common.findLiveRecordByLiveRoomId(
         Number(roomId)
       );
       if (!liveRes) {
+        console.log(
+          chalkERROR(
+            `[tencentcloud_css on_unpublish] 房间id：${roomId!}，没在直播`
+          )
+        );
         successHandler({
           ctx,
           data: `[tencentcloud_css on_unpublish] 房间id：${roomId!}，没在直播`,
@@ -287,8 +393,7 @@ class TencentcloudCssController {
       wsSocket.io?.to(`${roomId!}`).emit(WsMsgTypeEnum.roomNoLive);
       successHandler({
         ctx,
-        // eslint-disable-next-line
-        data: `[tencentcloud_css on_unpublish] ${authRes.msg}`,
+        data: `[tencentcloud_css on_unpublish] ${String(authRes?.msg)}`,
       });
       await next();
     } catch (error) {

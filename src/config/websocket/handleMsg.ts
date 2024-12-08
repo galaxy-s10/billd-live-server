@@ -564,8 +564,6 @@ export async function handleWsStartLive(args: {
   }
 }
 
-// ======
-
 export async function handleWsBilldDeskJoin(args: {
   io: Server;
   socket: Socket;

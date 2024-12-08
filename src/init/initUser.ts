@@ -157,7 +157,7 @@ export const initLiveRoom = {
     type: LiveRoomTypeEnum.system,
     area: [1],
     devFFmpeg: false, // 初始化ffmpeg
-    prodFFmpeg: true, // 初始化ffmpeg
+    prodFFmpeg: false, // 初始化ffmpeg
     devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),
     prodFFmpegLocalFile: path.resolve(
       SERVER_VIDEO_DIR,

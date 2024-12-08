@@ -247,7 +247,6 @@ class LiveRoomService {
   /** 查找直播间key */
   async findKey(id: number) {
     const result = await liveRoomModel.findOne({
-      attributes: ['key'],
       where: { id },
     });
     return result;

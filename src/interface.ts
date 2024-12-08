@@ -779,3 +779,12 @@ export interface IPushRes {
   srsPushRes: IStreamKey;
   cdnPushRes: IStreamKey;
 }
+
+export enum IThirdPartyLiveStreamingPlatformEnum {
+  bilibili = 'bilibili',
+  douyu = 'douyu',
+  huya = 'huya',
+  douyin = 'douyin',
+  kuaishou = 'kuaishou',
+  xiaohongshu = 'xiaohongshu',
+}
