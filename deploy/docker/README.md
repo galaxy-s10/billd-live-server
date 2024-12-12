@@ -32,12 +32,3 @@ user billd_live_redis_test on #874b810175570e2b33e44677fee1ce30c5c83282034b047db
 # SRS 配置文件
 
 ## conf/rtc2rtmp
-
-```
-# TIP http回调
-  http_hooks {
-    enabled on;
-    on_publish http://192.168.1.102:4300/live_room/publish;
-    on_unpublish http://192.168.1.102:4300/live_room/unpublish;
-  }
-```
