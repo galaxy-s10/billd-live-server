@@ -104,7 +104,7 @@ class UserLiveRoomController {
       );
     }
 
-    const key = getRandomString(30);
+    const key = getRandomString(20);
     const liveRoom = await liveRoomController.common.create({
       name: `${userInfo.username!.slice(0, 10)}的直播间`,
       key,

@@ -122,6 +122,16 @@ class UserService {
     return result;
   }
 
+  async findAll(ids: number[]) {
+    const result = await userModel.findAll({
+      attributes: {
+        exclude: ['password', 'token'],
+      },
+      where: { id: ids },
+    });
+    return result;
+  }
+
   /** 根据id查找用户（password和token都不返回） */
   async find(id: number) {
     const result = await userModel.findOne({

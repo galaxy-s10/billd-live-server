@@ -5,6 +5,7 @@ import { LIVE_ROOM_MODEL_EXCLUDE } from '@/constant';
 import { IList } from '@/interface';
 import areaModel from '@/model/area.model';
 import liveModel from '@/model/live.model';
+import liveRecordModel from '@/model/liveRecord.model';
 import liveRoomModel from '@/model/liveRoom.model';
 import userModel from '@/model/user.model';
 import userLiveRoomModel from '@/model/userLiveRoom.model';
@@ -169,6 +170,17 @@ class LiveRoomService {
   }
 
   /** 查找直播间 */
+  async findAll(ids: number[]) {
+    const result = await liveRoomModel.findAll({
+      attributes: {
+        exclude: LIVE_ROOM_MODEL_EXCLUDE,
+      },
+      where: { id: ids },
+    });
+    return result;
+  }
+
+  /** 查找直播间 */
   async find(id: number) {
     const result = await liveRoomModel.findOne({
       include: [
@@ -183,6 +195,11 @@ class LiveRoomService {
         },
         {
           model: liveModel,
+          include: [
+            {
+              model: liveRecordModel,
+            },
+          ],
         },
         {
           model: areaModel,
@@ -254,6 +271,7 @@ class LiveRoomService {
 
   /** 查找直播间key */
   async findKey2(id: number) {
+    f;
     const result = await liveRoomModel.findOne({
       attributes: LIVE_ROOM_MODEL_EXCLUDE,
       where: { id },

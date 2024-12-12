@@ -233,7 +233,7 @@ pnpm i billd-utils@latest billd-scss@latest billd-html-webpack-plugin@latest
 
 > 本地必须要有 docker、ffmpeg 环境！
 >
-> 项目启动后，会在项目的 src/secret/目录下生成 secret.ts 文件，请填写里面的信息，MYSQL_CONFIG、REDIS_CONFIG、SRS_CONFIG 必填！
+> 项目启动后，会在项目的 src/secret/目录下生成 ssecret-dev、ecret-beta、secret-prod 文件，请填写里面的信息，MYSQL_CONFIG、REDIS_CONFIG、RABBITMQ_CONFIG、SRS_CONFIG 必填！
 
 ```bash
 # 1.初始化docker容器

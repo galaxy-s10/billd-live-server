@@ -6,7 +6,7 @@ import qiniu from 'qiniu';
 
 import {
   QINIU_UPLOAD_PROGRESS_TYPE,
-  REDIS_PREFIX,
+  REDIS_KEY,
   STATIC_DIR,
   UPLOAD_DIR,
 } from '@/constant';
@@ -192,7 +192,7 @@ class QiniuUtils {
     putExtra.progressCallback = (uploadBytes: number, totalBytes: number) => {
       console.log('progressCallback', uploadBytes, totalBytes);
       redisController.setExVal({
-        prefix: REDIS_PREFIX.fileProgress,
+        prefix: REDIS_KEY.fileProgress,
         key: hash,
         value: {
           type: QINIU_UPLOAD_PROGRESS_TYPE.chunkFileProgress,

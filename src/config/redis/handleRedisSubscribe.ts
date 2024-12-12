@@ -1,28 +1,32 @@
-import { pubClient } from '@/config/redis/pub';
+import { subClient } from '@/config/redis/subscribe';
 import liveRedisController from '@/config/websocket/live-redis.controller';
-import { REDIS_PREFIX } from '@/constant';
+import { REDIS_CHANNEL, REDIS_KEY, REDIS_PREFIX_ENV } from '@/constant';
 import liveController from '@/controller/live.controller';
 import liveRecordController from '@/controller/liveRecord.controller';
+import logController from '@/controller/log.controller';
 import orderController from '@/controller/order.controller';
 import srsController from '@/controller/srs.controller';
 import tencentcloudCssController from '@/controller/tencentcloudCss.controller';
 import { REDIS_CONFIG } from '@/secret/secret';
-import { chalkINFO, chalkWARN } from '@/utils/chalkTip';
+import { chalkINFO } from '@/utils/chalkTip';
 
-export const handleRedisKeyExpired = () => {
-  pubClient.subscribe(
+export const handleRedisSubscribe = () => {
+  // 订阅过期事件
+  subClient.subscribe(
     `__keyevent@${REDIS_CONFIG.database}__:expired`,
-    async (redisKey, subscribeName) => {
-      console.log(chalkWARN('过期key监听'), redisKey, subscribeName);
+    async (expiredKey) => {
+      function handleKey(key: string) {
+        const res = expiredKey.replace(key, '');
+        console.log(
+          chalkINFO(`redis key过期：${key.replace(REDIS_PREFIX_ENV, '')}`),
+          res
+        );
+        return res;
+      }
       try {
         // tencentcloudCssPublishing过期
-        if (redisKey.indexOf(REDIS_PREFIX.tencentcloudCssPublishing) === 0) {
-          const key = redisKey.replace(
-            `${REDIS_PREFIX.tencentcloudCssPublishing}`,
-            ''
-          );
-          console.log(chalkINFO('tencentcloudCssPublishing过期'), key);
-          // key: `${data.data.live_room_id}___${data.data.live_record_id}___${data.data.live_id}`,
+        if (expiredKey.indexOf(REDIS_KEY.tencentcloudCssPublishing) === 0) {
+          const key = handleKey(REDIS_KEY.tencentcloudCssPublishing);
           const keyArr = key.split('___');
           const live_room_id = Number(keyArr[0]);
           const live_record_id = Number(keyArr[1]);
@@ -54,10 +58,8 @@ export const handleRedisKeyExpired = () => {
         }
 
         // srsPublishing过期
-        if (redisKey.indexOf(REDIS_PREFIX.srsPublishing) === 0) {
-          const key = redisKey.replace(`${REDIS_PREFIX.srsPublishing}`, '');
-          console.log(chalkINFO('srsPublishing过期'), key);
-          // key: `${data.data.live_room_id}___${data.data.live_record_id}___${data.data.live_id}`,
+        if (expiredKey.indexOf(REDIS_KEY.srsPublishing) === 0) {
+          const key = handleKey(REDIS_KEY.srsPublishing);
           const keyArr = key.split('___');
           const live_room_id = Number(keyArr[0]);
           const live_record_id = Number(keyArr[1]);
@@ -87,9 +89,8 @@ export const handleRedisKeyExpired = () => {
         }
 
         // rtcLiving过期
-        if (redisKey.indexOf(REDIS_PREFIX.rtcLiving) === 0) {
-          const key = redisKey.replace(`${REDIS_PREFIX.rtcLiving}`, '');
-          console.log(chalkINFO('rtcLiving过期'), key);
+        if (expiredKey.indexOf(REDIS_KEY.rtcLiving) === 0) {
+          const key = handleKey(REDIS_KEY.rtcLiving);
           // key: `${data.data.live_room_id}___${data.data.live_record_id}___${data.data.live_id}`,
           const keyArr = key.split('___');
           const live_room_id = Number(keyArr[0]);
@@ -107,33 +108,32 @@ export const handleRedisKeyExpired = () => {
         }
 
         // joined过期
-        if (redisKey.indexOf(REDIS_PREFIX.joined) === 0) {
-          const key = redisKey.replace(`${REDIS_PREFIX.joined}`, '');
-          console.log(chalkINFO('joined过期'), key);
-          const keyArr = key.split('___');
-          const userId = keyArr[0];
-          const roomId = keyArr[1];
-          await liveRedisController.delLiveRoomOnlineUser({
-            roomId: Number(roomId),
-            userId,
-          });
+        if (expiredKey.indexOf(REDIS_KEY.joined) === 0) {
+          handleKey(REDIS_KEY.joined);
+          // const keyArr = key.split('___');
+          // const roomId = keyArr[0];
+          // const userId = keyArr[1];
         }
 
         // 订单过期
-        if (redisKey.indexOf(REDIS_PREFIX.order) === 0) {
-          const key = redisKey.replace(`${REDIS_PREFIX.order}`, '');
-          console.log(chalkINFO('订单过期'), key);
+        if (expiredKey.indexOf(REDIS_KEY.order) === 0) {
+          const key = handleKey(REDIS_KEY.order);
           await orderController.common.getPayStatus(key, true);
-        }
-
-        // 房间不直播了
-        if (redisKey.indexOf(REDIS_PREFIX.roomIsLiveing) === 0) {
-          const key = redisKey.replace(`${REDIS_PREFIX.roomIsLiveing}`, '');
-          console.log(chalkINFO('房间不直播了'), key);
         }
       } catch (error) {
         console.log(error);
       }
     }
   );
+
+  // 订阅频道
+  subClient.subscribe(REDIS_CHANNEL.writeDbLog, (message, channel) => {
+    console.log(chalkINFO(`订阅${channel}`));
+    try {
+      const data = JSON.parse(message);
+      logController.common.create(data).catch();
+    } catch (error) {
+      console.log(error);
+    }
+  });
 };

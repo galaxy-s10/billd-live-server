@@ -2,7 +2,7 @@ import { prodDomain } from './spec-config';
 import { resolveApp } from './utils';
 
 export enum PROJECT_ENV_ENUM {
-  development = 'development',
+  dev = 'dev',
   prod = 'prod',
   beta = 'beta',
 }
@@ -161,21 +161,16 @@ export const SCHEDULE_TYPE = {
 
 export const REDIS_PREFIX_ENV = `${PROJECT_NAME}-${PROJECT_ENV}-`;
 
-// redis前缀
-export const REDIS_PREFIX = {
+// redis key前缀
+export const REDIS_KEY = {
   emailLogin: `${REDIS_PREFIX_ENV}emailLogin___`, // 邮箱登录
   emailRegister: `${REDIS_PREFIX_ENV}emailRegister___`, // 邮箱注册
   userBindEmail: `${REDIS_PREFIX_ENV}userBindEmail___`, // 用户绑定邮箱
   userCancelBindEmail: `${REDIS_PREFIX_ENV}userCancelBindEmail___`, // 用户取消绑定邮箱
   joined: `${REDIS_PREFIX_ENV}joined___`, // 用户加入了房间
-  roomIsLiveing: `${REDIS_PREFIX_ENV}roomIsLiveing___`, // 主播正在直播
   order: `${REDIS_PREFIX_ENV}order___`, // 订单
   fileProgress: `${REDIS_PREFIX_ENV}fileProgress___`, // 文件上传进度
   qrCodeLogin: `${REDIS_PREFIX_ENV}qrCodeLogin___`, // 二维码登录
-  disableSpeaking: `${REDIS_PREFIX_ENV}disableSpeaking___`, // 禁言用户
-  kick: `${REDIS_PREFIX_ENV}kick___`, // 踢掉用户
-  liveRoomOnlineUser: `${REDIS_PREFIX_ENV}liveRoomOnlineUser___`, // 直播间在线用户
-  socketIdJoinLiveRoom: `${REDIS_PREFIX_ENV}socketIdJoinLiveRoom___`,
   livePkKey: `${REDIS_PREFIX_ENV}livePkKey___`, // 直播间打pk秘钥
   dbLiveList: `${REDIS_PREFIX_ENV}dbLiveList___`, // 直播间在线列表
   dbLiveRoomHistoryMsgList: `${REDIS_PREFIX_ENV}dbLiveRoomHistoryMsgList___`, // 直播间历史消息
@@ -185,6 +180,16 @@ export const REDIS_PREFIX = {
   srsPublishing: `${REDIS_PREFIX_ENV}srsPublishing___`,
   rtcLiving: `${REDIS_PREFIX_ENV}rtcLiving___`,
   keepJoined: `${REDIS_PREFIX_ENV}keepJoined___`, // 用户加入了房间
+};
+
+// redis 频道
+export const REDIS_CHANNEL = {
+  writeDbLog: `${REDIS_PREFIX_ENV}writeDbLog___`,
+};
+
+// rabbitmq 频道
+export const RABBITMQ_CHANNEL = {
+  order: `${REDIS_PREFIX_ENV}order___`,
 };
 
 export const IS_UPLOAD_SERVER = !(PROJECT_ENV === PROJECT_ENV_ENUM.prod); // 是否上传到服务器

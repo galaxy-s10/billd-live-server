@@ -5,8 +5,10 @@ import './init/initFile';
 import { performance } from 'perf_hooks';
 
 import { connectMysql } from '@/config/mysql';
+import { connectRabbitMQ } from '@/config/rabbitmq';
 import { connectRedis } from '@/config/redis';
-import { createRedisPubSub } from '@/config/redis/pub';
+import { connectRedisPub } from '@/config/redis/publish';
+import { connectRedisSub } from '@/config/redis/subscribe';
 import {
   PROJECT_ENV,
   PROJECT_INIT_MYSQL,
@@ -21,6 +23,9 @@ import {
   chalkSUCCESS,
   chalkWARN,
 } from '@/utils/chalkTip';
+
+import { connectRabbitMQConsumer } from './config/rabbitmq/consumer';
+import { connectRabbitMQProducer } from './config/rabbitmq/producer';
 
 const start = performance.now();
 
@@ -52,10 +57,14 @@ async function main() {
     await Promise.all([
       connectMysql(), // 连接mysql
       connectRedis(), // 连接redis
-      createRedisPubSub(), // 创建redis的发布订阅
+      connectRedisPub(), // 连接redis的发布
+      connectRedisSub(), // 连接redis的订阅
+      connectRabbitMQ(), // 连接rabbitmq
+      connectRabbitMQProducer(), // 连接rabbitmq的生产者
+      connectRabbitMQConsumer(), // 连接rabbitmq的消费者
     ]);
   } catch (error) {
-    console.log(chalkERROR('mysql或redis初始化失败！'));
+    console.log(chalkERROR('rabbitmq、mysql、redis初始化失败！'));
     console.log(error);
     // 触发pm2的重启进程
     process.exit(1);

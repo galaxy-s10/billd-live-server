@@ -19,7 +19,7 @@ export function loadAllRoutes(app) {
   const err: string[] = [];
   fs.readdirSync(__dirname).forEach((file) => {
     try {
-      if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
+      if (PROJECT_ENV === PROJECT_ENV_ENUM.dev) {
         if (file === 'index.ts') return;
       } else if (PROJECT_ENV === PROJECT_ENV_ENUM.beta) {
         if (file === 'index.ts') return;

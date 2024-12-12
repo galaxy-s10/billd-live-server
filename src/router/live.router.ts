@@ -10,7 +10,15 @@ liveRouter.get('/list', liveController.getList);
 
 liveRouter.get('/pure_list', liveController.getPureList);
 
-liveRouter.get('/live_room_online_user', liveController.getLiveUser);
+liveRouter.get(
+  '/live_room_online_user/:live_room_id',
+  liveController.getLiveRoomOnlineUser
+);
+
+liveRouter.get(
+  '/all_live_room_online_user',
+  liveController.getAllLiveRoomOnlineUser
+);
 
 // 删除在线列表的重复直播间
 liveRouter.get('/list_duplicate_removal', liveController.listDuplicateRemoval);

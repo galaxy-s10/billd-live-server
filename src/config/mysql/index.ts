@@ -45,7 +45,7 @@ async function createDb() {
     { logging: false }
   );
   console.log(chalkSUCCESS(`新建${dbName}数据库成功！`));
-  await initDb('alert', sequelize);
+  await initDb('alter', sequelize);
   await initSequelize.close();
 }
 
@@ -66,7 +66,8 @@ export const connectMysql = async (init = false) => {
   await sequelize.authenticate({ logging: false });
   loadAllModel();
   require('@/model/relation');
-  // await initDb('alert', sequelize);
+  // await initDb('alter-1', sequelize);
+  // await initDb('alter', sequelize);
   // await initDb('force', sequelize);
   // await (
   //   await import('../../controller/init.controller')

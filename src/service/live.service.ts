@@ -19,7 +19,7 @@ import {
 export async function handleDelRedisByDbLiveList() {
   // try {
   //   await redisController.delByPrefix({
-  //     prefix: REDIS_PREFIX.dbLiveList,
+  //     prefix: REDIS_KEY.dbLiveList,
   //   });
   // } catch (error) {
   //   console.log(error);

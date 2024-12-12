@@ -9,7 +9,7 @@ export const dockerRunRabbitMQ = (init = true) => {
 
   // let isRunning = false;
 
-  // if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
+  // if (PROJECT_ENV === PROJECT_ENV_ENUM.dev) {
   //   try {
   //     execSync(`docker ps -a | grep ${RABBITMQ_CONFIG.docker.container}`);
   //     isRunning = true;

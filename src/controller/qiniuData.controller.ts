@@ -21,7 +21,7 @@ import {
   LOCALHOST_URL,
   PROJECT_PORT,
   QINIU_UPLOAD_PROGRESS_TYPE,
-  REDIS_PREFIX,
+  REDIS_KEY,
   STATIC_DIR,
   UPLOAD_DIR,
 } from '@/constant';
@@ -218,7 +218,7 @@ class QiniuController {
         const percentage = ((num / +chunkTotal) * 100) / 2;
 
         await this.setUploadProgress({
-          prefix: REDIS_PREFIX.fileProgress,
+          prefix: REDIS_KEY.fileProgress,
           key: hash,
           value: {
             type: QINIU_UPLOAD_PROGRESS_TYPE.chunkFileProgress,
@@ -425,7 +425,7 @@ class QiniuController {
       });
     } else {
       const redisData = await redisController.getVal({
-        prefix: REDIS_PREFIX.fileProgress,
+        prefix: REDIS_KEY.fileProgress,
         key: hash,
       });
       if (redisData) {

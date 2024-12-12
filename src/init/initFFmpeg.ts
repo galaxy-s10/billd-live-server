@@ -69,7 +69,7 @@ async function addLive({
     await srsController.common.closeLive({ live_room_id });
     await tencentcloudCssController.common.closeLive({ live_room_id });
     if (
-      (PROJECT_ENV === PROJECT_ENV_ENUM.development && devFFmpeg) ||
+      (PROJECT_ENV === PROJECT_ENV_ENUM.dev && devFFmpeg) ||
       (PROJECT_ENV === PROJECT_ENV_ENUM.beta && devFFmpeg) ||
       (PROJECT_ENV === PROJECT_ENV_ENUM.prod && prodFFmpeg)
     ) {
@@ -93,7 +93,7 @@ async function addLive({
       // const { pid } = ffmpegCmd;
       // console.log(chalkWARN('ffmpeg进程pid'), pid);
       let localFile = '';
-      if (PROJECT_ENV === PROJECT_ENV_ENUM.development && devFFmpeg) {
+      if (PROJECT_ENV === PROJECT_ENV_ENUM.dev && devFFmpeg) {
         localFile = devFFmpegLocalFile;
       } else if (PROJECT_ENV === PROJECT_ENV_ENUM.beta && devFFmpeg) {
         localFile = devFFmpegLocalFile;
@@ -200,7 +200,7 @@ export const initFFmpeg = async (init = true) => {
   // 开发环境的nodemon热更新会导致每次重启后执行initFFmpeg重新推流，但是重启node进程会导致之前的initFFmpeg子进程断掉，也就是会断开推流，导致触发on_publish。
   // 因为断开流的on_publish有延迟，所以重启后执行initFFmpeg了，触发onpublish了，过一会才收到了之前的on_publish，导致出问题（on_publish里会删掉数据库live表的记录）
   // 因此干脆重启一下srs容器？但重启太耗性能了，搞个延迟执行临时解决下先
-  // if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
+  // if (PROJECT_ENV === PROJECT_ENV_ENUM.dev) {
   //   setTimeout(() => {
   //     console.log(chalkWARN('两秒后初始化FFmpeg推流'));
   //   }, 500);

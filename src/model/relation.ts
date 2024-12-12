@@ -22,6 +22,11 @@ import WalletModel from '@/model/wallet.model';
 import WechatUserModel from '@/model/wechatUser.model';
 import WsMessageModel from '@/model/wsMessage.model';
 
+LiveModel.belongsTo(LiveRecordModel, {
+  foreignKey: 'live_record_id',
+  constraints: false,
+});
+
 LiveViewModel.belongsTo(UserModel, {
   foreignKey: 'user_id',
   constraints: false,

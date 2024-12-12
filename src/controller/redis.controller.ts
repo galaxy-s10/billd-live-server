@@ -36,7 +36,6 @@ class RedisController {
     return redisClient.set(
       `${data.prefix}${data.key}`,
       JSON.stringify({
-        created_at: +new Date(),
         value: data.value,
       })
     );
@@ -48,33 +47,23 @@ class RedisController {
     value: any;
     /** 有效期，单位：秒 */
     exp: number;
-    client_ip?: string;
   }) => {
     return redisClient.setEx(
       `${data.prefix}${data.key}`,
       data.exp,
       JSON.stringify({
-        created_at: +new Date(),
-        client_ip: data.client_ip || '',
         value: data.value,
       })
     );
   };
 
-  setHashVal = (data: {
-    key: string;
-    field: string;
-    value: any;
-    client_ip: string;
-  }) => {
+  setHashVal = (data: { key: string; field: string; value: any }) => {
     // 执行HSET命令并指定已存在的字段，那么这个字段的值会被新值覆盖。
     // 你不希望覆盖已存在的字段的值，你可以使用hSetNX命令，这个命令只有在指定的字段不存在时，才会设置值。
     return redisClient.hSet(
       data.key,
       data.field,
       JSON.stringify({
-        created_at: +new Date(),
-        client_ip: data.client_ip,
         value: data.value,
       })
     );
@@ -104,7 +93,6 @@ class RedisController {
     return redisClient.sAdd(
       data.key,
       JSON.stringify({
-        created_at: +new Date(),
         value: data.value,
       })
     );
@@ -118,7 +106,6 @@ class RedisController {
     return redisClient.lPush(
       data.key,
       JSON.stringify({
-        created_at: +new Date(),
         value: data.value,
       })
     );

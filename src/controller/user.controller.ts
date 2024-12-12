@@ -10,7 +10,7 @@ import {
   COMMON_SUCCESS_MSG,
   DEFAULT_ROLE_INFO,
   MAX_TOKEN_EXP,
-  REDIS_PREFIX,
+  REDIS_KEY,
   THIRD_PLATFORM,
 } from '@/constant';
 import authController from '@/controller/auth.controller';
@@ -27,6 +27,7 @@ import { judgeUserStatus, strSlice } from '@/utils';
 
 class UserController {
   common = {
+    findAll: (ids: number[]) => userService.findAll(ids),
     isExist: (ids) => userService.isExist(ids),
     list: (data) => userService.getList(data),
     create: (data: IUser) => userService.create(data),
@@ -170,7 +171,7 @@ class UserController {
       );
     }
     const res = await redisController.getVal({
-      prefix: REDIS_PREFIX.qrCodeLogin,
+      prefix: REDIS_KEY.qrCodeLogin,
       key: `${platform}___${login_id}`,
     });
     if (!res) {
@@ -206,7 +207,7 @@ class UserController {
     };
     const redisExp = 60 * 5;
     await redisController.setExVal({
-      prefix: REDIS_PREFIX.qrCodeLogin,
+      prefix: REDIS_KEY.qrCodeLogin,
       key: `${platform}___${createDate.login_id}`,
       exp: redisExp,
       value: createDate,

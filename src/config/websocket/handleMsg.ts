@@ -14,7 +14,7 @@ import {
   socketEmit,
 } from '@/config/websocket';
 import liveRedisController from '@/config/websocket/live-redis.controller';
-import { MSG_MAX_LENGTH, REDIS_PREFIX, WEBM_DIR } from '@/constant';
+import { MSG_MAX_LENGTH, REDIS_KEY, WEBM_DIR } from '@/constant';
 import deskUserController from '@/controller/deskUser.controller';
 import liveController from '@/controller/live.controller';
 import liveRecordController from '@/controller/liveRecord.controller';
@@ -73,22 +73,13 @@ export async function handleWsJoin(args: {
     data: {},
   });
   const { userInfo } = await jwtVerify(data.user_token || '');
-  if (!userInfo) {
+  if (!userInfo?.id) {
+    console.log(chalkERROR('userInfo为空'));
     await liveRedisController.joined({
       roomId,
-      // @ts-ignore
-      userInfo: { id: socket.id, username: socket.id, avatar: '' },
+      userId: socket.id,
       exp: data.data.duration + 5,
-      client_ip: getSocketRealIp(socket),
     });
-    await liveRedisController.addLiveRoomOnlineUser({
-      liveRoomId: roomId,
-      liveRoomName: '',
-      // @ts-ignore
-      userInfo: { id: socket.id, username: socket.id, avatar: '' },
-      client_ip: getSocketRealIp(socket),
-    });
-    console.log(chalkERROR('userInfo为空'));
     socketEmit<WsOtherJoinType['data']>({
       socket,
       msgType: WsMsgTypeEnum.otherJoin,
@@ -105,16 +96,8 @@ export async function handleWsJoin(args: {
   }
   await liveRedisController.joined({
     roomId,
-    userInfo,
+    userId: userInfo.id,
     exp: data.data.duration + 5,
-    client_ip: getSocketRealIp(socket),
-  });
-  await liveRedisController.addLiveRoomOnlineUser({
-    liveRoomId: roomId,
-    liveRoomName: '',
-    // @ts-ignore
-    userInfo,
-    client_ip: getSocketRealIp(socket),
   });
 
   const recRes = await liveController.common.findLiveRecordByLiveRoomId(roomId);
@@ -161,22 +144,19 @@ export async function handleWsKeepJoined(args: {
   const { roomId } = args;
   const { userInfo } = await jwtVerify(data.user_token || '');
 
-  if (!userInfo) {
+  if (!userInfo?.id) {
+    console.log(chalkERROR('userInfo为空'));
     await liveRedisController.joined({
       roomId,
-      // @ts-ignore
-      userInfo: { id: socket.id, username: socket.id, avatar: '' },
+      userId: socket.id,
       exp: data.data.duration + 5,
-      client_ip: getSocketRealIp(socket),
     });
-    console.log(chalkERROR('userInfo为空'));
     return;
   }
   await liveRedisController.joined({
     roomId,
-    userInfo,
+    userId: userInfo.id,
     exp: data.data.duration + 5,
-    client_ip: getSocketRealIp(socket),
   });
 
   const recRes = await liveController.common.findLiveRecordByLiveRoomId(roomId);
@@ -222,7 +202,6 @@ export async function handleWsKeepRtcLiving(args: {
       live_record_id: liveRes.live_record_id!,
       live_room_id: data.data.live_room_id,
     },
-    client_ip: getSocketRealIp(socket),
     exp: data.data.duration + 5,
   });
   await liveRecordController.common.updateDuration({
@@ -265,7 +244,7 @@ export async function handleWsBilldDeskUpdateUser(args: {
     const { socket, data } = args;
     if (data.data.deskUserUuid) {
       await redisController.setExVal({
-        prefix: REDIS_PREFIX.deskUserUuid,
+        prefix: REDIS_KEY.deskUserUuid,
         exp: 10,
         value: {
           socket_id: socket.id,
@@ -273,17 +252,15 @@ export async function handleWsBilldDeskUpdateUser(args: {
           deskUserPassword: data.data.deskUserPassword,
         },
         key: data.data.deskUserUuid,
-        client_ip: getSocketRealIp(socket),
       });
       await redisController.setExVal({
-        prefix: REDIS_PREFIX.deskUserSocketId,
+        prefix: REDIS_KEY.deskUserSocketId,
         exp: 10,
         value: {
           socket_id: socket.id,
           deskUserUuid: data.data.deskUserUuid,
         },
         key: socket.id,
-        client_ip: getSocketRealIp(socket),
       });
     }
   } catch (error) {
@@ -541,13 +518,12 @@ export async function handleWsStartLive(args: {
     data.data.type === LiveRoomTypeEnum.tencent_css_pk
   ) {
     try {
-      const pkKey = getRandomString(8);
+      const pkKey = getRandomString(20);
       await redisController.setExVal({
-        prefix: REDIS_PREFIX.livePkKey,
+        prefix: REDIS_KEY.livePkKey,
         exp: 60 * 5,
         value: { key: pkKey },
         key: `${roomId}`,
-        client_ip: getSocketRealIp(socket),
       });
       socketEmit<WsLivePkKeyType['data']>({
         socket,
@@ -579,7 +555,7 @@ export async function handleWsBilldDeskJoin(args: {
   socket.join(roomId);
   console.log(chalkWARN(`${socket.id} 进入房间号:${roomId}`));
   await redisController.setExVal({
-    prefix: REDIS_PREFIX.deskUserUuid,
+    prefix: REDIS_KEY.deskUserUuid,
     exp: 10,
     value: {
       socket_id: socket.id,
@@ -587,17 +563,15 @@ export async function handleWsBilldDeskJoin(args: {
       deskUserPassword: data.data.deskUserPassword,
     },
     key: data.data.deskUserUuid,
-    client_ip: getSocketRealIp(socket),
   });
   await redisController.setExVal({
-    prefix: REDIS_PREFIX.deskUserSocketId,
+    prefix: REDIS_KEY.deskUserSocketId,
     exp: 10,
     value: {
       socket_id: socket.id,
       deskUserUuid: data.data.deskUserUuid,
     },
     key: socket.id,
-    client_ip: getSocketRealIp(socket),
   });
   socketEmit<WsBilldDeskJoinedType['data']>({
     socket,
@@ -673,7 +647,7 @@ export async function handleWsBilldDeskStartRemote(args: {
     return;
   }
   const val = await redisController.getVal({
-    prefix: REDIS_PREFIX.deskUserUuid,
+    prefix: REDIS_KEY.deskUserUuid,
     key: `${data.data.remoteDeskUserUuid}`,
   });
   if (!val) {

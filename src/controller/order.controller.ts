@@ -3,7 +3,7 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import { COMMON_HTTP_CODE, REDIS_PREFIX } from '@/constant';
+import { COMMON_HTTP_CODE, REDIS_KEY } from '@/constant';
 import goodsControllerfrom from '@/controller/goods.controller';
 import redisController from '@/controller/redis.controller';
 import walletRecordController from '@/controller/walletRecord.controller';
@@ -164,7 +164,7 @@ class OrderController {
       await orderService.create(createDate);
       const exp = 60 * 5;
       redisController.setExVal({
-        prefix: REDIS_PREFIX.order,
+        prefix: REDIS_KEY.order,
         key: res.bizContent.out_trade_no,
         exp,
         value: createDate,

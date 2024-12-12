@@ -97,8 +97,7 @@ class TencentcloudCssClass {
    * 获取拉流地址。
    */
   getPullUrl = (data: { liveRoomId: number }) => {
-    const http =
-      PROJECT_ENV === PROJECT_ENV_ENUM.development ? 'http' : 'https';
+    const http = PROJECT_ENV === PROJECT_ENV_ENUM.dev ? 'http' : 'https';
     return {
       rtmp: `rtmp://${TENCENTCLOUD_CSS.PullDomain}/${TENCENTCLOUD_CSS.AppName}/roomId___${data.liveRoomId}`,
       flv: `${http}://${TENCENTCLOUD_CSS.PullDomain}/${TENCENTCLOUD_CSS.AppName}/roomId___${data.liveRoomId}.flv`,

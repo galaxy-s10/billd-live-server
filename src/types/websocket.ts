@@ -53,10 +53,6 @@ export enum WsMsgTypeEnum {
   endLive = 'endLive',
   /** 直播pk秘钥 */
   livePkKey = 'livePkKey',
-  /** 主播禁言用户 */
-  disableSpeaking = 'disableSpeaking',
-  /** 主播踢掉用户 */
-  kick = 'kick',
   keepRtcLiving = 'keepRtcLiving',
 
   srsOffer = 'srsOffer',
@@ -155,31 +151,6 @@ export type WsRoomNoLiveType = IResWsFormat<{ live_room_id: number }>;
 
 /** ws消息 */
 export type WsMessageType = IReqWsFormat<IWsMessage>;
-
-/** 禁言用户 */
-export type WsDisableSpeakingType = IReqWsFormat<{
-  request_id?: string;
-  /** 被禁言用户socket_id */
-  socket_id: string;
-  /** 被禁言用户id */
-  user_id: number;
-  /** 直播间id */
-  live_room_id: number;
-  /** 禁言时长（单位：秒） */
-  duration?: number;
-  /** 禁言创建消息 */
-  disable_created_at?: number;
-  /** 禁言到期消息 */
-  disable_expired_at?: number;
-  /** 禁言成功 */
-  disable_ok?: boolean;
-  /** 解除禁言成功 */
-  restore_disable_ok?: boolean;
-  /** 是否正在禁言 */
-  is_disable_speaking?: boolean;
-  /** 是否解除禁言 */
-  restore?: boolean;
-}>;
 
 /** 其他用户加入直播间 */
 export type WsOtherJoinType = IResWsFormat<{

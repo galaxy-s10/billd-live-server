@@ -7,7 +7,6 @@ import staticService from 'koa-static';
 import { catchErrorMiddle, corsMiddle } from '@/app/app.middleware';
 import errorHandler from '@/app/handler/error-handle';
 import { apiBeforeVerify } from '@/app/verify.middleware';
-import { handleRedisKeyExpired } from '@/config/redis/handleRedisKeyExpired';
 import { initSchedule } from '@/config/schedule';
 import { connectWebSocket } from '@/config/websocket';
 import { COMMON_HTTP_CODE, STATIC_DIR, UPLOAD_DIR } from '@/constant';
@@ -69,7 +68,6 @@ export async function setupKoa({ port }) {
     });
     connectWebSocket(httpServer); // 初始化websocket
   }); // http接口服务
-  handleRedisKeyExpired();
   initSchedule();
   pushToBilibili(false);
   const useInitFFmpeg = true;

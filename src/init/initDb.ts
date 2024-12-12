@@ -1,5 +1,6 @@
 import fs from 'fs';
 
+import { getArrayDifference } from 'billd-utils';
 import dayjs from 'dayjs';
 import { Sequelize } from 'sequelize';
 import { Model, ModelStatic } from 'sequelize/types';
@@ -153,19 +154,39 @@ export const deleteIndexs = async (data: {
   }
 };
 
+// 获取表字段信息
+export async function getRealTableFields(tableName) {
+  const queryInterface = sequelize.getQueryInterface();
+  const tableInfo = await queryInterface.describeTable(tableName);
+  return tableInfo;
+}
+
+// 删除表字段
+export async function delRealTableFields({
+  table,
+  column,
+}: {
+  table: string;
+  column: string;
+}) {
+  const queryInterface = sequelize.getQueryInterface();
+  await queryInterface.removeColumn(table, column);
+  console.log(chalkSUCCESS(`删除${table}表的${column}字段成功！`));
+}
+
 /**
  * 初始化表
  * @param model
  * @param method
  */
-export const initTable = (data: {
+export function initTable(data: {
   model: ModelStatic<Model>;
-  method?: 'force' | 'alter';
+  method?: 'force' | 'alter' | 'alter-1';
   sequelize: Sequelize;
-}) => {
+}) {
   async function main(
     modelArg: ModelStatic<Model>,
-    methodArg?: 'force' | 'alter'
+    methodArg?: 'force' | 'alter' | 'alter-1'
   ) {
     if (methodArg === 'force') {
       console.log(chalkWARN(`开始(重新)创建${modelArg.tableName}表`));
@@ -185,15 +206,38 @@ export const initTable = (data: {
       });
       await modelArg.sync({ alter: true });
       console.log(chalkSUCCESS(`${modelArg.tableName}表刚刚同步成功！`));
+    } else if (methodArg === 'alter-1') {
+      console.log(chalkWARN(`开始同步${modelArg.tableName}表`));
+      await deleteIndexs({ sequelizeInst: data.sequelize, model: data.model });
+      await deleteForeignKeys({
+        sequelizeInst: data.sequelize,
+        model: data.model,
+      });
+      const tableFields = await getRealTableFields(data.model.name);
+      const realTableFields = Object.keys(tableFields);
+      const sequelizeTableFields = Object.keys(data.model.getAttributes());
+      const shouldDelRealTableFields = getArrayDifference(
+        realTableFields,
+        sequelizeTableFields
+      );
+      const queue: Promise<any>[] = [];
+      shouldDelRealTableFields.forEach((item) => {
+        queue.push(
+          delRealTableFields({ table: data.model.name, column: item })
+        );
+      });
+      await Promise.all(queue);
+      await modelArg.sync({ alter: true });
+      console.log(chalkSUCCESS(`${modelArg.tableName}表刚刚同步成功！`));
     } else {
       console.log(chalkINFO(`加载数据库表: ${modelArg.tableName}`));
     }
   }
-  main(data.model, data.method).catch((err) => {
+  return main(data.model, data.method).catch((err) => {
     console.log(chalkERROR(`initTable失败`), err.message);
     console.log(err);
   });
-};
+}
 
 /** 加载所有model */
 export const loadAllModel = () => {
@@ -201,7 +245,7 @@ export const loadAllModel = () => {
     PROJECT_ENV === PROJECT_ENV_ENUM.prod ? 'dist' : 'src'
   }/model`;
   fs.readdirSync(modelDir).forEach((file: string) => {
-    if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
+    if (PROJECT_ENV === PROJECT_ENV_ENUM.dev) {
       if (file.indexOf('.model.ts') === -1) return;
     } else if (PROJECT_ENV === PROJECT_ENV_ENUM.beta) {
       if (file.indexOf('.model.ts') === -1) return;
@@ -226,11 +270,11 @@ export const deleteAllTable = async (sequelizeInst: Sequelize) => {
 /**
  * 初始化数据库：
  * force:重置所有
- * alert:校正现有数据库
+ * alter:校正现有数据库
  * load:加载数据库表
  */
 export const initDb = async (
-  type: 'force' | 'alert',
+  type: 'force' | 'alter' | 'alter-1',
   sequelizeInst: Sequelize
 ) => {
   switch (type) {
@@ -242,11 +286,24 @@ export const initDb = async (
       await sequelizeInst.sync({ force: true }); // 将创建表,如果表已经存在,则将其首先删除
       console.log(chalkSUCCESS('初始化数据库所有表完成！'));
       break;
-    case 'alert':
+    case 'alter':
       console.log(chalkWARN('开始校正数据库所有表'));
       await sequelizeInst.sync({ alter: true }); // 这将检查数据库中表的当前状态(它具有哪些列,它们的数据类型等),然后在表中进行必要的更改以使其与模型匹配.
       console.log(chalkSUCCESS('校正数据库所有表完成！'));
       break;
+    case 'alter-1': {
+      const allModels = sequelize.models;
+      const queue: Promise<any>[] = [];
+      Object.keys(allModels).forEach((item) => {
+        // console.log(allModels[item], '----');
+        queue.push(
+          initTable({ model: allModels[item], method: 'alter-1', sequelize })
+        );
+      });
+      await Promise.all(queue);
+      console.log(chalkSUCCESS('校正数据库所有表完成！'));
+      break;
+    }
     default:
       throw new Error('initDb参数不正确！');
   }

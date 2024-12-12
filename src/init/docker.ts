@@ -16,7 +16,7 @@ if (flag) {
   dockerRunMysql(PROJECT_ENV !== PROJECT_ENV_ENUM.prod);
   dockerRunRedis(PROJECT_ENV !== PROJECT_ENV_ENUM.prod);
   dockerRunSRS(true);
-  dockerRunRabbitMQ(false);
+  dockerRunRabbitMQ(true);
 } else {
   console.log(chalkERROR('未安装docker！'));
 }

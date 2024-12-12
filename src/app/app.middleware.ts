@@ -1,13 +1,14 @@
 import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
+import { pubClient } from '@/config/redis/publish';
 import {
   COMMON_ERROR_CODE,
   COMMON_HTTP_CODE,
   CORS_ALLOW_ORIGIN,
   PROJECT_ENV,
+  REDIS_CHANNEL,
 } from '@/constant';
-import logController from '@/controller/log.controller';
 import { CustomError } from '@/model/customError.model';
 import { handleCtxRequestHeaders, strSlice } from '@/utils';
 import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
@@ -36,26 +37,29 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
         const api_forwarded_for = headers.forwarded_for;
         const api_referer = headers.referer;
         const api_path = headers.path;
-        logController.common.create({
-          user_id: userInfo?.id || -1,
-          api_user_agent,
-          api_body,
-          api_query,
-          api_real_ip,
-          api_forwarded_for,
-          api_referer,
-          api_path,
-          api_method: ctx.request.method,
-          // ctx.request.host存在时获取主机（hostname:port）。当 app.proxy 是 true 时支持 X-Forwarded-Host，否则使用 Host。
-          api_host: ctx.request.host, // ctx.request.hostname不带端口号;ctx.request.host带端口号
-          // ctx.request.hostname存在时获取主机名。当 app.proxy 是 true 时支持 X-Forwarded-Host，否则使用 Host。
-          api_hostname: ctx.request.hostname, // ctx.request.hostname不带端口号;ctx.request.host带端口号
-          api_status_code: info.httpStatusCode,
-          api_error: info.error,
-          api_err_msg: info.msg,
-          api_duration: info.duration,
-          api_err_code: info.errorCode,
-        });
+        pubClient.publish(
+          REDIS_CHANNEL.writeDbLog,
+          JSON.stringify({
+            user_id: userInfo?.id || -1,
+            api_user_agent,
+            api_body,
+            api_query,
+            api_real_ip,
+            api_forwarded_for,
+            api_referer,
+            api_path,
+            api_method: ctx.request.method,
+            // ctx.request.host存在时获取主机（hostname:port）。当 app.proxy 是 true 时支持 X-Forwarded-Host，否则使用 Host。
+            api_host: ctx.request.host, // ctx.request.hostname不带端口号;ctx.request.host带端口号
+            // ctx.request.hostname存在时获取主机名。当 app.proxy 是 true 时支持 X-Forwarded-Host，否则使用 Host。
+            api_hostname: ctx.request.hostname, // ctx.request.hostname不带端口号;ctx.request.host带端口号
+            api_status_code: info.httpStatusCode,
+            api_error: info.error,
+            api_err_msg: info.msg,
+            api_duration: info.duration,
+            api_err_code: info.errorCode,
+          })
+        );
       }
     } catch (error) {
       console.log(error);

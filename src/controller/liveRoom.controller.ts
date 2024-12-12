@@ -7,7 +7,7 @@ import {
   COMMON_HTTP_CODE,
   PROJECT_ENV,
   PROJECT_ENV_ENUM,
-  REDIS_PREFIX,
+  REDIS_KEY,
 } from '@/constant';
 import areaController from '@/controller/area.controller';
 import redisController from '@/controller/redis.controller';
@@ -178,6 +178,7 @@ class LiveRoomController {
         forward_kuaishou_url,
         forward_xiaohongshu_url,
       }),
+    findAll: (ids: number[]) => liveRoomService.findAll(ids),
     find: (id: number) => liveRoomService.find(id),
     findPure: (id: number) => liveRoomService.findPure(id),
     getList: ({
@@ -358,7 +359,7 @@ class LiveRoomController {
     const id = +ctx.params.id;
     const { key } = ctx.request.query;
     const result = await redisController.getVal({
-      prefix: REDIS_PREFIX.livePkKey,
+      prefix: REDIS_KEY.livePkKey,
       key: `${id}`,
     });
     let pass = false;
@@ -391,7 +392,7 @@ class LiveRoomController {
         COMMON_HTTP_CODE.paramsError
       );
     } else {
-      const key = getRandomString(30);
+      const key = getRandomString(20);
       const srsPushRes = srsController.common.getPushUrl({
         isdev: PROJECT_ENV === PROJECT_ENV_ENUM.prod ? '2' : '1',
         userId: userInfo.id!,

@@ -7,7 +7,7 @@ import {
   COMMON_HTTP_CODE,
   DEFAULT_ROLE_INFO,
   MAX_TOKEN_EXP,
-  REDIS_PREFIX,
+  REDIS_KEY,
   THIRD_PLATFORM,
 } from '@/constant';
 import redisController from '@/controller/redis.controller';
@@ -21,7 +21,6 @@ import walletService from '@/service/wallet.service';
 import wechatUserService from '@/service/wechatUser.service';
 import { WECHAT_GZH_APPID } from '@/spec-config';
 import { IWechatUser } from '@/types/IUser';
-import { strSlice } from '@/utils';
 import { myaxios } from '@/utils/request';
 
 interface IAccessTokenOk {
@@ -247,16 +246,11 @@ class WechatUserController {
         token,
       };
       const redisExp = 10;
-      const client_ip = strSlice(
-        String(ctx.request.headers['x-real-ip'] || ''),
-        100
-      );
       await redisController.setExVal({
-        prefix: REDIS_PREFIX.qrCodeLogin,
+        prefix: REDIS_KEY.qrCodeLogin,
         key: `${platform}___${login_id}`,
         exp: redisExp,
         value: createDate,
-        client_ip,
       });
       successHandler({ ctx, data: token, msg: 'wechat登录成功！' });
     } else {
@@ -316,16 +310,11 @@ class WechatUserController {
         token,
       };
       const redisExp = 10;
-      const client_ip = strSlice(
-        String(ctx.request.headers['x-real-ip'] || ''),
-        100
-      );
       await redisController.setExVal({
-        prefix: REDIS_PREFIX.qrCodeLogin,
+        prefix: REDIS_KEY.qrCodeLogin,
         key: `${platform}___${login_id}`,
         exp: redisExp,
         value: createDate,
-        client_ip,
       });
       successHandler({ ctx, data: token, msg: 'wechat登录成功！' });
     }

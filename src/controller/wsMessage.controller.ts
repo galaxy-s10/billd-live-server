@@ -1,7 +1,7 @@
 import { ParameterizedContext } from 'koa';
 
 import successHandler from '@/app/handler/success-handle';
-import { COMMON_HTTP_CODE, MSG_MAX_LENGTH, REDIS_PREFIX } from '@/constant';
+import { COMMON_HTTP_CODE, MSG_MAX_LENGTH, REDIS_KEY } from '@/constant';
 import redisController from '@/controller/redis.controller';
 import { IList, IWsMessage } from '@/interface';
 import { CustomError } from '@/model/customError.model';
@@ -115,7 +115,7 @@ class WsMessageController {
     }: IList<IWsMessage>) => {
       try {
         const oldCache = await redisController.getVal({
-          prefix: REDIS_PREFIX.dbLiveRoomHistoryMsgList,
+          prefix: REDIS_KEY.dbLiveRoomHistoryMsgList,
           key: `${live_room_id!}`,
         });
         if (oldCache) {
@@ -151,7 +151,7 @@ class WsMessageController {
       });
       try {
         redisController.setExVal({
-          prefix: REDIS_PREFIX.dbLiveRoomHistoryMsgList,
+          prefix: REDIS_KEY.dbLiveRoomHistoryMsgList,
           key: `${live_room_id!}`,
           value: result,
           exp: 3,

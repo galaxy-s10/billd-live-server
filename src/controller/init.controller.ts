@@ -178,7 +178,7 @@ class InitController {
           live_room_id,
         ]);
         if (!liveRoomIsExist) {
-          const pushKey = getRandomString(6);
+          const pushKey = getRandomString(20);
           const srsPushRes = srsController.common.getPushUrl({
             isdev: PROJECT_ENV === PROJECT_ENV_ENUM.prod ? '2' : '1',
             userId: user_id,
@@ -473,7 +473,7 @@ class InitController {
     const res = await userLiveRoomController.common.findAll();
     const queue: Promise<any>[] = [];
     res.forEach((item) => {
-      const key = getRandomString(30);
+      const key = getRandomString(20);
       const srsPullRes = srsController.common.getPullUrl({
         liveRoomId: item.live_room_id!,
       });

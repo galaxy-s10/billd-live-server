@@ -7,19 +7,68 @@ import { rimrafSync } from 'rimraf';
 
 import { authJwt } from '@/app/auth/authJwt';
 import successHandler from '@/app/handler/success-handle';
-import liveRedisController from '@/config/websocket/live-redis.controller';
-import { COMMON_HTTP_CODE, SCHEDULE_TYPE, WEBM_DIR } from '@/constant';
+import {
+  COMMON_HTTP_CODE,
+  REDIS_KEY,
+  SCHEDULE_TYPE,
+  WEBM_DIR,
+} from '@/constant';
 import { IList, ILive } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import liveService from '@/service/live.service';
 import { getForwardList, killPid } from '@/utils/process';
 
+import liveRoomController from './liveRoom.controller';
+import redisController from './redis.controller';
 import srsController from './srs.controller';
 import tencentcloudCssController from './tencentcloudCss.controller';
+import userController from './user.controller';
 import userLiveRoomController from './userLiveRoom.controller';
 
 class LiveController {
   common = {
+    liveUser: async (key: string) => {
+      const res = await redisController.findByPrefix({
+        prefix: key,
+      });
+      const userIdArr: any[] = [];
+      const liveRoomIdArr: any[] = [];
+
+      res.forEach((item) => {
+        const live_room_id = item.split('___')[1];
+        const user_id = item.split('___')[2];
+        liveRoomIdArr.push(live_room_id);
+        userIdArr.push(user_id);
+      });
+      const res1 = await userController.common.findAll(userIdArr);
+      const res2 = await liveRoomController.common.findAll(liveRoomIdArr);
+
+      const userObj = {};
+      const liveRoomObj = {};
+
+      res1.forEach((item) => {
+        userObj[item.id!] = item;
+      });
+      res2.forEach((item) => {
+        liveRoomObj[item.id!] = item;
+      });
+
+      const res3: any[] = [];
+      res.forEach((item) => {
+        const live_room_id = item.split('___')[1];
+        const user_id = item.split('___')[2];
+
+        res3.push({
+          user_id,
+          user_avatar: userObj[user_id]?.avatar || '',
+          user_username: userObj[user_id]?.username || user_id,
+          live_room_id,
+          live_room_name: liveRoomObj[live_room_id]?.name || '',
+        });
+      });
+      return res3;
+    },
+
     findAll: async ({
       id,
       live_record_id,
@@ -156,12 +205,12 @@ class LiveController {
       }
     },
 
-    deleteByLiveRoomId: async (liveRoomIds: number[]) => {
-      if (!liveRoomIds.length) {
-        console.log('liveRoomIds为空');
+    deleteByLiveRoomId: async (liveRoomIdArr: number[]) => {
+      if (!liveRoomIdArr.length) {
+        console.log('liveRoomIdArr为空');
         return 0;
       }
-      const res = await liveService.deleteByLiveRoomId(liveRoomIds);
+      const res = await liveService.deleteByLiveRoomId(liveRoomIdArr);
       return res;
     },
 
@@ -231,12 +280,25 @@ class LiveController {
     await next();
   };
 
-  getLiveUser = async (ctx: ParameterizedContext, next) => {
-    const { live_room_id } = ctx.request.query;
-    const liveUser = await liveRedisController.getLiveRoomOnlineUser(
-      Number(live_room_id)
-    );
-    successHandler({ ctx, data: liveUser });
+  getLiveRoomOnlineUser = async (ctx: ParameterizedContext, next) => {
+    const live_room_id = +ctx.params.live_room_id;
+    if (!live_room_id) {
+      throw new CustomError(
+        `live_room_id错误`,
+        COMMON_HTTP_CODE.paramsError,
+        COMMON_HTTP_CODE.paramsError
+      );
+    }
+    const key = `${REDIS_KEY.joined}${live_room_id}`;
+    const res = await this.common.liveUser(key);
+    successHandler({ ctx, data: res });
+    await next();
+  };
+
+  getAllLiveRoomOnlineUser = async (ctx: ParameterizedContext, next) => {
+    const key = `${REDIS_KEY.joined}`;
+    const res = await this.common.liveUser(key);
+    successHandler({ ctx, data: res });
     await next();
   };
 

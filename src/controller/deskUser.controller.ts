@@ -2,7 +2,7 @@ import { getRandomString } from 'billd-utils';
 import { ParameterizedContext } from 'koa';
 
 import successHandler from '@/app/handler/success-handle';
-import { COMMON_HTTP_CODE, REDIS_PREFIX } from '@/constant';
+import { COMMON_HTTP_CODE, REDIS_KEY } from '@/constant';
 import redisController from '@/controller/redis.controller';
 import { CustomError } from '@/model/customError.model';
 import deskUserService from '@/service/deskUser.service';
@@ -49,7 +49,7 @@ class DeskUserController {
   async findReceiverByUuid(ctx: ParameterizedContext, next) {
     const { uuid }: any = ctx.request.query;
     const val = await redisController.getVal({
-      prefix: REDIS_PREFIX.deskUserUuid,
+      prefix: REDIS_KEY.deskUserUuid,
       key: uuid,
     });
     let receiver = '';

@@ -78,8 +78,7 @@ class SRSController {
         `http://${LOCALHOST_URL}:${SRS_CONFIG.docker.port[1985]}/api/v1/clients/${clientId}`
       ),
     getPullUrl: (data: { liveRoomId: number }) => {
-      const http =
-        PROJECT_ENV === PROJECT_ENV_ENUM.development ? 'http' : 'https';
+      const http = PROJECT_ENV === PROJECT_ENV_ENUM.dev ? 'http' : 'https';
       return {
         rtmp: `rtmp://${SRS_LIVE.PullDomain}/${SRS_LIVE.AppName}/roomId___${data.liveRoomId}`,
         flv: `${http}://${SRS_LIVE.PullDomain}/${SRS_LIVE.AppName}/roomId___${data.liveRoomId}.flv`,
