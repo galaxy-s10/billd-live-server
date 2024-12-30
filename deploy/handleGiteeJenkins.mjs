@@ -8,7 +8,7 @@ import trash from 'trash';
 const allFile = [];
 const ignore = ['.DS_Store', '.git', '.gitignore', 'node_modules', 'dist'];
 const localDir =
-  '/Users/huangshuisheng/Desktop/hss/galaxy-s10/billd-live-server';
+  '/Users/huangshuisheng/Desktop/hss/billd-project/billd-live-server-pro';
 const giteeDir = '/Users/huangshuisheng/Desktop/hss/jenkins/billd-live-server';
 
 const dir = fs.readdirSync(localDir).filter((item) => {
@@ -91,6 +91,7 @@ if (process.cwd().indexOf('jenkins') !== -1) {
     const gitignoreTxt =
       'node_modules\n.DS_Store\ndist\n/public/**/*\n/upload/**/*\n/webm/**/*\n!/public/README.md\n!/upload/README.md\n!/webm/README.md\n';
     fs.writeFileSync(path.resolve(giteeDir, './.gitignore'), gitignoreTxt);
+    execSync(`git rm -r --cached .`, { cwd: giteeDir });
     execSync(`pnpm i`, { cwd: giteeDir });
     execSync(`git add .`, { cwd: giteeDir });
     execSync(`git commit -m 'feat: ${new Date().toLocaleString()}'`, {

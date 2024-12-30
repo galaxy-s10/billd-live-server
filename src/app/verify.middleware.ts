@@ -4,7 +4,6 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
 import {
-  BLACKLIST_TYPE,
   COMMON_ERROE_MSG,
   COMMON_ERROR_CODE,
   COMMON_HTTP_CODE,
@@ -13,6 +12,7 @@ import {
 } from '@/constant';
 import authController from '@/controller/auth.controller';
 import blacklistController from '@/controller/blacklist.controller';
+import { BlacklistTypeEnum } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import { strSlice } from '@/utils';
 import { chalkINFO } from '@/utils/chalkTip';
@@ -26,6 +26,7 @@ const frontendWhiteList = [
 
   '/user/register', // 注册，这个接口是post的
   '/user/login', // 登录，这个接口是post的
+  '/user/id_login', // 登录，这个接口是post的
   '/user/username_login', // 登录，这个接口是post的
   '/user/qrcode_login', // 登录，这个接口是post的
 
@@ -61,6 +62,8 @@ const frontendWhiteList = [
   '/tencentcloud_css/on_publish',
   '/tencentcloud_css/on_unpublish',
   '/tencentcloud_css/remote_auth',
+
+  '/tencentcloud_chat/gen_user_sig',
 ];
 
 // 全局白名单
@@ -96,19 +99,17 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
   // 判断黑名单
   const inBlacklist = await blacklistController.findByIp(client_ip);
 
-  if (inBlacklist?.type === BLACKLIST_TYPE.banIp) {
-    // 频繁操作
+  if (inBlacklist?.type === BlacklistTypeEnum.frequent) {
     throw new CustomError(
-      `当前ip:${client_ip}调用api频繁,${COMMON_ERROE_MSG.banIp}`,
+      COMMON_ERROE_MSG.frequent,
       COMMON_HTTP_CODE.forbidden,
-      COMMON_ERROR_CODE.banIp
+      COMMON_ERROR_CODE.frequent
     );
-  } else if (inBlacklist?.type === BLACKLIST_TYPE.adminDisableUser) {
-    // 管理员手动禁用
+  } else if (inBlacklist?.type === BlacklistTypeEnum.admin_disable) {
     throw new CustomError(
-      COMMON_ERROE_MSG.userStatusIsDisable,
+      COMMON_ERROE_MSG.admin_disable,
       COMMON_HTTP_CODE.forbidden,
-      COMMON_ERROR_CODE.userStatusIsDisable
+      COMMON_ERROR_CODE.admin_disable
     );
   }
 
@@ -122,13 +123,13 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
       blacklistController.common.create({
         user_id: userInfo?.id,
         client_ip,
-        type: BLACKLIST_TYPE.banIp,
-        msg: COMMON_ERROE_MSG.banIp,
+        type: BlacklistTypeEnum.frequent,
+        msg: COMMON_ERROE_MSG.frequent,
       });
       throw new CustomError(
-        `当前ip:${client_ip}调用api频繁,${COMMON_ERROE_MSG.banIp}`,
+        `ip：${client_ip}，${COMMON_ERROE_MSG.frequent}`,
         COMMON_HTTP_CODE.forbidden,
-        COMMON_ERROR_CODE.banIp
+        COMMON_ERROR_CODE.frequent
       );
     }
   }

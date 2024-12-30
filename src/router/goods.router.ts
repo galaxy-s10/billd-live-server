@@ -12,6 +12,6 @@ goodsRouter.put('/update/:id', goodsController.update);
 
 goodsRouter.post('/create', goodsController.create);
 
-goodsRouter.get('/fiud_by_type', goodsController.findByType);
+goodsRouter.get('/find_by_type', goodsController.findByType);
 
 export default goodsRouter;

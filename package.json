@@ -1,9 +1,22 @@
 {
-  "name": "billd-live-server",
-  "version": "0.0.1",
+  "name": "billd-live",
+  "version": "0.1.0",
+  "description": "基于Vue3 + WebRTC + Node + SRS搭建的直播间",
+  "keywords": [
+    "billd",
+    "bilibili",
+    "webrtc",
+    "rtmp",
+    "flv",
+    "hls"
+  ],
+  "homepage": "https://live.hsslive.cn",
+  "bugs": {
+    "url": "https://github.com/galaxy-s10/billd-live/issues"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/galaxy-s10/billd-live-server"
+    "url": "https://github.com/galaxy-s10/billd-live"
   },
   "license": "MIT",
   "author": "shuisheng <2274751790@qq.com>",
@@ -30,54 +43,11 @@
     "release:first": "standard-version --first-release",
     "start:beta": "cross-env NODE_ENV=production NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=4300 nodemon ./dist/index.js",
     "start:prod": "cross-env NODE_ENV=production NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=prod NODE_APP_RELEASE_PROJECT_PORT=4200 nodemon ./dist/index.js",
+    "sync-repo": "ts-node ./deploy/handleSyncPublic.mjs",
     "typecheck": "tsc -p ./tsconfig.prod.json --noEmit"
   },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  },
-  "dependencies": {
-    "@socket.io/redis-adapter": "^8.0.0",
-    "alipay-sdk": "^3.4.0",
-    "amqplib": "^0.10.3",
-    "axios": "^1.4.0",
-    "billd-html-webpack-plugin": "^1.0.6",
-    "billd-utils": "^0.0.22",
-    "chalk": "^4.1.2",
-    "cos-nodejs-sdk-v5": "^2.14.6",
-    "crypto-js": "^4.1.1",
-    "dayjs": "^1.11.3",
-    "fs-extra": "^11.2.0",
-    "joi": "^17.5.0",
-    "jsonwebtoken": "^8.5.1",
-    "koa": "^2.13.4",
-    "koa-body": "^5.0.0",
-    "koa-bodyparser": "^4.3.0",
-    "koa-conditional-get": "^3.0.0",
-    "koa-convert": "^2.0.0",
-    "koa-csrf": "^3.0.8",
-    "koa-etag": "^4.0.0",
-    "koa-generic-session": "^2.3.0",
-    "koa-router": "^10.1.1",
-    "koa-static": "^5.0.0",
-    "module-alias": "^2.2.2",
-    "mysql2": "^2.3.3",
-    "node-emoji": "^1.11.0",
-    "node-media-server": "^2.5.0",
-    "node-schedule": "^2.1.0",
-    "nodemailer": "^6.7.2",
-    "oxlint": "^0.13.0",
-    "qcloud-cos-sts": "^3.1.1",
-    "qiniu": "7.4.0",
-    "redis": "^4.0.4",
-    "rimraf": "^5.0.1",
-    "sequelize": "^6.32.1",
-    "socket.io": "^4.7.2",
-    "socket.io-msgpack-parser": "^3.0.2",
-    "ssh2": "^1.7.0",
-    "tencentcloud-sdk-nodejs": "^4.0.616"
-  },
+  "config": {},
+  "dependencies": {},
   "devDependencies": {
     "@commitlint/cli": "^16.0.1",
     "@commitlint/config-conventional": "^16.0.0",

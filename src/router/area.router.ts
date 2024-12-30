@@ -10,4 +10,6 @@ areaRouter.get('/area_live_room_list', areaController.getAreaLiveRoomList);
 
 areaRouter.get('/live_room_list', areaController.getLiveRoomList);
 
+areaRouter.get('/get_tree_area', areaController.getTreeArea);
+
 export default areaRouter;

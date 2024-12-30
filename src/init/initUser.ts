@@ -13,6 +13,17 @@ export const initLiveRoom = {
     cdn: SwitchEnum.no,
     type: LiveRoomTypeEnum.system,
     area: [1],
+    ffmpegParams: {
+      '-b:v': '300k', // 平均码率
+      '-maxrate': '500k', // 最大码率
+      '-bufsize': '1000k', // 缓存区，通常是最大码率的2倍
+      '-bf': 0, // 禁用 B 帧
+      '-tune': 'zerolatency', // 优化延迟，适合实时流
+      // fps=20：将视频的帧率设置为 20 帧每秒。
+      // round=down：确保帧率向下取整，适用于处理帧率不均匀的视频。
+      // scale=480:-2：将视频的宽度设置为 480 像素，而高度自动计算，以确保高度为 2 的倍数（h264要求），保持原始纵横比。
+      '-vf': 'fps=20:round=down,scale=480:-2',
+    },
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: false, // 初始化ffmpeg
     devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_snjs.mp4'),
@@ -26,6 +37,15 @@ export const initLiveRoom = {
     cdn: SwitchEnum.yes,
     type: LiveRoomTypeEnum.system,
     area: [1],
+    ffmpegParams: {
+      '-b:v': '700k', // 平均码率
+      '-maxrate': '1100k', // 最大码率
+      '-bufsize': '1600k', // 缓存区，通常是最大码率的2倍
+      // fps=20：将视频的帧率设置为 20 帧每秒。
+      // round=down：确保帧率向下取整，适用于处理帧率不均匀的视频。
+      // scale=480:-2：将视频的宽度设置为 480 像素，而高度自动计算，以确保高度为 2 的倍数（h264要求），保持原始纵横比。
+      '-vf': 'fps=20:round=down,scale=480:-2',
+    },
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: true, // 初始化ffmpeg
     devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_snjs.mp4'),
@@ -39,6 +59,17 @@ export const initLiveRoom = {
     cdn: SwitchEnum.no,
     type: LiveRoomTypeEnum.system,
     area: [1],
+    ffmpegParams: {
+      '-b:v': '300k', // 平均码率
+      '-maxrate': '500k', // 最大码率
+      '-bufsize': '1000k', // 缓存区，通常是最大码率的2倍
+      '-bf': 0, // 禁用 B 帧
+      '-tune': 'zerolatency', // 优化延迟，适合实时流
+      // fps=20：将视频的帧率设置为 20 帧每秒。
+      // round=down：确保帧率向下取整，适用于处理帧率不均匀的视频。
+      // scale=480:-2：将视频的宽度设置为 480 像素，而高度自动计算，以确保高度为 2 的倍数（h264要求），保持原始纵横比。
+      '-vf': 'fps=20:round=down,scale=480:-2',
+    },
     devFFmpeg: true, // 初始化ffmpeg
     prodFFmpeg: true, // 初始化ffmpeg
     devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_hyzdwmgl.mp4'),
@@ -52,6 +83,17 @@ export const initLiveRoom = {
     cdn: SwitchEnum.no,
     type: LiveRoomTypeEnum.system,
     area: [1],
+    ffmpegParams: {
+      '-b:v': '500k', // 平均码率
+      '-maxrate': '800k', // 最大码率
+      '-bufsize': '1200k', // 缓存区，通常是最大码率的2倍
+      '-bf': 0, // 禁用 B 帧
+      '-tune': 'zerolatency', // 优化延迟，适合实时流
+      // fps=20：将视频的帧率设置为 20 帧每秒。
+      // round=down：确保帧率向下取整，适用于处理帧率不均匀的视频。
+      // scale=480:-2：将视频的宽度设置为 480 像素，而高度自动计算，以确保高度为 2 的倍数（h264要求），保持原始纵横比。
+      '-vf': 'fps=20:round=down,scale=480:-2',
+    },
     devFFmpeg: true, // 初始化ffmpeg
     prodFFmpeg: true, // 初始化ffmpeg
     devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_snjs.mp4'),
@@ -65,8 +107,19 @@ export const initLiveRoom = {
     cdn: SwitchEnum.no,
     type: LiveRoomTypeEnum.system,
     area: [1],
+    ffmpegParams: {
+      '-b:v': '300k', // 平均码率
+      '-maxrate': '500k', // 最大码率
+      '-bufsize': '1000k', // 缓存区，通常是最大码率的2倍
+      '-bf': 0, // 禁用 B 帧
+      '-tune': 'zerolatency', // 优化延迟，适合实时流
+      // fps=20：将视频的帧率设置为 20 帧每秒。
+      // round=down：确保帧率向下取整，适用于处理帧率不均匀的视频。
+      // scale=480:-2：将视频的宽度设置为 480 像素，而高度自动计算，以确保高度为 2 的倍数（h264要求），保持原始纵横比。
+      '-vf': 'fps=20:round=down,scale=480:-2',
+    },
     devFFmpeg: true, // 初始化ffmpeg
-    prodFFmpeg: true, // 初始化ffmpeg
+    prodFFmpeg: false, // 初始化ffmpeg
     devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),
     prodFFmpegLocalFile: path.resolve(SERVER_VIDEO_DIR, 'fddm_xyzcsl.mp4'),
   },
@@ -78,6 +131,17 @@ export const initLiveRoom = {
     cdn: SwitchEnum.no,
     type: LiveRoomTypeEnum.system,
     area: [1],
+    ffmpegParams: {
+      '-b:v': '300k', // 平均码率
+      '-maxrate': '500k', // 最大码率
+      '-bufsize': '1000k', // 缓存区，通常是最大码率的2倍
+      '-bf': 0, // 禁用 B 帧
+      '-tune': 'zerolatency', // 优化延迟，适合实时流
+      // fps=20：将视频的帧率设置为 20 帧每秒。
+      // round=down：确保帧率向下取整，适用于处理帧率不均匀的视频。
+      // scale=480:-2：将视频的宽度设置为 480 像素，而高度自动计算，以确保高度为 2 的倍数（h264要求），保持原始纵横比。
+      '-vf': 'fps=20:round=down,scale=480:-2',
+    },
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: true, // 初始化ffmpeg
     devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),
@@ -91,6 +155,17 @@ export const initLiveRoom = {
     cdn: SwitchEnum.no,
     type: LiveRoomTypeEnum.system,
     area: [1],
+    ffmpegParams: {
+      '-b:v': '300k', // 平均码率
+      '-maxrate': '500k', // 最大码率
+      '-bufsize': '1000k', // 缓存区，通常是最大码率的2倍
+      '-bf': 0, // 禁用 B 帧
+      '-tune': 'zerolatency', // 优化延迟，适合实时流
+      // fps=20：将视频的帧率设置为 20 帧每秒。
+      // round=down：确保帧率向下取整，适用于处理帧率不均匀的视频。
+      // scale=480:-2：将视频的宽度设置为 480 像素，而高度自动计算，以确保高度为 2 的倍数（h264要求），保持原始纵横比。
+      '-vf': 'fps=20:round=down,scale=480:-2',
+    },
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: true, // 初始化ffmpeg
     devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),
@@ -104,6 +179,17 @@ export const initLiveRoom = {
     cdn: SwitchEnum.no,
     type: LiveRoomTypeEnum.system,
     area: [1],
+    ffmpegParams: {
+      '-b:v': '300k', // 平均码率
+      '-maxrate': '500k', // 最大码率
+      '-bufsize': '1000k', // 缓存区，通常是最大码率的2倍
+      '-bf': 0, // 禁用 B 帧
+      '-tune': 'zerolatency', // 优化延迟，适合实时流
+      // fps=20：将视频的帧率设置为 20 帧每秒。
+      // round=down：确保帧率向下取整，适用于处理帧率不均匀的视频。
+      // scale=480:-2：将视频的宽度设置为 480 像素，而高度自动计算，以确保高度为 2 的倍数（h264要求），保持原始纵横比。
+      '-vf': 'fps=20:round=down,scale=480:-2',
+    },
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: false, // 初始化ffmpeg
     devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),
@@ -117,6 +203,17 @@ export const initLiveRoom = {
     cdn: SwitchEnum.no,
     type: LiveRoomTypeEnum.system,
     area: [1],
+    ffmpegParams: {
+      '-b:v': '300k', // 平均码率
+      '-maxrate': '500k', // 最大码率
+      '-bufsize': '1000k', // 缓存区，通常是最大码率的2倍
+      '-bf': 0, // 禁用 B 帧
+      '-tune': 'zerolatency', // 优化延迟，适合实时流
+      // fps=20：将视频的帧率设置为 20 帧每秒。
+      // round=down：确保帧率向下取整，适用于处理帧率不均匀的视频。
+      // scale=480:-2：将视频的宽度设置为 480 像素，而高度自动计算，以确保高度为 2 的倍数（h264要求），保持原始纵横比。
+      '-vf': 'fps=20:round=down,scale=480:-2',
+    },
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: true, // 初始化ffmpeg
     devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),
@@ -130,6 +227,17 @@ export const initLiveRoom = {
     cdn: SwitchEnum.no,
     type: LiveRoomTypeEnum.system,
     area: [1],
+    ffmpegParams: {
+      '-b:v': '300k', // 平均码率
+      '-maxrate': '500k', // 最大码率
+      '-bufsize': '1000k', // 缓存区，通常是最大码率的2倍
+      '-bf': 0, // 禁用 B 帧
+      '-tune': 'zerolatency', // 优化延迟，适合实时流
+      // fps=20：将视频的帧率设置为 20 帧每秒。
+      // round=down：确保帧率向下取整，适用于处理帧率不均匀的视频。
+      // scale=480:-2：将视频的宽度设置为 480 像素，而高度自动计算，以确保高度为 2 的倍数（h264要求），保持原始纵横比。
+      '-vf': 'fps=20:round=down,scale=480:-2',
+    },
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: true, // 初始化ffmpeg
     devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),
@@ -143,6 +251,17 @@ export const initLiveRoom = {
     cdn: SwitchEnum.no,
     type: LiveRoomTypeEnum.system,
     area: [1],
+    ffmpegParams: {
+      '-b:v': '300k', // 平均码率
+      '-maxrate': '500k', // 最大码率
+      '-bufsize': '1000k', // 缓存区，通常是最大码率的2倍
+      '-bf': 0, // 禁用 B 帧
+      '-tune': 'zerolatency', // 优化延迟，适合实时流
+      // fps=20：将视频的帧率设置为 20 帧每秒。
+      // round=down：确保帧率向下取整，适用于处理帧率不均匀的视频。
+      // scale=480:-2：将视频的宽度设置为 480 像素，而高度自动计算，以确保高度为 2 的倍数（h264要求），保持原始纵横比。
+      '-vf': 'fps=20:round=down,scale=480:-2',
+    },
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: false, // 初始化ffmpeg
     devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),
@@ -156,6 +275,17 @@ export const initLiveRoom = {
     cdn: SwitchEnum.no,
     type: LiveRoomTypeEnum.system,
     area: [1],
+    ffmpegParams: {
+      '-b:v': '300k', // 平均码率
+      '-maxrate': '500k', // 最大码率
+      '-bufsize': '1000k', // 缓存区，通常是最大码率的2倍
+      '-bf': 0, // 禁用 B 帧
+      '-tune': 'zerolatency', // 优化延迟，适合实时流
+      // fps=20：将视频的帧率设置为 20 帧每秒。
+      // round=down：确保帧率向下取整，适用于处理帧率不均匀的视频。
+      // scale=480:-2：将视频的宽度设置为 480 像素，而高度自动计算，以确保高度为 2 的倍数（h264要求），保持原始纵横比。
+      '-vf': 'fps=20:round=down,scale=480:-2',
+    },
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: false, // 初始化ffmpeg
     devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),
@@ -172,6 +302,17 @@ export const initLiveRoom = {
     cdn: SwitchEnum.no,
     type: LiveRoomTypeEnum.system,
     area: [1],
+    ffmpegParams: {
+      '-b:v': '300k', // 平均码率
+      '-maxrate': '500k', // 最大码率
+      '-bufsize': '1000k', // 缓存区，通常是最大码率的2倍
+      '-bf': 0, // 禁用 B 帧
+      '-tune': 'zerolatency', // 优化延迟，适合实时流
+      // fps=20：将视频的帧率设置为 20 帧每秒。
+      // round=down：确保帧率向下取整，适用于处理帧率不均匀的视频。
+      // scale=480:-2：将视频的宽度设置为 480 像素，而高度自动计算，以确保高度为 2 的倍数（h264要求），保持原始纵横比。
+      '-vf': 'fps=20:round=down,scale=480:-2',
+    },
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: false, // 初始化ffmpeg
     devFFmpegLocalFile: path.resolve(VIDEO_DIR, ''),
@@ -185,6 +326,17 @@ export const initLiveRoom = {
     cdn: SwitchEnum.no,
     type: LiveRoomTypeEnum.system,
     area: [1],
+    ffmpegParams: {
+      '-b:v': '300k', // 平均码率
+      '-maxrate': '500k', // 最大码率
+      '-bufsize': '1000k', // 缓存区，通常是最大码率的2倍
+      '-bf': 0, // 禁用 B 帧
+      '-tune': 'zerolatency', // 优化延迟，适合实时流
+      // fps=20：将视频的帧率设置为 20 帧每秒。
+      // round=down：确保帧率向下取整，适用于处理帧率不均匀的视频。
+      // scale=480:-2：将视频的宽度设置为 480 像素，而高度自动计算，以确保高度为 2 的倍数（h264要求），保持原始纵横比。
+      '-vf': 'fps=20:round=down,scale=480:-2',
+    },
     devFFmpeg: false, // 初始化ffmpeg
     prodFFmpeg: false, // 初始化ffmpeg
     devFFmpegLocalFile: path.resolve(VIDEO_DIR, 'fddm_xyzcsl.mp4'),

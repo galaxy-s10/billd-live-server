@@ -226,11 +226,18 @@ export interface ILiveUser {
 
 export interface IArea {
   id?: number;
+  p_id?: number;
   name?: string;
+  status?: SwitchEnum;
+  hot_status?: SwitchEnum;
   /** 备注 */
   remark?: string;
   /** 权重 */
   priority?: number;
+
+  children?: IArea[];
+
+  live_rooms?: ILiveRoom[];
   area_live_rooms?: IAreaLiveRoom[];
 
   created_at?: string;
@@ -503,8 +510,13 @@ export interface IBlacklist {
   id?: number;
   client_ip?: string;
   user_id?: number;
-  type?: number;
+  type?: BlacklistTypeEnum;
+  start_date?: number;
+  end_date?: number;
   msg?: string;
+  remark?: string;
+
+  user?: IUser;
 
   created_at?: string;
   updated_at?: string;
@@ -696,6 +708,11 @@ export interface IMinuteData {
   deleted_at?: string;
 }
 
+export enum StatusEnum {
+  normal,
+  disable,
+}
+
 export enum SwitchEnum {
   yes,
   no,
@@ -787,4 +804,33 @@ export enum IThirdPartyLiveStreamingPlatformEnum {
   douyin = 'douyin',
   kuaishou = 'kuaishou',
   xiaohongshu = 'xiaohongshu',
+}
+
+export enum BlacklistTypeEnum {
+  /** 频繁请求 */
+  frequent,
+  /** 管理员禁用 */
+  admin_disable,
+  /** 禁言 */
+  disable_msg,
+}
+
+export interface IOnlineStatistics {
+  id?: number;
+  user_id?: number;
+  live_room_id?: number;
+  client_ip?: string;
+  client_env?: ClientEnvEnum;
+  user_agent?: string;
+  /** 上线时间 */
+  online_time?: number;
+  /** 下线时间 */
+  offline_time?: number;
+
+  user?: IUser;
+  live_room?: ILiveRoom;
+
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
 }

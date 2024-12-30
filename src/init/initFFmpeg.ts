@@ -6,6 +6,7 @@ import srsController from '@/controller/srs.controller';
 import tencentcloudCssController from '@/controller/tencentcloudCss.controller';
 import { initUser } from '@/init/initUser';
 import { SwitchEnum } from '@/interface';
+import { SRS_LIVE, TENCENTCLOUD_CSS } from '@/secret/secret';
 import { LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 import { tencentcloudCssUtils } from '@/utils/tencentcloud-css';
@@ -28,6 +29,7 @@ async function addLive({
   prodFFmpeg,
   devFFmpegLocalFile,
   prodFFmpegLocalFile,
+  ffmpegParams,
 }: {
   live_room_id: number;
   user_id: number;
@@ -37,6 +39,7 @@ async function addLive({
   prodFFmpeg: boolean;
   devFFmpegLocalFile: string;
   prodFFmpegLocalFile: string;
+  ffmpegParams: Record<string, any>;
 }) {
   const liveRoomInfoResult = await liveRoomController.common.findKey(
     live_room_id
@@ -104,6 +107,27 @@ async function addLive({
         console.log(chalkERROR(`FFmpeg推流错误！`), 'localFile为空');
         return;
       }
+      let rtmptoflvurl = cdnPushRes.rtmp_url;
+      if (cdn === SwitchEnum.yes) {
+        rtmptoflvurl = cdnPushRes.rtmp_url;
+      } else {
+        rtmptoflvurl = rtmptoflvurl.replace(
+          `rtmp://${SRS_LIVE.PushDomain}`,
+          'rtmp://localhost'
+        );
+        rtmptoflvurl = rtmptoflvurl.replace(
+          `rtmp://${TENCENTCLOUD_CSS.PushDomain}`,
+          'rtmp://localhost'
+        );
+      }
+
+      let ffmpegParamsStr = '';
+      Object.keys(ffmpegParams).forEach((item) => {
+        ffmpegParamsStr += `${item} ${ffmpegParams[item] as string} `;
+      });
+      // 将最后的空格去掉
+      ffmpegParamsStr = ffmpegParamsStr.replace(/ $/g, '');
+
       /**
        * -preset值：
        * ultrafast: 编码速度最快，文件大小较大，质量较差。
@@ -121,13 +145,31 @@ async function addLive({
       // -tune zerolatency，优化延迟，适合实时流。这个选项优化编码以减少延迟，可能会增加CPU使用率，因为它会影响编码的方式以实现低延迟。
       // -g 1，设置 GOP（Group of Pictures）大小为 1，这样会禁用 B 帧，因为每帧都是 I 帧，每一帧都是关键帧，这会显著增加CPU占用，因为每帧都需要完整编码。
       // -bf 0，禁用 B 帧，设置B帧为0，减少了编码的复杂性，有助于降低CPU占用。
+      // -filter:v fps=fps=20:round=down
+      // -b:v 1000k，目标平均码率，也即希望得到的输出文件的平均码率（单位 bit/s）。该参数也在二压中被使用。
+      // 1. scale=480:-1
+      // 含义：将宽度设置为 480 像素，高度将自动计算以保持原始视频的纵横比。
+      // 用途：适用于需要保持视频比例的场景，且不特别要求高度必须是偶数。
+      // 2. scale=480:-2
+      // 含义：将宽度设置为 480 像素，高度自动计算，但确保高度为 2 的倍数。
+      // 用途：适用于需要满足编码器要求的场景，特别是某些编码器（如 H.264）要求高度必须是 2 的倍数。
       // WARN 核心是禁用B帧，rtc-rtmp需要禁用b帧，则不能-vcodec copy，需要使用编码
       // const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec copy -acodec copy -f flv '${
-      //   cdn === SwitchEnum.yes ? cdnPushRes.rtmp_url : srsPushRes.rtmp_url
+      //   rtmptoflvurl
       // }'`;
-      const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec libx264 -preset ultrafast -b:v 1200k -filter:v fps=fps=20:round=down -acodec copy -f flv '${
-        cdn === SwitchEnum.yes ? cdnPushRes.rtmp_url : srsPushRes.rtmp_url
-      }'`;
+      // WARN rtmptoflvurl推流到localhost即可，推流到服务器的域名的话，会多一层中转，没必要。
+      // CPU 90%+
+      // const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec libx264 -preset ultrafast -acodec copy -bf 0 -tune zerolatency -f flv '${rtmptoflvurl}'`;
+      // CPU 90%+
+      // const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec libx264 -preset ultrafast -acodec copy -bf 0 -f flv '${rtmptoflvurl}'`;
+      // CPU 90%+
+      // const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec libx264 -preset ultrafast -acodec copy -f flv '${rtmptoflvurl}'`;
+      // CPU 60%+
+      // const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec libx264 -preset ultrafast -acodec copy -filter:v fps=fps=20:round=down -b:v 1000k -f flv '${rtmptoflvurl}'`;
+      // CPU 65%+
+      // const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec libx264 -preset ultrafast -acodec copy -bf 0 -tune zerolatency -filter:v fps=fps=20:round=down -b:v 1000k -f flv '${rtmptoflvurl}'`;
+      // CPU 50%+
+      const ffmpegCmd = `ffmpeg -loglevel quiet -readrate 1 -stream_loop -1 -i ${localFile} -vcodec libx264 -preset ultrafast -acodec copy ${ffmpegParamsStr} -f flv '${rtmptoflvurl}'`;
       // const ffmpegSyncCmd = `${ffmpegCmd} 1>/dev/null 2>&1 &`;
       try {
         // WARN 使用execSync的话，命令最后需要添加：1>/dev/null 2>&1 &，否则会自动退出进程；
@@ -241,6 +283,7 @@ export const initFFmpeg = async (init = true) => {
             prodFFmpeg: live_room.prodFFmpeg,
             devFFmpegLocalFile: live_room.devFFmpegLocalFile,
             prodFFmpegLocalFile: live_room.prodFFmpegLocalFile,
+            ffmpegParams: live_room.ffmpegParams,
           })
         );
       }

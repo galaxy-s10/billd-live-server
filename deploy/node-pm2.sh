@@ -4,9 +4,9 @@
 # Date: 2022-04-26 01:54:48
 # Description: https://github.com/galaxy-s10/sh/blob/master/pm2.sh
 # Email: 2274751790@qq.com
-# FilePath: /billd-live-server/deploy/node-pm2.sh
+# FilePath: /billd-live-server-pro/deploy/node-pm2.sh
 # Github: https://github.com/galaxy-s10
-# LastEditTime: 2024-02-21 23:13:19
+# LastEditTime: 2024-12-16 23:58:21
 # LastEditors: shuisheng
 ###
 

@@ -93,8 +93,8 @@ export const DOMAIN_URL = 'localhost'; // 本地地址，一般是localhost或�
 
 export const COMMON_ERROR_CODE = {
   serverError: 10000, // 服务器错误
-  banIp: 1000, // 黑名单禁用了ip
-  userStatusIsDisable: 1001, // 你的账号已被禁用，请联系管理员处理！
+  frequent: 1000, // 当前ip请求频繁，已被禁用！
+  admin_disable: 1001, // 你的账号已被禁用，请联系管理员处理！
   notFound: 1002, // 返回了404的http状态码
   errStatusCode: 1003, // 返回了即不是200也不是404的http状态码
   shutdown: 1004, // 停机维护
@@ -119,10 +119,10 @@ export const COMMON_HTTP_CODE = {
 };
 
 export const COMMON_ERROE_MSG = {
-  banIp: '此ip已被禁用，请联系管理员处理！', // 此ip已被禁用，请联系管理员处理！
+  frequent: '当前ip请求频繁，已被禁用！', // 当前ip请求频繁，已被禁用！
   jwtExpired: '登录信息过期！', // 登录信息过期！
   invalidToken: '非法token！', // 非法token！
-  userStatusIsDisable: '你的账号已被禁用，请联系管理员处理！', // 你的账号已被禁用，请联系管理员处理！
+  admin_disable: '你的账号已被禁用，请联系管理员处理！', // 你的账号已被禁用，请联系管理员处理！
   userStatusNoNormal: '用户状态非正常', // 你的账号已被管理员禁用，请联系管理员处理！
   shutdown: '停机维护中', // 停机维护中
 
@@ -132,7 +132,7 @@ export const COMMON_ERROE_MSG = {
   forbidden: '权限不足！', // 权限不足！
   notFound: '未找到！', // 未找到！
   serverError: '服务器错误！', // 服务器错误！
-  idOrPwdError: '账号或密码错误！', // 账号或密码错误！
+  idOrPwdError: '用户ID或密码错误！', // 用户ID或密码错误！
   usernameOrPwdError: '用户名或密码错误！', // 用户名或密码错误！
   todayAlreadySignin: '今天已签到过了！', // 今天已签到过了！
   alreadyGetRedbag: '你已经领取过红包', // 你已经领取过红包
@@ -146,11 +146,6 @@ export const COMMON_SUCCESS_MSG = {
   DELETE: '删除成功！',
 
   loginSuccess: '登录成功！',
-};
-
-export const BLACKLIST_TYPE = {
-  banIp: 1, // 频繁操作
-  adminDisableUser: 2, // 被管理员禁用
 };
 
 export const SCHEDULE_TYPE = {
