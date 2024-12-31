@@ -1,5 +1,5 @@
 {
-  "name": "billd-live",
+  "name": "billd-live-server",
   "version": "0.1.0",
   "description": "基于Vue3 + WebRTC + Node + SRS搭建的直播间",
   "keywords": [
@@ -12,11 +12,11 @@
   ],
   "homepage": "https://live.hsslive.cn",
   "bugs": {
-    "url": "https://github.com/galaxy-s10/billd-live/issues"
+    "url": "https://github.com/galaxy-s10/billd-live-server/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/galaxy-s10/billd-live"
+    "url": "https://github.com/galaxy-s10/billd-live-server"
   },
   "license": "MIT",
   "author": "shuisheng <2274751790@qq.com>",
