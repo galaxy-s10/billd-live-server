@@ -53,11 +53,13 @@ const map = {
 
 async function foo() {
   const result = await autocannon({
-    url: `${baseUrl}/live/list?live_room_is_show=0&orderName=created_at&orderBy=desc`,
+    // url: `https://xdyun.com/article/100704`,
+    url: `https://www.funpassgg.com/zh/blog/detail/top-3-winners-for-funpass-gaming-awards-2024.html`,
+    // url: `https://nuxt2.hsslive.cn/`,
     method: 'GET',
-    connections: 10, // 并发连接数。可选默认值：10
+    connections: 3, // 并发连接数。可选默认值：10
     pipelining: 1, // 每个连接的管道请求数。当大于 1 时将导致ClientAPI 抛出异常。可选默认值：1
-    duration: 5, // 运行的秒数。可以是时间字符串。可选默认值：10
+    duration: 50, // 运行的秒数。可以是时间字符串。可选默认值：10
   });
   // const result = await autocannon({
   //   url: `${baseUrl}/area/list`,

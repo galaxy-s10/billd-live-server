@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      function flattenTree(tree, childrenField = 'children') {
+        const result = [];
+
+        function recurse(node) {
+          const flatNode = { ...node };
+          delete flatNode[childrenField];
+
+          result.push(flatNode);
+          const child = node[childrenField];
+          if (child && Array.isArray(child)) {
+            child.forEach((item) => {
+              recurse(item);
+            });
+          }
+        }
+
+        recurse(tree);
+
+        return result;
+      }
+      // 示例数据
+      const treeData = {
+        id: 1,
+        p_id: 0,
+        status: null,
+        hot_status: null,
+        name: '音乐',
+        priority: 10,
+        remark: '音乐分区',
+        created_at: '2024-12-11 19:11:42',
+        updated_at: '2024-12-11 19:11:42',
+        deleted_at: null,
+        children: [
+          {
+            id: 5,
+            p_id: 1,
+            status: null,
+            hot_status: null,
+            name: '网游23',
+            priority: 5,
+            remark: '英雄联盟、CS:GO、DOTA2',
+            created_at: '2024-12-11 19:11:42',
+            updated_at: '2024-12-11 19:11:42',
+            deleted_at: null,
+            children: [],
+          },
+          {
+            id: 6,
+            p_id: 1,
+            status: null,
+            hot_status: null,
+            name: '网游',
+            priority: 6,
+            remark: '英雄联盟、CS:GO、DOTA2',
+            created_at: '2024-12-11 19:11:42',
+            updated_at: '2024-12-11 19:11:42',
+            deleted_at: null,
+            children: [],
+          },
+        ],
+      };
+
+      // 使用示例
+      const flatData = flattenTree(treeData);
+      console.log(flatData);
+    </script>
+  </body>
+</html>

@@ -110,13 +110,14 @@ async function addLive({
       let rtmptoflvurl = cdnPushRes.rtmp_url;
       if (cdn === SwitchEnum.yes) {
         rtmptoflvurl = cdnPushRes.rtmp_url;
-      } else {
-        rtmptoflvurl = rtmptoflvurl.replace(
-          `rtmp://${SRS_LIVE.PushDomain}`,
-          'rtmp://localhost'
-        );
         rtmptoflvurl = rtmptoflvurl.replace(
           `rtmp://${TENCENTCLOUD_CSS.PushDomain}`,
+          'rtmp://localhost'
+        );
+      } else {
+        rtmptoflvurl = srsPushRes.rtmp_url;
+        rtmptoflvurl = rtmptoflvurl.replace(
+          `rtmp://${SRS_LIVE.PushDomain}`,
           'rtmp://localhost'
         );
       }

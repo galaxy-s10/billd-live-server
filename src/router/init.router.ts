@@ -6,6 +6,22 @@ import initController from '@/controller/init.controller';
 
 const initRouter = new Router({ prefix: '/init' });
 
+// 更新所有直播间的推拉流地址
+initRouter.post(
+  '/update_all_liveroom_url',
+  // apiVerifyEnv([PROJECT_ENV_ENUM.dev]),
+  // apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
+  initController.updateAllLiveRoomUrl
+);
+
+// 初始化分区
+initRouter.post(
+  '/area',
+  apiVerifyEnv([PROJECT_ENV_ENUM.dev]),
+  apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
+  initController.initArea
+);
+
 // 初始化角色
 initRouter.post(
   '/role',

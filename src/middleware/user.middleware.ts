@@ -19,7 +19,9 @@ const schema = Joi.object({
   //   .pattern(/(?![0-9]+$)(?![a-zA-Z]+$)(?![_]+$)[0-9a-zA-A_]{8,16}/)
   //   .required(),
   desc: Joi.string().min(3).max(50).error(new Error('描述长度要求3-50！')),
-  avatar: Joi.string().min(3).max(100).error(new Error('头像长度要求3-100！')),
+  avatar: Joi.alternatives()
+    .try(null, Joi.string().min(3).max(100))
+    .error(new Error('头像长度要求3-100！')),
   status: Joi.array()
     .valid(UserStatusEnum.disable, UserStatusEnum.normal)
     .error(new Error('状态错误！')),

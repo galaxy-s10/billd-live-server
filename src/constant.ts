@@ -169,8 +169,6 @@ export const REDIS_KEY = {
   livePkKey: `${REDIS_PREFIX_ENV}livePkKey___`, // 直播间打pk秘钥
   dbLiveList: `${REDIS_PREFIX_ENV}dbLiveList___`, // 直播间在线列表
   dbLiveRoomHistoryMsgList: `${REDIS_PREFIX_ENV}dbLiveRoomHistoryMsgList___`, // 直播间历史消息
-  deskUserUuid: `${REDIS_PREFIX_ENV}deskUserUuid___`,
-  deskUserSocketId: `${REDIS_PREFIX_ENV}deskUserSocketId___`,
   tencentcloudCssPublishing: `${REDIS_PREFIX_ENV}tencentcloudCssPublishing___`,
   srsPublishing: `${REDIS_PREFIX_ENV}srsPublishing___`,
   rtcLiving: `${REDIS_PREFIX_ENV}rtcLiving___`,

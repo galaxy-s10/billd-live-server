@@ -18,7 +18,7 @@ globalMsgRouter.post(
   globalMsgController.create
 );
 
-globalMsgRouter.get('/my_list', globalMsgController.getMyList);
+globalMsgRouter.get('/global', globalMsgController.getGlobal);
 
 globalMsgRouter.get('/find/:id', globalMsgController.find);
 

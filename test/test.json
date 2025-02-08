@@ -1,18 +1,503 @@
 {
-  "user_id": -1,
-  "api_user_agent": "Apifox/1.0.0 (https://apifox.com)",
-  "api_body": "{}",
-  "api_query": "{}",
-  "api_real_ip": "undefined",
-  "api_forwarded_for": "undefined",
-  "api_referer": "undefined",
-  "api_path": "undefined",
-  "api_method": "POST",
-  "api_host": "127.0.0.1:4300",
-  "api_hostname": "127.0.0.1",
-  "api_status_code": 401,
-  "api_error": "登录信息过期！",
-  "api_err_msg": "登录信息过期！",
-  "api_duration": -1,
-  "api_err_code": 401
+  "code": 200,
+  "data": {
+    "flatdata": [
+      {
+        "id": 1,
+        "p_id": 0,
+        "name": "音乐",
+        "remark": "音乐分区",
+        "priority": 10,
+        "status": 0,
+        "hot_status": 1
+      },
+      {
+        "p_id": 1,
+        "name": "流行",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 8
+      },
+      {
+        "p_id": 1,
+        "name": "民谣",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 9
+      },
+      {
+        "p_id": 1,
+        "name": "轻音乐",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 10
+      },
+      {
+        "p_id": 1,
+        "name": "原声带",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 11
+      },
+      {
+        "p_id": 1,
+        "name": "古典",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 12
+      },
+      {
+        "p_id": 1,
+        "name": "金属",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 13
+      },
+      {
+        "id": 2,
+        "p_id": 0,
+        "name": "知识",
+        "remark": "知识分区",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1
+      },
+      {
+        "p_id": 2,
+        "name": "科技",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 14
+      },
+      {
+        "p_id": 2,
+        "name": "教育学习",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 15
+      },
+      {
+        "p_id": 2,
+        "name": "自习室",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 16
+      },
+      {
+        "p_id": 2,
+        "name": "历史",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 17
+      },
+      {
+        "id": 3,
+        "p_id": 0,
+        "name": "手游",
+        "remark": "手游分区",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1
+      },
+      {
+        "p_id": 3,
+        "name": "王者荣耀",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 18
+      },
+      {
+        "p_id": 3,
+        "name": "和平精英",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 19
+      },
+      {
+        "p_id": 3,
+        "name": "原神",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 20
+      },
+      {
+        "p_id": 3,
+        "name": "第五人格",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 21
+      },
+      {
+        "p_id": 3,
+        "name": "蛋仔派对",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 22
+      },
+      {
+        "p_id": 3,
+        "name": "元梦之星",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 23
+      },
+      {
+        "id": 4,
+        "p_id": 0,
+        "name": "网游",
+        "remark": "网游分区",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1
+      },
+      {
+        "p_id": 4,
+        "name": "英雄联盟",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 24
+      },
+      {
+        "p_id": 4,
+        "name": "DOTA2",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 25
+      },
+      {
+        "p_id": 4,
+        "name": "守望先锋",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 26
+      },
+      {
+        "p_id": 4,
+        "name": "魔兽世界",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 27
+      },
+      {
+        "p_id": 4,
+        "name": "穿越火线",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 28
+      },
+      {
+        "p_id": 4,
+        "name": "APEX英雄",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 29
+      },
+      {
+        "p_id": 4,
+        "name": "CS:GO",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 30
+      },
+      {
+        "p_id": 4,
+        "name": "DNF",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 31
+      },
+      {
+        "p_id": 4,
+        "name": "QQ飞车",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 32
+      },
+      {
+        "p_id": 4,
+        "name": "三角洲行动",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 33
+      },
+      {
+        "id": 5,
+        "p_id": 0,
+        "name": "单机游戏",
+        "remark": "单机游戏分区",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1
+      },
+      {
+        "p_id": 5,
+        "name": "主机游戏",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 34
+      },
+      {
+        "p_id": 5,
+        "name": "独立游戏",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 35
+      },
+      {
+        "p_id": 5,
+        "name": "怀旧游戏",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 36
+      },
+      {
+        "p_id": 5,
+        "name": "黑神话：悟空",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 37
+      },
+      {
+        "p_id": 5,
+        "name": "幻兽帕鲁",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 38
+      },
+      {
+        "p_id": 5,
+        "name": "NBA2K",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 39
+      },
+      {
+        "p_id": 5,
+        "name": "使命召唤21",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 40
+      },
+      {
+        "p_id": 5,
+        "name": "我的世界",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 41
+      },
+      {
+        "p_id": 5,
+        "name": "生化危机",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 42
+      },
+      {
+        "p_id": 5,
+        "name": "荒野大嫖客2",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 43
+      },
+      {
+        "p_id": 5,
+        "name": "刺客信条",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 44
+      },
+      {
+        "p_id": 5,
+        "name": "赛博朋克2077",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 45
+      },
+      {
+        "p_id": 5,
+        "name": "糖豆人",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 46
+      },
+      {
+        "id": 6,
+        "p_id": 0,
+        "name": "娱乐",
+        "remark": "娱乐分区",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1
+      },
+      {
+        "p_id": 6,
+        "name": "颜值",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 47
+      },
+      {
+        "p_id": 6,
+        "name": "舞见",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 48
+      },
+      {
+        "p_id": 6,
+        "name": "萌宅",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 49
+      },
+      {
+        "id": 7,
+        "p_id": 0,
+        "name": "生活",
+        "remark": "生活分区",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1
+      },
+      {
+        "p_id": 7,
+        "name": "情感",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 50
+      },
+      {
+        "p_id": 7,
+        "name": "手工绘画",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 51
+      },
+      {
+        "p_id": 7,
+        "name": "户外",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 52
+      },
+      {
+        "p_id": 7,
+        "name": "美食",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 53
+      },
+      {
+        "p_id": 7,
+        "name": "萌宠",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 54
+      },
+      {
+        "p_id": 7,
+        "name": "时尚",
+        "remark": "",
+        "priority": 9,
+        "status": 0,
+        "hot_status": 1,
+        "id": 55
+      }
+    ]
+  },
+  "msg": "初始化分区表成功！"
 }

@@ -16,9 +16,6 @@ roleRouter.get('/all_list', roleController.getAllList);
 // DONE 获取所有角色（树型）
 roleRouter.get('/get_tree_role', roleController.getTreeRole);
 
-// DONE 获取除了父级以外的所有角色（树型）
-roleRouter.get('/get_tree_child_role', roleController.getTreeChildRole);
-
 // DONE 批量删除子角色
 roleRouter.post(
   '/batch_delete_child_roles',

@@ -22,9 +22,6 @@ authRouter.get('/all_list', authController.getAllList);
 // 获取所有权限（树型）
 authRouter.get('/get_tree_auth', authController.getTreeAuth);
 
-// 获取除了父级以外的所有权限（树型）
-authRouter.get('/get_tree_child_auth', authController.getTreeChildAuth);
-
 // 查找权限
 authRouter.get('/find/:id', authController.find);
 
