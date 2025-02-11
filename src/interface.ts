@@ -399,32 +399,12 @@ export interface IOrder {
   deleted_at?: string;
 }
 
-export interface ISrsPublishStream {
-  /** 客户端在获取信息时，必须检查ServerID是否改变，改变时就是服务器重启，之前所有的数据都应该作废了。 */
-  srs_server_id?: string;
-  srs_service_id?: string;
-  srs_action?: string;
-  srs_client_id?: string;
-  srs_ip?: string;
-  srs_vhost?: string;
-  srs_app?: string;
-  srs_tcUrl?: string;
-  srs_stream?: string;
-  srs_param?: string;
-  srs_stream_url?: string;
-  srs_stream_id?: string;
-  /** 是否是腾讯云云直播，1是，2否 */
-  is_tencentcloud_css?: number;
-}
-
 export interface ILiveRecord {
   id?: number;
   /** 直播平台 */
   platform?: LivePlatformEnum;
-  /** 直播流名称 */
-  stream_name?: string;
-  /** 直播流id */
-  stream_id?: string;
+  /** 直播id */
+  live_id?: number;
   /** 用户id */
   user_id?: number;
   /** 直播间id */
@@ -436,7 +416,7 @@ export interface ILiveRecord {
   /** 观看数 */
   view?: number;
   /** 直播开始时间 */
-  start_time?: string;
+  start_time?: string | number;
   /** 直播结束时间 */
   end_time?: string;
   /** 备注 */
@@ -676,10 +656,6 @@ export type ILive = {
   live_room_id?: number;
   /** 直播平台 */
   platform?: LivePlatformEnum;
-  /** 直播流名称 */
-  stream_name?: string;
-  /** 直播流id */
-  stream_id?: string;
   /** 这次直播的标识id（用于推拉流回调） */
   flag_id?: string;
   /** 备注 */
