@@ -1,4 +1,4 @@
-import { ILiveRoom } from '@/types/ILiveRoom';
+import { ILiveRoom, LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import { IUser } from '@/types/IUser';
 
 export interface IVisitorLog {
@@ -401,8 +401,7 @@ export interface IOrder {
 
 export interface ILiveRecord {
   id?: number;
-  /** 直播平台 */
-  platform?: LivePlatformEnum;
+  live_room_type?: LiveRoomTypeEnum;
   /** 直播id */
   live_id?: number;
   /** 用户id */
@@ -654,8 +653,7 @@ export type ILive = {
   user_id?: number;
   /** 直播间id */
   live_room_id?: number;
-  /** 直播平台 */
-  platform?: LivePlatformEnum;
+  live_room_type?: LiveRoomTypeEnum;
   /** 这次直播的标识id（用于推拉流回调） */
   flag_id?: string;
   /** 备注 */
@@ -670,13 +668,6 @@ export type ILive = {
   updated_at?: string;
   deleted_at?: string;
 };
-
-/** 直播平台 */
-export enum LivePlatformEnum {
-  rtc,
-  srs,
-  tencentcloud_css,
-}
 
 export enum ClientEnvEnum {
   android,

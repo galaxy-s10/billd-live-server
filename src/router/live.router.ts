@@ -38,6 +38,8 @@ liveRouter.post('/add_fake_live', liveController.addFakeLive);
 // 删除一个假直播开播
 liveRouter.post('/del_fake_live', liveController.delFakeLive);
 
+liveRouter.post('/start_live', liveController.startLive);
+
 liveRouter.post('/close_my_live', liveController.closeMyLive);
 
 liveRouter.post(
