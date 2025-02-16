@@ -1,6 +1,7 @@
 import { exec, spawnSync } from 'child_process';
 
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import liveController from '@/controller/live.controller';
 import liveRoomController from '@/controller/liveRoom.controller';
 import srsController from '@/controller/srs.controller';
 import tencentcloudCssController from '@/controller/tencentcloudCss.controller';
@@ -76,6 +77,10 @@ async function addLive({
       (PROJECT_ENV === PROJECT_ENV_ENUM.beta && devFFmpeg) ||
       (PROJECT_ENV === PROJECT_ENV_ENUM.prod && prodFFmpeg)
     ) {
+      await liveController.common.startLive({
+        userId: user_id,
+        live_room_type: type,
+      });
       // const ffmpegCmd = spawn(`ffmpeg`, [
       //   '-loglevel', // -loglevel quiet不输出log
       //   'quiet',
