@@ -16,6 +16,11 @@ liveRouter.get(
 );
 
 liveRouter.get(
+  '/live_room_online_user_count/:live_room_id',
+  liveController.getLiveRoomOnlineUserCount
+);
+
+liveRouter.get(
   '/all_live_room_online_user',
   liveController.getAllLiveRoomOnlineUser
 );

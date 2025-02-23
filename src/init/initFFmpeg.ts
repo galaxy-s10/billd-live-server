@@ -6,7 +6,6 @@ import liveRoomController from '@/controller/liveRoom.controller';
 import srsController from '@/controller/srs.controller';
 import tencentcloudCssController from '@/controller/tencentcloudCss.controller';
 import { initUser } from '@/init/initUser';
-import { SwitchEnum } from '@/interface';
 import { SRS_LIVE, TENCENTCLOUD_CSS } from '@/secret/secret';
 import { LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
@@ -24,7 +23,6 @@ function ffmpegIsInstalled() {
 async function addLive({
   live_room_id,
   user_id,
-  cdn,
   type,
   devFFmpeg,
   prodFFmpeg,
@@ -34,7 +32,6 @@ async function addLive({
 }: {
   live_room_id: number;
   user_id: number;
-  cdn: SwitchEnum;
   type: LiveRoomTypeEnum;
   devFFmpeg: boolean;
   prodFFmpeg: boolean;
@@ -50,7 +47,7 @@ async function addLive({
     liveRoomId: live_room_id,
   });
   const srsPushRes = srsController.common.getPushUrl({
-    isdev: PROJECT_ENV === PROJECT_ENV_ENUM.prod ? '2' : '1',
+    isdev: PROJECT_ENV === PROJECT_ENV_ENUM.prod ? 'no' : 'yes',
     userId: user_id,
     liveRoomId: live_room_id,
     type: LiveRoomTypeEnum.system,
@@ -60,10 +57,10 @@ async function addLive({
     liveRoomId: live_room_id,
   });
   const cdnPushRes = tencentcloudCssUtils.getPushUrl({
-    isdev: PROJECT_ENV === PROJECT_ENV_ENUM.prod ? '2' : '1',
+    isdev: PROJECT_ENV === PROJECT_ENV_ENUM.prod ? 'no' : 'yes',
     userId: user_id,
     liveRoomId: live_room_id,
-    type: LiveRoomTypeEnum.tencent_css,
+    type: LiveRoomTypeEnum.tencentcloud_css,
     key,
   });
 
@@ -80,12 +77,13 @@ async function addLive({
       await liveController.common.startLive({
         userId: user_id,
         live_room_type: type,
+        areas: undefined,
       });
       // const ffmpegCmd = spawn(`ffmpeg`, [
       //   '-loglevel', // -loglevel quiet不输出log
       //   'quiet',
       //   '-readrate', // 以本地帧频读数据，主要用于模拟捕获设备
-      //   '1',
+      //   'yes',
       //   '-stream_loop', // 设置输入流应循环的次数。Loop 0表示无循环，loop-1表示无限循环。
       //   '-1',
       //   '-i', // 输入
@@ -113,7 +111,12 @@ async function addLive({
         return;
       }
       let rtmptoflvurl = cdnPushRes.rtmp_url;
-      if (cdn === SwitchEnum.yes) {
+      if (
+        [
+          LiveRoomTypeEnum.tencentcloud_css,
+          LiveRoomTypeEnum.tencentcloud_css_pk,
+        ].includes(type)
+      ) {
         rtmptoflvurl = cdnPushRes.rtmp_url;
         rtmptoflvurl = rtmptoflvurl.replace(
           `rtmp://${TENCENTCLOUD_CSS.PushDomain}`,
@@ -195,7 +198,6 @@ async function addLive({
 
     await liveRoomController.common.update({
       id: live_room_id,
-      cdn,
       type,
 
       pull_rtmp_url: srsPullRes.rtmp,
@@ -222,7 +224,12 @@ async function addLive({
     });
   }
 
-  if (cdn === SwitchEnum.yes) {
+  if (
+    [
+      LiveRoomTypeEnum.tencentcloud_css,
+      LiveRoomTypeEnum.tencentcloud_css_pk,
+    ].includes(type)
+  ) {
     if (PROJECT_ENV !== PROJECT_ENV_ENUM.prod) {
       return;
     }
@@ -283,7 +290,6 @@ export const initFFmpeg = async (init = true) => {
           addLive({
             live_room_id: live_room.id!,
             user_id: initUser[item].id!,
-            cdn: live_room.cdn!,
             type: live_room.type!,
             devFFmpeg: live_room.devFFmpeg,
             prodFFmpeg: live_room.prodFFmpeg,
