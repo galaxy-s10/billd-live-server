@@ -54,6 +54,8 @@ const frontendWhiteList = [
   '/srs/rtcV1Play',
   '/srs/rtcV1Whep',
 
+  '/ws/keep_joined',
+
   '/tencentcloud_css/on_publish',
   '/tencentcloud_css/on_unpublish',
   '/tencentcloud_css/remote_auth',
