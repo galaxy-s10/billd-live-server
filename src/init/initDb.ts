@@ -6,7 +6,8 @@ import { Sequelize } from 'sequelize';
 import { Model, ModelStatic } from 'sequelize/types';
 
 import sequelize from '@/config/mysql';
-import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import { COMMON_HTTP_CODE, PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import { CustomError } from '@/model/customError.model';
 import {
   chalkERROR,
   chalkINFO,
@@ -304,7 +305,12 @@ export const initDb = async (
       console.log(chalkSUCCESS('校正数据库所有表完成！'));
       break;
     }
-    default:
-      throw new Error('initDb参数不正确！');
+    default: {
+      throw new CustomError({
+        msg: `initDb参数不正确！`,
+        httpStatusCode: COMMON_HTTP_CODE.serverError,
+        errorCode: COMMON_HTTP_CODE.serverError,
+      });
+    }
   }
 };

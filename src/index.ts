@@ -6,6 +6,8 @@ import { performance } from 'perf_hooks';
 
 import { connectMysql } from '@/config/mysql';
 import { connectRabbitMQ } from '@/config/rabbitmq';
+import { connectRabbitMQConsumer } from '@/config/rabbitmq/consumer';
+import { connectRabbitMQProducer } from '@/config/rabbitmq/producer';
 import { connectRedis } from '@/config/redis';
 import { connectRedisPub } from '@/config/redis/publish';
 import { connectRedisSub } from '@/config/redis/subscribe';
@@ -23,9 +25,6 @@ import {
   chalkSUCCESS,
   chalkWARN,
 } from '@/utils/chalkTip';
-
-import { connectRabbitMQConsumer } from './config/rabbitmq/consumer';
-import { connectRabbitMQProducer } from './config/rabbitmq/producer';
 
 const start = performance.now();
 

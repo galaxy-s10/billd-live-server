@@ -3,6 +3,7 @@ import fs from 'fs';
 import Router from 'koa-router';
 
 import { PROJECT_ENV, PROJECT_ENV_ENUM, PROJECT_NAME } from '@/constant';
+import { CustomError } from '@/model/customError.model';
 import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 
 const router = new Router();
@@ -14,6 +15,7 @@ export function loadAllRoutes(app) {
     };
     await next();
   });
+
   app.use(router.routes()).use(router.allowedMethods()); // 每一个router都要配置routes()和allowedMethods()
 
   const err: string[] = [];
@@ -38,9 +40,12 @@ export function loadAllRoutes(app) {
       console.log(error);
     }
   });
+
   if (err.length) {
     console.log(chalkERROR(`加载路由: ${err.toString()}出错！`));
-    throw new Error('');
+    throw new CustomError({
+      msg: '',
+    });
   } else {
     console.log(chalkSUCCESS('加载所有路由成功！'));
   }

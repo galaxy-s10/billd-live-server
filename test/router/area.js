@@ -65,15 +65,21 @@ async function foo() {
     // url: `https://www.ldyuncs.com/`,
     // url: `https://www.xdyun.com`,
     // url: `https://www.hsslive.cn`,
-    url: `https://nuxt2.hsslive.cn`,
+    // url: `https://nuxt2.hsslive.cn`,
     // url: `https://api.hsslive.cn/prodapi/tag/list`,
-    // url: `https://live-api.hsslive.cn/other/get_client_ip`,
+    // url: `https://live-api.hsslive.cn`,
+    url: `https://live-api.hsslive.cn/other/get_client_ip`,
+    // url: `http://127.0.0.1:4300/other/get_client_ip`,
+    // url: `http://127.0.0.1:4300/area/list?keyWord=%E6%B8%B8`,
+    // url: `https://live-api.hsslive.cn/area/list?keyWord=%E6%B8%B8`, // 100左右
+    // url: `http://127.0.0.1:4300`,
+    // url: `https://live-api.hsslive.cn/health/`,
     // url: `https://live-api.hsslive.cn/area/get_all_area_by_tree?orderName=priority&orderBy=desc&id=0`,
     // url: `http://127.0.0.1:3000`,
     method: 'GET',
-    connections: 100, // 并发连接数。可选默认值：10
+    connections: 10, // 并发连接数。可选默认值：10
     pipelining: 10, // 每个连接的管道请求数。当大于 1 时将导致ClientAPI 抛出异常。可选默认值：1
-    duration: 10, // 运行的秒数。可以是时间字符串。可选默认值：10
+    duration: 5, // 运行的秒数。可以是时间字符串。可选默认值：10
   });
   // const result = await autocannon({
   //   // url: `https://blog.codedogs.top`,
@@ -104,7 +110,7 @@ async function foo() {
   //   pipelining: 1, // 每个连接的管道请求数。当大于 1 时将导致ClientAPI 抛出异常。可选默认值：1
   //   duration: 5, // 运行的秒数。可以是时间字符串。可选默认值：10
   // });
-  console.log(result);
+  // console.log(result);
   if (result) {
     let codeStr = '状态码:';
     let latencyStr = '响应延迟:';

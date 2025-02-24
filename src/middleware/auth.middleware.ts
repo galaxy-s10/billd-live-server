@@ -24,10 +24,10 @@ export const verifyProp = async (ctx: ParameterizedContext, next) => {
     });
     await next();
   } catch (error: any) {
-    throw new CustomError(
-      error.message,
-      COMMON_HTTP_CODE.paramsError,
-      COMMON_HTTP_CODE.paramsError
-    );
+    throw new CustomError({
+      msg: error.message,
+      httpStatusCode: COMMON_HTTP_CODE.paramsError,
+      errorCode: COMMON_HTTP_CODE.paramsError,
+    });
   }
 };

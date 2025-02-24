@@ -29,6 +29,8 @@ export const CORS_ALLOW_ORIGIN: string | string[] = [
   `https://admin.${prodDomain}`,
   `http://live.${prodDomain}`,
   `https://live.${prodDomain}`,
+  `http://live-api.${prodDomain}`,
+  `https://live-api.${prodDomain}`,
   `http://live-admin.${prodDomain}`,
   `https://live-admin.${prodDomain}`,
   `http://nuxt2.${prodDomain}`,
@@ -39,6 +41,10 @@ export const CORS_ALLOW_ORIGIN: string | string[] = [
   `https://project.${prodDomain}`,
   `http://desk.${prodDomain}`,
   `https://desk.${prodDomain}`,
+  `http://desk-api.${prodDomain}`,
+  `https://desk-api.${prodDomain}`,
+  `http://desk-admin.${prodDomain}`,
+  `https://desk-admin.${prodDomain}`,
 ];
 
 /** 消息最大长度 */
@@ -154,35 +160,36 @@ export const SCHEDULE_TYPE = {
   liveRoomIsLive: 'liveRoomIsLive',
 };
 
-export const REDIS_PREFIX_ENV = `${PROJECT_NAME}-${PROJECT_ENV}-`;
+export const REDIS_KEY_PREFIX = `${PROJECT_NAME}-${PROJECT_ENV}-`;
 
 // redis key前缀
 export const REDIS_KEY = {
-  emailLogin: `${REDIS_PREFIX_ENV}emailLogin___`, // 邮箱登录
-  emailRegister: `${REDIS_PREFIX_ENV}emailRegister___`, // 邮箱注册
-  userBindEmail: `${REDIS_PREFIX_ENV}userBindEmail___`, // 用户绑定邮箱
-  userCancelBindEmail: `${REDIS_PREFIX_ENV}userCancelBindEmail___`, // 用户取消绑定邮箱
-  joined: `${REDIS_PREFIX_ENV}joined___`, // 用户加入了房间
-  order: `${REDIS_PREFIX_ENV}order___`, // 订单
-  fileProgress: `${REDIS_PREFIX_ENV}fileProgress___`, // 文件上传进度
-  qrCodeLogin: `${REDIS_PREFIX_ENV}qrCodeLogin___`, // 二维码登录
-  livePkKey: `${REDIS_PREFIX_ENV}livePkKey___`, // 直播间打pk秘钥
-  dbLiveList: `${REDIS_PREFIX_ENV}dbLiveList___`, // 直播间在线列表
-  dbLiveRoomHistoryMsgList: `${REDIS_PREFIX_ENV}dbLiveRoomHistoryMsgList___`, // 直播间历史消息
-  tencentcloudCssPublishing: `${REDIS_PREFIX_ENV}tencentcloudCssPublishing___`,
-  srsPublishing: `${REDIS_PREFIX_ENV}srsPublishing___`,
-  rtcLiving: `${REDIS_PREFIX_ENV}rtcLiving___`,
-  keepJoined: `${REDIS_PREFIX_ENV}keepJoined___`, // 用户加入了房间
+  emailLogin: `${REDIS_KEY_PREFIX}emailLogin___`, // 邮箱登录
+  emailRegister: `${REDIS_KEY_PREFIX}emailRegister___`, // 邮箱注册
+  userBindEmail: `${REDIS_KEY_PREFIX}userBindEmail___`, // 用户绑定邮箱
+  userCancelBindEmail: `${REDIS_KEY_PREFIX}userCancelBindEmail___`, // 用户取消绑定邮箱
+  joined: `${REDIS_KEY_PREFIX}joined___`, // 用户加入了房间
+  order: `${REDIS_KEY_PREFIX}order___`, // 订单
+  fileProgress: `${REDIS_KEY_PREFIX}fileProgress___`, // 文件上传进度
+  qrCodeLogin: `${REDIS_KEY_PREFIX}qrCodeLogin___`, // 二维码登录
+  livePkKey: `${REDIS_KEY_PREFIX}livePkKey___`, // 直播间打pk秘钥
+  dbLiveList: `${REDIS_KEY_PREFIX}dbLiveList___`, // 直播间在线列表
+  dbLiveRoomHistoryMsgList: `${REDIS_KEY_PREFIX}dbLiveRoomHistoryMsgList___`, // 直播间历史消息
+  tencentcloudCssPublishing: `${REDIS_KEY_PREFIX}tencentcloudCssPublishing___`,
+  srsPublishing: `${REDIS_KEY_PREFIX}srsPublishing___`,
+  rtcLiving: `${REDIS_KEY_PREFIX}rtcLiving___`,
+  keepJoined: `${REDIS_KEY_PREFIX}keepJoined___`, // 用户加入了房间
+  db_blacklist: `${REDIS_KEY_PREFIX}db_blacklist___`,
 };
 
 // redis 频道
 export const REDIS_CHANNEL = {
-  writeDbLog: `${REDIS_PREFIX_ENV}writeDbLog___`,
+  writeDbLog: `${REDIS_KEY_PREFIX}writeDbLog___`,
 };
 
 // rabbitmq 频道
 export const RABBITMQ_CHANNEL = {
-  order: `${REDIS_PREFIX_ENV}order___`,
+  order: `${REDIS_KEY_PREFIX}order___`,
 };
 
 export const IS_UPLOAD_SERVER = !(PROJECT_ENV === PROJECT_ENV_ENUM.prod); // 是否上传到服务器

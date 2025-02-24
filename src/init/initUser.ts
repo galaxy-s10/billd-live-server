@@ -9,7 +9,7 @@ export const initLiveRoom = {
     name: '房东的猫-美好事物',
     desc: '房东的猫livehouse合集',
     priority: 2,
-    type: LiveRoomTypeEnum.system,
+    type: LiveRoomTypeEnum.srs,
     area: [1],
     ffmpegParams: {
       '-b:v': '300k', // 平均码率
@@ -32,7 +32,7 @@ export const initLiveRoom = {
     name: '房东的猫-云烟成雨',
     desc: '房东的猫livehouse合集',
     priority: 10,
-    type: LiveRoomTypeEnum.system,
+    type: LiveRoomTypeEnum.tencentcloud_css,
     area: [1],
     ffmpegParams: {
       '-b:v': '700k', // 平均码率
@@ -53,7 +53,7 @@ export const initLiveRoom = {
     name: '房东的猫-和宇宙的温柔关联',
     desc: '房东的猫livehouse合集',
     priority: 3,
-    type: LiveRoomTypeEnum.system,
+    type: LiveRoomTypeEnum.srs,
     area: [1],
     ffmpegParams: {
       '-b:v': '300k', // 平均码率
@@ -76,7 +76,7 @@ export const initLiveRoom = {
     name: '房东的猫-少年锦时',
     desc: '房东的猫livehouse合集',
     priority: 20,
-    type: LiveRoomTypeEnum.system,
+    type: LiveRoomTypeEnum.srs,
     area: [1],
     ffmpegParams: {
       '-b:v': '500k', // 平均码率
@@ -99,7 +99,7 @@ export const initLiveRoom = {
     name: '房东的猫-下一站茶山刘',
     desc: '房东的猫livehouse合集',
     priority: 2,
-    type: LiveRoomTypeEnum.system,
+    type: LiveRoomTypeEnum.srs,
     area: [1],
     ffmpegParams: {
       '-b:v': '300k', // 平均码率
@@ -122,7 +122,7 @@ export const initLiveRoom = {
     name: '房东的猫-你是我为数不多的骄傲',
     desc: '房东的猫livehouse合集',
     priority: 2,
-    type: LiveRoomTypeEnum.system,
+    type: LiveRoomTypeEnum.srs,
     area: [1],
     ffmpegParams: {
       '-b:v': '300k', // 平均码率
@@ -145,7 +145,7 @@ export const initLiveRoom = {
     name: '周杰伦-不能说的秘密',
     desc: '周杰伦演唱会合集',
     priority: 2,
-    type: LiveRoomTypeEnum.system,
+    type: LiveRoomTypeEnum.srs,
     area: [1],
     ffmpegParams: {
       '-b:v': '300k', // 平均码率
@@ -168,7 +168,7 @@ export const initLiveRoom = {
     name: '周杰伦-晴天',
     desc: '周杰伦演唱会合集',
     priority: 2,
-    type: LiveRoomTypeEnum.system,
+    type: LiveRoomTypeEnum.srs,
     area: [1],
     ffmpegParams: {
       '-b:v': '300k', // 平均码率
@@ -191,7 +191,7 @@ export const initLiveRoom = {
     name: '房东的猫-一次就好',
     desc: '房东的猫livehouse合集',
     priority: 2,
-    type: LiveRoomTypeEnum.system,
+    type: LiveRoomTypeEnum.srs,
     area: [1],
     ffmpegParams: {
       '-b:v': '300k', // 平均码率
@@ -214,7 +214,7 @@ export const initLiveRoom = {
     name: '七龙珠-渐渐被你吸引',
     desc: '龙珠系列合集',
     priority: 2,
-    type: LiveRoomTypeEnum.system,
+    type: LiveRoomTypeEnum.srs,
     area: [1],
     ffmpegParams: {
       '-b:v': '300k', // 平均码率
@@ -237,7 +237,7 @@ export const initLiveRoom = {
     name: '周杰伦-搁浅',
     desc: '周杰伦演唱会合集',
     priority: 2,
-    type: LiveRoomTypeEnum.system,
+    type: LiveRoomTypeEnum.srs,
     area: [1],
     ffmpegParams: {
       '-b:v': '300k', // 平均码率
@@ -260,7 +260,7 @@ export const initLiveRoom = {
     name: 'billd-live付费课',
     desc: '从零搭建一个开源直播间系列',
     priority: 10,
-    type: LiveRoomTypeEnum.system,
+    type: LiveRoomTypeEnum.srs,
     area: [1],
     ffmpegParams: {
       '-b:v': '300k', // 平均码率
@@ -286,7 +286,7 @@ export const initLiveRoom = {
     name: '哔哩哔哩直播间',
     desc: '转播哔哩哔哩直播间',
     priority: 10,
-    type: LiveRoomTypeEnum.system,
+    type: LiveRoomTypeEnum.srs,
     area: [1],
     ffmpegParams: {
       '-b:v': '300k', // 平均码率
@@ -309,7 +309,7 @@ export const initLiveRoom = {
     name: '周杰伦-一路向北',
     desc: '周杰伦演唱会合集',
     priority: 2,
-    type: LiveRoomTypeEnum.system,
+    type: LiveRoomTypeEnum.srs,
     area: [1],
     ffmpegParams: {
       '-b:v': '300k', // 平均码率

@@ -6,7 +6,7 @@
 # Email: 2274751790@qq.com
 # FilePath: /billd-live-server-pro/deploy/node-pm2.sh
 # Github: https://github.com/galaxy-s10
-# LastEditTime: 2024-12-16 23:58:21
+# LastEditTime: 2025-02-24 20:20:20
 # LastEditors: shuisheng
 ###
 
@@ -99,7 +99,7 @@ echo 使用pm2维护:
 # npx cross-env NODE_APP_RELEASE_PROJECT_NAME=billd-live-server-prod-4200 NODE_APP_RELEASE_PROJECT_ENV=prod NODE_APP_RELEASE_PROJECT_PORT=4200 pm2 start ./dist/index.js --name billd-live-server-prod-4200
 # npx cross-env NODE_APP_RELEASE_PROJECT_NAME=JOBNAME NODE_APP_RELEASE_PROJECT_ENV=prod NODE_APP_RELEASE_PROJECT_PORT=4200 pm2 start ./dist/index.js --name billd-live-server-prod-4200
 # npx cross-env NODE_APP_RELEASE_PROJECT_NAME=JOBNAME NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=4300 pm2 start ./dist/index.js --name billd-live-server-beta-4300
-npx cross-env NODE_APP_RELEASE_PROJECT_NAME=$JOBNAME NODE_APP_RELEASE_PROJECT_ENV=$ENV NODE_APP_RELEASE_PROJECT_PORT=$PORT pm2 start ./dist/index.js --name $JOBNAME-$ENV-$PORT -i 1
+npx cross-env NODE_APP_RELEASE_PROJECT_NAME=$JOBNAME NODE_APP_RELEASE_PROJECT_ENV=$ENV NODE_APP_RELEASE_PROJECT_PORT=$PORT pm2 start ./dist/index.js --name $JOBNAME-$ENV-$PORT -i 2
 
 # yarn和pnpm都能用
 # npx cross-env NODE_APP_RELEASE_PROJECT_NAME=$JOBNAME NODE_APP_RELEASE_PROJECT_ENV=$ENV NODE_APP_RELEASE_PROJECT_PORT=$PORT pm2 start ./src/index.ts --name $JOBNAME-$ENV-$PORT --interpreter ./node_modules/.bin/ts-node --interpreter-args '-P tsconfig.json'
