@@ -4,6 +4,10 @@ import areaController from '@/controller/area.controller';
 
 const areaRouter = new Router({ prefix: '/area' });
 
+areaRouter.post('/create', areaController.create);
+
+areaRouter.put('/update', areaController.update);
+
 areaRouter.get('/list', areaController.getList);
 
 areaRouter.get('/get_area_info/:id', areaController.getAreaInfo);

@@ -9,8 +9,8 @@ import { connectWebSocket } from '@/config/websocket';
 import { COMMON_HTTP_CODE, STATIC_DIR, UPLOAD_DIR } from '@/constant';
 import { initFFmpeg } from '@/init/initFFmpeg';
 import { apiBeforeVerify } from '@/middleware/apiBeforeVerify.middleware';
-import { catchErrorMiddle } from '@/middleware/catchError.middleware';
-import { corsMiddle } from '@/middleware/cors.middleware';
+import { catchError } from '@/middleware/catchError.middleware';
+import { cors } from '@/middleware/cors.middleware';
 import { CustomError } from '@/model/customError.model';
 import { loadAllRoutes } from '@/router';
 import { countdown } from '@/utils';
@@ -22,7 +22,7 @@ export async function setupKoa({ port }) {
   // app.proxyIpHeader = 'X-Real-IP';
   app.proxy = true;
 
-  app.use(catchErrorMiddle); // 全局错误处理
+  app.use(catchError); // 全局错误处理
   app.use(
     koaBody({
       multipart: true,
@@ -55,7 +55,7 @@ export async function setupKoa({ port }) {
   ); // 静态文件目录
   app.use(conditional()); // 接口缓存
   app.use(etag()); // 接口缓存
-  app.use(corsMiddle); // 设置允许跨域
+  app.use(cors); // 设置允许跨域
   app.use(apiBeforeVerify); // 注意：需要在所有路由加载前使用这个中间件
 
   loadAllRoutes(app); // 加载所有路由

@@ -4,7 +4,7 @@ import { CORS_ALLOW_ORIGIN } from '@/constant';
 import { chalkINFO } from '@/utils/chalkTip';
 
 // 跨域中间件
-export const corsMiddle = async (ctx: ParameterizedContext, next) => {
+export const cors = async (ctx: ParameterizedContext, next) => {
   console.log(
     chalkINFO('===== 中间件开始（corsMiddle） ====='),
     ctx.header.origin

@@ -12,7 +12,6 @@ import {
   StatusEnum,
   SwitchEnum,
 } from '@/interface';
-import { QINIU_KODO } from '@/spec-config';
 
 const initAuth = () => {
   const deafultAuth: IAuth[] = [
@@ -1123,7 +1122,7 @@ export const bulkCreateGoods: IGoods[] = [
     badge: '',
     badge_bg: 'pink',
     nums: 1,
-    cover: `${QINIU_KODO.hssblog.url}/billd-live/image/c5258ebf3a79c7d67ef8ae95062c8fe4.webp`,
+    cover: '',
   },
   {
     type: GoodsTypeEnum.gift,
@@ -1135,7 +1134,7 @@ export const bulkCreateGoods: IGoods[] = [
     badge: '新品',
     badge_bg: '#e60c0d',
     nums: 1,
-    cover: `${QINIU_KODO.hssblog.url}/billd-live/image/3f56506ae5f536864dbc92b52c355bfe.webp`,
+    cover: '',
   },
   {
     type: GoodsTypeEnum.gift,
@@ -1147,7 +1146,7 @@ export const bulkCreateGoods: IGoods[] = [
     badge: '',
     badge_bg: '',
     nums: 1,
-    cover: `${QINIU_KODO.hssblog.url}/billd-live/image/3f4e7debdc978741f90515ace48aee22.webp`,
+    cover: '',
   },
   {
     type: GoodsTypeEnum.gift,
@@ -1159,7 +1158,7 @@ export const bulkCreateGoods: IGoods[] = [
     badge: '肝！',
     badge_bg: '#cda8a1',
     nums: 1,
-    cover: `${QINIU_KODO.hssblog.url}/billd-live/image/d9770d31ac7350556103c0b1ed09e01d.webp`,
+    cover: '',
   },
   {
     type: GoodsTypeEnum.sponsors,
@@ -1171,7 +1170,7 @@ export const bulkCreateGoods: IGoods[] = [
     badge: '',
     badge_bg: '',
     nums: 1,
-    cover: `${QINIU_KODO.hssblog.url}/billd-live/image/7170e9bbf14b8dcda73e30ccff589132.webp`,
+    cover: '',
   },
   {
     type: GoodsTypeEnum.sponsors,
@@ -1183,7 +1182,7 @@ export const bulkCreateGoods: IGoods[] = [
     badge: '',
     badge_bg: '',
     nums: 1,
-    cover: `${QINIU_KODO.hssblog.url}/billd-live/image/ed2e20878ee3cd9d2f71a4c3714e82a9.webp`,
+    cover: '',
   },
   {
     type: GoodsTypeEnum.sponsors,
@@ -1195,7 +1194,7 @@ export const bulkCreateGoods: IGoods[] = [
     badge: '',
     badge_bg: '',
     nums: 1,
-    cover: `${QINIU_KODO.hssblog.url}/billd-live/image/7e9edac32a8d9e0b7ac0b9554eded85c.webp`,
+    cover: '',
   },
   {
     type: GoodsTypeEnum.sponsors,
@@ -1207,7 +1206,7 @@ export const bulkCreateGoods: IGoods[] = [
     badge: '',
     badge_bg: '',
     nums: 1,
-    cover: `${QINIU_KODO.hssblog.url}/billd-live/image/8d4ac68c84b6d0cad754e15151869d71.webp`,
+    cover: '',
   },
   {
     type: GoodsTypeEnum.sponsors,
@@ -1219,7 +1218,7 @@ export const bulkCreateGoods: IGoods[] = [
     badge: 'crazy',
     badge_bg: '#cda8a1',
     nums: 1,
-    cover: `${QINIU_KODO.hssblog.url}/billd-live/image/fd04506d5b3167cf210bd875e5a97c8b.webp`,
+    cover: '',
   },
   {
     type: GoodsTypeEnum.sponsors,
@@ -1231,7 +1230,7 @@ export const bulkCreateGoods: IGoods[] = [
     badge: '',
     badge_bg: '',
     nums: 1,
-    cover: `${QINIU_KODO.hssblog.url}/billd-live/image/3f71039d061fb5b2dc4a2d835a5c66ca.webp`,
+    cover: '',
   },
   {
     type: GoodsTypeEnum.support,
@@ -1243,7 +1242,7 @@ export const bulkCreateGoods: IGoods[] = [
     badge: '新人优惠',
     badge_bg: '#8fcbee',
     nums: 1,
-    cover: `${QINIU_KODO.hssblog.url}/billd-live/image/b89fcf45fb773d5ea6f173c906ce6a07.webp`,
+    cover: '',
   },
   {
     type: GoodsTypeEnum.support,
@@ -1255,7 +1254,7 @@ export const bulkCreateGoods: IGoods[] = [
     badge: '',
     badge_bg: '',
     nums: 1,
-    cover: `${QINIU_KODO.hssblog.url}/billd-live/image/b89fcf45fb773d5ea6f173c906ce6a07.webp`,
+    cover: '',
   },
   {
     type: GoodsTypeEnum.support,
@@ -1267,7 +1266,7 @@ export const bulkCreateGoods: IGoods[] = [
     badge: '',
     badge_bg: '',
     nums: 1,
-    cover: `${QINIU_KODO.hssblog.url}/billd-live/image/b89fcf45fb773d5ea6f173c906ce6a07.webp`,
+    cover: '',
   },
   {
     type: GoodsTypeEnum.support,
@@ -1279,7 +1278,7 @@ export const bulkCreateGoods: IGoods[] = [
     badge: 'hot',
     badge_bg: '#ea3323',
     nums: 1,
-    cover: `${QINIU_KODO.hssblog.url}/billd-live/image/b89fcf45fb773d5ea6f173c906ce6a07.webp`,
+    cover: '',
   },
   {
     type: GoodsTypeEnum.recharge,

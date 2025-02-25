@@ -13,7 +13,7 @@ import { handleCtxRequestHeaders, strSlice } from '@/utils';
 import { chalkERROR, chalkINFO } from '@/utils/chalkTip';
 
 // 全局错误处理中间件
-export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
+export const catchError = async (ctx: ParameterizedContext, next) => {
   let duration = -1;
   const startTime = performance.now();
   const url = ctx.request.path;
@@ -24,10 +24,10 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
   console.log(
     chalkINFO(`ip:${client_ip},收到请求 ${ctx.request.method} ${url}`)
   );
-  console.log(chalkINFO('===== 中间件开始（catchErrorMiddle） ====='));
+  console.log(chalkINFO('===== 中间件开始（catchError） ====='));
   const consoleEnd = () => {
     duration = Math.floor(performance.now() - startTime);
-    console.log(chalkINFO(`===== 中间件通过（catchErrorMiddle） =====`));
+    console.log(chalkINFO(`===== 中间件通过（catchError） =====`));
     console.log(
       chalkINFO(
         `ip:${client_ip},响应请求 ${ctx.status} ${ctx.request.method} ${url} ,耗时:${duration}ms`
@@ -48,7 +48,7 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
     await next();
     consoleEnd();
   } catch (error: any) {
-    console.log(chalkERROR(`===== catchErrorMiddle中间件捕获到错误 =====`));
+    console.log(chalkERROR(`===== catchError中间件捕获到错误 =====`));
     if (url.indexOf('/socket.io/') !== -1) {
       console.log('socket.io错误，return');
       return;
@@ -68,7 +68,7 @@ export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
       console.log('cookie:', ctx.request.header.cookie);
       console.log('token:', ctx.request.headers.authorization);
       console.log('error:', error);
-      console.log('ctx.body:', ctx.body);
+      // console.log('ctx.body:', ctx.body);
     };
     const insertLog = async (info: {
       httpStatusCode: number;

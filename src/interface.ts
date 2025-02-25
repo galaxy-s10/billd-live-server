@@ -230,10 +230,10 @@ export interface IArea {
   name?: string;
   status?: StatusEnum;
   hot_status?: SwitchEnum;
-  /** 备注 */
-  remark?: string;
   /** 权重 */
   priority?: number;
+  /** 备注 */
+  remark?: string;
 
   children?: IArea[];
 
@@ -588,6 +588,14 @@ export type IListBase = {
 };
 
 export type IList<T> = IListBase & T;
+
+export interface IPaging<T> {
+  nowPage: number;
+  pageSize: number;
+  hasMore: boolean;
+  total: number;
+  rows: T[];
+}
 
 export interface IRedisVal<T> {
   created_at: number;

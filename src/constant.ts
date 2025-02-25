@@ -180,6 +180,8 @@ export const REDIS_KEY = {
   rtcLiving: `${REDIS_KEY_PREFIX}rtcLiving___`,
   keepJoined: `${REDIS_KEY_PREFIX}keepJoined___`, // 用户加入了房间
   db_blacklist: `${REDIS_KEY_PREFIX}db_blacklist___`,
+  db_area: `${REDIS_KEY_PREFIX}db_area___`,
+  dbToRedis: `${REDIS_KEY_PREFIX}dbToRedis___`,
 };
 
 // redis 频道
