@@ -108,7 +108,7 @@ export const deleteForeignKeys = async (data: {
     }
     console.log(chalkSUCCESS(`删除${allTables.toString()}表的外键成功！`));
   } catch (err) {
-    console.log(chalkERROR(`删除外键失败！`), err);
+    console.error(chalkERROR(`删除外键失败！`), err);
   }
 };
 
@@ -151,7 +151,7 @@ export const deleteIndexs = async (data: {
     }
     console.log(chalkSUCCESS(`删除${allTables.toString()}表的索引成功！`));
   } catch (err) {
-    console.log(chalkERROR(`删除索引失败！`), err);
+    console.error(chalkERROR(`删除索引失败！`), err);
   }
 };
 
@@ -235,7 +235,7 @@ export function initTable(data: {
     }
   }
   return main(data.model, data.method).catch((err) => {
-    console.log(chalkERROR(`initTable失败`), err.message);
+    console.error(chalkERROR(`initTable失败`), err.message);
     console.log(err);
   });
 }
@@ -263,7 +263,7 @@ export const deleteAllTable = async (sequelizeInst: Sequelize) => {
     await sequelizeInst.drop();
     console.log(chalkSUCCESS('删除所有表成功！'));
   } catch (error) {
-    console.log(chalkERROR('删除所有表失败！'));
+    console.error(chalkERROR('删除所有表失败！'));
     console.log(error);
   }
 };

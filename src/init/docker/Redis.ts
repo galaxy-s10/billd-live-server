@@ -44,7 +44,7 @@ export const dockerRunRedis = (init = true) => {
     );
     console.log(chalkSUCCESS(`启动Redis成功！`), emoji.get('✅'));
   } catch (error) {
-    console.log(chalkERROR(`启动Redis错误！`));
+    console.error(chalkERROR(`启动Redis错误！`));
     console.log(error);
   }
 };

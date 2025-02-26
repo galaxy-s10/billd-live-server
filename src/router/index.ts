@@ -36,13 +36,13 @@ export function loadAllRoutes(app) {
       console.log(chalkINFO(`加载路由: ${file}`));
     } catch (error) {
       err.push(file);
-      console.log(chalkERROR(`加载路由: ${file}出错!`));
+      console.error(chalkERROR(`加载路由: ${file}出错!`));
       console.log(error);
     }
   });
 
   if (err.length) {
-    console.log(chalkERROR(`加载路由: ${err.toString()}出错！`));
+    console.error(chalkERROR(`加载路由: ${err.toString()}出错！`));
     throw new CustomError({
       msg: '',
     });

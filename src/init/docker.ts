@@ -17,5 +17,5 @@ if (flag) {
   dockerRunSRS(true);
   dockerRunRabbitMQ(true);
 } else {
-  console.log(chalkERROR('未安装docker！'));
+  console.error(chalkERROR('未安装docker！'));
 }

@@ -6,7 +6,7 @@ import liveRoomController from '@/controller/liveRoom.controller';
 import srsController from '@/controller/srs.controller';
 import tencentcloudCssController from '@/controller/tencentcloudCss.controller';
 import { initUser } from '@/init/initUser';
-import { SRS_LIVE, TENCENTCLOUD_CSS } from '@/secret/secret';
+import { SRS_LIVE } from '@/secret/secret';
 import { LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 import { tencentcloudCssUtils } from '@/utils/tencentcloud-css';
@@ -107,7 +107,7 @@ async function addLive({
         localFile = prodFFmpegLocalFile;
       }
       if (localFile === '') {
-        console.log(chalkERROR(`FFmpeg推流错误！`), 'localFile为空');
+        console.error(chalkERROR(`FFmpeg推流错误！`), 'localFile为空');
         return;
       }
       let rtmptoflvurl = cdnPushRes.rtmp_url;
@@ -118,10 +118,6 @@ async function addLive({
         ].includes(type)
       ) {
         rtmptoflvurl = cdnPushRes.rtmp_url;
-        rtmptoflvurl = rtmptoflvurl.replace(
-          `rtmp://${TENCENTCLOUD_CSS.PushDomain}`,
-          'rtmp://localhost'
-        );
       } else {
         rtmptoflvurl = srsPushRes.rtmp_url;
         rtmptoflvurl = rtmptoflvurl.replace(
@@ -192,7 +188,7 @@ async function addLive({
           ffmpegCmd.replace(' -loglevel quiet', '')
         );
       } catch (error) {
-        console.log(chalkERROR(`FFmpeg推流错误！`), error);
+        console.error(chalkERROR(`FFmpeg推流错误！`), error);
       }
     }
 
@@ -268,7 +264,7 @@ export const initFFmpeg = async (init = true) => {
   if (flag) {
     console.log(chalkWARN('ffmpeg已安装，开始运行ffmpeg推流'));
   } else {
-    console.log(chalkERROR('未安装ffmpeg！'));
+    console.error(chalkERROR('未安装ffmpeg！'));
     return;
   }
   try {
@@ -322,7 +318,7 @@ export const initFFmpeg = async (init = true) => {
     //   );
     // });
   } catch (error) {
-    console.log(chalkERROR(`初始化FFmpeg推流错误！`));
+    console.error(chalkERROR(`初始化FFmpeg推流错误！`));
     console.log(error);
   }
 };

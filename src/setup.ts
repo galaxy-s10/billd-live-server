@@ -68,7 +68,7 @@ export async function setupKoa({ port }) {
   }); // http接口服务
   initSchedule();
   pushToBilibili(false);
-  const useInitFFmpeg = false;
+  const useInitFFmpeg = true;
   if (useInitFFmpeg) {
     setTimeout(() => {
       const countdownInitFFmpegDelay = 3;

@@ -48,7 +48,7 @@ export const catchError = async (ctx: ParameterizedContext, next) => {
     await next();
     consoleEnd();
   } catch (error: any) {
-    console.log(chalkERROR(`===== catchError中间件捕获到错误 =====`));
+    console.error(chalkERROR(`===== catchError中间件捕获到错误 =====`));
     if (url.indexOf('/socket.io/') !== -1) {
       console.log('socket.io错误，return');
       return;
@@ -57,17 +57,17 @@ export const catchError = async (ctx: ParameterizedContext, next) => {
 
     // eslint-disable-next-line
     const errorLog = (error) => {
-      console.log('httpStatusCode:', error.httpStatusCode);
-      console.log('errorCode:', error.errorCode);
-      console.log('message:', error.message);
-      console.log('query:', { ...ctx.request.query });
-      console.log('params:', ctx.params);
-      console.log('body:', ctx.request.body);
-      console.log('host:', ctx.request.header.host);
-      console.log('referer:', ctx.request.header.referer);
-      console.log('cookie:', ctx.request.header.cookie);
-      console.log('token:', ctx.request.headers.authorization);
-      console.log('error:', error);
+      console.error('httpStatusCode:', error.httpStatusCode);
+      console.error('errorCode:', error.errorCode);
+      console.error('message:', error.message);
+      console.error('query:', { ...ctx.request.query });
+      console.error('params:', ctx.params);
+      console.error('body:', ctx.request.body);
+      console.error('host:', ctx.request.header.host);
+      console.error('referer:', ctx.request.header.referer);
+      console.error('cookie:', ctx.request.header.cookie);
+      console.error('token:', ctx.request.headers.authorization);
+      console.error('error:', error);
       // console.log('ctx.body:', ctx.body);
     };
     const insertLog = async (info: {
@@ -122,7 +122,7 @@ export const catchError = async (ctx: ParameterizedContext, next) => {
       }
     };
     if (!(error instanceof CustomError)) {
-      console.log(chalkERROR(`收到非自定义错误！`));
+      console.error(chalkERROR(`收到非自定义错误！`));
       const defaultError = {
         httpStatusCode: COMMON_HTTP_CODE.serverError,
         errorCode: COMMON_ERROR_CODE.serverError,
@@ -138,7 +138,7 @@ export const catchError = async (ctx: ParameterizedContext, next) => {
       };
       errorLog(error);
       insertLog({ ...defaultError, duration });
-      console.log(chalkERROR(`非自定义错误返回前端的数据`), defaultError);
+      console.error(chalkERROR(`非自定义错误返回前端的数据`), defaultError);
     } else {
       // 不手动设置状态的话，默认是404（delete方法返回400），因此，即使走到了error-handle，且ctx.body返回了数据
       // 但是没有手动设置status的话，一样返回不了数据，因为status状态码都返回404了。
@@ -149,7 +149,6 @@ export const catchError = async (ctx: ParameterizedContext, next) => {
         msg: error?.message || COMMON_ERROE_MSG[error.httpStatusCode],
       };
 
-      errorLog(error);
       insertLog({
         httpStatusCode: error.httpStatusCode,
         error: error.message,
@@ -157,7 +156,8 @@ export const catchError = async (ctx: ParameterizedContext, next) => {
         msg: error.message,
         duration,
       });
-      console.log(
+      errorLog(error);
+      console.error(
         chalkERROR(
           `===== 收到自定义错误: ip:${client_ip},${method} ${path} =====`
         )

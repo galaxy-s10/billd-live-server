@@ -43,7 +43,7 @@ export const dockerRunRabbitMQ = (init = true) => {
     );
     console.log(chalkSUCCESS(`启动RabbitMQ成功！`), emoji.get('✅'));
   } catch (error) {
-    console.log(chalkERROR(`启动RabbitMQ错误！`));
+    console.error(chalkERROR(`启动RabbitMQ错误！`));
     console.log(error);
   }
 };

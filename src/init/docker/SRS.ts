@@ -67,6 +67,6 @@ export const dockerRunSRS = (init = true) => {
     // });
   } catch (error) {
     console.log(error);
-    console.log(chalkERROR(`启动SRS失败！`));
+    console.error(chalkERROR(`启动SRS失败！`));
   }
 };

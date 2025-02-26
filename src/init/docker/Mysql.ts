@@ -44,7 +44,7 @@ export const dockerRunMysql = (init = true) => {
     );
     console.log(chalkSUCCESS(`启动Mysql成功！`), emoji.get('✅'));
   } catch (error) {
-    console.log(chalkERROR(`启动Mysql错误！`));
+    console.error(chalkERROR(`启动Mysql错误！`));
     console.log(error);
   }
 };

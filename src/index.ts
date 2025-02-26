@@ -63,8 +63,8 @@ async function main() {
       connectRabbitMQConsumer(), // 连接rabbitmq的消费者
     ]);
   } catch (error) {
-    console.log(chalkERROR('rabbitmq、mysql、redis初始化失败！'));
-    console.log(error);
+    console.error(chalkERROR('rabbitmq、mysql、redis初始化失败！'));
+    console.error(error);
     // 触发pm2的重启进程
     process.exit(1);
   }
@@ -88,7 +88,7 @@ async function main() {
     adLog();
   } catch (error) {
     console.log(error);
-    console.log(chalkERROR('项目启动失败！'));
+    console.error(chalkERROR('项目启动失败！'));
     adLog();
   }
 }
