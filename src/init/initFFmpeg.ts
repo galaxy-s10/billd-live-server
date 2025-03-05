@@ -6,7 +6,6 @@ import liveRoomController from '@/controller/liveRoom.controller';
 import srsController from '@/controller/srs.controller';
 import tencentcloudCssController from '@/controller/tencentcloudCss.controller';
 import { initUser } from '@/init/initUser';
-import { SRS_LIVE } from '@/secret/secret';
 import { LiveRoomTypeEnum } from '@/types/ILiveRoom';
 import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 import { tencentcloudCssUtils } from '@/utils/tencentcloud-css';
@@ -77,7 +76,7 @@ async function addLive({
       await liveController.common.startLive({
         userId: user_id,
         live_room_type: type,
-        areas: undefined,
+        area_id: undefined,
       });
       // const ffmpegCmd = spawn(`ffmpeg`, [
       //   '-loglevel', // -loglevel quiet不输出log
@@ -120,10 +119,10 @@ async function addLive({
         rtmptoflvurl = cdnPushRes.rtmp_url;
       } else {
         rtmptoflvurl = srsPushRes.rtmp_url;
-        rtmptoflvurl = rtmptoflvurl.replace(
-          `rtmp://${SRS_LIVE.PushDomain}`,
-          'rtmp://localhost'
-        );
+        // rtmptoflvurl = rtmptoflvurl.replace(
+        //   `rtmp://${SRS_CONFIG.PushDomain}`,
+        //   'rtmp://localhost'
+        // );
       }
 
       let ffmpegParamsStr = '';

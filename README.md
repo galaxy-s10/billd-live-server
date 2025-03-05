@@ -27,9 +27,10 @@
 
 </div>
 
-## 📢 省流 📢
+## 🎉🎉🎉
 
-2025 年起，billd-live 项目的所有仓库将进入 dev 状态：[history-reason.md](docs/history-reason.md)
+- 2025 年起，billd-live-prod 项目的所有仓库将进入 prod 状态！
+- 2025 年起，billd-live 项目的所有仓库将进入 dev 状态！
 
 ## 简介
 
@@ -185,6 +186,8 @@ billd 直播间，目前实现了类似 [bilibili 的 Web 在线直播](https://
 - [x] billd-live(pro) 查看 [start-client.md](docs/start-client.md)
 
 - [x] billd-live-server(pro) 查看 [start-server.md](docs/start-server.md)
+
+- [x] billd-live-flutter(pro) 查看 [start-app.md](docs/start-app.md)
 
 ## 性能测试
 

@@ -401,13 +401,14 @@ export interface IOrder {
 
 export interface ILiveRecord {
   id?: number;
-  live_room_type?: LiveRoomTypeEnum;
   /** 直播id */
   live_id?: number;
   /** 用户id */
   user_id?: number;
   /** 直播间id */
   live_room_id?: number;
+  live_room_type?: LiveRoomTypeEnum;
+  area_id?: number;
   /** 直播时长（单位：秒） */
   duration?: number;
   /** 弹幕数 */

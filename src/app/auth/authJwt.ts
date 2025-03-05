@@ -2,8 +2,8 @@ import { filterObj } from 'billd-utils';
 import jwt from 'jsonwebtoken';
 
 import { COMMON_ERROE_MSG, COMMON_HTTP_CODE } from '@/constant';
+import userController from '@/controller/user.controller';
 import { JWT_SECRET } from '@/secret/secret';
-import userService from '@/service/user.service';
 import { IUser, UserStatusEnum } from '@/types/IUser';
 import { judgeUserStatus } from '@/utils';
 
@@ -32,9 +32,8 @@ export const jwtVerify = (token: string) => {
       }
       async function main() {
         try {
-          const userResult = await userService.findAndToken(
-            // @ts-ignore
-            decoded.userInfo.id
+          const userResult = await userController.common.findAndToken(
+            decoded?.userInfo?.id
           );
           if (!userResult) {
             // 这个用户已经被删除了
@@ -66,7 +65,7 @@ export const jwtVerify = (token: string) => {
           resolve({
             code: COMMON_HTTP_CODE.success,
             msg: '验证token通过！',
-            userInfo: filterObj(userResult.get(), ['token']),
+            userInfo: filterObj({ ...userResult }, ['password', 'token']),
           });
         } catch (error: any) {
           resolve({ code: COMMON_HTTP_CODE.paramsError, msg: error });

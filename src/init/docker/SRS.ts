@@ -31,9 +31,16 @@ export const dockerRunSRS = (init = true) => {
   }
 
   try {
+    // 删掉旧的容器
+    execSync(`docker rm ${SRS_CONFIG.docker.container}`);
+  } catch {
+    console.log('删掉旧的srs容器出错');
+  }
+
+  try {
     // 启动新的容器
     // https://ossrs.net/lts/zh-cn/docs/v5/doc/webrtc#rtc-to-rtmp
-    const srsCmd = `docker run -d --rm \
+    const srsCmd = `docker run -d \
     --name ${SRS_CONFIG.docker.container} \
     --env CANDIDATE=${SRS_CONFIG.CANDIDATE} \
     -p ${SRS_CONFIG.docker.port[1935]}:1935 \

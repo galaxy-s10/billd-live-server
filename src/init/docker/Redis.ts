@@ -31,10 +31,18 @@ export const dockerRunRedis = (init = true) => {
     // console.log(error);
   }
 
+  try {
+    // 删掉旧的容器
+    execSync(`docker rm ${REDIS_CONFIG.docker.container}`);
+  } catch (error) {
+    console.log('删掉旧的redis容器出错');
+    // console.log(error);
+  }
+
   // 启动新的容器
   try {
     execSync(
-      `docker run -d --rm \
+      `docker run -d \
       -p ${REDIS_CONFIG.docker.port[6379]}:6379 \
       --name ${REDIS_CONFIG.docker.container} \
       -v ${REDIS_CONFIG.docker.volume}/data:/data \

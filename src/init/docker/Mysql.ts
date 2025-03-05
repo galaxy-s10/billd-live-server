@@ -30,11 +30,19 @@ export const dockerRunMysql = (init = true) => {
     // console.log(error);
   }
 
+  try {
+    // 删掉旧的容器
+    execSync(`docker rm ${MYSQL_CONFIG.docker.container}`);
+  } catch (error) {
+    console.log('删掉旧的mysql容器出错');
+    // console.log(error);
+  }
+
   // 启动新的容器
   try {
     // -d即后台运行，https://docs.docker.com/engine/reference/run/#detached--d
     execSync(
-      `docker run -d --rm \
+      `docker run -d \
       -p ${MYSQL_CONFIG.docker.port[3306]}:3306 \
       --name ${MYSQL_CONFIG.docker.container} \
       -e MYSQL_ROOT_PASSWORD=${MYSQL_CONFIG.docker.MYSQL_ROOT_PASSWORD}  \

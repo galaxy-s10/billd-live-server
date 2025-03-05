@@ -31,11 +31,19 @@ export const dockerRunRabbitMQ = (init = true) => {
     // console.log(error);
   }
 
+  try {
+    // 删掉旧的容器
+    execSync(`docker rm ${RABBITMQ_CONFIG.docker.container}`);
+  } catch (error) {
+    console.log('删掉旧的rabbitmq容器出错');
+    // console.log(error);
+  }
+
   // 启动新的容器
   try {
     execSync(
       // https://www.rabbitmq.com/download.html
-      `docker run -d --rm \
+      `docker run -d \
        --name ${RABBITMQ_CONFIG.docker.container} \
        -p ${RABBITMQ_CONFIG.docker.port[5672]}:5672 \
        -p ${RABBITMQ_CONFIG.docker.port[15672]}:15672 \

@@ -27,7 +27,7 @@ DOCKER_SRS_TMP=`docker run -d registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5.0.20
 
 ```bash
 LOCAL_DOCKER_SRS_PATH=/node/docker/srs \
-&& docker run -d --rm \
+&& docker run -d \
 --name billd_live_srs \
 --env CANDIDATE=$(ifconfig en0 inet | grep 'inet ' | awk '{print $2}') \
 -p 1935:1935 \
@@ -60,11 +60,17 @@ coturn/coturn -c /my/coturn.conf
 
 ## Rabbit
 
+### 拉镜像
+
+```bash
+docker pull rabbitmq:3.11-management
+```
+
 ### 启动容器
 
 ```bash
-docker run -d --rm \
---name billd_live_coturn \
+docker run -d \
+--name billd_live_rabbitmq \
 -p 5672:5672 \
 -p 15672:15672 \
 rabbitmq:3.11-management

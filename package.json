@@ -22,7 +22,6 @@
   "author": "shuisheng <2274751790@qq.com>",
   "scripts": {
     "build": "rimraf dist && tsc -P ./tsconfig.prod.json || true",
-    "copy": "ts-node ./deploy/handleGiteeJenkins.mjs",
     "cz": "cz",
     "dev": "cross-env NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=dev NODE_APP_RELEASE_PROJECT_PORT=4300 nodemon --exec node -r @swc-node/register ./src/index.ts",
     "dev:beta": "cross-env NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=4300 nodemon --exec node -r @swc-node/register ./src/index.ts",
@@ -43,7 +42,9 @@
     "release:first": "standard-version --first-release",
     "start:beta": "cross-env NODE_ENV=production NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=4300 nodemon ./dist/index.js",
     "start:prod": "cross-env NODE_ENV=production NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=prod NODE_APP_RELEASE_PROJECT_PORT=4200 nodemon ./dist/index.js",
-    "sync-repo": "ts-node ./deploy/handleSyncPublic.mjs",
+    "sync-codeup": "ts-node ./deploy/handleSyncCodeup.mjs",
+    "sync-gitee": "ts-node ./deploy/handleSyncGitee.mjs",
+    "sync-public": "ts-node ./deploy/handleSyncPublic.mjs",
     "typecheck": "tsc -p ./tsconfig.prod.json --noEmit"
   },
   "config": {},

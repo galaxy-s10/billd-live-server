@@ -66,7 +66,7 @@ async function foo() {
     // url: `https://www.xdyun.com`,
     // url: `https://www.hsslive.cn`,
     // url: `https://nuxt2.hsslive.cn`,
-    url: `https://api.hsslive.cn/prodapi/tag/list`,
+    // url: `https://api.hsslive.cn/prodapi/tag/list`,
     // url: `https://live-api.hsslive.cn`,
     // url: `https://live-api.hsslive.cn/other/get_client_ip`, // 350左右
     // url: `https://live-api.hsslive.cn/signin_statistics/list?nowPage=50&pageSize=1&orderName=sum_nums,max_nums,recently_signin_time&orderBy=desc,desc,desc`,
@@ -74,7 +74,7 @@ async function foo() {
     // url: `http://127.0.0.1:4300/area/list?keyWord=%E6%B8%B8`,
     // url: `http://127.0.0.1:4300/area/list`,
     // url: `http://127.0.0.1:4300/area/live_room_list?nowPage=1&pageSize=2&id=1`,
-    // url: `https://live-api.hsslive.cn/area/list?keyWord=%E6%B8%B8`, // 50左右
+    url: `https://live-api.hsslive.cn/area/list?keyWord=%E6%B8%B8`, // 50左右
     // url: `http://127.0.0.1:4300`,
     // url: `https://live-api.hsslive.cn/health/`,
     // url: `https://live-api.hsslive.cn/area/get_all_area_by_tree?orderName=priority&orderBy=desc&id=0`,
