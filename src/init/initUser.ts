@@ -6,7 +6,7 @@ import { LiveRoomTypeEnum } from '@/types/ILiveRoom';
 export const initLiveRoom = {
   1: {
     id: 1,
-    name: '房东的猫-美好事物',
+    title: '房东的猫-美好事物',
     desc: '房东的猫livehouse合集',
     priority: 2,
     type: LiveRoomTypeEnum.srs,
@@ -29,7 +29,7 @@ export const initLiveRoom = {
   },
   2: {
     id: 2,
-    name: '房东的猫-云烟成雨',
+    title: '房东的猫-云烟成雨',
     desc: '房东的猫livehouse合集',
     priority: 10,
     type: LiveRoomTypeEnum.tencentcloud_css,
@@ -50,7 +50,7 @@ export const initLiveRoom = {
   },
   3: {
     id: 3,
-    name: '房东的猫-和宇宙的温柔关联',
+    title: '房东的猫-和宇宙的温柔关联',
     desc: '房东的猫livehouse合集',
     priority: 3,
     type: LiveRoomTypeEnum.srs,
@@ -73,7 +73,7 @@ export const initLiveRoom = {
   },
   4: {
     id: 4,
-    name: '房东的猫-少年锦时',
+    title: '房东的猫-少年锦时',
     desc: '房东的猫livehouse合集',
     priority: 20,
     type: LiveRoomTypeEnum.srs,
@@ -96,7 +96,7 @@ export const initLiveRoom = {
   },
   5: {
     id: 5,
-    name: '房东的猫-下一站茶山刘',
+    title: '房东的猫-下一站茶山刘',
     desc: '房东的猫livehouse合集',
     priority: 2,
     type: LiveRoomTypeEnum.srs,
@@ -119,7 +119,7 @@ export const initLiveRoom = {
   },
   6: {
     id: 6,
-    name: '房东的猫-你是我为数不多的骄傲',
+    title: '房东的猫-你是我为数不多的骄傲',
     desc: '房东的猫livehouse合集',
     priority: 2,
     type: LiveRoomTypeEnum.srs,
@@ -142,7 +142,7 @@ export const initLiveRoom = {
   },
   7: {
     id: 7,
-    name: '周杰伦-不能说的秘密',
+    title: '周杰伦-不能说的秘密',
     desc: '周杰伦演唱会合集',
     priority: 2,
     type: LiveRoomTypeEnum.srs,
@@ -165,7 +165,7 @@ export const initLiveRoom = {
   },
   8: {
     id: 8,
-    name: '周杰伦-晴天',
+    title: '周杰伦-晴天',
     desc: '周杰伦演唱会合集',
     priority: 2,
     type: LiveRoomTypeEnum.srs,
@@ -188,7 +188,7 @@ export const initLiveRoom = {
   },
   9: {
     id: 9,
-    name: '房东的猫-一次就好',
+    title: '房东的猫-一次就好',
     desc: '房东的猫livehouse合集',
     priority: 2,
     type: LiveRoomTypeEnum.srs,
@@ -211,7 +211,7 @@ export const initLiveRoom = {
   },
   10: {
     id: 10,
-    name: '七龙珠-渐渐被你吸引',
+    title: '七龙珠-渐渐被你吸引',
     desc: '龙珠系列合集',
     priority: 2,
     type: LiveRoomTypeEnum.srs,
@@ -234,7 +234,7 @@ export const initLiveRoom = {
   },
   11: {
     id: 11,
-    name: '周杰伦-搁浅',
+    title: '周杰伦-搁浅',
     desc: '周杰伦演唱会合集',
     priority: 2,
     type: LiveRoomTypeEnum.srs,
@@ -257,7 +257,7 @@ export const initLiveRoom = {
   },
   12: {
     id: 12,
-    name: 'billd-live付费课',
+    title: 'billd-live付费课',
     desc: '从零搭建一个开源直播间系列',
     priority: 10,
     type: LiveRoomTypeEnum.srs,
@@ -283,7 +283,7 @@ export const initLiveRoom = {
   },
   13: {
     id: 13,
-    name: '哔哩哔哩直播间',
+    title: '哔哩哔哩直播间',
     desc: '转播哔哩哔哩直播间',
     priority: 10,
     type: LiveRoomTypeEnum.srs,
@@ -306,7 +306,7 @@ export const initLiveRoom = {
   },
   9999: {
     id: 9999,
-    name: '周杰伦-一路向北',
+    title: '周杰伦-一路向北',
     desc: '周杰伦演唱会合集',
     priority: 2,
     type: LiveRoomTypeEnum.srs,

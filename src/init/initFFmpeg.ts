@@ -74,9 +74,10 @@ async function addLive({
       (PROJECT_ENV === PROJECT_ENV_ENUM.prod && prodFFmpeg)
     ) {
       await liveController.common.startLive({
-        userId: user_id,
+        user_id,
         live_room_type: type,
         area_id: undefined,
+        area_name: undefined,
       });
       // const ffmpegCmd = spawn(`ffmpeg`, [
       //   '-loglevel', // -loglevel quiet不输出log

@@ -217,7 +217,7 @@ export interface ILiveUser {
   client_ip: string;
   value: {
     live_room_id: number;
-    live_room_name: string;
+    live_room_title: string;
     user_id: number;
     user_username: string;
     user_avatar: string;
@@ -409,6 +409,7 @@ export interface ILiveRecord {
   live_room_id?: number;
   live_room_type?: LiveRoomTypeEnum;
   area_id?: number;
+  area_name?: string;
   /** 直播时长（单位：秒） */
   duration?: number;
   /** 弹幕数 */
