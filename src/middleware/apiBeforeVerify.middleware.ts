@@ -16,8 +16,8 @@ import { chalkINFO } from '@/utils/chalkTip';
 const frontendWhiteList: string[] = [
   '/init/role',
   '/init/auth',
-  '/init/roleAuth',
-  '/init/dayData',
+  '/init/role_auth',
+  '/init/day_data',
 
   '/user/register', // 注册，这个接口是post的
   '/user/login', // 登录，这个接口是post的
@@ -64,10 +64,7 @@ const frequentlyWhiteList: string[] = [];
 export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
   console.log(chalkINFO('===== 中间件开始（apiBeforeVerify） ====='));
   const url = ctx.request.path;
-  const client_ip = strSlice(
-    String(ctx.request.headers['x-real-ip'] || ''),
-    100
-  );
+  const client_ip = strSlice(String(ctx.request.headers['x-real-ip']), 90);
 
   const consoleEnd = () => {
     console.log(chalkINFO(`===== 中间件通过（apiBeforeVerify） =====`));

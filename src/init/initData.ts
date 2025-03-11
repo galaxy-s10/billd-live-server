@@ -96,25 +96,17 @@ const initAuth = () => {
       p_id: DEFAULT_AUTH_INFO.LIVE_MANAGE.id,
     },
     {
+      id: DEFAULT_AUTH_INFO.LIVE_PUSH_CDN.id,
+      auth_name: '直播推流(CDN)',
+      auth_value: DEFAULT_AUTH_INFO.LIVE_PUSH_CDN.auth_value,
+      type: 1,
+      priority: 99,
+      p_id: DEFAULT_AUTH_INFO.LIVE_MANAGE.id,
+    },
+    {
       id: DEFAULT_AUTH_INFO.LIVE_PULL.id,
       auth_name: '直播拉流',
       auth_value: DEFAULT_AUTH_INFO.LIVE_PULL.auth_value,
-      type: 1,
-      priority: 99,
-      p_id: DEFAULT_AUTH_INFO.LIVE_MANAGE.id,
-    },
-    {
-      id: DEFAULT_AUTH_INFO.LIVE_PULL_SVIP.id,
-      auth_name: '直播拉流（svip）',
-      auth_value: DEFAULT_AUTH_INFO.LIVE_PULL_SVIP.auth_value,
-      type: 1,
-      priority: 99,
-      p_id: DEFAULT_AUTH_INFO.LIVE_MANAGE.id,
-    },
-    {
-      id: DEFAULT_AUTH_INFO.LIVE_PUSH_CDN.id,
-      auth_name: '直播推流（CDN）',
-      auth_value: DEFAULT_AUTH_INFO.LIVE_PUSH_CDN.auth_value,
       type: 1,
       priority: 99,
       p_id: DEFAULT_AUTH_INFO.LIVE_MANAGE.id,
@@ -264,9 +256,8 @@ const initRoleAuth = () => {
     DEFAULT_AUTH_INFO.MESSAGE_DISABLE,
     DEFAULT_AUTH_INFO.LIVE_MANAGE,
     DEFAULT_AUTH_INFO.LIVE_PUSH,
-    DEFAULT_AUTH_INFO.LIVE_PULL,
-    DEFAULT_AUTH_INFO.LIVE_PULL_SVIP,
     DEFAULT_AUTH_INFO.LIVE_PUSH_CDN,
+    DEFAULT_AUTH_INFO.LIVE_PULL,
     DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_BILIBILI,
     DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_DOUYIN,
     DEFAULT_AUTH_INFO.LIVE_PUSH_FORWARD_DOUYU,
@@ -289,8 +280,8 @@ const initRoleAuth = () => {
     DEFAULT_AUTH_INFO.MESSAGE_DISABLE,
     DEFAULT_AUTH_INFO.LIVE_MANAGE,
     DEFAULT_AUTH_INFO.LIVE_PUSH,
+    DEFAULT_AUTH_INFO.LIVE_PUSH_CDN,
     DEFAULT_AUTH_INFO.LIVE_PULL,
-    DEFAULT_AUTH_INFO.LIVE_PULL_SVIP,
   ].forEach((item) => {
     id += 1;
     roleAuth.push({
@@ -303,8 +294,8 @@ const initRoleAuth = () => {
   [
     DEFAULT_AUTH_INFO.MESSAGE_SEND,
     DEFAULT_AUTH_INFO.LIVE_PUSH,
+    DEFAULT_AUTH_INFO.LIVE_PUSH_CDN,
     DEFAULT_AUTH_INFO.LIVE_PULL,
-    DEFAULT_AUTH_INFO.LIVE_PULL_SVIP,
   ].forEach((item) => {
     id += 1;
     roleAuth.push({

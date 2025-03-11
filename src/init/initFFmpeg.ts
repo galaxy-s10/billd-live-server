@@ -1,6 +1,7 @@
 import { exec, spawnSync } from 'child_process';
 
 import { PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
+import areaController from '@/controller/area.controller';
 import liveController from '@/controller/live.controller';
 import liveRoomController from '@/controller/liveRoom.controller';
 import srsController from '@/controller/srs.controller';
@@ -73,11 +74,12 @@ async function addLive({
       (PROJECT_ENV === PROJECT_ENV_ENUM.beta && devFFmpeg) ||
       (PROJECT_ENV === PROJECT_ENV_ENUM.prod && prodFFmpeg)
     ) {
+      const areaRes = await areaController.common.findOneByIdPure(1);
       await liveController.common.startLive({
         user_id,
         live_room_type: type,
-        area_id: undefined,
-        area_name: undefined,
+        area_id: 1,
+        area_name: areaRes.name,
       });
       // const ffmpegCmd = spawn(`ffmpeg`, [
       //   '-loglevel', // -loglevel quiet不输出log

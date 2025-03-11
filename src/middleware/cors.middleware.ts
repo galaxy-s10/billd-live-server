@@ -11,7 +11,7 @@ export const cors = async (ctx: ParameterizedContext, next) => {
   );
   ctx.set(
     'Access-Control-Allow-Headers',
-    'Content-Type, Content-Length, Authorization, Accept, X-Requested-With'
+    'Content-Type, Content-Length, Authorization, Accept, X-Requested-With, X-Clientenv, X-Clientapp, X-Clientappver'
   ); // 允许的请求头
   ctx.set('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS'); // 允许的方法
 

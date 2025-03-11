@@ -502,6 +502,9 @@ export interface ILoginRecord {
   user_agent?: string;
   type?: LoginRecordEnum;
   client_ip?: string;
+  client_env?: ClientEnvEnum;
+  client_app?: ClientAppEnum;
+  client_app_version?: string;
   remark?: string;
 
   user?: IUser;
@@ -690,6 +693,13 @@ export enum ClientEnvEnum {
   macos,
 }
 
+export enum ClientAppEnum {
+  billd_live_android_app,
+  billd_live_ios_app,
+  billd_live_web,
+  billd_live_admin,
+}
+
 export interface ILiveView {
   id?: number;
   /** 直播记录id */
@@ -703,6 +713,8 @@ export interface ILiveView {
   user_agent?: string;
   client_ip?: string;
   client_env?: ClientEnvEnum;
+  client_app?: ClientAppEnum;
+  client_app_version?: string;
   /** 备注 */
   remark?: string;
 
@@ -748,6 +760,8 @@ export interface IOnlineStatistics {
   live_room_id?: number;
   client_ip?: string;
   client_env?: ClientEnvEnum;
+  client_app?: ClientAppEnum;
+  client_app_version?: string;
   user_agent?: string;
   /** 上线时间 */
   online_time?: number;
@@ -769,6 +783,8 @@ export interface IDailyActivity {
   version?: string;
   client_ip?: string;
   client_env?: ClientEnvEnum;
+  client_app?: ClientAppEnum;
+  client_app_version?: string;
 
   created_at?: string;
   updated_at?: string;

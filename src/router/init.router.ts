@@ -9,8 +9,8 @@ const initRouter = new Router({ prefix: '/init' });
 // 更新所有直播间的推拉流地址
 initRouter.post(
   '/update_all_liveroom_url',
-  // apiVerifyEnv([PROJECT_ENV_ENUM.dev]),
-  // apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
+  apiVerifyEnv([PROJECT_ENV_ENUM.dev]),
+  apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
   initController.updateAllLiveRoomUrl
 );
 
@@ -34,7 +34,7 @@ initRouter.post(
 initRouter.post(
   '/auth',
   apiVerifyEnv([PROJECT_ENV_ENUM.dev]),
-  // apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
+  apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
   initController.initAuth
 );
 
@@ -42,7 +42,7 @@ initRouter.post(
 initRouter.post(
   '/role_auth',
   apiVerifyEnv([PROJECT_ENV_ENUM.dev]),
-  // apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
+  apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
   initController.initRoleAuth
 );
 
@@ -50,7 +50,7 @@ initRouter.post(
 initRouter.post(
   '/rbac',
   apiVerifyEnv([PROJECT_ENV_ENUM.dev]),
-  // apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
+  apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
   initController.rbacMode
 );
 
@@ -125,6 +125,11 @@ initRouter.post(
   initController.deleteUser
 );
 
-initRouter.post('/resetLiveRoomUrl', initController.resetLiveRoomUrl);
+initRouter.post(
+  '/resetLiveRoomUrl',
+  apiVerifyEnv([PROJECT_ENV_ENUM.dev]),
+  apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
+  initController.resetLiveRoomUrl
+);
 
 export default initRouter;

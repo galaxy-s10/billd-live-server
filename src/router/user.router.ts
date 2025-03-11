@@ -18,7 +18,7 @@ userRouter.post('/qrcode_login', userController.qrCodeLogin);
 userRouter.get('/qrcode_login_status', userController.qrCodeLoginStatus);
 
 // 账号密码登录
-userRouter.post('/login', verifyProp, userController.login);
+userRouter.post('/login', verifyProp, userController.idLogin);
 
 // 用户ID密码登录
 userRouter.post('/id_login', verifyProp, userController.idLogin);

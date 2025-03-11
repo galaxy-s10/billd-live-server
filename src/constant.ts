@@ -50,6 +50,7 @@ export const CORS_ALLOW_ORIGIN: string | string[] = [
 /** 消息最大长度 */
 export const MSG_MAX_LENGTH = 200;
 export const MAX_TOKEN_EXP = 24 * 90; // token过期时间：90天
+export const DEFAULT_TOKEN_EXP = 24 * 7;
 
 export const VIDEO_DIR =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
@@ -244,40 +245,36 @@ export const DEFAULT_AUTH_INFO = {
     id: 10,
     auth_value: 'LIVE_PUSH',
   },
-  LIVE_PULL: {
-    id: 11,
-    auth_value: 'LIVE_PULL',
-  },
-  LIVE_PULL_SVIP: {
-    id: 12,
-    auth_value: 'LIVE_PULL_SVIP',
-  },
   LIVE_PUSH_CDN: {
-    id: 13,
+    id: 11,
     auth_value: 'LIVE_PUSH_CDN',
   },
+  LIVE_PULL: {
+    id: 12,
+    auth_value: 'LIVE_PULL',
+  },
   LIVE_PUSH_FORWARD_BILIBILI: {
-    id: 14,
+    id: 13,
     auth_value: 'LIVE_PUSH_FORWARD_BILIBILI',
   },
   LIVE_PUSH_FORWARD_HUYA: {
-    id: 15,
+    id: 14,
     auth_value: 'LIVE_PUSH_FORWARD_HUYA',
   },
   LIVE_PUSH_FORWARD_DOUYU: {
-    id: 16,
+    id: 15,
     auth_value: 'LIVE_PUSH_FORWARD_DOUYU',
   },
   LIVE_PUSH_FORWARD_DOUYIN: {
-    id: 17,
+    id: 16,
     auth_value: 'LIVE_PUSH_FORWARD_DOUYIN',
   },
   LIVE_PUSH_FORWARD_KUAISHOU: {
-    id: 18,
+    id: 17,
     auth_value: 'LIVE_PUSH_FORWARD_KUAISHOU',
   },
   LIVE_PUSH_FORWARD_XIAOHONGSHU: {
-    id: 19,
+    id: 18,
     auth_value: 'LIVE_PUSH_FORWARD_XIAOHONGSHU',
   },
 };

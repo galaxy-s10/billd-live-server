@@ -17,10 +17,7 @@ export const catchError = async (ctx: ParameterizedContext, next) => {
   let duration = -1;
   const startTime = performance.now();
   const url = ctx.request.path;
-  const client_ip = strSlice(
-    String(ctx.request.headers['x-real-ip'] || ''),
-    100
-  );
+  const client_ip = strSlice(String(ctx.request.headers['x-real-ip']), 90);
   console.log(
     chalkINFO(`ip:${client_ip},收到请求 ${ctx.request.method} ${url}`)
   );
