@@ -162,6 +162,9 @@ export interface IWsMessage {
   live_room_id?: number;
   user_id?: number;
   client_ip?: string;
+  client_env?: ClientEnvEnum;
+  client_app?: ClientAppEnum;
+  client_app_version?: string;
   msg_type?: DanmuMsgTypeEnum;
   user_agent?: string;
   send_msg_time?: number;
@@ -205,6 +208,10 @@ export interface IWalletRecord {
   name?: string;
   amount?: number;
   amount_status?: WalletRecordAmountStatusEnum;
+  client_ip?: string;
+  client_env?: ClientEnvEnum;
+  client_app?: ClientAppEnum;
+  client_app_version?: string;
   remark?: string;
 
   created_at?: string;
@@ -263,6 +270,7 @@ export interface IUserLiveRoom {
   id?: number;
   user_id?: number;
   live_room_id?: number;
+
   /** 用户信息 */
   user?: IUser;
   /** 直播间信息 */
@@ -345,6 +353,10 @@ export interface IGiftRecord {
   send_user_id?: number;
   recv_user_id?: number;
   status?: GiftRecordStatusEnum;
+  client_ip?: string;
+  client_env?: ClientEnvEnum;
+  client_app?: ClientAppEnum;
+  client_app_version?: string;
   remark?: string;
 
   created_at?: string;
@@ -354,13 +366,6 @@ export interface IGiftRecord {
 
 export interface IOrder {
   id?: number;
-  /** 用户信息 */
-  user?: IUser;
-  /** 商品信息 */
-  goods?: IGoods;
-  /** 直播间信息 */
-  live_room?: IGoods;
-
   billd_live_user_id?: number;
   billd_live_goods_id?: number;
   billd_live_live_room_id?: number;
@@ -368,7 +373,6 @@ export interface IOrder {
   /** 判断幂等 */
   billd_live_order_version?: number;
   client_ip?: string;
-
   product_code?: string;
   qr_code?: string;
   /** 买家支付宝账号 */
@@ -394,6 +398,13 @@ export interface IOrder {
   /** 本次交易打款给卖家的时间 */
   send_pay_date?: string;
 
+  /** 用户信息 */
+  user?: IUser;
+  /** 商品信息 */
+  goods?: IGoods;
+  /** 直播间信息 */
+  live_room?: IGoods;
+
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -416,6 +427,10 @@ export interface ILiveRecord {
   danmu?: number;
   /** 观看数 */
   view?: number;
+  client_ip?: string;
+  client_env?: ClientEnvEnum;
+  client_app?: ClientAppEnum;
+  client_app_version?: string;
   /** 直播开始时间 */
   start_time?: string | number;
   /** 直播结束时间 */
@@ -436,6 +451,7 @@ export interface ILiveRecord {
 export interface IBlacklist {
   id?: number;
   client_ip?: string;
+  live_room_id?: number;
   user_id?: number;
   type?: BlacklistTypeEnum;
   start_date?: number;
@@ -559,6 +575,7 @@ export interface IRole {
   role_value?: string;
   type?: number;
   priority?: number;
+
   role_auths?: number[];
   c_roles?: number[];
 
@@ -683,21 +700,22 @@ export type ILive = {
 };
 
 export enum ClientEnvEnum {
-  android,
-  ios,
-  ipad,
-  web,
-  web_mobile,
-  web_pc,
-  windows,
-  macos,
+  android = 'android',
+  ios = 'ios',
+  ipad = 'ipad',
+  web = 'web',
+  web_mobile = 'web_mobile',
+  web_pc = 'web_pc',
+  windows = 'windows',
+  macos = 'macos',
+  linux = 'linux',
 }
 
 export enum ClientAppEnum {
-  billd_live_android_app,
-  billd_live_ios_app,
-  billd_live_web,
-  billd_live_admin,
+  billd_live = 'billd_live',
+  billd_live_admin = 'billd_live_admin',
+  billd_desk = 'billd_desk',
+  billd_desk_admin = 'billd_desk_admin',
 }
 
 export interface ILiveView {

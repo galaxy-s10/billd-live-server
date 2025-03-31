@@ -183,6 +183,15 @@ export const REDIS_KEY = {
   db_blacklist: `${REDIS_KEY_PREFIX}db_blacklist___`,
   db_area: `${REDIS_KEY_PREFIX}db_area___`,
   dbToRedis: `${REDIS_KEY_PREFIX}dbToRedis___`,
+  join: `${REDIS_KEY_PREFIX}join___`,
+};
+
+export const IM_REDIS_KEY_PREFIX = `billd-im-server-${PROJECT_ENV}-`;
+export const IM_REDIS_KEY = {
+  join: `${IM_REDIS_KEY_PREFIX}join___`,
+  clusterWsMap: `${IM_REDIS_KEY_PREFIX}clusterWsMap___`,
+  liveRoomClusterInfo: `${IM_REDIS_KEY_PREFIX}liveRoomClusterInfo___`,
+  liveRoomUserList: `${IM_REDIS_KEY_PREFIX}liveRoomUserList___`,
 };
 
 // redis 频道
@@ -190,9 +199,19 @@ export const REDIS_CHANNEL = {
   writeDbLog: `${REDIS_KEY_PREFIX}writeDbLog___`,
 };
 
+export const RABBITMQ_PREFIX = `${PROJECT_NAME}-${PROJECT_ENV}-`;
 // rabbitmq 频道
-export const RABBITMQ_CHANNEL = {
-  order: `${REDIS_KEY_PREFIX}order___`,
+export const RABBITMQ_QUEUE = {
+  order: `${RABBITMQ_PREFIX}order___`,
+};
+// rabbitmq 交换机
+export const RABBITMQ_EXCHANGE = {};
+
+export const IM_RABBITMQ_EXCHANGE = {
+  fanoutMessage: (prefix: string) => `${prefix}-fanoutMessage___`,
+};
+export const IM_RABBITMQ_QUEUE = {
+  sendMsg: (prefix: string) => `${prefix}-sendMsg___`,
 };
 
 export const IS_UPLOAD_SERVER = !(PROJECT_ENV === PROJECT_ENV_ENUM.prod); // 是否上传到服务器

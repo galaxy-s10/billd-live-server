@@ -12,14 +12,45 @@ import { CustomError } from '@/model/customError.model';
 import { handleCtxRequestHeaders, strSlice } from '@/utils';
 import { chalkERROR, chalkINFO } from '@/utils/chalkTip';
 
+function handleErr({
+  ctx,
+  code,
+  errorCode,
+  error,
+  data,
+  msg,
+}: {
+  ctx;
+  code?;
+  errorCode?;
+  error?;
+  data?;
+  msg?;
+}) {
+  const traceId = ctx.request.headers['x-billd-trace-id'] as string;
+  if (traceId) {
+    ctx.response.append('X-Billd-Trace-Id', traceId);
+  }
+  ctx.body = {
+    code,
+    errorCode,
+    error,
+    data,
+    msg,
+  };
+}
+
 // 全局错误处理中间件
 export const catchError = async (ctx: ParameterizedContext, next) => {
   let duration = -1;
   const startTime = performance.now();
   const url = ctx.request.path;
   const client_ip = strSlice(String(ctx.request.headers['x-real-ip']), 90);
+  const trace_id = ctx.request.headers['x-billd-trace-id'] as string;
   console.log(
-    chalkINFO(`ip:${client_ip},收到请求 ${ctx.request.method} ${url}`)
+    chalkINFO(
+      `[${trace_id}] ip:${client_ip},收到请求 ${ctx.request.method} ${url}`
+    )
   );
   console.log(chalkINFO('===== 中间件开始（catchError） ====='));
   const consoleEnd = () => {
@@ -27,17 +58,18 @@ export const catchError = async (ctx: ParameterizedContext, next) => {
     console.log(chalkINFO(`===== 中间件通过（catchError） =====`));
     console.log(
       chalkINFO(
-        `ip:${client_ip},响应请求 ${ctx.status} ${ctx.request.method} ${url} ,耗时:${duration}ms`
+        `[${trace_id}] ip:${client_ip},响应请求 ${ctx.status} ${ctx.request.method} ${url} ,耗时:${duration}ms`
       )
     );
     console.log();
     if (ctx.status === COMMON_HTTP_CODE.notFound) {
       ctx.status = COMMON_HTTP_CODE.notFound;
-      ctx.body = {
+      handleErr({
+        ctx,
         code: COMMON_HTTP_CODE.notFound,
         errorCode: COMMON_HTTP_CODE.notFound,
         msg: COMMON_ERROE_MSG.notFound,
-      };
+      });
     }
   };
 
@@ -86,7 +118,7 @@ export const catchError = async (ctx: ParameterizedContext, next) => {
           const api_query = strSlice(JSON.stringify(ctx.request.query), 2000);
           const headers = handleCtxRequestHeaders(ctx);
           const api_user_agent = headers.user_agent;
-          const api_real_ip = headers.real_ip;
+          const api_real_ip = headers.client_ip;
           const api_forwarded_for = headers.forwarded_for;
           const api_referer = headers.referer;
           const api_path = headers.path;
@@ -126,13 +158,15 @@ export const catchError = async (ctx: ParameterizedContext, next) => {
         error: error.message,
         msg: COMMON_ERROE_MSG.serverError,
       };
+      console.log(ctx, 'kkkk');
       ctx.status = defaultError.httpStatusCode;
-      ctx.body = {
+      handleErr({
+        ctx,
         code: defaultError.errorCode,
         errorCode: defaultError.errorCode,
         error: defaultError.error,
         msg: defaultError.msg,
-      };
+      });
       errorLog(error);
       insertLog({ ...defaultError, duration });
       console.error(chalkERROR(`非自定义错误返回前端的数据`), defaultError);
@@ -140,11 +174,12 @@ export const catchError = async (ctx: ParameterizedContext, next) => {
       // 不手动设置状态的话，默认是404（delete方法返回400），因此，即使走到了error-handle，且ctx.body返回了数据
       // 但是没有手动设置status的话，一样返回不了数据，因为status状态码都返回404了。
       ctx.status = error.httpStatusCode;
-      ctx.body = {
+      handleErr({
+        ctx,
         code: error.errorCode,
         errorCode: error.errorCode,
         msg: error?.message || COMMON_ERROE_MSG[error.httpStatusCode],
-      };
+      });
 
       insertLog({
         httpStatusCode: error.httpStatusCode,

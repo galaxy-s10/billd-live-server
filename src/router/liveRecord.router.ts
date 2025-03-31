@@ -4,6 +4,11 @@ import liveRecordController from '@/controller/liveRecord.controller';
 
 const liveRecordRouter = new Router({ prefix: '/live_record' });
 
+liveRecordRouter.get(
+  '/recently_live/:user_id',
+  liveRecordController.recentlyLive
+);
+
 liveRecordRouter.get('/list', liveRecordController.getList);
 
 liveRecordRouter.get('/my_list', liveRecordController.getMyList);

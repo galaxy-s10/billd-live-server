@@ -80,6 +80,10 @@ async function addLive({
         live_room_type: type,
         area_id: 1,
         area_name: areaRes.name,
+        client_app: -1,
+        client_app_version: '',
+        client_env: -1,
+        client_ip: '',
       });
       // const ffmpegCmd = spawn(`ffmpeg`, [
       //   '-loglevel', // -loglevel quiet不输出log

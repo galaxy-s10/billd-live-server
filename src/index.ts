@@ -5,9 +5,7 @@ import './init/initFile';
 import { performance } from 'perf_hooks';
 
 import { connectMysql } from '@/config/mysql';
-import { connectRabbitMQ } from '@/config/rabbitmq';
-import { connectRabbitMQConsumer } from '@/config/rabbitmq/consumer';
-import { connectRabbitMQProducer } from '@/config/rabbitmq/producer';
+import { connectRabbitMQ, createRabbitMQChannel } from '@/config/rabbitmq';
 import { connectRedis } from '@/config/redis';
 import { connectRedisPub } from '@/config/redis/publish';
 import { connectRedisSub } from '@/config/redis/subscribe';
@@ -29,6 +27,7 @@ import {
 const start = performance.now();
 
 async function main() {
+  // for find address mode
   function adLog() {
     console.log();
 
@@ -58,10 +57,9 @@ async function main() {
       connectRedis(), // 连接redis
       connectRedisPub(), // 连接redis的发布
       connectRedisSub(), // 连接redis的订阅
-      connectRabbitMQ(), // 连接rabbitmq
-      connectRabbitMQProducer(), // 连接rabbitmq的生产者
-      connectRabbitMQConsumer(), // 连接rabbitmq的消费者
     ]);
+    await connectRabbitMQ(); // 连接rabbitmq
+    await createRabbitMQChannel(); // 创建rabbitmq通道
   } catch (error) {
     console.error(chalkERROR('rabbitmq、mysql、redis初始化失败！'));
     console.error(error);

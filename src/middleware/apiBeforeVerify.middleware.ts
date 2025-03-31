@@ -56,6 +56,11 @@ const frontendWhiteList: string[] = [
   '/tencentcloud_css/remote_auth',
 
   '/tencentcloud_chat/gen_user_sig',
+
+  '/ws/join',
+  '/ws/init_ws_map',
+  '/ws/add_cluster_ws',
+  '/ws/del_cluster_ws',
 ];
 
 // 允许频繁请求的路径白名单
