@@ -34,6 +34,8 @@ function objectToUrlParams(obj) {
   return params.toString();
 }
 
+console.log(objectToUrlParams({ a: 1 }));
+
 const baseUrl = 'http://localhost:4300';
 // const baseUrl = 'https://api.hsslive.cn';
 const codeMap = {

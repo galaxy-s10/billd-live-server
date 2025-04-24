@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-console
 console.log(
   '\x1B[0;37;44m INFO \x1B[0m',
   '\x1B[0;;34m ' +

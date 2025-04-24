@@ -6,8 +6,6 @@ const wsRouter = new Router({ prefix: '/ws' });
 
 wsRouter.get('/get_ws_info', wsController.getWsInfo);
 
-wsRouter.post('/send_msg', wsController.sendMsg);
-
 wsRouter.post('/join', wsController.join);
 
 wsRouter.post('/keep_joined', wsController.keepJoined);

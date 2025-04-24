@@ -1,5 +1,6 @@
-import { prodDomain } from './spec-config';
-import { resolveApp } from './utils';
+import path from 'path';
+
+import { PROD_DOMAIN } from './spec-config';
 
 export enum PROJECT_ENV_ENUM {
   dev = 'dev',
@@ -23,34 +24,40 @@ export enum QINIU_UPLOAD_PROGRESS_TYPE {
 }
 
 export const CORS_ALLOW_ORIGIN: string | string[] = [
-  `http://www.${prodDomain}`,
-  `https://www.${prodDomain}`,
-  `http://admin.${prodDomain}`,
-  `https://admin.${prodDomain}`,
-  `http://live.${prodDomain}`,
-  `https://live.${prodDomain}`,
-  `http://live-api.${prodDomain}`,
-  `https://live-api.${prodDomain}`,
-  `http://live-admin.${prodDomain}`,
-  `https://live-admin.${prodDomain}`,
-  `http://nuxt2.${prodDomain}`,
-  `https://nuxt2.${prodDomain}`,
-  `http://next.${prodDomain}`,
-  `https://next.${prodDomain}`,
-  `http://project.${prodDomain}`,
-  `https://project.${prodDomain}`,
-  `http://desk.${prodDomain}`,
-  `https://desk.${prodDomain}`,
-  `http://desk-api.${prodDomain}`,
-  `https://desk-api.${prodDomain}`,
-  `http://desk-admin.${prodDomain}`,
-  `https://desk-admin.${prodDomain}`,
+  `http://www.${PROD_DOMAIN}`,
+  `https://www.${PROD_DOMAIN}`,
+  `http://admin.${PROD_DOMAIN}`,
+  `https://admin.${PROD_DOMAIN}`,
+  `http://live.${PROD_DOMAIN}`,
+  `https://live.${PROD_DOMAIN}`,
+  `http://live-api.${PROD_DOMAIN}`,
+  `https://live-api.${PROD_DOMAIN}`,
+  `http://live-admin.${PROD_DOMAIN}`,
+  `https://live-admin.${PROD_DOMAIN}`,
+  `http://nuxt2.${PROD_DOMAIN}`,
+  `https://nuxt2.${PROD_DOMAIN}`,
+  `http://next.${PROD_DOMAIN}`,
+  `https://next.${PROD_DOMAIN}`,
+  `http://project.${PROD_DOMAIN}`,
+  `https://project.${PROD_DOMAIN}`,
+  `http://desk.${PROD_DOMAIN}`,
+  `https://desk.${PROD_DOMAIN}`,
+  `http://desk-api.${PROD_DOMAIN}`,
+  `https://desk-api.${PROD_DOMAIN}`,
+  `http://desk-admin.${PROD_DOMAIN}`,
+  `https://desk-admin.${PROD_DOMAIN}`,
 ];
 
 /** 消息最大长度 */
 export const MSG_MAX_LENGTH = 200;
 export const MAX_TOKEN_EXP = 24 * 90; // token过期时间：90天
 export const DEFAULT_TOKEN_EXP = 24 * 7;
+
+export const appDir = process.cwd();
+
+export const resolveApp = (relativePath) => {
+  return path.join(appDir, relativePath);
+};
 
 export const VIDEO_DIR =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
@@ -182,6 +189,9 @@ export const REDIS_KEY = {
   keepJoined: `${REDIS_KEY_PREFIX}keepJoined___`, // 用户加入了房间
   db_blacklist: `${REDIS_KEY_PREFIX}db_blacklist___`,
   db_area: `${REDIS_KEY_PREFIX}db_area___`,
+  db_globalmsg: `${REDIS_KEY_PREFIX}db_globalmsg___`,
+  db_goods: `${REDIS_KEY_PREFIX}db_goods___`,
+  db_msg: `${REDIS_KEY_PREFIX}db_msg___`,
   dbToRedis: `${REDIS_KEY_PREFIX}dbToRedis___`,
   join: `${REDIS_KEY_PREFIX}join___`,
 };

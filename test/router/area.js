@@ -24,16 +24,6 @@ function formatMemorySize(val, num = 2) {
   return `${format(val / oneTb)}TB`;
 }
 
-function objectToUrlParams(obj) {
-  const params = new URLSearchParams();
-
-  Object.keys(obj).forEach((key) => {
-    params.append(key, obj[key]);
-  });
-
-  return params.toString();
-}
-
 // const baseUrl = 'http://localhost:4300';
 // const baseUrl = 'https://api.hsslive.cn';
 // const baseUrl = 'https://live-api.hsslive.cn';
@@ -89,20 +79,23 @@ async function foo() {
     // url: `http://127.0.0.1:4300/area/live_room_list?nowPage=1&pageSize=2&id=1`,
     // url: `https://live-api.hsslive.cn/area/list?keyWord=%E6%B8%B8`, // 50左右
     // url: `http://127.0.0.1:4300`,
+    // url: `https://www.juejin.cn`,
     // url: `https://live-api.hsslive.cn`,
+    // url: `https://live-api.hsslive.cn/other/get_client_ip`,
     // url: `https://live-api.hsslive.cn/health/`,
-    url: `https://live-api.hsslive.cn/area/live_room_list?id=47&live_room_is_show=0&nowPage=1&pageSize=50`,
+    // url: `https://live-api.hsslive.cn/msg/list?nowPage=1&pageSize=10&orderName=created_at&orderBy=desc&live_room_id=4&is_show=0`,
+    url: `http://localhost:4300/goods/list2?orderName=id&orderBy=desc&pageSize=10&nowPage=1`,
     // url: `https://live-api.hsslive.cn/area/get_all_area?orderName=priority&orderBy=desc`,
     // url: `https://live-api.hsslive.cn/area/get_all_area_by_tree?orderName=priority&orderBy=desc&id=0`,
     // url: `http://127.0.0.1:3000`,
     method: 'GET',
     connections: 100, // 并发连接数。可选默认值：10
     pipelining: 1, // 每个连接的管道请求数。当大于 1 时将导致ClientAPI 抛出异常。可选默认值：1
-    duration: 2, // 运行的秒数。可以是时间字符串。可选默认值：10
+    duration: 5, // 运行的秒数。可以是时间字符串。可选默认值：10
     headers: {
       'user-agent': '',
     },
-    body: JSON.stringify({ channelid: 17300, pchannelid: 17321, priceType: 0 }),
+    // body: JSON.stringify({ channelid: 17300, pchannelid: 17321, priceType: 0 }),
   });
   if (result) {
     let codeStr = '压测时间内返回的所有状态码:';

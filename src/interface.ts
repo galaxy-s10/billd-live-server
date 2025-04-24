@@ -134,7 +134,6 @@ export enum GoodsTypeEnum {
   sponsors = 'sponsors',
   gift = 'gift',
   recharge = 'recharge',
-  qypShop = 'qypShop',
 }
 
 export enum DanmuMsgTypeEnum {
@@ -145,18 +144,18 @@ export enum DanmuMsgTypeEnum {
   redbag,
 }
 
-export enum WsMessageContentTypeEnum {
+export enum MsgContentTypeEnum {
   txt,
   img,
   video,
 }
 
-export interface IWsMessage {
+export interface IMsg {
   id?: number;
   live_record_id?: number;
   username?: string;
   origin_username?: string;
-  content_type?: WsMessageContentTypeEnum;
+  content_type?: MsgContentTypeEnum;
   content?: string;
   origin_content?: string;
   live_room_id?: number;
