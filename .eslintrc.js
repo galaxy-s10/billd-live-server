@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-console
 console.log(
   '\x1B[0;37;44m INFO \x1B[0m',
   '\x1B[0;;34m ' +
@@ -43,7 +42,6 @@ module.exports = {
         'class-methods-use-this': 0, // 类方法如果不使用this的话会报错
         'global-require': 0, // 此规则要求所有调用require()都在模块的顶层，此规则在 ESLint v7.0.0中已弃用。请使用 中的相应规则eslint-plugin-node：https://github.com/mysticatea/eslint-plugin-node
         'no-unused-vars': 0, // 禁止出现未使用过的变量
-        'no-use-before-define': 0,
 
         'no-underscore-dangle': 1, // 此规则不允许在标识符中使用悬空下划线。
 
@@ -158,14 +156,6 @@ module.exports = {
         'import/no-dynamic-require': 0, // 禁止使用动态的require，如：require(`../${name}`)
 
         // @typescript-eslint插件
-        '@typescript-eslint/restrict-template-expressions': [
-          'error',
-          {
-            allowBoolean: true,
-            allowNumber: true,
-          },
-        ], // 强制模板文字表达式为string类型。即const a = {};console.log(`${a}`);会报错
-        '@typescript-eslint/no-use-before-define': 2, // 此规则扩展了基本eslint/no-use-before-define规则。它增加了对type,interface和enum声明的支持。
         '@typescript-eslint/no-unused-vars': 2, // 禁止出现未使用过的变量
         '@typescript-eslint/no-shadow': 2, // 禁止变量声明与外层作用域的变量同名
         '@typescript-eslint/no-explicit-any': 0, // 不允许any定义类型。

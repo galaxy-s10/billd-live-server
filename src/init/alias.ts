@@ -2,13 +2,15 @@ import path from 'path';
 
 import moduleAlias from 'module-alias';
 
-import { PROJECT_ENV, PROJECT_ENV_ENUM } from '../constant';
+import { PROJECT_NODE_ENV } from '../constant';
 import { chalkSUCCESS } from '../utils/chalkTip';
 
-if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
-  moduleAlias.addAlias('@', path.join(process.cwd(), 'dist'));
-} else {
+if (PROJECT_NODE_ENV === 'development') {
   moduleAlias.addAlias('@', path.join(process.cwd(), 'src'));
+} else {
+  moduleAlias.addAlias('@', path.join(process.cwd(), 'dist'));
 }
 
-console.log(chalkSUCCESS('添加路径别名成功！'));
+export const aliasOk = () => {
+  console.log(chalkSUCCESS('添加路径别名成功！'));
+};

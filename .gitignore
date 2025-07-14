@@ -1,13 +1,5 @@
 node_modules
 .DS_Store
-/dist
-/src/secret/secret-beta.ts
-/src/secret/secret-dev.ts
-/src/secret/secret-prod.ts
-/public/**/*
-/upload/**/*
-/webm/**/*
-!/public/README.md
-!/upload/README.md
-!/webm/README.md
-.eslintcache
+dist
+src/config/secret.ts
+src/upload/**/*

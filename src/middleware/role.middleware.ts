@@ -1,7 +1,7 @@
 import Joi from 'joi';
 import { ParameterizedContext } from 'koa';
 
-import { COMMON_HTTP_CODE } from '@/constant';
+import { ALLOW_HTTP_CODE } from '@/constant';
 import { CustomError } from '@/model/customError.model';
 
 const schema = Joi.object({
@@ -25,10 +25,10 @@ export const verifyProp = async (ctx: ParameterizedContext, next) => {
     });
     await next();
   } catch (error: any) {
-    throw new CustomError({
-      msg: error.message,
-      httpStatusCode: COMMON_HTTP_CODE.paramsError,
-      errorCode: COMMON_HTTP_CODE.paramsError,
-    });
+    throw new CustomError(
+      error.message,
+      ALLOW_HTTP_CODE.paramsError,
+      ALLOW_HTTP_CODE.paramsError
+    );
   }
 };

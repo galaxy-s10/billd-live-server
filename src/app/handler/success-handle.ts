@@ -1,34 +1,32 @@
 import { ParameterizedContext } from 'koa';
 
-import { COMMON_HTTP_CODE, COMMON_SUCCESS_MSG } from '@/constant';
+import { ALLOW_HTTP_CODE, HTTP_SUCCESS_MSG } from '@/constant';
+import { chalkSUCCESS } from '@/utils/chalkTip';
 
 const successHandler = ({
-  httpStatusCode,
-  code = COMMON_HTTP_CODE.success,
+  statusCode = ALLOW_HTTP_CODE.ok,
+  code = ALLOW_HTTP_CODE.ok,
   ctx,
   data,
-  msg,
+  message,
 }: {
-  httpStatusCode?: number;
+  statusCode?: number;
   code?: number;
   ctx: ParameterizedContext;
   data?: any;
-  msg?: string;
+  message?: string;
 }) => {
+  console.log(chalkSUCCESS(`👇👇👇👇 success-handle 👇👇👇👇`));
   const methods = ctx.request.method;
-  if (httpStatusCode) {
-    // 不手动设置状态的话，koa默认方法返回404，delete方法返回400
-    ctx.status = httpStatusCode;
-  }
-  const traceId = ctx.request.headers['x-billd-trace-id'] as string;
-  if (traceId) {
-    ctx.response.append('X-Billd-Trace-Id', traceId);
-  }
+
+  ctx.status = statusCode; // 不手动设置状态的话，koa默认方法返回404，delete方法返回400
   ctx.body = {
     code,
     data,
-    msg: msg || COMMON_SUCCESS_MSG[methods],
+    message: message || HTTP_SUCCESS_MSG[methods],
   };
+
+  console.log(chalkSUCCESS(`👆👆👆👆 success-handle 👆👆👆👆`));
 };
 
 export default successHandler;

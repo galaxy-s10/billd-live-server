@@ -1,19 +1,6 @@
 {
   "name": "billd-live-server",
-  "version": "0.1.0",
-  "description": "基于Vue3 + WebRTC + Node + SRS搭建的直播间",
-  "keywords": [
-    "billd",
-    "bilibili",
-    "webrtc",
-    "rtmp",
-    "flv",
-    "hls"
-  ],
-  "homepage": "https://live.hsslive.cn",
-  "bugs": {
-    "url": "https://github.com/galaxy-s10/billd-live-server/issues"
-  },
+  "version": "0.0.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/galaxy-s10/billd-live-server"
@@ -21,21 +8,14 @@
   "license": "MIT",
   "author": "shuisheng <2274751790@qq.com>",
   "scripts": {
-    "build": "rimraf dist && tsc -P ./tsconfig.prod.json || true",
-    "cz": "cz",
-    "dev": "cross-env NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=dev NODE_APP_RELEASE_PROJECT_PORT=4300 nodemon --exec node -r @swc-node/register ./src/index.ts",
-    "dev-a": "cross-env NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=dev NODE_APP_RELEASE_PROJECT_PORT=4301 nodemon --exec node -r @swc-node/register ./src/index.ts",
-    "dev:beta": "cross-env NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=4300 nodemon --exec node -r @swc-node/register ./src/index.ts",
-    "dev:prod": "cross-env NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=prod NODE_APP_RELEASE_PROJECT_PORT=4200 nodemon --exec node -r @swc-node/register ./src/index.ts",
-    "docker:dev": "cross-env NODE_ENV=development NODE_APP_RELEASE_PROJECT_ALIAS=src NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=dev NODE_APP_RELEASE_PROJECT_PORT=4300 nodemon --exec node -r @swc-node/register ./src/init/docker.ts",
-    "docker:prod": "cross-env NODE_ENV=production NODE_APP_RELEASE_PROJECT_ALIAS=src NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=prod NODE_APP_RELEASE_PROJECT_PORT=4200 nodemon --exec node -r @swc-node/register ./src/init/docker.ts",
+    "build": "rimraf dist && tsc -P ./tsconfig.json",
+    "commit": "cz",
+    "copy": "node ./handleGiteeJenkins.js",
+    "dev": "cross-env NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=development NODE_APP_RELEASE_PROJECT_PORT=4300 nodemon ./src/index.ts",
+    "dev:beta": "cross-env NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=4300 nodemon ./src/index.ts",
+    "dev:prod": "cross-env NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=prod NODE_APP_RELEASE_PROJECT_PORT=4200 nodemon ./src/index.ts",
     "lint": "eslint --config ./.eslintrc.js . --ext .js,.ts --cache",
     "lint:fix": "eslint --config ./.eslintrc.js . --ext .js,.ts --cache --fix",
-    "mysql:beta": "cross-env NODE_APP_INIT_MYSQL=true NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=4300 nodemon --exec node -r @swc-node/register ./src/index.ts",
-    "mysql:dev": "cross-env NODE_APP_INIT_MYSQL=true NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=dev NODE_APP_RELEASE_PROJECT_PORT=4300 nodemon --exec node -r @swc-node/register ./src/index.ts",
-    "mysql:prod": "cross-env NODE_APP_INIT_MYSQL=true NODE_ENV=development NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=prod NODE_APP_RELEASE_PROJECT_PORT=4200 nodemon --exec node -r @swc-node/register ./src/index.ts",
-    "oxclint": "pnpm dlx oxlint@latest",
-    "oxlint": "oxlint",
     "prepare": "husky install",
     "prettier": "prettier --write .",
     "push": "cz && standard-version",
@@ -43,17 +23,47 @@
     "release:first": "standard-version --first-release",
     "start:beta": "cross-env NODE_ENV=production NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=beta NODE_APP_RELEASE_PROJECT_PORT=4300 nodemon ./dist/index.js",
     "start:prod": "cross-env NODE_ENV=production NODE_APP_RELEASE_PROJECT_NAME=billd-live-server NODE_APP_RELEASE_PROJECT_ENV=prod NODE_APP_RELEASE_PROJECT_PORT=4200 nodemon ./dist/index.js",
-    "sync-codeup": "ts-node ./deploy/handleSyncCodeup.mjs",
-    "sync-github": "ts-node ./deploy/handleSyncGithub.mjs",
-    "typecheck": "tsc -p ./tsconfig.prod.json --noEmit"
+    "typecheck": "tsc -p ./tsconfig.json --noEmit"
   },
-  "config": {},
-  "dependencies": {},
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "dependencies": {
+    "@socket.io/redis-adapter": "^8.0.0",
+    "alipay-sdk": "^3.3.1",
+    "axios": "^0.26.1",
+    "crypto-js": "^4.1.1",
+    "dayjs": "^1.11.3",
+    "joi": "^17.5.0",
+    "jsonwebtoken": "^8.5.1",
+    "koa": "^2.13.4",
+    "koa-body": "^5.0.0",
+    "koa-bodyparser": "^4.3.0",
+    "koa-conditional-get": "^3.0.0",
+    "koa-convert": "^2.0.0",
+    "koa-csrf": "^3.0.8",
+    "koa-etag": "^4.0.0",
+    "koa-generic-session": "^2.3.0",
+    "koa-router": "^10.1.1",
+    "koa-static": "^5.0.0",
+    "mediasoup": "3",
+    "module-alias": "^2.2.2",
+    "mysql2": "^2.3.3",
+    "node-emoji": "^1.11.0",
+    "node-media-server": "^2.5.0",
+    "node-schedule": "^2.1.0",
+    "nodemailer": "^6.7.2",
+    "qiniu": "^7.4.0",
+    "redis": "^4.0.4",
+    "sequelize": "^6.12.0-alpha.1",
+    "socket.io": "^4.4.1",
+    "ssh2": "^1.7.0"
+  },
   "devDependencies": {
     "@commitlint/cli": "^16.0.1",
     "@commitlint/config-conventional": "^16.0.0",
-    "@swc-node/register": "^1.6.7",
-    "@types/amqplib": "^0.10.1",
     "@types/crypto-js": "^4.1.0",
     "@types/fs-extra": "^9.0.13",
     "@types/jsonwebtoken": "^8.5.6",
@@ -70,7 +80,7 @@
     "@types/validator": "^13.7.0",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
-    "autocannon": "^7.14.0",
+    "chalk": "^4.1.2",
     "commitizen": "^4.2.4",
     "cross-env": "^7.0.3",
     "eslint": "^8.2.0",
@@ -82,13 +92,9 @@
     "lint-staged": "^12.1.6",
     "nodemon": "^2.0.15",
     "prettier": "^2.6.0",
+    "rimraf": "^4.0.5",
     "standard-version": "^9.3.2",
-    "trash": "^8.1.1",
     "ts-node": "^10.4.0",
     "typescript": "^4.8.2"
-  },
-  "engines": {
-    "node": ">=v18.0.0",
-    "pnpm": ">=9.0.0"
   }
 }
